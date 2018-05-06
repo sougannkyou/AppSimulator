@@ -1,0 +1,91 @@
+<!-- login first page -->
+
+{% extends 'lib/_base.html' %}
+
+{% block title %}智慧星光采集后台{% endblock title %}
+
+{% block bodyclass %}skin-blue hold-transition sidebar-mini{% endblock bodyclass %}
+{% block wrapper_content %}
+    <div class="hold-transition skin-blue sidebar-mini">
+        {% block _main_header %}{% include 'lib/_main_header.html' %}{% endblock _main_header %}
+        <!-- Left side column. contains the logo and sidebar -->
+        {% block _main_sidebar %}{% include 'lib/_main_sidebar.html' %} {% endblock _main_sidebar %}
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header" style="padding: 0">
+                {% block section_content_header %}{% endblock section_content_header %}</section>
+            <!-- Main content -->
+            <section class="content">{% block section_content %}content{% endblock section_content %}</section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        {% include 'lib/_main_footer.html' %}
+
+        <!-- Control Sidebar -->
+        {% include 'lib/_control_sidebar.html' %}
+        <!-- /.control-sidebar -->
+        <!-- Add the sidebar's background. This div must be placed
+             immediately after the control sidebar -->
+        <div class="control-sidebar-bg"></div>
+    </div>
+
+{% endblock wrapper_content %}
+
+{% block body_base_script %}
+    <script>
+        $(document).ready(function () {
+            var main_siders = $('.treeview-menu');
+            var href = window.location.href;
+            var domain = window.location.host;
+            var select_siderbar;
+            if (href.indexOf('admin') >= 0) {
+                select_siderbar = $('#user_siderbar');
+                // $('#user_siderbar').css('display', 'block');
+            } else if (href.indexOf('otherstest') >= 0) {
+                select_siderbar = $('#otherstest');
+                // $('#otherstest').css('display', 'block');
+            } else if (href.indexOf('datamonitor') >= 0) {
+                select_siderbar = $('#datamonitor_siderbar');
+                // $('#datamonitor_siderbar').css('display', 'block');
+            } else if (href.indexOf('allsite') >= 0) {
+                select_siderbar = $('#allsite_siderbar');
+                // $('#allsite_siderbar').css('display', 'block');
+            } else if (href.indexOf('comments') >= 0) {
+                select_siderbar = $('#comments_siderbar');
+                // $('#comments_siderbar').css('display', 'block');
+            } else if (href.indexOf('channels') >= 0) {
+                select_siderbar = $('#channels_siderbar');
+                // $('#channels_siderbar').css('display', 'block');
+            } else if (href.indexOf('config') >= 0 && href.indexOf('visual') >= 0) {
+                select_siderbar = $('#visual-config');
+                // $('#visual-config').css('display', 'block');
+            } else if (href.indexOf('config') >= 0) {
+                select_siderbar = $('#config_siderbar');
+                // $('#config_siderbar').css('display', 'block');
+            } else if (href.indexOf('wechat') >= 0) {
+                select_siderbar = $('#wechat_sidebar');
+                // $('#wechat_sidebar').css('display', 'block');
+            } else if (href.indexOf('urlSearchBeta') >= 0) {
+                select_siderbar = $('#urlSearchBeta_siderbar');
+                // $('#urlSearchBeta_siderbar').css('display', 'block');
+            } else if (href.indexOf('urlSearch') >= 0) {
+                select_siderbar = $('#urlSearch_siderbar');
+                // $('#urlSearch_siderbar').css('display', 'block');
+            }
+            var url_arg = href.split('?')[0].replace(domain, '').replace('http://', '').replace('search/', '');
+            var sider_a = select_siderbar.find('a');
+            sider_a.each(function () {
+                if ($(this).attr('href') == url_arg) {
+                    $(this).css('color', '#abec43')
+                }
+            });
+            select_siderbar.css('display', 'block');
+
+            $('input[data-layout="fixed"]').click();
+            $('input[data-layout="fixed"]').attr("checked", true);
+        })
+    </script>
+
+{% endblock body_base_script %}

@@ -1,0 +1,24 @@
+<!-- login first page -->
+
+{% extends 'lib/_base.html' %}
+
+{% block title %}可视化爬虫{% endblock title %}
+
+{% block wrapper_content %}
+    <div class="hold-transition skin-blue sidebar-mini">
+        <!-- Left side column. contains the logo and sidebar -->
+
+        <!-- Content Wrapper. Contains page content -->
+            <!-- Content Header (Page header) -->
+            <!-- Main content -->
+            <section class="content">{% block section_content %}content{% endblock section_content %}</section>
+            <!-- /.content -->
+        <!-- /.content-wrapper -->
+
+        <!-- Control Sidebar -->
+        <!-- /.control-sidebar -->
+        <!-- Add the sidebar's background. This div must be placed
+             immediately after the control sidebar -->
+    </div>
+
+{% endblock wrapper_content %}

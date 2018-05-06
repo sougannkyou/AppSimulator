@@ -1,0 +1,6 @@
+{% extends 'base_backend.html' %}
+{% load static backend_admin_filtets %}
+{% block section_content %}
+<h1>403forbidden</h1>
+<p>如果登录已到期，请重新<a href="{% url 'backend_admin:login' %}">登录</a></p>
+{% endblock section_content %}

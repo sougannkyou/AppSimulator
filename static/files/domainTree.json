@@ -1,0 +1,66 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "name": "http://roll.news.sina.com.cn/news/gnxw/gdxw1/index.shtml"
+            }
+          ],
+          "name": "\u914d\u7f6eID:100"
+        }
+      ],
+      "name": "roll.news.sina.com.cn"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "name": "http://domestic.firefox.sina.com/"
+            },
+            {
+              "name": "http://world.firefox.sina.com/"
+            }
+          ],
+          "name": "\u914d\u7f6eID:99"
+        },
+        {
+          "children": [
+            {
+              "name": "http://tech.firefox.sina.com/"
+            }
+          ],
+          "name": "\u914d\u7f6eID:101"
+        },
+        {
+          "children": [
+            {
+              "name": "http://domestic.firefox.sina.com/"
+            },
+            {
+              "name": "http://world.firefox.sina.com/"
+            }
+          ],
+          "name": "\u914d\u7f6eID:99"
+        }
+      ],
+      "name": "firefox.sina.com"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "name": "http://politics.people.com.cn/"
+            }
+          ],
+          "name": "\u914d\u7f6eID:102"
+        }
+      ],
+      "name": "people.com.cn"
+    }
+  ],
+  "name": "\u5168\u90e8\u57df\u540d"
+}

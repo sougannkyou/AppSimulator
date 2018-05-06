@@ -1,0 +1,26 @@
+{% extends 'base_backend.html' %}
+{% load static backend_admin_filtets %}
+{% block section_content %}
+
+{% for i in model_list_fields %}
+    <p>{{ i }}</p>
+{% endfor %}
+
+{% for result in result_list %}
+    {{ result }}
+    <ul>
+        {% for j in result %}
+            <li>
+                {% if j.value == True %}
+                    <img src="{% static 'admin/img/icon-yes.gif' %}" alt="">
+                {% elif j.value == False %}
+                    <img src="{% static 'admin/img/icon-no.gif' %}" alt="">
+                {% else %}
+                    {{ j.value }}
+                {% endif %}
+
+            </li>
+        {% endfor %}
+    </ul>
+{% endfor %}
+{% endblock section_content %}

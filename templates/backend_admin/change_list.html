@@ -1,0 +1,269 @@
+{% extends 'base_backend.html' %}
+{% load static admin_static i18n %}
+{% load backend_admin_filtets %}
+
+{% block header_tail %}
+    <link rel="stylesheet" href="{% static 'backend/backend_admin/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
+{% endblock header_tail %}
+
+{% block section_content %}
+    <div>
+        <div class="box-header with-border">
+            <h3 class="box-title">{{ model_verbose_name }}管理</h3>
+        </div>
+        <!-- form start -->
+        <div class="box box-primary">
+            <div class="box-header">
+                {% if add_perm_verify %}
+                    <a href="{{ add_urls }}">
+                        <button class="btn " id="model_add">增加{{ model_verbose_name }}</button>
+                    </a>
+                {% endif %}
+                {% if delete_perm_verify %}
+                    <button class="btn " id="model_delete"><a href="#">删除{{ model_verbose_name }}</a></button>
+                {% endif %}
+            </div>
+            <div class="box-body">
+                <form id="model_form" role="form"
+                      action="{% url 'backend_admin:model_object_delete' app_label model_name %}"
+                      method="post">{% csrf_token %}
+
+                    <div class="group">
+
+                        <table id="config_each_table" border="1" class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th class="action-checkbox" style="width: 10px; padding: 0;text-align: center; vertical-align: middle"><input type="checkbox" name="th_checkbox"></th>
+                                {% for field in model_list_fields %}
+                                    <th>{{ field }}</th>
+                                {% endfor %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for result in result_list %}
+                                <tr>
+                                    <td class="action-checkbox"><input type="checkbox" name="td_checkbox"
+                                                                       value="{{ result.id }}"></td>
+                                    {% for item in result.values %}
+                                        {% if item.is_link == True %}
+                                            <td><a href="{{ item.link }}">{{ item.value }}</a></td>
+                                        {% elif item.value == True %}
+                                            <td>
+                                                <img src="{% static 'admin/img/icon-yes.gif' %}" alt="">
+                                                <span class="no-display">1</span>
+                                            </td>
+                                        {% elif item.value == False %}
+                                            <td>
+                                                <img src="{% static 'admin/img/icon-no.gif' %}" alt="">
+                                                <span class="no-display">0</span>
+                                            </td>
+
+                                        {% else %}
+                                            {% if forloop.counter == 2 and model_name == 'group' %}
+                                                <td><p class="btn-link group-users"
+                                                       style="cursor: pointer">{{ item.value }}</p></td>
+                                                <td>
+                                                    <!-- 频道弹出窗口-->
+                                                    <div class="modal fade" id="config-channels" tabindex="-1"
+                                                         role="dialog"
+                                                         aria-labelledby="myModalLabel">
+                                                        <div class="modal-dialog modal-lg" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <button type="button" class="close"
+                                                                            data-dismiss="modal"
+                                                                            aria-label="Close"><span
+                                                                            aria-hidden="true">×</span></button>
+                                                                    <h4 class="modal-title" id="myModalLabel">人员</h4>
+                                                                </div>
+                                                                <div class="modal-body">
+
+                                                                    <div class="form-group" id="channels-display"
+                                                                         style="max-height:500px; overflow: scroll">
+                                                                        <table class="table table-bordered table-striped">
+                                                                            <tbody id="channel-tbody">
+                                                                            {% for user in item.value_all %}
+                                                                                <tr>
+                                                                                    <td>{{ user.username }}</td>
+                                                                                    <td>{{ user.nickname }}</td>
+                                                                                </tr>
+                                                                            {% endfor %}
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" id="btn_close"
+                                                                            class="btn btn-default"
+                                                                            data-dismiss="modal"><span
+                                                                            class="glyphicon glyphicon-remove"
+                                                                            aria-hidden="true"></span>关闭
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            {% else %}
+                                                <td>{{ item.value }}</td>
+                                            {% endif %}
+
+                                        {% endif %}
+
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- /.box-footer -->
+                    <div class="box-footer">
+                        <!--取消启动，删除等弹出框-->
+            <div class="modal fade" id="cancel-window" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel" style="top:30%">
+                <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            {#                        <div class="modal-header">#}
+                            {#                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span#}
+                            {#                                    aria-hidden="true">×</span></button>#}
+                            {#                            <h4 class="modal-title" id="cancel-label">频道</h4>#}
+                            {#                        </div>#}
+                            <div class="modal-body">
+                                <div class="form-group" style="max-height:500px">
+{#                                    <input type="text" id="cancel-tag" name="cancel-tag" class="no-display">#}
+{#                                    <input type="text" id="url-org" name="url-org" class="no-display"#}
+{#                                           value="">#}
+{##}
+{#                                    <input type="text" id="cancel-cid" name="cancel-cid" class="no-display">#}
+{#                                    <input type="text" id="cancel-gid" name="cancel-gid" class="no-display">#}
+{##}
+{#                                    <input type="text" id="cancel-value" name="cancel-value" class="no-display">#}
+                                    <p style="color: red"><span id="cancel-content"></span></p>
+                                    <p><input type="text" placeholder="请输入原因" id="cancel-reason"
+                                              name="cancel-reason" class=""
+                                              style="width: 60%"></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" id="cancel_close" class="btn btn-default"
+                                        data-dismiss="modal">取消
+                                </button>
+                                <button id="cancel-submit" type="submit" class="btn btn-default">
+                                    确定
+                                </button>
+                            </div>
+                        </div>
+                </div>
+            </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+{% endblock section_content %}
+
+{% block body_js %}
+    {{ block.super }}
+
+    <!-- DataTables -->
+    <script src="{% static 'plugins/datatables/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
+
+    <script>
+        $(function () {
+
+            var cancel_val = $('#cancel-value');    // 取消内容获取
+            var cancel_window = $('#cancel-window');
+            var cancel_label = $('#cancel-label');
+            var cancel_content = $('#cancel-content');
+
+            $('#model_delete').click(function () {
+                if($('.group-users').length > 0){
+                    var cancel_text = '删除分组后，所有分组内人员的组权限都将被删除，请谨慎操作！'
+                }else{
+                    cancel_text = '确定要删除选择的分组？'
+                }
+                cancel_content.text(cancel_text);
+                cancel_window.modal();
+            });
+            $('cancel-submit').click(function () {
+                // $('#model_form').attr('action', '{% url 'backend_admin:model_object_delete' app_label model_name%}');
+                console.log( $('#model_form').attr('action'));
+                $('#submit_button').click();
+            });
+
+
+            $("#config_each_table").DataTable({
+                "columnDefs": [
+                    {"orderable": false, "targets": 0}
+                ],
+                "order": [[1, 'dec'],],
+                "language": {
+                    "emptyTable": "没有匹配的数据",
+                    "info": "_START_ to _END_ of _TOTAL_",
+                    "infoEmpty": "0 of _MAX_",
+                    "infoFiltered": "",
+                    "lengthMenu": "显示 _MENU_ 条",
+                    "search": "搜索:",
+                    "zeroRecords": "没有匹配的数据",
+                    "paginate": {
+                        "first": "首页",
+                        "last": "尾页",
+                        "next": "下一页",
+                        "previous": "上一页"
+                    },
+                }
+            });
+{#            $('.action-checkbox').css('width', '3px');#}
+{#            $('.action-checkbox').css('padding-right', '3px');#}
+        });
+
+
+        // 删除时的选择
+        $('input[name="th_checkbox"]').click(function () {
+            var children_checkboxes = $(this).closest('#config_each_table').find('input[name="td_checkbox"]');
+            if ($(this).prop('checked') == true) {
+                $(this).attr("checked", true);
+                children_checkboxes.each(function () {
+                    $(this).prop("checked", "checked");
+                })
+            } else {
+                $(this).attr("checked", false);
+                children_checkboxes.each(function () {
+                    $(this).removeAttr('checked')
+                })
+            }
+        });
+
+        $('input[name="td_checkbox"]').click(function () {
+            var parent_checkbox = $(this).closest('#config_each_table').find('input[name="th_checkbox"]');
+            var children_checkboxes = $(this).closest('#config_each_table').find('input[name="td_checkbox"]');
+            var checked_num = 0;
+            children_checkboxes.each(function () {
+                if ($(this).prop('checked') == true) {
+                    checked_num += 1
+                }
+            });
+            if (checked_num == children_checkboxes.length) {
+                parent_checkbox.prop("checked", "checked");
+            } else {
+                parent_checkbox.removeAttr('checked')
+            }
+        });
+
+        // 弹出每组具体人员
+        $('.group-users').click(function () {
+            var group_name = $(this).parent().prev().text();
+            var detail_modal = $(this).parent().next().children('div');
+            var title_div = detail_modal.find('.modal-title');
+            title_div.text(group_name + '-人员');
+            detail_modal.modal()
+        });
+
+
+
+    </script>
+{% endblock body_js %}

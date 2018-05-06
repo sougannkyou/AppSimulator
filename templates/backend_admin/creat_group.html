@@ -1,0 +1,81 @@
+{% extends 'base_backend.html' %}
+{% load static admin_static i18n %}
+{% load backend_admin_filtets %}
+
+{% block header_tail %}
+    <link rel="stylesheet" href="{% static 'public/bootstrap-duallistbox/bootstrap-duallistbox.css' %}">
+    <link rel="stylesheet" href="{% static 'backend/config/css/main.css' %}">
+{% endblock header_tail %}
+
+{% block section_content %}
+    <div>
+        <div class="box-header with-border">
+            <h3 class="box-title">配置分组管理</h3>
+        </div>
+        <!-- form start -->
+        <div class="box box-primary">
+            <div class="box-body">
+                <form id="demoform" role="form" action="{% if group_id %}{% url 'backend_admin:change_group' group_id %}{% else %}{% url 'backend_admin:add_group' %}{% endif %}" method="post">{% csrf_token %}
+
+                    {% for field in group_form %}
+                        <div class="form-group select_resize">
+                            <label for="">{{ field.label }} ：</label>
+                            <div>{{ field }}</div>
+                        </div>
+                        {% if forloop.counter in '3,6' %}
+                            <br>
+                        {% endif %}
+                    {% endfor %}
+                    <br>
+
+                    <!-- /.box-footer -->
+                    <div class="box-footer">
+                        <button class="btn btn-primary" id="save_button">确定</button>
+                        <button type="submit" class="btn btn-primary" id="create_user_submit" name="_save"
+                                style="display: none">sure
+                        </button>
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+{% endblock section_content %}
+
+{% block body_js %}
+    {{ block.super }}
+    <script src="{% static 'public/bootstrap-duallistbox/jquery.bootstrap-duallistbox.js' %}"></script>
+
+    <script>
+        // 获取option值
+        var permissions = $('select[name="permissions"]');
+        permissions.children().each(function () {
+            var new_text = $(this).text().split('\|');
+            $(this).text($.trim(new_text[2]));
+        });
+
+        var demo1 = $('select[name="permissions"]').bootstrapDualListbox({
+            nonSelectedListLabel: '选中的 {{ name }}',
+            selectedListLabel: '可用的 {{ name }}',
+            preserveSelectionOnMove: 'moved',
+            filterPlaceHolder: '请输入需要查找的关键词',
+            infoTextFiltered: '<span class="label label-warning">查找到</span> {0}项',
+            infoText: '{0} {{ name }}',
+            moveOnSelect: false,
+            infoTextEmpty: '',
+
+        });
+        function all_select(move_all) {
+            move_all.children().remove();
+            move_all.text('全选');
+        }
+
+        all_select($('button[title="Remove all"]'));
+        all_select($('button[title="Move all"]'));
+
+        $('.col-md-6 > label').css({'font-weight': 'normal', 'position':'absolute', 'left':'30%'})
+
+    </script>
+
+{% endblock body_js %}

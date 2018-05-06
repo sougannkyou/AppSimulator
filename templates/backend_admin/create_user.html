@@ -1,0 +1,127 @@
+{% extends 'base_backend.html' %}
+{% load static %}
+{% load backend_admin_filtets %}
+
+{% block header_tail %}
+    <link rel="stylesheet" href="{% static 'backend/backend_admin/css/style.css' %}">
+{% endblock header_tail %}
+
+{% block section_content %}
+    <div>
+        <div class="box-header with-border">
+            <h3 class="box-title">{% if change %}修改用户{% else %}创建用户{% endif %}</h3>
+        </div>
+        <div class="box box-primary">
+            <div class="box-body">
+                <form id="create_user_form" role="form" action="
+                        {% if change %}{% url 'backend_admin:change_user' user_id %}{% else %}{% url 'backend_admin:create_user' %}{% endif %}"
+                      method="post">{% csrf_token %}
+                    {% if change %}
+                        <div class="form-group">
+                            <span><label for="">用户名：</label></span>
+                            <span id="change_username_id">{{ username }}</span>
+                        </div>
+                        <div class="form-group">
+                            <span><label for="">密码：</label></span>
+                            <span>*********，如果修改，请点击<a
+                                    href="{% url 'backend_admin:change_user_password' user_id %}">这里</a></span>
+                        </div>
+                    {% endif %}
+                    {% for field in form %}
+                        <div class="form-group">
+                            {% if field.name == 'is_active' or field.name == 'is_staff' %}
+                                {{ field }}<label for="">{{ field.label }}</label>
+                                {{ field.help_text }}
+                            {% elif field.name == 'groups_permissions' %}
+                                <div class="{% if change %}change-margin{% else %}{% endif %}">
+                                    <div class="form-group">
+                                        <label for="">角色权限</label>
+                                        <ul class="ul-no-padding">
+                                            {% for permission_group in field %}
+                                                {% with group_name=permission_group|striptags %}
+                                                    <li class="li-groups user-groups">
+                                                        {{ permission_group }}
+                                                        <div class="no-display docBubble">
+                                                            <p>{{ group_name }}包含权限：</p>
+                                                            {% for group_permission in group_name|groups_filter %}
+                                                                <ul>
+                                                                    <li class="li-group">{{ group_permission.name }}</li>
+                                                                </ul>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </li>
+                                                {% endwith %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div style="clear: both"></div>
+                            {% elif field.name == 'permissions' %}
+                                <div class="">
+                                    {#                            <label for="">个人权限定制</label>#}
+                                    {#                            {% for permission_name in field %}#}
+                                    {#                                <div class="box-permission">#}
+                                    {#                                    <span class="span_permission">{{ permission_name }}</span>#}
+                                    {#                                    <ul>#}
+                                    {#                                        {% with permission_name=permission_name|striptags %}#}
+                                    {#                                            {% autoescape off %}#}
+                                    {#                                                {% for permission in permission_name|permission_groups_filter %}#}
+                                    {#                                                    <li class="li_permission">#}
+                                    {#                                                        <input type="checkbox" name="checkbox_permission"#}
+                                    {#                                                               value="{{ permission.name }}">#}
+                                    {#                                                        {{ permission.name }}#}
+                                    {#                                                    </li>#}
+                                    {#                                                {% endfor %}#}
+                                    {#                                            {% endautoescape %}#}
+                                    {#                                        {% endwith %}#}
+                                    {#                                    </ul>#}
+                                    {#                                </div>#}
+                                    {#                                <br>#}
+                                    {#                            {% endfor %}#}
+                                </div>
+                            {% elif 'config' in field.name %}
+                                <label for="">{{ field.label }}</label>
+                                <ul class="ul-no-padding">
+                                    {% for config_name in field %}
+                                        <li class="li-groups">
+                                            {{ config_name }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                <div style="clear: both"></div>
+                            {% else %}
+                                <label for="">{{ field.label }}</label>
+                                <p>{{ field }}</p>
+                                <p>{{ field.help_text }}</p>
+                                {{ field.errors }}
+                            {% endif %}
+                        </div>
+
+                    {% endfor %}
+
+                    <!-- /.box-body -->
+                    <div class="box-footer">
+                        <button class="btn btn-primary" id="create_user_button">确认</button>
+                        <button type="submit" class="btn btn-primary" id="create_user_submit" name="_save"
+                                style="display: none">sure
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock section_content %}
+
+
+{% block jquery_js %}
+
+    <script type="text/javascript">
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        });
+    </script>
+    <script src="{% static 'backend/backend_admin/js/createuser.js' %}"></script>
+
+
+{% endblock jquery_js %}

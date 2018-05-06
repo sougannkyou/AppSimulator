@@ -1,0 +1,167 @@
+<!-- /.login-box -->
+
+{% extends 'lib/_base.html' %}
+{% load static %}
+
+{% block header_tail %}
+    <style type="text/css">
+        body {
+        {#            background-color: #606c84;#}
+            background: url({% static 'backend/backend_admin/img/4.jpg' %}) no-repeat;
+            background-size: 100%;
+            opacity: 0.9;
+        }
+
+        .row {
+            margin-top: 90px;
+        }
+
+        .login {
+            background-image: {% static 'backend/backend_admin/img/4.jpg' %};
+        }
+
+        @media (min-width: 768px) {
+            .form-signin {
+                max-width: 380px;
+                margin: 0 auto 20px;
+                background-color: #fff;
+                border: 1px solid #e5e5e5;
+                -webkit-border-radius: 5px;
+                -moz-border-radius: 5px;
+                border-radius: 5px;
+                -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+                -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+                box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            }
+
+            .form-signin-inner {
+                padding: 9px 29px 29px;
+            }
+
+            .form-signin .form-signin-heading, .form-signin .checkbox, .form-signin h2 {
+                margin-bottom: 30px;
+            }
+
+            .form-signin .form-actions {
+                margin: 0;
+            }
+
+            #id_username, #id_password {
+                display: block;
+                font-size: 16px;
+                height: 44px;
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block wrapper_content %}
+    <div class="login">
+        <div class="container">
+
+            <!-- Header -->
+            <div class="navbar navbar-default navbar-fixed-top">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                                    data-target="#header-navbar-collapse">
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+
+                            <a class="navbar-brand" href="#">智慧星光采集后台</a>
+
+                        </div>
+                        <div id="header-navbar-collapse" class="navbar-collapse collapse navbar-right">
+                            <ul class="nav navbar-nav">
+
+
+                            </ul>
+                        </div><!--/.nav-collapse -->
+                    </div>
+                </div>
+            </div>
+            <!-- END Header -->
+            <div class="row">
+                <div class="col-sm-12">
+
+                </div>
+            </div>
+
+
+            <!-- Content -->
+            <div id="content" class="colM">
+
+
+                <div id="content-main">
+                    <form class="form-signin" action="{% url 'backend_admin:login' %}" method="post" id="login-form">
+                        {% csrf_token %}
+                        <div class="form-signin-inner">
+                            <h2>Login</h2>
+                            {% if messages %}
+                                <div class="alert">
+                                    <ul class="messages" style="padding: 0;">
+                                        {% for message in messages %}
+                                            <li{% if message.tags %}
+                                                class="alert-{{ message.tags }}"{% endif %} style="text-align:center">{{ message }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    <span>{{ content }}</span>
+                                </div>
+                            {% endif %}
+
+
+                            <div class="form-group">
+                                <label class="required" for="id_username">用户名:</label>
+                                <p class="text-danger"></p>
+                                <input class="form-control" id="id_username" maxlength="254" name="username"
+                                       placeholder="用户名" required="required" title="" type="text"/>
+                            </div>
+                            <div class="form-group">
+                                <label class="required" for="id_password">密码:</label>
+                                <p class="text-danger"></p>
+                                <input class="form-control" id="id_password" name="password" placeholder="密码"
+                                       required="required" title="" type="password"/>
+                                <input type="hidden" name="next" value="/admin/"/>
+                            </div>
+
+
+                            <div class="form-actions clearfix">
+                                <input type="submit" value="登录" class="btn btn-lg btn-primary btn-block"/>
+                            </div>
+                        </div>
+                    </form>
+
+                    <script type="text/javascript">
+                        $(document).ready(function () {
+                            $('#id_username').attr('autocapitalize', 'off').focus();
+                        })
+                    </script>
+                </div>
+
+
+            </div>
+            <!-- END Content -->
+        </div>
+    </div>
+    <!-- /.login-box -->
+{% endblock wrapper_content %}
+
+
+{% block body_js %}
+    <link rel="stylesheet" href="">
+    <!-- jQuery 2.2.3 -->
+    <script>
+        $(function () {
+            $('input').iCheck({
+                checkboxClass: 'icheckbox_square-blue',
+                radioClass: 'iradio_square-blue',
+                increaseArea: '20%' // optional
+            });
+        });
+    </script>
+{% endblock body_js %}
+

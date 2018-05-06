@@ -1,0 +1,19 @@
+# coding=utf-8
+from django.conf.urls import patterns, url
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import cache_page
+
+from .views import (
+    DashBoardView
+)
+
+from .restAPI import (
+    HubXPathViewAPI, getDeviceInfoAPI
+)
+
+cache_time_out = 60 * 3
+
+urlpatterns = patterns('',
+                       url(r'^dashboard/$', DashBoardView.as_view(), name='dashboard'),
+                       url(r'^getDeviceInfoAPI/$', getDeviceInfoAPI, name='getDeviceInfoAPI'),
+                       )

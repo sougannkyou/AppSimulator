@@ -1,0 +1,76 @@
+/*生成密码css*/
+.create_password {
+    color: #00AA88;
+    margin-left: 5px;
+}
+
+/*增加生成密码按钮、密码验证区域等css*/
+.create_element_class {
+    margin-left: 10px;
+}
+
+/*清除浮动效果影响*/
+.no-float{
+    clear: both;
+}
+
+.no-display {
+    display: none;
+}
+
+.groups-div {
+    margin-bottom: 10px;
+}
+
+.docBubble {
+    max-height: 300px;
+    overflow: scroll;
+    position: absolute;
+    text-align: left;
+    background-color: lightyellow;
+
+}
+
+.ul-no-padding {
+    padding: 0;
+}
+
+.li_permission {
+    float: left;
+    margin-left: 20px;
+    list-style: none;
+}
+
+.li-groups {
+    float: left;
+    margin-right: 20px;
+    list-style: none;
+}
+
+.span_permission {
+    float: left;
+}
+
+.change-margin {
+    margin-bottom: 50px;
+    margin-top: 10px;
+}
+
+.user-div {
+    position: absolute;
+    top: 10%;
+    left: 30%;
+}
+
+.error {
+    color: red;
+}
+
+.success {
+    color: green;
+}
+
+.create-button{
+    width: 10px;
+}
+

@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+{% block docttype_tail %}{% endblock docttype_tail %}
+<html {% block html_lang %}{% endblock html_lang %}>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}{% endblock title %}</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <!-- Bootstrap 3.3.6 -->
+    <link rel="stylesheet" href='{% static "bootstrap/css/bootstrap.min.css" %}'>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href='{% static "Font-Awesome-master/css/font-awesome.min.css" %}'>
+    <!-- Ionicons -->
+    <link rel="stylesheet" href='{% static "ionicons-2.0.1/css/ionicons.min.css" %}'>
+    <!-- Theme style -->
+    <link rel="stylesheet" href='{% static "dist/css/AdminLTE.min.css" %}'>
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+         folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href='{% static "dist/css/skins/_all-skins.min.css" %}'>
+    <!-- iCheck -->
+    <link rel="stylesheet" href='{% static "plugins/iCheck/flat/blue.css" %}'>
+    <link rel="stylesheet" href='{% static "backend/public/css/base.css" %}'>
+    {% block head_css %}{% endblock head_css %}
+
+    <!--[if lt IE 9]>
+    <script src='{% static "public/js/respond.min.js" %}'></script>
+    <![endif]-->
+    {% block header_tail %}{% endblock header_tail %}
+
+</head>
+{% load i18n %}
+{#<body class="hold-transition skin-blue sidebar-mini">#}
+<body class="{% block bodyclass %}{% endblock bodyclass %}">
+
+
+<div class="wrapper">
+    {% block wrapper_content %}{% endblock wrapper_content %}
+</div>
+<!-- ./wrapper -->
+
+{% block body_middle %}{% endblock body_middle %}
+{% block body_end %}{% endblock body_end %}
+
+
+{% if messages %}
+    <!-- message 弹出框-->
+    <div class="modal fade" id="base-message-window" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" style="top:5%">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="base-message-label">提示信息：</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group" style="max-height:500px">
+                        <ul class="messages">
+                            {% for message in messages %}
+                                <li class="alert {% if message.tags %} base-alert-{{ message.tags }}{% endif %}">{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <span>{{ content }}</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="base-message-close" class="btn btn-default"
+                            data-dismiss="modal">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- message 弹出框-->
+<div class="modal fade" id="alert-message-window" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" style="top:10%">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="alert-message-label">提示信息：</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group" style="max-height:500px">
+                </div>
+                <span id="alert-modal-content"></span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="alert-message-close" class="btn btn-default"
+                        data-dismiss="modal">关闭
+                </button>
+                <button type="button" id="alert-message-submit" class="btn btn-default" style="display: none"
+                        data-dismiss="modal">确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% block body_js %}
+    <!-- jQuery 2.2.3 -->
+    <script src='{% static "plugins/jQuery/jquery-2.2.3.min.js" %}'></script>
+    {% block jquery_js %}{% endblock jquery_js %}
+
+    <!-- jQuery UI 1.11.4 -->
+    {#    <script src="{% static 'public/jquery-ui-1.11.4/jquery-ui.min.css' %}"></script>#}
+    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+    <!-- Bootstrap 3.3.6 -->
+    <script src='{% static "bootstrap/js/bootstrap.min.js" %}'></script>
+    <!-- Morris.js charts -->
+    <!-- Slimscroll -->
+    <script src='{% static "plugins/slimScroll/jquery.slimscroll.min.js" %}'></script>
+    <!-- AdminLTE App -->
+    <script src='{% static "dist/js/app.min.js" %}'></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src='{% static "dist/js/demo.js" %}'></script>
+    <script>
+        var alert_window = $('#alert-message-window');
+        var alert_content = $('#alert-modal-content');
+        function alert_base(text) {
+            alert_content.text(text);
+            alert_window.modal();
+        }
+
+        if ($('#base-message-label').length > 0) {
+            $('#base-message-window').modal()
+        }
+        {#        $.widget.bridge('uibutton', $.ui.button);#}
+    </script>
+{% endblock body_js %}
+{% block body_base_script %}{% endblock body_base_script %}
+{% block body_tail %}{% endblock body_tail %}
+
+</body>
+</html>
