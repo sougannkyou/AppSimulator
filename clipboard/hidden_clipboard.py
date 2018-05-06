@@ -1,3 +1,4 @@
+# coding: utf-8
 import win32con as WCON
 import win32gui
 import win32clipboard as WCB

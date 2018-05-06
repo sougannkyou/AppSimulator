@@ -1,3 +1,4 @@
+# coding: utf-8
 import time
 import win32con as WCON
 import win32api
