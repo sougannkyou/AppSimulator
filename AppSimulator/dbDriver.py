@@ -22,8 +22,8 @@ from urllib.parse import urlparse, urlunparse
 #     REDIS_SERVER = 'redis://192.168.16.223:6379/2'
 
 REDIS_SERVER = 'redis://127.0.0.1/1'
-MONGODB_SERVER = os.environ["visual_mongo_host"].split(':')[0]
-MONGODB_PORT = int(os.environ["visual_mongo_host"].split(':')[1])
+MONGODB_SERVER = '127.0.0.1'
+MONGODB_PORT = 27017
 
 
 # print(REDIS_SERVER)
