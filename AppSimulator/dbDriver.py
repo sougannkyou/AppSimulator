@@ -26,13 +26,6 @@ MONGODB_SERVER = '127.0.0.1'
 MONGODB_PORT = 27017
 
 
-# print(REDIS_SERVER)
-# print(MONGODB_SERVER,MONGODB_PORT)
-
-# MONGODB_SERVER = '127.0.0.1'
-# MONGODB_PORT = 27017
-# REDIS_SERVER = 'redis://192.168.16.223:6379/2'
-
 class RedisDriver(object):
     def __init__(self):
         self._conn = redis.StrictRedis.from_url(REDIS_SERVER)
@@ -47,6 +40,8 @@ class RedisDriver(object):
             ret[device_id] = self._conn.scard(device_id)
         return ret
 
+    def get_device_history(self, device_id):
+        return self._conn.scard(device_id)
 
 class MongoDriver(object):
     def __init__(self):
@@ -57,7 +52,6 @@ class MongoDriver(object):
         self.hub_xpath = self.webspider.hub_xpath
         self.simulator = self.webspider.simulator
 
-    ################## 入口信息 ########################
     def get_entry_info(self, taskId):
         info = self.entry_setting.find_one({'taskId': taskId})
         if info: info.pop('_id')
@@ -66,8 +60,6 @@ class MongoDriver(object):
 
 if __name__ == '__main__':
     # r = RedisDriver()
-    # r.init_options()
-
     db = MongoDriver()
     # a = "//div[@class='wrapper mt20 content']/div[@class='fl cola']/div[@class='haoklil']/div[@class='haoklil1']/dl/dd/span[@class='haoklil113']"
     # b = "//div[@class='wrapper mt20 content']/div[@class='fl cola']/div[@class='haoklil']/div[@class='haoklil1']/div[@class='haoklil11']/span/a"
