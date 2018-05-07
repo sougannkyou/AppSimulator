@@ -30,7 +30,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'AppSimulator',
-    'rest_framework',
+    # 'rest_framework',
     'corsheaders'
 )
 
