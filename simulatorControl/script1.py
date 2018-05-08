@@ -4,7 +4,6 @@ import time
 import win32con as WCON
 import win32api
 import win32gui
-import win32clipboard as WCB
 from PIL import ImageGrab
 import cv2
 import aircv as ac
