@@ -72,7 +72,7 @@ def _detect_obj(img, circle_center_pos, circle_radius, color, line_width):
 
 def send2web(pic_path):
     shutil.copyfile('../static/AppSimulator/images/capture.png',
-                '../static/AppSimulator/images/capture_before.png')
+                    '../static/AppSimulator/images/capture_before.png')
     shutil.copyfile(pic_path, '../static/AppSimulator/images/capture.png')
 
 
@@ -83,8 +83,6 @@ def find_element(hwnd, comment, timeout):
     while (timeout > 0):
         win32gui.SetForegroundWindow(hwnd)
         left, top, right, bottom = win32gui.GetWindowRect(hwnd)
-        # print(left, top, right, bottom)
-        # print(right - left, bottom - top)
         app_bg_box = (left, top, right, bottom)
         im = ImageGrab.grab(app_bg_box)
         im.save('images/capture.png')
@@ -175,4 +173,4 @@ if __name__ == "__main__":
     hwnd = win32gui.FindWindow(None, "抖音0")
     if hwnd: ret = find_element(hwnd, comment='锁屏', timeout=5)
     if ret: ret = unlock(hwnd, 1)
-    start(hwnd)
+    if ret: start(hwnd)
