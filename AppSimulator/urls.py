@@ -8,7 +8,7 @@ from .views import (
 )
 
 from .restAPI import (
-    HubXPathViewAPI, getDeviceInfoAPI
+    HubXPathViewAPI, getDeviceInfoAPI, getResultSampleAPI,
 )
 
 cache_time_out = 60 * 3
@@ -16,4 +16,5 @@ cache_time_out = 60 * 3
 urlpatterns = patterns('',
                        url(r'^dashboard/$', DashBoardView.as_view(), name='dashboard'),
                        url(r'^getDeviceInfoAPI/$', getDeviceInfoAPI, name='getDeviceInfoAPI'),
+                       url(r'^getResultSampleAPI/$', getResultSampleAPI, name='getResultSampleAPI'),
                        )

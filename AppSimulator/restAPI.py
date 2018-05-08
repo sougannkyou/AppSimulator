@@ -37,6 +37,13 @@ def getDeviceInfoAPI(request):
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
+def getResultSampleAPI(request):
+    ret = RDB.get_result_sample()
+    output = JsonResponse({
+        'ret': ret,
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
 
 class HubXPathViewAPI(APIView):
     def _get_data(self, args):

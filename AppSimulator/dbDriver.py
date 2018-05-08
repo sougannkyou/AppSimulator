@@ -21,7 +21,8 @@ from urllib.parse import urlparse, urlunparse
 #     MONGODB_PORT = 37017
 #     REDIS_SERVER = 'redis://192.168.16.223:6379/2'
 
-REDIS_SERVER = 'redis://127.0.0.1/1'
+REDIS_SERVER = 'redis://127.0.0.1/11'
+REDIS_SERVER_RESULT = 'redis://127.0.0.1/10'
 MONGODB_SERVER = '127.0.0.1'
 MONGODB_PORT = 27017
 
@@ -29,19 +30,26 @@ MONGODB_PORT = 27017
 class RedisDriver(object):
     def __init__(self):
         self._conn = redis.StrictRedis.from_url(REDIS_SERVER)
+        self._conn_result = redis.StrictRedis.from_url(REDIS_SERVER_RESULT)
         self.device1 = 'device1'
         self.device2 = 'device2'
         self.device3 = 'device3'
         self.device4 = 'device4'
 
+    def get_result_sample(self):
+        cnt = self._conn_result.llen('douyin_data')
+        ret = self._conn_result.blrange('douyin_data', -1, -1)
+        return ret
+
     def get_device_info(self):
         ret = {}
         for device_id in ['device1', 'device2', 'device3', 'device4']:
-            ret[device_id] = self._conn.scard(device_id)
+            ret[device_id] = self._conn.scard(device_id + '_org')
         return ret
 
     def get_device_history(self, device_id):
         return self._conn.scard(device_id)
+
 
 class MongoDriver(object):
     def __init__(self):

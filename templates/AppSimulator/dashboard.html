@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block header_tail %}
-    <!-- DataTables -->
+    <meta http-equiv="refresh" content="2">
     <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
 {% endblock header_tail %}
 
@@ -71,39 +71,13 @@
     </div>
 
     <div class="row">
-        <!-- 入口总数 -->
-        <section class="col-md-6 connectedSortable">
-            <div class="box box-primary">
-                <div class="box-header with-border">
-                    <h3 class="box-title">入口总数</h3>
-                    <select id="newDomainSel" class="input-sm" style="width:150px;"
-                            onchange="reDrawNewDoaminDays(this.options[this.options.selectedIndex].value)">
-                        <option value="week">最近一周</option>
-                        <option value="month">最近一个月</option>
-                        <option value="year">最近一年</option>
-                    </select>
-                    <div class="box-tools pull-left">
-                        <span class="label label-primary">每日新增</span>
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-box-tool" data-widget="remove">
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-                <div id="newEntranceCntByDays" class="box-body">
-                    <div id="entranceCntByDays" style="width:100%;height:280px;"> loading ...</div>
-                </div>
-            </div>
-        </section>
-        <!-- 入口采集量排名 -->
+        <!-- device1 -->
         <section class="col-md-6 connectedSortable">
             <div class="box box-success">
                 <div class="box-header with-border">
-                    <h3 class="box-title">入口采集量排名</h3>
+                    <h3 class="box-title">device1</h3>
                     <div class="box-tools pull-left">
-                        <span class="label label-success">Top10</span>
+                        <span class="label label-success">device1</span>
                         <button type="button" class="btn btn-box-tool" data-widget="collapse">
                             <i class="fa fa-minus"></i>
                         </button>
@@ -113,17 +87,29 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    <div id="entrance_rank" style="width:100%;height:280px;"> loading ...</div>
+                    <div id="device1" style="width:100%;height:280px;">
+                        <div class="col-md-3" title="before">
+                            <img src="{% static 'AppSimulator/images/capture_before.png' %}" height="250">
+                            <label>before</label>
+                        </div>
+                        <div class="col-md-3" title="current">
+                            <img src="{% static 'AppSimulator/images/capture.png' %}" height="250">
+                            <label>current</label>
+                        </div>
+                        {#                        <div class="col-md-6">#}
+                        {#                            <textarea id="result_sample_1" rows="12" title="" style="width:100%;"></textarea>#}
+                        {#                        </div>#}
+                    </div>
                 </div>
             </div>
         </section>
-        <!-- 运行状态 -->
+        <!-- device2 -->
         <section class="col-md-6 connectedSortable">
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">运行状态</h3>
+                    <h3 class="box-title">device2</h3>
                     <div class="box-tools pull-left">
-                        <span class="label label-primary">分类</span>
+                        <span class="label label-primary">device2</span>
                         <button type="button" class="btn btn-box-tool" data-widget="collapse">
                             <i class="fa fa-minus"></i>
                         </button>
@@ -133,17 +119,18 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    <div id="runStatus" style="width:100%;height:280px;"> loading ...</div>
+                    <div id="device2" style="width:100%;height:280px;">
+                    </div>
                 </div>
             </div>
         </section>
-        <!-- Redis内存使用情况-->
+        <!-- device3 -->
         <section class="col-md-6 connectedSortable">
-            <div class="box box-default">
+            <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">CPU使用情况</h3>
+                    <h3 class="box-title">device3</h3>
                     <div class="box-tools pull-left">
-                        <span class="label label-default">百分比</span>
+                        <span class="label label-primary">device3</span>
                         <button type="button" class="btn btn-box-tool" data-widget="collapse">
                             <i class="fa fa-minus"></i>
                         </button>
@@ -153,7 +140,29 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    <div id="redis_monitor" style="width:100%;height:280px;"> loading ...</div>
+                    <div id="device3" style="width:100%;height:280px;">
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- device4 -->
+        <section class="col-md-6 connectedSortable">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">device4</h3>
+                    <div class="box-tools pull-left">
+                        <span class="label label-primary">device4</span>
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div id="device4" style="width:100%;height:280px;">
+                    </div>
                 </div>
             </div>
         </section>
