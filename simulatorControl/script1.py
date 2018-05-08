@@ -9,6 +9,7 @@ from PIL import ImageGrab
 import cv2
 import aircv as ac
 import shutil
+import pyautogui
 
 DEBUG_ENV = False
 
@@ -23,12 +24,25 @@ KEY_VALUE_7 = 55
 KEY_VALUE_8 = 56
 KEY_VALUE_9 = 57
 
+# 宏按键Enter的定义
+# size 480 800
+# click 38 783
+# delay 1000
+# click 447 617
+# delay 1000
+# click 47 700
 CLICK_POS = {
     u"APP图标": (38, 793),
     u"更新": (38, 793),
     u"分享": (451, 628),
     u"复制链接": (47, 720),
     u"以后再说": (231, 590)
+}
+
+UNLOCK_POS = {
+    "step1": (133, 496),
+    "step2": (132, 705),
+    "step3": (343, 707)
 }
 
 
@@ -117,16 +131,36 @@ def send_key(hwnd, key_value, timeout):
     print('发送', key_value, '键')
     time.sleep(timeout)
     return True
-    # 宏按键Enter的定义
-    # size 480 800
-    # click 38 783
-    # delay 1000
-    # click 447 617
-    # delay 1000
-    # click 47 700
 
 
-def script(hwnd):
+def unlock(hwnd, timeout):
+    win32gui.SetForegroundWindow(hwnd)
+    left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+    top += 20
+    time.sleep(timeout)
+
+    (x, y) = UNLOCK_POS['step1']
+    x = left + x
+    y = top + y
+    pyautogui.moveTo(x, y)
+    pyautogui.mouseDown()
+
+    (x, y) = UNLOCK_POS['step2']
+    x = left + x
+    y = top + y
+    # pyautogui.dragTo(x, y, 0.5, button='left')
+    pyautogui.moveTo(x, y, 1, pyautogui.easeInQuad)
+
+    (x, y) = UNLOCK_POS['step3']
+    x = left + x
+    y = top + y
+    # pyautogui.dragTo(x, y, 0.5, button='left')
+    pyautogui.moveTo(x, y, 1, pyautogui.easeInBounce)
+    pyautogui.mouseUp()
+    time.sleep(timeout)
+    return True
+
+def start(hwnd):
     ret = None
     if hwnd: ret = find_element(hwnd, element_pic_path='images/app_ready.png', timeout=10)  # unlock ok
     # if ret: ret = send_key(hwnd, key_value=KEY_VALUE_0, timeout=2)  # 点击APP图标
@@ -146,6 +180,9 @@ def script(hwnd):
 
 
 if __name__ == "__main__":
+    ret = None
     # hwnd = win32gui.FindWindow("Qt5QWindowIcon", None)
     hwnd = win32gui.FindWindow(None, "抖音0")
-    script(hwnd)
+    if hwnd: ret = find_element(hwnd, element_pic_path='images/screen_lock.png', timeout=5)
+    if ret: ret = unlock(hwnd, 1)
+    start(hwnd)
