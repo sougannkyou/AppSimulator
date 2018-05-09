@@ -124,6 +124,12 @@ def send_key(hwnd, key_value, timeout):
     return True
 
 
+def app_quit(hwnd):
+    send_key(hwnd, WCON.VK_ESCAPE, 1)
+    send_key(hwnd, WCON.VK_ESCAPE, 1)
+    send_key(hwnd, WCON.VK_ESCAPE, 1)
+
+
 def unlock(hwnd, timeout):
     win32gui.SetForegroundWindow(hwnd)
     left, top, right, bottom = win32gui.GetWindowRect(hwnd)
@@ -172,5 +178,6 @@ if __name__ == "__main__":
     # hwnd = win32gui.FindWindow("Qt5QWindowIcon", None)
     hwnd = win32gui.FindWindow(None, "抖音0")
     if hwnd: ret = find_element(hwnd, comment='锁屏', timeout=5)
-    if ret: ret = unlock(hwnd, 1)
-    if ret: start(hwnd)
+    if ret: unlock(hwnd, 1)
+    app_quit(hwnd)
+    start(hwnd)
