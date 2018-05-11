@@ -2,173 +2,175 @@
 {% load static %}
 
 {% block header_tail %}
-    <meta http-equiv="refresh" content="2">
+{#    <meta http-equiv="refresh" content="10">#}
     <link rel="stylesheet" href="{% static 'AppSimulator/css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
 {% endblock header_tail %}
 
 {% block section_content %}
-    <div class="row">
-        <div class="col-md-3 col-xs-6">
-            <div class="small-box bg-aqua">
-                <div class="inner">
-                    <p>device1</p>
-                    <h3 id="device1">0</h3>
+    <div id="main" v-cloak>
+        <div class="row">
+            <div class="col-md-3 col-xs-6">
+                <div class="small-box bg-aqua">
+                    <div class="inner">
+                        <p>device1</p>
+                        <h3 id="device1">0</h3>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-mobile-phone"></i>
+                    </div>
+                    <a href="/AppSimulator/dashboard/" class="small-box-footer">
+                        详情&nbsp;
+                        <i class="fa fa-arrow-circle-right"></i>
+                    </a>
                 </div>
-                <div class="icon">
-                    <i class="fa fa-mobile-phone"></i>
+            </div>
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-green">
+                    <div class="inner">
+                        <p>device2</p>
+                        <h3 id="device2">0<sup style="font-size: 20px"></sup></h3>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-mobile-phone"></i>
+                    </div>
+                    <a href="/AppSimulator/dashboard/" class="small-box-footer">
+                        详情&nbsp;
+                        <i class="fa fa-arrow-circle-right"></i>
+                    </a>
                 </div>
-                <a href="/AppSimulator/dashboard/" class="small-box-footer">
-                    详情&nbsp;
-                    <i class="fa fa-arrow-circle-right"></i>
-                </a>
+            </div>
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-yellow">
+                    <div class="inner">
+                        <p>device3</p>
+                        <h3 id="device3">0</h3>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-mobile-phone"></i>
+                    </div>
+                    <a href="/AppSimulator/dashboard/" class="small-box-footer">
+                        详情&nbsp;
+                        <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-red">
+                    <div class="inner">
+                        <p>device4</p>
+                        <h3 id="device4">0</h3>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-mobile-phone"></i>
+                    </div>
+                    <a href="/AppSimulator/dashboard/" class="small-box-footer">
+                        详情&nbsp;
+                        <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                </div>
             </div>
         </div>
-        <div class="col-lg-3 col-xs-6">
-            <div class="small-box bg-green">
-                <div class="inner">
-                    <p>device2</p>
-                    <h3 id="device2">0<sup style="font-size: 20px"></sup></h3>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-mobile-phone"></i>
-                </div>
-                <a href="/AppSimulator/dashboard/" class="small-box-footer">
-                    详情&nbsp;
-                    <i class="fa fa-arrow-circle-right"></i>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-3 col-xs-6">
-            <div class="small-box bg-yellow">
-                <div class="inner">
-                    <p>device3</p>
-                    <h3 id="device3">0</h3>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-mobile-phone"></i>
-                </div>
-                <a href="/AppSimulator/dashboard/" class="small-box-footer">
-                    详情&nbsp;
-                    <i class="fa fa-arrow-circle-right"></i>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-3 col-xs-6">
-            <div class="small-box bg-red">
-                <div class="inner">
-                    <p>device4</p>
-                    <h3 id="device4">0</h3>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-mobile-phone"></i>
-                </div>
-                <a href="/AppSimulator/dashboard/" class="small-box-footer">
-                    详情&nbsp;
-                    <i class="fa fa-arrow-circle-right"></i>
-                </a>
-            </div>
-        </div>
-    </div>
 
-    <div class="row">
-        <!-- device1 -->
-        <section class="col-md-3 connectedSortable">
-            <div class="box box-info">
-                <div class="box-header with-border">
-                    <h3 class="box-title">device1</h3>
-                    <div class="box-tools pull-left">
-                        <button class="btn btn-sm btn-info">重启App</button>
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-box-tool" data-widget="remove">
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="box-body">
-                    <div id="device1" class="device-img">
-                        <div class="col-md-6" title="before">
-                            <img src="{% static 'AppSimulator/images/capture_before.png' %}" height="240">
-                            <label>before</label>
-                        </div>
-                        <div class="col-md-6" title="current">
-                            <img src="{% static 'AppSimulator/images/capture.png' %}" height="240">
-                            <label>current</label>
-                        </div>
-                        <div class="col-md-6">
-                            <input type="text" placeholder="latitude">
-                            <input type="text" placeholder="longitude">
-                            <button class="btn btn-info">set</button>
+        <div class="row">
+            <!-- device1 -->
+            <section class="col-md-3 connectedSortable">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">device1</h3>
+                        <div class="box-tools pull-left">
+                            <button class="btn btn-sm btn-info">重启App</button>
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                <i class="fa fa-times"></i>
+                            </button>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-        <!-- device2 -->
-        <section class="col-md-3 connectedSortable">
-            <div class="box box-success">
-                <div class="box-header with-border">
-                    <h3 class="box-title">device2</h3>
-                    <div class="box-tools pull-left">
-                        <button class="btn btn-sm btn-success">重启App</button>
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-box-tool" data-widget="remove">
-                            <i class="fa fa-times"></i>
-                        </button>
+                    <div class="box-body">
+                        <div id="device1" class="device-img">
+                            <div class="col-md-6" title="before">
+                                <img src="{% static 'AppSimulator/images/capture_before.png' %}" height="240">
+                                <label>before</label>
+                            </div>
+                            <div class="col-md-6" title="current">
+                                <img src="{% static 'AppSimulator/images/capture.png' %}" height="240">
+                                <label>current</label>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" placeholder="latitude" v-model="latitude">
+                                <input type="text" placeholder="longitude" v-model="longitude">
+                                <button class="btn btn-info" v-on:click="setDeviceGPS">设定</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="box-body">
-                    <div id="device2" class="device-img">
+            </section>
+            <!-- device2 -->
+            <section class="col-md-3 connectedSortable">
+                <div class="box box-success">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">device2</h3>
+                        <div class="box-tools pull-left">
+                            <button class="btn btn-sm btn-success">重启App</button>
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div id="device2" class="device-img">
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <!-- device3 -->
-        <section class="col-md-3 connectedSortable">
-            <div class="box box-warning">
-                <div class="box-header with-border">
-                    <h3 class="box-title">device3</h3>
-                    <div class="box-tools pull-left">
-                        <button class="btn btn-sm btn-warning">重启App</button>
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-box-tool" data-widget="remove">
-                            <i class="fa fa-times"></i>
-                        </button>
+            </section>
+            <!-- device3 -->
+            <section class="col-md-3 connectedSortable">
+                <div class="box box-warning">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">device3</h3>
+                        <div class="box-tools pull-left">
+                            <button class="btn btn-sm btn-warning">重启App</button>
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div id="device3" class="device-img">
+                        </div>
                     </div>
                 </div>
-                <div class="box-body">
-                    <div id="device3" class="device-img">
+            </section>
+            <!-- device4 -->
+            <section class="col-md-3 connectedSortable">
+                <div class="box box-danger">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">device4</h3>
+                        <div class="box-tools pull-left">
+                            <button class="btn btn-sm btn-danger">重启App</button>
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div id="device4" class="device-img">
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <!-- device4 -->
-        <section class="col-md-3 connectedSortable">
-            <div class="box box-danger">
-                <div class="box-header with-border">
-                    <h3 class="box-title">device4</h3>
-                    <div class="box-tools pull-left">
-                        <button class="btn btn-sm btn-danger">重启App</button>
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-box-tool" data-widget="remove">
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="box-body">
-                    <div id="device4" class="device-img">
-                    </div>
-                </div>
-            </div>
-        </section>
+            </section>
+        </div>
     </div>
 {% endblock section_content %}
 
@@ -178,7 +180,6 @@
 
 {% block body_tail %}
     <!-- page script -->
-    <script src="{% static 'plugins/vue1/vue.js' %}"></script>
     <script type="text/javascript"
             src="{% static 'plugins/echarts/extension/dataTool.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'plugins/echarts/echarts-all-3.js' %}"></script>
@@ -191,7 +192,67 @@
     <script type="text/javascript" src="{% static 'backend/js/theme/vintage.js' %}"></script>
     <script type="text/javascript" src="{% static 'AppSimulator/js/csrf.js' %}"></script>
     <script type="text/javascript" src="{% static 'AppSimulator/js/dashboard.js' %}"></script>
+    <script src="{% static 'plugins/vue1/vue.js' %}"></script>
     <script type="text/javascript">
+        const HOST = "http://172.16.55.155:8000";
 
+        function setDeviceGPS(obj) {
+            if (obj.deviceId === '') {
+                alert("请选择设备。");
+                return false;
+            }
+
+
+
+            let opt = {
+                url: HOST + '/AppSimulator/setDeviceGPSAPI/',
+                type: 'POST',
+                data: {
+                    deviceId: obj.deviceId,
+                    latitude: obj.latitude,
+                    longitude: obj.longitude
+                },
+                dataType: "json",
+                error: function (xhr, err) {
+                    obj.msg = "Failure";
+                    console.error("[dashboard] setDeviceGPSAPI", err);
+                },
+                success: function (data, status) {
+                    obj.msg = "OK";
+                }
+            };
+            $.ajaxSetup({
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
+            });
+            $.ajax(opt);
+        }
+
+        //----------------------------------------------------------------------------
+        Vue.config.delimiters = ['[[', ']]'];
+        //----------------------------------------------------------------------------
+        let mainVue = new Vue({
+            el: "#main",
+            data: {
+                deviceId: 'device1',
+                district: '海淀区',
+                lng_lat: "",
+                latitude: 39.6099202570, // 经度
+                longitude: 118.1799316404, // 纬度
+                current_address: "",
+                search_address: '',
+                msg: ""
+            },
+            methods: {
+                trace: function () {
+                },
+                setDeviceGPS: function () {
+                    setDeviceGPS(this);
+                },
+            },
+            ready: function () {
+            },
+            watch: {},
+            computed: {}
+        });
     </script>
 {% endblock body_tail %}

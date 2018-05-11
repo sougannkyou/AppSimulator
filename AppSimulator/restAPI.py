@@ -30,6 +30,21 @@ from .setting import PAGE_SIZE
 MDB = MongoDriver()
 RDB = RedisDriver()
 
+def setDeviceGPSAPI(request):
+    deviceId = request.POST.get('deviceId')  # 设备ID
+    latitude = request.POST.get('latitude')  # 经度
+    longitude = request.POST.get('longitude')  # 纬度
+    print(latitude, longitude)  # 39.6099202570, 118.1799316404
+    p = os.popen("adb shell setprop persist.nox.gps.latitude " + latitude)
+    print(p.read())
+
+    p = os.popen("adb shell setprop persist.nox.gps.longitude " + longitude)
+    print(p.read())
+    output = JsonResponse({
+        'ret': 'ok',
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
 def getDeviceInfoAPI(request):
     ret = RDB.get_device_info()
     output = JsonResponse({

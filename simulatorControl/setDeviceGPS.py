@@ -1,7 +1,7 @@
 import os
 
 
-def setNoxGPS(latitude, longitude):
+def setDeviceGPS(deviceId, latitude, longitude):
     print(latitude, longitude)  # 39.6099202570, 118.1799316404
     p = os.popen("adb shell setprop persist.nox.gps.latitude " + latitude)
     print(p.read())
