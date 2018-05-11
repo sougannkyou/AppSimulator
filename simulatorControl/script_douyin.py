@@ -176,7 +176,7 @@ def start(hwnd):
 if __name__ == "__main__":
     ret = None
     # hwnd = win32gui.FindWindow("Qt5QWindowIcon", None)
-    hwnd = win32gui.FindWindow(None, "抖音0")
+    hwnd = win32gui.FindWindow(None, "douyin0")
     if hwnd: ret = find_element(hwnd, comment='锁屏', timeout=5)
     if ret: unlock(hwnd, 1)
     app_quit(hwnd)
