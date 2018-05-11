@@ -3,6 +3,7 @@
 
 {% block header_tail %}
     <meta http-equiv="refresh" content="2">
+    <link rel="stylesheet" href="{% static 'AppSimulator/css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
 {% endblock header_tail %}
 
@@ -87,18 +88,20 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    <div id="device1" style="width:100%;height:240px;">
+                    <div id="device1" class="device-img">
                         <div class="col-md-6" title="before">
-                            <img src="{% static 'AppSimulator/images/capture_before.png' %}" height="200">
+                            <img src="{% static 'AppSimulator/images/capture_before.png' %}" height="240">
                             <label>before</label>
                         </div>
                         <div class="col-md-6" title="current">
-                            <img src="{% static 'AppSimulator/images/capture.png' %}" height="200">
+                            <img src="{% static 'AppSimulator/images/capture.png' %}" height="240">
                             <label>current</label>
                         </div>
-                        {#<div class="col-md-6">#}
-                        {#<textarea id="result_sample_1" rows="12" title="" style="width:100%;"></textarea>#}
-                        {#</div>#}
+                        <div class="col-md-6">
+                            <input type="text" placeholder="latitude">
+                            <input type="text" placeholder="longitude">
+                            <button class="btn btn-info">set</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -119,7 +122,7 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    <div id="device2" style="width:100%;height:240px;">
+                    <div id="device2" class="device-img">
                     </div>
                 </div>
             </div>
@@ -140,7 +143,7 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    <div id="device3" style="width:100%;height:240px;">
+                    <div id="device3" class="device-img">
                     </div>
                 </div>
             </div>
@@ -161,7 +164,7 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    <div id="device4" style="width:100%;height:240px;">
+                    <div id="device4" class="device-img">
                     </div>
                 </div>
             </div>
@@ -175,6 +178,7 @@
 
 {% block body_tail %}
     <!-- page script -->
+    <script src="{% static 'plugins/vue1/vue.js' %}"></script>
     <script type="text/javascript"
             src="{% static 'plugins/echarts/extension/dataTool.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'plugins/echarts/echarts-all-3.js' %}"></script>
