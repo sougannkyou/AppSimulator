@@ -22,6 +22,100 @@ function ajaxError(err, msg) {
         }
     });
 })();
+
+
+(function getDeviceCaptureAPI() {
+    $.ajax({
+        url: '/AppSimulator/getDeviceCaptureAPI/',
+        type: 'get',
+        contentType: "application/json; charset=UTF-8",
+        error: function (xhr, err) {
+            ajaxError(err, 'getDeviceCaptureAPI');
+        },
+        success: function (data, textStatus) {
+        }
+    });
+})();
+
+(function memoryMonitor() {
+    let myChart = echarts.init(document.getElementById("memory_monitor"), THEME);
+
+    let base = 1;
+    let hour = [];
+
+    let data = [0];
+    let now = base;
+
+    function addData(shift) {
+        hour.push(now);
+        data.push(100 - 50);
+
+        if (shift) {
+            hour.shift();
+            data.shift();
+        }
+        if (now > 29) {
+            now = 1;
+        } else {
+            now = now + 1;
+        }
+    }
+
+    for (let i = 1; i < 30; i++) {
+        addData();
+    }
+
+    let option = {
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: hour
+        },
+        yAxis: {
+            boundaryGap: [0, '50%'],
+            type: 'value',
+            max: 100
+        },
+        series: [
+            {
+                name: 'memory',
+                type: 'line',
+                smooth: true,
+                symbol: 'none',
+                stack: 'a',
+                areaStyle: {
+                    normal: {}
+                },
+                color: ['#1cffac'],
+                data: data,
+                markLine: {
+                    data: [
+                        // 纵轴，默认
+                        {type: 'max', name: '最大值', itemStyle: {normal: {color: '#dc143c'}}},
+                    ]
+                }
+            }
+        ]
+    };
+
+    setInterval(function () {
+        addData(true);
+        myChart.setOption({
+            xAxis: {
+                data: hour
+            },
+            series: [{
+                name: 'memory',
+                data: data
+            }]
+        });
+    }, 2000);
+
+    if (option && typeof option === "object") {
+        myChart.setOption(option, true);
+    }
+})();
+
 //
 // (function getResultSample() {
 //     $.ajax({

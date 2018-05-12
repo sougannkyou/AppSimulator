@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block header_tail %}
-{#    <meta http-equiv="refresh" content="10">#}
+    <meta http-equiv="refresh" content="2">
     <link rel="stylesheet" href="{% static 'AppSimulator/css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
 {% endblock header_tail %}
@@ -10,11 +10,11 @@
 {% block section_content %}
     <div id="main" v-cloak>
         <div class="row">
-            <div class="col-md-3 col-xs-6">
+            <div class="col-lg-3 col-xs-6">
                 <div class="small-box bg-aqua">
                     <div class="inner">
-                        <p>device1</p>
-                        <h3 id="device1">0</h3>
+                        <p>内存使用率</p>
+                        <h3>[[ proxyInfo.memory_rate ]]%</h3>
                     </div>
                     <div class="icon">
                         <i class="fa fa-mobile-phone"></i>
@@ -28,8 +28,8 @@
             <div class="col-lg-3 col-xs-6">
                 <div class="small-box bg-green">
                     <div class="inner">
-                        <p>device2</p>
-                        <h3 id="device2">0<sup style="font-size: 20px"></sup></h3>
+                        <p>CPU使用率</p>
+                        <h3>[[ proxyInfo.cpu_rate ]]%</h3>
                     </div>
                     <div class="icon">
                         <i class="fa fa-mobile-phone"></i>
@@ -43,8 +43,8 @@
             <div class="col-lg-3 col-xs-6">
                 <div class="small-box bg-yellow">
                     <div class="inner">
-                        <p>device3</p>
-                        <h3 id="device3">0</h3>
+                        <p>硬盘剩余（C盘）</p>
+                        <h3>0</h3>
                     </div>
                     <div class="icon">
                         <i class="fa fa-mobile-phone"></i>
@@ -58,8 +58,8 @@
             <div class="col-lg-3 col-xs-6">
                 <div class="small-box bg-red">
                     <div class="inner">
-                        <p>device4</p>
-                        <h3 id="device4">0</h3>
+                        <p>采集总量</p>
+                        <h3>0</h3>
                     </div>
                     <div class="icon">
                         <i class="fa fa-mobile-phone"></i>
@@ -73,13 +73,28 @@
         </div>
 
         <div class="row">
-            <!-- device1 -->
-            <section class="col-md-3 connectedSortable">
+            {#            <section class="col-md-6 connectedSortable"><!-- 内存使用率 -->#}
+            {#                <div class="box box-success">#}
+            {#                    <div class="box-header with-border">#}
+            {#                        <label class="box-title">内存使用率</label>#}
+            {#                        <span class="badge">[[ memorySize ]]</span>#}
+            {#                        <div class="box-tools pull-left">#}
+            {#                            <span class="label label-success"><i class="fa fa-clock-o"></i>&nbsp;&nbsp;2s 刷新</span>#}
+            {#                        </div>#}
+            {#                    </div>#}
+            {#                    <div class="box-body">#}
+            {#                        <div id="memory_monitor" style="width:100%;height:235px;">#}
+            {#                            <img src="/static/AppSimulator/images/loading.gif" class="loading">#}
+            {#                        </div>#}
+            {#                    </div>#}
+            {#                </div>#}
+            {#            </section>#}
+            <section class="col-md-3 connectedSortable"><!-- device1 -->
                 <div class="box box-info">
                     <div class="box-header with-border">
-                        <h3 class="box-title">device1</h3>
+                        <h3 class="box-title">device1 <span id="device1" class="badge"></span></h3>
                         <div class="box-tools pull-left">
-                            <button class="btn btn-sm btn-info">重启App</button>
+                            <button v-on:click="resetDevice" class="btn btn-sm btn-info">重启</button>
                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                 <i class="fa fa-minus"></i>
                             </button>
@@ -107,13 +122,12 @@
                     </div>
                 </div>
             </section>
-            <!-- device2 -->
-            <section class="col-md-3 connectedSortable">
+            <section class="col-md-3 connectedSortable"><!-- device2 -->
                 <div class="box box-success">
                     <div class="box-header with-border">
-                        <h3 class="box-title">device2</h3>
+                        <h3 class="box-title">device2 <span id="device2" class="badge"></span></h3>
                         <div class="box-tools pull-left">
-                            <button class="btn btn-sm btn-success">重启App</button>
+                            <button class="btn btn-sm btn-success">重启</button>
                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                 <i class="fa fa-minus"></i>
                             </button>
@@ -128,13 +142,12 @@
                     </div>
                 </div>
             </section>
-            <!-- device3 -->
-            <section class="col-md-3 connectedSortable">
+            <section class="col-md-3 connectedSortable"><!-- device3 -->
                 <div class="box box-warning">
                     <div class="box-header with-border">
-                        <h3 class="box-title">device3</h3>
+                        <h3 class="box-title">device3 <span id="device3" class="badge"></span></h3>
                         <div class="box-tools pull-left">
-                            <button class="btn btn-sm btn-warning">重启App</button>
+                            <button class="btn btn-sm btn-warning">重启</button>
                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                 <i class="fa fa-minus"></i>
                             </button>
@@ -149,13 +162,12 @@
                     </div>
                 </div>
             </section>
-            <!-- device4 -->
-            <section class="col-md-3 connectedSortable">
+            <section class="col-md-3 connectedSortable"><!-- device4 -->
                 <div class="box box-danger">
                     <div class="box-header with-border">
-                        <h3 class="box-title">device4</h3>
+                        <h3 class="box-title">device4 <span id="device4" class="badge"></span></h3>
                         <div class="box-tools pull-left">
-                            <button class="btn btn-sm btn-danger">重启App</button>
+                            <button class="btn btn-sm btn-danger">重启</button>
                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                 <i class="fa fa-minus"></i>
                             </button>
@@ -194,16 +206,14 @@
     <script type="text/javascript" src="{% static 'AppSimulator/js/dashboard.js' %}"></script>
     <script src="{% static 'plugins/vue1/vue.js' %}"></script>
     <script type="text/javascript">
-        const HOST = "http://172.16.55.155:8000";
+        {#const HOST = "http://172.16.55.155:8000";#}
+        const HOST = "http://192.168.31.227:8000";
 
         function setDeviceGPS(obj) {
             if (obj.deviceId === '') {
                 alert("请选择设备。");
                 return false;
             }
-
-
-
             let opt = {
                 url: HOST + '/AppSimulator/setDeviceGPSAPI/',
                 type: 'POST',
@@ -227,12 +237,43 @@
             $.ajax(opt);
         }
 
+        function resetDevice(obj) {
+            console.log("resetDevice start.");
+            if (obj.deviceId === '') {
+                alert("请选择设备。");
+                return false;
+            }
+            let opt = {
+                url: HOST + '/AppSimulator/resetDeviceAPI/',
+                type: 'POST',
+                data: {
+                    deviceId: obj.deviceId
+                },
+                dataType: "json",
+                error: function (xhr, err) {
+                    obj.msg = "Failure";
+                    console.error("[dashboard] resetDeviceAPI", err);
+                },
+                success: function (data, status) {
+                    obj.msg = "OK";
+                }
+            };
+            $.ajaxSetup({
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
+            });
+            $.ajax(opt);
+        }
+
         //----------------------------------------------------------------------------
         Vue.config.delimiters = ['[[', ']]'];
         //----------------------------------------------------------------------------
         let mainVue = new Vue({
             el: "#main",
             data: {
+                proxyInfo: {
+                    memory_rate: 10,
+                    cpu_rate: 10
+                },
                 deviceId: 'device1',
                 district: '海淀区',
                 lng_lat: "",
@@ -247,6 +288,9 @@
                 },
                 setDeviceGPS: function () {
                     setDeviceGPS(this);
+                },
+                resetDevice: function () {
+                    resetDevice(this);
                 },
             },
             ready: function () {

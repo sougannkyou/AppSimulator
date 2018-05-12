@@ -128,6 +128,7 @@ def app_quit(hwnd):
     send_key(hwnd, WCON.VK_ESCAPE, 1)
     send_key(hwnd, WCON.VK_ESCAPE, 1)
     send_key(hwnd, WCON.VK_ESCAPE, 1)
+    send_key(hwnd, WCON.VK_ESCAPE, 1)
 
 
 def unlock(hwnd, timeout):
