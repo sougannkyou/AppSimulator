@@ -10,32 +10,23 @@ import aircv as ac
 import shutil
 import pyautogui
 
-DEBUG_ENV = True
+DEBUG_ENV = False
 
-KEY_VALUE_0 = 48
-KEY_VALUE_1 = 49
-KEY_VALUE_2 = 50
-KEY_VALUE_3 = 51
-KEY_VALUE_4 = 52
-KEY_VALUE_5 = 53
-KEY_VALUE_6 = 54
-KEY_VALUE_7 = 55
-KEY_VALUE_8 = 56
-KEY_VALUE_9 = 57
+PIC_PATH = {
+    u"APP图标": 'images/app_ready.png',
+    u"更新": 'images/update.png',
+    u"分享": 'images/share.png',
+    u"复制链接": 'images/copylink.png',
+    u"跳过软件升级": 'images/is_upgrade.png',
+    u"锁屏": 'images/screen_lock.png'
+}
 
-# 宏按键Enter的定义
-# size 480 800
-# click 38 783
-# delay 1000
-# click 447 617
-# delay 1000
-# click 47 700
 CLICK_POS = {
     u"APP图标": (38, 793),
     u"更新": (38, 793),
     u"分享": (451, 628),
     u"复制链接": (47, 720),
-    u"以后再说": (231, 590)
+    u"跳过软件升级": (231, 590)  # 以后再说
 }
 
 UNLOCK_POS = {
@@ -45,143 +36,155 @@ UNLOCK_POS = {
 }
 
 
-def is_upgrade(img_capture, element_pic_path, timeout):
-    img_obj = ac.imread('images/is_upgrade.png')
-    pos = ac.find_template(img_capture, img_obj)
-    if pos and pos['confidence'] > 0.9:
-        print('版本更新提示', element_pic_path, timeout)
-        click(hwnd, u"以后再说", 1)
-        click(hwnd, u"分享", 1)
-        # send_key(hwnd, key_value=KEY_VALUE_9, timeout=1)  # 点击“以后再说”按钮
-        # send_key(hwnd, key_value=KEY_VALUE_2, timeout=1)  # 点击“分享”按钮
-        timeout -= 2
+class Simulator:
+    def __init__(self, app_name):
+        self.hwnd = win32gui.FindWindow(None, app_name)
 
-
-def click(hwnd, comment, timeout):
-    left, top, right, bottom = win32gui.GetWindowRect(hwnd)
-    win32gui.SetForegroundWindow(hwnd)
-    # print(left, top, right, bottom)
-    # print(right - left, bottom - top)
-    (x, y) = CLICK_POS[comment]
-    x = left + x
-    y = top + y
-    time.sleep(timeout)
-    win32api.SetCursorPos((x, y))
-    win32api.mouse_event(WCON.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
-    win32api.mouse_event(WCON.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
-    time.sleep(timeout)
-    print("click", comment)
-    return True
-
-
-def _detect_obj(img, circle_center_pos, circle_radius, color, line_width):
-    if DEBUG_ENV:
-        cv2.circle(img, circle_center_pos, circle_radius, color, line_width)
-        cv2.imshow('detect_obj', img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-
-def find_element(hwnd, element_pic_path, timeout):
-    # 匹配element图像
-    # pprint(pos)
-    while (timeout > 0):
-        win32gui.SetForegroundWindow(hwnd)
-        left, top, right, bottom = win32gui.GetWindowRect(hwnd)
-        # print(left, top, right, bottom)
-        # print(right - left, bottom - top)
-        app_bg_box = (left, top, right, bottom)
-        im = ImageGrab.grab(app_bg_box)
-        shutil.move('../static/AppSimulator/images/capture.png', '../static/AppSimulator/images/capture_before.png')
-        shutil.move('images/capture.png', '../static/AppSimulator/images/capture.png')
-        im.save('images/capture.png')
-
-        img_capture = ac.imread('images/capture.png')
-        img_obj = ac.imread(element_pic_path)
+    def is_upgrade(self, img_capture, comment):
+        img_obj = ac.imread(PIC_PATH[comment])
         pos = ac.find_template(img_capture, img_obj)
         if pos and pos['confidence'] > 0.9:
-            print('匹配到', element_pic_path, timeout)
-            x, y = pos['result']
-            _detect_obj(img=img_capture, circle_center_pos=(int(x), int(y)), circle_radius=40, color=(0, 255, 0),
-                        line_width=2)
-            return True
-        else:
-            print('未匹配到', element_pic_path, timeout)
-            time.sleep(1)
-            timeout -= 1
-            is_upgrade(img_capture, element_pic_path, timeout)
+            print('版本更新提示', PIC_PATH[comment])
+            self.click(u"跳过软件升级", 1)
+            self.click(u"分享", 1)
 
-    return False
+    def click(self, comment, timeout):
+        left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
+        win32gui.SetForegroundWindow(self.hwnd)
+        # print(left, top, right, bottom)
+        # print(right - left, bottom - top)
+        (x, y) = CLICK_POS[comment]
+        x = left + x
+        y = top + y
+        time.sleep(timeout)
+        win32api.SetCursorPos((x, y))
+        win32api.mouse_event(WCON.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
+        win32api.mouse_event(WCON.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
+        time.sleep(timeout)
+        print("click", comment)
+        return True
 
+    def _detect_obj(self, img, circle_center_pos, circle_radius, color, line_width):
+        if DEBUG_ENV:
+            cv2.circle(img, circle_center_pos, circle_radius, color, line_width)
+            cv2.imshow('detect_obj', img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
 
-def send_key(hwnd, key_value, timeout):
-    win32gui.SetForegroundWindow(hwnd)
-    # win32api.SetCursorPos([left + 10, top + 10])
-    # win32api.mouse_event(WCON.MOUSEEVENTF_LEFTDOWN,0,0,0,0)
-    # time.sleep(0.3)
-    # win32api.mouse_event(WCON.MOUSEEVENTF_LEFTUP,0,0,0,0)
-    # win32api.SendMessage(hwnd,WCON.WM_SETTEXT,None,'A')
+    def send2web(self, pic_path):
+        shutil.copyfile('../static/AppSimulator/images/capture.png',
+                        '../static/AppSimulator/images/capture_before.png')
+        shutil.copyfile(pic_path, '../static/AppSimulator/images/capture.png')
+        return True
 
-    # 向窗口发送Enter键
-    time.sleep(timeout)
-    win32api.keybd_event(key_value, 0, 0, 0)
-    # time.sleep(0.5)
-    win32api.keybd_event(key_value, 0, WCON.KEYEVENTF_KEYUP, 0)
-    print('发送', key_value, '键')
-    time.sleep(timeout)
-    return True
+    def find_element(self, comment, timeout):
+        # 匹配element图像
+        # pprint(pos)
+        obj_pic_path = PIC_PATH[comment]
+        while (timeout > 0):
+            win32gui.SetForegroundWindow(self.hwnd)
+            left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
+            app_bg_box = (left, top, right, bottom)
+            im = ImageGrab.grab(app_bg_box)
+            im.save('images/capture.png')
+            self.send2web('images/capture.png')
 
+            img_capture = ac.imread('images/capture.png')
+            img_obj = ac.imread(obj_pic_path)
+            pos = ac.find_template(img_capture, img_obj)
+            if pos and pos['confidence'] > 0.9:
+                print('匹配到', comment, timeout)
+                x, y = pos['result']
+                self._detect_obj(img=img_capture, circle_center_pos=(int(x), int(y)), circle_radius=40,
+                                 color=(0, 255, 0),
+                                 line_width=2)
+                return True
+            else:
+                print('未匹配到', comment, timeout)
+                time.sleep(1)
+                timeout -= 1
+                self.is_upgrade(img_capture, comment=u"跳过软件升级")
 
-def unlock(hwnd, timeout):
-    win32gui.SetForegroundWindow(hwnd)
-    left, top, right, bottom = win32gui.GetWindowRect(hwnd)
-    top += 20
-    time.sleep(timeout)
+        return False
 
-    (x, y) = UNLOCK_POS['step1']
-    x = left + x
-    y = top + y
-    pyautogui.moveTo(x, y)
-    pyautogui.mouseDown()
+    def send_key(self, key_value, timeout):
+        win32gui.SetForegroundWindow(self.hwnd)
+        # win32api.SetCursorPos([left + 10, top + 10])
+        # win32api.mouse_event(WCON.MOUSEEVENTF_LEFTDOWN,0,0,0,0)
+        # time.sleep(0.3)
+        # win32api.mouse_event(WCON.MOUSEEVENTF_LEFTUP,0,0,0,0)
+        # win32api.SendMessage(hwnd,WCON.WM_SETTEXT,None,'A')
 
-    (x, y) = UNLOCK_POS['step2']
-    x = left + x
-    y = top + y
-    # pyautogui.dragTo(x, y, 0.5, button='left')
-    pyautogui.moveTo(x, y, 1, pyautogui.easeInQuad)
+        # 向窗口发送Enter键
+        time.sleep(timeout)
+        win32api.keybd_event(key_value, 0, 0, 0)
+        # time.sleep(0.5)
+        win32api.keybd_event(key_value, 0, WCON.KEYEVENTF_KEYUP, 0)
+        print('发送', key_value, '键')
+        time.sleep(timeout)
+        return True
 
-    (x, y) = UNLOCK_POS['step3']
-    x = left + x
-    y = top + y
-    # pyautogui.dragTo(x, y, 0.5, button='left')
-    pyautogui.moveTo(x, y, 1, pyautogui.easeInBounce)
-    pyautogui.mouseUp()
-    time.sleep(timeout)
-    return True
+    def app_quit(self):
+        self.send_key(WCON.VK_ESCAPE, 1)
+        self.send_key(WCON.VK_ESCAPE, 1)
+        self.send_key(WCON.VK_ESCAPE, 1)
+        self.send_key(WCON.VK_ESCAPE, 1)
+        return True
 
-def start(hwnd):
-    ret = None
-    if hwnd: ret = find_element(hwnd, element_pic_path='images/app_ready.png', timeout=10)  # unlock ok
-    # if ret: ret = send_key(hwnd, key_value=KEY_VALUE_0, timeout=2)  # 点击APP图标
-    if ret: ret = click(hwnd, u"APP图标", timeout=2)
-    while (ret):
-        if ret: ret = find_element(hwnd, element_pic_path='images/update.png', timeout=10)  # 查找“更新”按钮
-        # if ret: ret = send_key(hwnd, key_value=KEY_VALUE_1, timeout=1)  # 点击“更新”按钮
-        if ret: ret = click(hwnd, u"更新", timeout=1)
+    def unlock(self, timeout):
+        win32gui.SetForegroundWindow(self.hwnd)
+        left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
+        top += 20
+        time.sleep(timeout)
 
-        if ret: ret = find_element(hwnd, element_pic_path='images/share.png', timeout=10)  # 查找“分享”按钮
-        # if ret: ret = send_key(hwnd, key_value=KEY_VALUE_2, timeout=1)  # 点击“分享”按钮
-        if ret: ret = click(hwnd, u"分享", timeout=1)
+        (x, y) = UNLOCK_POS['step1']
+        x = left + x
+        y = top + y
+        pyautogui.moveTo(x, y)
+        pyautogui.mouseDown()
 
-        if ret: ret = find_element(hwnd, element_pic_path='images/copylink.png', timeout=10)  # 查找“复制链接”按钮
-        # if ret: ret = send_key(hwnd, key_value=KEY_VALUE_3, timeout=1)  # 点击“复制链接”按钮
-        if ret: ret = click(hwnd, u"复制链接", timeout=1)
+        (x, y) = UNLOCK_POS['step2']
+        x = left + x
+        y = top + y
+        # pyautogui.dragTo(x, y, 0.5, button='left')
+        pyautogui.moveTo(x, y, 1, pyautogui.easeInQuad)
 
+        (x, y) = UNLOCK_POS['step3']
+        x = left + x
+        y = top + y
+        # pyautogui.dragTo(x, y, 0.5, button='left')
+        pyautogui.moveTo(x, y, 1, pyautogui.easeInBounce)
+        pyautogui.mouseUp()
+        time.sleep(timeout)
+        return True
+
+    def run(self):
+        ret = None
+        # hwnd = win32gui.FindWindow("Qt5QWindowIcon", None)
+        if self.hwnd: ret = self.find_element(comment='锁屏', timeout=5)
+        if ret: ret = self.unlock(1)
+        if ret: ret = self.app_quit()
+        if ret: self.script()
+
+    def script(self):
+        pass
 
 if __name__ == "__main__":
-    ret = None
-    # hwnd = win32gui.FindWindow("Qt5QWindowIcon", None)
-    hwnd = win32gui.FindWindow(None, "抖音0")
-    if hwnd: ret = find_element(hwnd, element_pic_path='images/screen_lock.png', timeout=5)
-    if ret: ret = unlock(hwnd, 1)
-    start(hwnd)
+    class MySimulator(Simulator):
+        def script(self):
+            ret = None
+            if self.hwnd: ret = self.find_element(comment='APP图标', timeout=10)  # unlock ok
+            if ret: ret = self.click(u"APP图标", timeout=2)
+            while (ret):
+                if ret: ret = self.find_element(comment='更新', timeout=10)
+                if ret: ret = self.click(u"更新", timeout=1)
+
+                if ret: ret = self.find_element(comment='分享', timeout=10)
+                if ret: ret = self.click(u"分享", timeout=1)
+
+                if ret: ret = self.find_element(comment='复制链接', timeout=10)
+                if ret: ret = self.click(u"复制链接", timeout=1)
+                if not ret: self.send2web('images/offline.png')
+
+    me = MySimulator("douyin0")
+    me.run()

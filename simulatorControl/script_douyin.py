@@ -36,7 +36,7 @@ UNLOCK_POS = {
 }
 
 
-def is_upgrade(img_capture, comment):
+def is_upgrade(hwnd, img_capture, comment):
     img_obj = ac.imread(PIC_PATH[comment])
     pos = ac.find_template(img_capture, img_obj)
     if pos and pos['confidence'] > 0.9:
@@ -74,6 +74,7 @@ def send2web(pic_path):
     shutil.copyfile('../static/AppSimulator/images/capture.png',
                     '../static/AppSimulator/images/capture_before.png')
     shutil.copyfile(pic_path, '../static/AppSimulator/images/capture.png')
+    return True
 
 
 def find_element(hwnd, comment, timeout):
@@ -101,7 +102,7 @@ def find_element(hwnd, comment, timeout):
             print('未匹配到', comment, timeout)
             time.sleep(1)
             timeout -= 1
-            is_upgrade(img_capture, comment=u"跳过软件升级")
+            is_upgrade(hwnd, img_capture, comment=u"跳过软件升级")
 
     return False
 
@@ -129,6 +130,7 @@ def app_quit(hwnd):
     send_key(hwnd, WCON.VK_ESCAPE, 1)
     send_key(hwnd, WCON.VK_ESCAPE, 1)
     send_key(hwnd, WCON.VK_ESCAPE, 1)
+    return True
 
 
 def unlock(hwnd, timeout):
@@ -159,7 +161,7 @@ def unlock(hwnd, timeout):
     return True
 
 
-def start(hwnd):
+def script(hwnd):
     ret = None
     if hwnd: ret = find_element(hwnd, comment='APP图标', timeout=10)  # unlock ok
     if ret: ret = click(hwnd, u"APP图标", timeout=2)
@@ -172,13 +174,18 @@ def start(hwnd):
 
         if ret: ret = find_element(hwnd, comment='复制链接', timeout=10)
         if ret: ret = click(hwnd, u"复制链接", timeout=1)
+        if not ret: send2web('images/offline.png')
+
+
+def run():
+    ret = None
+    hwnd = win32gui.FindWindow(None, "douyin0")
+    # hwnd = win32gui.FindWindow("Qt5QWindowIcon", None)
+    if hwnd: ret = find_element(hwnd, comment='锁屏', timeout=5)
+    if ret: ret = unlock(hwnd, 1)
+    if ret: ret = app_quit(hwnd)
+    if ret: script(hwnd)
 
 
 if __name__ == "__main__":
-    ret = None
-    # hwnd = win32gui.FindWindow("Qt5QWindowIcon", None)
-    hwnd = win32gui.FindWindow(None, "douyin0")
-    if hwnd: ret = find_element(hwnd, comment='锁屏', timeout=5)
-    if ret: unlock(hwnd, 1)
-    app_quit(hwnd)
-    start(hwnd)
+    run()

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block header_tail %}
-    <meta http-equiv="refresh" content="2">
+    {#    <meta http-equiv="refresh" content="2">#}
     <link rel="stylesheet" href="{% static 'AppSimulator/css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
 {% endblock header_tail %}
@@ -13,8 +13,8 @@
             <div class="col-lg-3 col-xs-6">
                 <div class="small-box bg-aqua">
                     <div class="inner">
-                        <p>内存使用率</p>
-                        <h3>[[ proxyInfo.memory_rate ]]%</h3>
+                        <p>代理服务器-内存剩余</p>
+                        <h3>[[ proxyServerInfo.memory_rate ]]%</h3>
                     </div>
                     <div class="icon">
                         <i class="fa fa-mobile-phone"></i>
@@ -28,8 +28,8 @@
             <div class="col-lg-3 col-xs-6">
                 <div class="small-box bg-green">
                     <div class="inner">
-                        <p>CPU使用率</p>
-                        <h3>[[ proxyInfo.cpu_rate ]]%</h3>
+                        <p>代理服务器-使用CPU</p>
+                        <h3>[[ proxyServerInfo.cpu_rate ]]%</h3>
                     </div>
                     <div class="icon">
                         <i class="fa fa-mobile-phone"></i>
@@ -43,7 +43,7 @@
             <div class="col-lg-3 col-xs-6">
                 <div class="small-box bg-yellow">
                     <div class="inner">
-                        <p>硬盘剩余（C盘）</p>
+                        <p>代理服务器-硬盘剩余（C盘）</p>
                         <h3>0</h3>
                     </div>
                     <div class="icon">
@@ -207,7 +207,37 @@
     <script src="{% static 'plugins/vue1/vue.js' %}"></script>
     <script type="text/javascript">
         {#const HOST = "http://172.16.55.155:8000";#}
-        const HOST = "http://192.168.31.227:8000";
+        {#const HOST = "http://192.168.31.227:8000";#}
+
+        setInterval(function getProxyServerInfoAPI() {
+            if (mainVue.deviceId === '') {
+                alert("请选择设备。");
+                return false;
+            }
+            let opt = {
+                url: '/AppSimulator/getProxyServerInfoAPI/',
+                type: 'GET',
+                data: {
+                    deviceId: mainVue.deviceId,
+                },
+                dataType: "json",
+                error: function (xhr, err) {
+                    mainVue.msg = "Failure";
+                    console.error("[dashboard] setDeviceGPSAPI", err);
+                },
+                success: function (data, status) {
+                    console.log("data", data);
+                    mainVue.proxyServerInfo.memory_rate =
+                        (data['mem_info']['free'] * 100 / data['mem_info']['total']).toFixed(1);
+                    mainVue.proxyServerInfo.cpu_rate = data['cpu_info']['available'];
+                    mainVue.msg = "OK";
+                }
+            };
+            $.ajaxSetup({
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
+            });
+            $.ajax(opt);
+        }, 10000);
 
         function setDeviceGPS(obj) {
             if (obj.deviceId === '') {
@@ -215,7 +245,7 @@
                 return false;
             }
             let opt = {
-                url: HOST + '/AppSimulator/setDeviceGPSAPI/',
+                url: '/AppSimulator/setDeviceGPSAPI/',
                 type: 'POST',
                 data: {
                     deviceId: obj.deviceId,
@@ -231,9 +261,6 @@
                     obj.msg = "OK";
                 }
             };
-            $.ajaxSetup({
-                data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
-            });
             $.ajax(opt);
         }
 
@@ -244,8 +271,8 @@
                 return false;
             }
             let opt = {
-                url: HOST + '/AppSimulator/resetDeviceAPI/',
-                type: 'POST',
+                url: '/AppSimulator/resetDeviceAPI/',
+                type: 'GET',
                 data: {
                     deviceId: obj.deviceId
                 },
@@ -258,9 +285,6 @@
                     obj.msg = "OK";
                 }
             };
-            $.ajaxSetup({
-                data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
-            });
             $.ajax(opt);
         }
 
@@ -270,7 +294,7 @@
         let mainVue = new Vue({
             el: "#main",
             data: {
-                proxyInfo: {
+                proxyServerInfo: {
                     memory_rate: 10,
                     cpu_rate: 10
                 },

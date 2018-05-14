@@ -2,6 +2,7 @@
 import datetime, time
 import os, sys
 import psutil
+import xmlrpc.client
 import json
 import copy
 from io import StringIO
@@ -39,33 +40,23 @@ def setDeviceGPSAPI(request):
     deviceId = request.POST.get('deviceId')  # 设备ID
     latitude = request.POST.get('latitude')  # 经度
     longitude = request.POST.get('longitude')  # 纬度
-    print(latitude, longitude)  # 39.6099202570, 118.1799316404
-    p = os.popen("adb shell setprop persist.nox.gps.latitude " + latitude)
-    print(p.read())
+    print(deviceId, latitude, longitude)
+    with xmlrpc.client.ServerProxy("http://localhost:8000/") as proxy:
+        ret = proxy.setDeviceGPS(deviceId, latitude, longitude)
 
-    p = os.popen("adb shell setprop persist.nox.gps.longitude " + longitude)
-    print(p.read())
     output = JsonResponse({
-        'ret': 'ok',
+        'ret': ret,
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
 def resetDeviceAPI(request):
-    # deviceId = request.POST.get('deviceId')  # 设备ID
-    print("resetDeviceAPI start.")
-    p = os.popen("Nox -quit")
-    print("Nox -quit", p.read())
-
-    p = os.popen("tasklist | findstr 'Nox'")
-    print("tasklist | findstr 'Nox'", p.read())
-
-    time.sleep(5)
-    p = os.popen("Nox")
-    print("Nox", p.read())
+    deviceId = request.GET.get('deviceId')  # 设备ID
+    with xmlrpc.client.ServerProxy("http://localhost:8000/") as proxy:
+        ret = proxy.resetDevice(deviceId)
 
     output = JsonResponse({
-        'ret': 'ok',
+        'ret': ret,
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
@@ -90,16 +81,18 @@ def getDeviceCaptureAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
-def getMemoryInfo(request):
-    cpu = {'user': 0, 'system': 0, 'idle': 0, 'percent': 0}
-    mem = {'total': 0, 'avaiable': 0, 'percent': 0, 'used': 0, 'free': 0}
+def getProxyServerInfoAPI(request):
+    cpu_info = {'user': 0, 'system': 0, 'idle': 0, 'percent': 0}
     mem_info = psutil.virtual_memory()
-    mem['total'] = mem_info.total
-    mem['available'] = mem_info.available
-    mem['percent'] = mem_info.percent
-    mem['used'] = mem_info.used
-    mem['free'] = mem_info.free
     output = JsonResponse({
+        'cpu_info': cpu_info,
+        'mem_info': {
+            'total': mem_info.total,
+            'avaiable': mem_info.available,
+            'percent': mem_info.percent,
+            'used': mem_info.used,
+            'free': mem_info.free
+        },
         'ret': 'ok',
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
