@@ -48,6 +48,15 @@ class Simulator:
         print("click", comment)
         return True
 
+    def set_proxy(self):
+        self.is_proxy_active = False
+
+    def proxy_change_status_stop(self):
+        self.is_proxy_active = False
+
+    def proxy_change_status_run(self):
+        self.is_proxy_active = True
+
     def _sleep(self, times):
         while (not self.is_proxy_active):
             print("wait for proxy server active ...")
@@ -161,24 +170,25 @@ class Simulator:
         pass
 
 
-if __name__ == "__main__":
-    class MySimulator(Simulator):
-        def script(self):
-            ret = None
-            if self.hwnd: ret = self.find_element(comment='APP图标', timeout=10)  # unlock ok
-            if ret: ret = self.click(u"APP图标", timeout=2)
-            while (ret):
-                if ret: ret = self.find_element(comment='更新', timeout=10)
-                if ret: ret = self.click(u"更新", timeout=1)
+# if __name__ == "__main__":
+class MySimulator(Simulator):
+    def script(self):
+        ret = None
+        if self.hwnd: ret = self.find_element(comment='APP图标', timeout=10)  # unlock ok
+        if ret: ret = self.click(u"APP图标", timeout=2)
+        while (ret):
+            if ret: ret = self.find_element(comment='更新', timeout=10)
+            if ret: ret = self.click(u"更新", timeout=1)
 
-                if ret: ret = self.find_element(comment='分享', timeout=10)
-                if ret: ret = self.click(u"分享", timeout=1)
+            if ret: ret = self.find_element(comment='分享', timeout=10)
+            if ret: ret = self.click(u"分享", timeout=1)
 
-                if ret: ret = self.find_element(comment='复制链接', timeout=10)
-                if ret: ret = self.click(u"复制链接", timeout=1)
-                if not ret: self.send2web('images/offline.png')
+            if ret: ret = self.find_element(comment='复制链接', timeout=10)
+            if ret: ret = self.click(u"复制链接", timeout=1)
+            if not ret: self.send2web('images/offline.png')
 
 
+def run():
     me = MySimulator("douyin0")
     me._PIC_PATH = {
         u"APP图标": 'images/app_ready.png',
