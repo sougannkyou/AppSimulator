@@ -5,7 +5,7 @@ function ajaxError(err, msg) {
 }
 
 // ------------------ DeviceInfo  ------------------
-(function getDeviceInfo() {
+setInterval(function getDeviceInfo() {
     $.ajax({
         url: '/AppSimulator/getDeviceInfoAPI/',
         type: 'get',
@@ -15,13 +15,14 @@ function ajaxError(err, msg) {
         },
         success: function (data, textStatus) {
             let ret = data.ret;
-            $('#device1').text(ret.device1);
-            $('#device2').text(ret.device2);
-            $('#device3').text(ret.device3);
-            $('#device4').text(ret.device4);
+            mainVue.device1_cnt = ret.device1;
+            mainVue.device2_cnt = ret.device2;
+            mainVue.device3_cnt = ret.device3;
+            mainVue.device4_cnt = ret.device4;
+            // $('#device1').text(ret.device1);
         }
     });
-})();
+}, 5000)
 
 
 (function getDeviceCaptureAPI() {

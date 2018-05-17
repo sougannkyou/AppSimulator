@@ -1,5 +1,3 @@
-# coding=utf8
-import os, time
 import time
 import win32con as WCON
 import win32api
@@ -9,12 +7,10 @@ import cv2
 import aircv as ac
 import shutil
 import pyautogui
-from xmlrpc.server import SimpleXMLRPCServer
 
 DEBUG_ENV = False
 
-
-class Simulator:
+class Simulator(object):
     def __init__(self, app_name):
         self._UNLOCK_POS = {
             "step1": (133, 496),
@@ -165,92 +161,11 @@ class Simulator:
         # hwnd = win32gui.FindWindow("Qt5QWindowIcon", None)
         if self.hwnd: ret = self.find_element(comment='锁屏', timeout=5)
         if ret: ret = self.unlock(1)
-        if ret: ret = self.app_quit()
+        else: ret = self.app_quit()
         if ret: self.script()
 
     def script(self):
         pass
 
-
-class MySimulator(Simulator):
-    def script(self):
-        ret = None
-        if self.hwnd: ret = self.find_element(comment='APP图标', timeout=10)  # unlock ok
-        if ret: ret = self.click(u"APP图标", timeout=2)
-        while (ret):
-            if ret: ret = self.find_element(comment='更新', timeout=10)
-            if ret: ret = self.click(u"更新", timeout=1)
-
-            if ret: ret = self.find_element(comment='分享', timeout=10)
-            if ret: ret = self.click(u"分享", timeout=1)
-
-            if ret: ret = self.find_element(comment='复制链接', timeout=10)
-            if ret: ret = self.click(u"复制链接", timeout=1)
-            if not ret: self.send2web('images/offline.png')
-
-
-me = None
-
-
-def run():
-    me = MySimulator("douyin0")
-    me._PIC_PATH = {
-        u"APP图标": 'images/app_ready.png',
-        u"更新": 'images/update.png',
-        u"分享": 'images/share.png',
-        u"复制链接": 'images/copylink.png',
-        u"跳过软件升级": 'images/is_upgrade.png',
-        u"锁屏": 'images/screen_lock.png'
-    }
-
-    me._CLICK_POS = {
-        u"APP图标": (38, 793),
-        u"更新": (38, 793),
-        u"分享": (451, 628),
-        u"复制链接": (47, 720),
-        u"跳过软件升级": (231, 590)  # 以后再说
-    }
-    me.run()
-    return me
-
-
-def proxy_change_status_stop():
-    me.is_proxy_active = False
-
-
-def proxy_change_status_run():
-    me.is_proxy_active = True
-
-
-def resetDevice(deviceId):
-    print("resetDeviceAPI start.", deviceId)
-    p = os.popen("D:\\Nox\\bin\\Nox.exe -quit")
-    print("Nox.exe -quit :", p.read())
-
-    p = os.popen("tasklist | findstr 'Nox'")
-    print("tasklist | findstr 'Nox' :", p.read())
-
-    time.sleep(10)
-    p = os.popen("D:\\Nox\\bin\\Nox.exe")
-    print("Nox.exe :", p.read())
-    return True
-
-
-def setDeviceGPS(deviceId, latitude, longitude):
-    print(deviceId, latitude, longitude)  # 39.6099202570, 118.1799316404
-    p = os.popen("adb shell setprop persist.nox.gps.latitude " + latitude)
-    print(p.read())
-
-    p = os.popen("adb shell setprop persist.nox.gps.longitude " + longitude)
-    print(p.read())
-    return True
-
-
-######################################################################
-server = SimpleXMLRPCServer(("localhost", 8000))
-server.register_function(run, "run")
-server.register_function(run, "run")
-server.register_function(run, "run")
-server.register_function(resetDevice, "resetDevice")
-server.register_function(setDeviceGPS, 'setDeviceGPS')
-server.serve_forever()
+if __name__ == "__main__":
+    pass

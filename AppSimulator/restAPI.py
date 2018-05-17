@@ -50,16 +50,35 @@ def setDeviceGPSAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
-def resetDeviceAPI(request):
+def restartDeviceAPI(request):
     deviceId = request.GET.get('deviceId')  # 设备ID
-    with xmlrpc.client.ServerProxy("http://localhost:8000/") as proxy:
-        ret = proxy.resetDevice(deviceId)
+    with xmlrpc.client.ServerProxy("http://localhost:8003/") as proxy:
+        ret = proxy.restartDevice(deviceId)
 
     output = JsonResponse({
         'ret': ret,
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
+def quitAppAPI(request):
+    deviceId = request.GET.get('deviceId')  # 设备ID
+    with xmlrpc.client.ServerProxy("http://localhost:8003/") as proxy:
+        ret = proxy.quitApp()
+    # ret = True
+    output = JsonResponse({
+        'ret': ret,
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+def runScriptAPI(request):
+    deviceId = request.GET.get('deviceId')  # 设备ID
+    with xmlrpc.client.ServerProxy("http://localhost:8003/") as proxy:
+        ret = proxy.runScript()
+    # ret = True
+    output = JsonResponse({
+        'ret': ret,
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 def getDeviceCaptureAPI(request):
     # deviceId = request.POST.get('deviceId')  # 设备ID
