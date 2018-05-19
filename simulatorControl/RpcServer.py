@@ -1,6 +1,6 @@
 # coding=utf8
 import os
-import time
+import time,datetime
 import win32gui
 from PIL import ImageGrab
 import shutil
@@ -34,7 +34,7 @@ def runScript1():
     return True
 
 def runScript():
-    print("[rpc_server] runScript ...")
+    print("[rpc_server] runScript start:",datetime.datetime.now())
     try:
         class MySimulator(Simulator):
             def script(self):
@@ -48,9 +48,15 @@ def runScript():
                     if ret: ret = self.find_element(comment='分享', timeout=10)
                     if ret: ret = self.click(u"分享", timeout=1)
 
-                    if ret: ret = self.find_element(comment='复制链接', timeout=10)
+                    if ret:
+                        ret = self.find_element(comment='复制链接', timeout=10)
+                        if not ret:
+                            print("重试 click 分享 按钮 ...")
+                            ret = self.find_element(comment='分享', timeout=10)
+                            if ret: ret = self.click(u"分享", timeout=1)
+
                     if ret: ret = self.click(u"复制链接", timeout=1)
-                    if not ret: self.send2web('images/offline.png')
+                    if not ret: self.send2web('images/offline.jpeg')
 
         mySimulator = MySimulator("douyin0")
         mySimulator._PIC_PATH = {
@@ -70,9 +76,10 @@ def runScript():
             u"跳过软件升级": (231, 590)  # 以后再说
         }
         mySimulator.run()
+        print("[rpc_server] runScript end:", datetime.datetime.now())
         return True
     except Exception as e:
-        print("[rpc_server] runScript err", e)
+        print("[rpc_server] runScript error:", datetime.datetime.now() ,e)
         return False
 
 def send2web(pic_path):
@@ -114,13 +121,13 @@ def restartDevice(deviceId):
         print("[rpc_server] tasklist | findstr Nox.exe\n", msg)
         if len(msg) > 0:
             print("[rpc_server] 模拟器正在 运行 ...")
-            os.popen("D:\\Nox\\bin\\Nox.exe -quit")
+            os.popen("C:\\Nox\\bin\\Nox.exe -quit")
             # os.popen("taskkill /f /t /im Nox.exe")
             # os.popen("taskkill /f /t /im NoxVMSVC.exe")
             # os.popen("taskkill /f /t /im NoxVMHandle.exe")
         else:
             print("[rpc_server] 将重启模拟器 ...")
-            p = os.popen("D:\\Nox\\bin\\Nox.exe")
+            p = os.popen("C:\\Nox\\bin\\Nox.exe")
             # msg = p.read() # 不能使用 会将命令阻塞
             break
 
@@ -139,7 +146,7 @@ def setDeviceGPS(deviceId, latitude, longitude):
 
 ######################################################################
 # netstat -ano | findstr "8003"
-server = SimpleXMLRPCServer(("localhost", 8003))
+server = SimpleXMLRPCServer(("0.0.0.0", 8003))
 server.register_function(restartDevice, "restartDevice")
 server.register_function(setDeviceGPS, 'setDeviceGPS')
 server.register_function(runScript, "runScript")
