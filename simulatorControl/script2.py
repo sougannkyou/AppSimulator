@@ -16,9 +16,15 @@ def runScript(deviceId):
                     if ret: ret = self.find_element(comment='分享', timeout=10)
                     if ret: ret = self.click(u"分享", timeout=1)
 
-                    if ret: ret = self.find_element(comment='复制链接', timeout=10)
+                    if ret:
+                        ret = self.find_element(comment='复制链接', timeout=10)
+                        if not ret:
+                            print("重试 click 分享 按钮 ...")
+                            ret = self.find_element(comment='分享', timeout=10)
+                            if ret: ret = self.click(u"分享", timeout=1)
+
                     if ret: ret = self.click(u"复制链接", timeout=1)
-                    if not ret: self.send2web('images/offline.png')
+                    if not ret: self.send2web('images/offline.jpeg')
 
         mySimulator = MySimulator("douyin0")
         mySimulator._PIC_PATH = {

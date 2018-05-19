@@ -65,6 +65,10 @@ class MongoDriver(object):
         if info: info.pop('_id')
         return info
 
+    def set_crwal_data_cnt(self, deviceId):
+        info = self.entry_setting.find_one({'taskId': taskId})
+        if info: info.pop('_id')
+        return info
 
 if __name__ == '__main__':
     # r = RedisDriver()
