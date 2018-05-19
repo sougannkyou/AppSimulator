@@ -34,14 +34,14 @@ from .setting import PAGE_SIZE
 
 MDB = MongoDriver()
 RDB = RedisDriver()
-
+RPC_CLIENT = "http://192.168.186.133:8003/"
 
 def setDeviceGPSAPI(request):
     deviceId = request.POST.get('deviceId')  # 设备ID
     latitude = request.POST.get('latitude')  # 经度
     longitude = request.POST.get('longitude')  # 纬度
     print(deviceId, latitude, longitude)
-    with xmlrpc.client.ServerProxy("http://localhost:8000/") as proxy:
+    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
         ret = proxy.setDeviceGPS(deviceId, latitude, longitude)
 
     output = JsonResponse({
@@ -52,7 +52,7 @@ def setDeviceGPSAPI(request):
 
 def restartDeviceAPI(request):
     deviceId = request.GET.get('deviceId')  # 设备ID
-    with xmlrpc.client.ServerProxy("http://localhost:8003/") as proxy:
+    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
         ret = proxy.restartDevice(deviceId)
 
     output = JsonResponse({
@@ -62,7 +62,7 @@ def restartDeviceAPI(request):
 
 def quitAppAPI(request):
     deviceId = request.GET.get('deviceId')  # 设备ID
-    with xmlrpc.client.ServerProxy("http://localhost:8003/") as proxy:
+    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
         ret = proxy.quitApp()
     # ret = True
     output = JsonResponse({
@@ -71,8 +71,8 @@ def quitAppAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 def runScriptAPI(request):
-    deviceId = request.GET.get('deviceId')  # 设备ID
-    with xmlrpc.client.ServerProxy("http://localhost:8003/") as proxy:
+    # deviceId = request.GET.get('deviceId')  # 设备ID
+    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
         ret = proxy.runScript()
     # ret = True
     output = JsonResponse({

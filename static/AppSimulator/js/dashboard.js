@@ -5,7 +5,7 @@ function ajaxError(err, msg) {
 }
 
 // ------------------ DeviceInfo  ------------------
-setInterval(function getDeviceInfo() {
+window.setInterval(function () {
     $.ajax({
         url: '/AppSimulator/getDeviceInfoAPI/',
         type: 'get',
@@ -25,7 +25,7 @@ setInterval(function getDeviceInfo() {
 }, 5000)
 
 
-(function getDeviceCaptureAPI() {
+function getDeviceCaptureAPI() {
     $.ajax({
         url: '/AppSimulator/getDeviceCaptureAPI/',
         type: 'get',
@@ -36,7 +36,9 @@ setInterval(function getDeviceInfo() {
         success: function (data, textStatus) {
         }
     });
-})();
+}
+
+getDeviceCaptureAPI();
 
 // (function memoryMonitor() {
 //     let myChart = echarts.init(document.getElementById("memory_monitor"), THEME);
