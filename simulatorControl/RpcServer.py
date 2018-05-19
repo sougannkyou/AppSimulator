@@ -1,40 +1,18 @@
 # coding=utf8
 import os
-import time,datetime
+import time, datetime
 import win32gui
 from PIL import ImageGrab
 import shutil
 from xmlrpc.server import SimpleXMLRPCServer
 from simulator import Simulator
 
-def runScript1():
-    print("[rpc_server] runScript")
-    # try:
-    # mySimulator = MySimulator("douyin0")
-    # mySimulator._PIC_PATH = {
-    #     u"APP图标": 'images/app_ready.png',
-    #     u"更新": 'images/update.png',
-    #     u"分享": 'images/share.png',
-    #     u"复制链接": 'images/copylink.png',
-    #     u"跳过软件升级": 'images/is_upgrade.png',
-    #     u"锁屏": 'images/screen_lock.png'
-    # }
-    #
-    # mySimulator._CLICK_POS = {
-    #     u"APP图标": (38, 793),
-    #     u"更新": (38, 793),
-    #     u"分享": (451, 628),
-    #     u"复制链接": (47, 720),
-    #     u"跳过软件升级": (231, 590)  # 以后再说
-    # }
-    # mySimulator.run()
-
-    # except Exception as e:
-    #     print("[rpc_server] runScript err", e)
-    return True
+def runProxy():
+    os.system("start /B start cmd.exe @cmd /k anyproxy -i")
 
 def runScript():
-    print("[rpc_server] runScript start:",datetime.datetime.now())
+    start = datetime.datetime.now()
+    print("[rpc_server] runScript start:", start)
     try:
         class MySimulator(Simulator):
             def script(self):
@@ -76,11 +54,14 @@ def runScript():
             u"跳过软件升级": (231, 590)  # 以后再说
         }
         mySimulator.run()
-        print("[rpc_server] runScript end:", datetime.datetime.now())
+        end = datetime.datetime.now()
+        print("[rpc_server] runScript success.", (end - start).seconds)
         return True
     except Exception as e:
-        print("[rpc_server] runScript error:", datetime.datetime.now() ,e)
+        end = datetime.datetime.now()
+        print("[rpc_server] runScript error:", (end - start).seconds, e)
         return False
+
 
 def send2web(pic_path):
     try:
