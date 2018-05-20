@@ -118,7 +118,8 @@ def getProxyServerInfoAPI(request):
 
 
 def getDeviceInfoAPI(request):
-    ret = RDB.get_device_info()
+    ret = RDB.get_crwal_cnt_by_device()
+    MDB.set_device_statistics_info(ret)
     output = JsonResponse({
         'ret': ret,
     })
@@ -141,9 +142,7 @@ class HubXPathViewAPI(APIView):
         return info
 
     def _set_data(self, args):
-        xgsjTaskId = int(args.get('xgsjTaskId')) if args.get('xgsjTaskId') else -1
-
-        return ret, msg
+        return ret
 
     def _remove_data(self, args):
         taskId = args.get('taskId')

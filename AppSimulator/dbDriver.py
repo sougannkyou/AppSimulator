@@ -1,6 +1,7 @@
 # coding=utf-8
 from pprint import pprint
-import os, time, datetime
+import os, time
+from datetime import datetime, timedelta
 import pymongo
 import redis
 import json
@@ -25,6 +26,7 @@ REDIS_SERVER = 'redis://127.0.0.1/11'
 REDIS_SERVER_RESULT = 'redis://127.0.0.1/10'
 MONGODB_SERVER = '127.0.0.1'
 MONGODB_PORT = 27017
+DEVICE_LIST = ['device1', 'device2', 'device3', 'device4']
 
 
 class RedisDriver(object):
@@ -41,9 +43,9 @@ class RedisDriver(object):
         ret = self._conn_result.blrange('douyin_data', -1, -1)
         return ret
 
-    def get_device_info(self):
+    def get_crwal_cnt_by_device(self):
         ret = {}
-        for device_id in ['device1', 'device2', 'device3', 'device4']:
+        for device_id in DEVICE_LIST:
             ret[device_id] = self._conn.scard(device_id + '_org')
         return ret
 
@@ -53,27 +55,46 @@ class RedisDriver(object):
 
 class MongoDriver(object):
     def __init__(self):
-        self.local_client = pymongo.MongoClient(host=MONGODB_SERVER, port=MONGODB_PORT)
-        self.webspider = self.local_client.webspider
-        self.entry_setting = self.webspider.entry_setting
-        self.detail_xpath = self.webspider.detail_xpath
-        self.hub_xpath = self.webspider.hub_xpath
-        self.simulator = self.webspider.simulator
+        self._client = pymongo.MongoClient(host=MONGODB_SERVER, port=MONGODB_PORT)
+        self._db = self._client.AppSimulator
+        self.deviceStatisticsInfo = self._db.deviceStatisticsInfo
+
+    def get_device_list(self):
+        return DEVICE_LIST
 
     def get_entry_info(self, taskId):
-        info = self.entry_setting.find_one({'taskId': taskId})
+        info = self.deviceStatisticsInfo.find_one({'deviceId': taskId})
         if info: info.pop('_id')
         return info
 
-    def set_crwal_data_cnt(self, deviceId):
-        info = self.entry_setting.find_one({'taskId': taskId})
-        if info: info.pop('_id')
-        return info
+    def set_device_statistics_info(self, info):
+        now = int(datetime.now().timestamp())
+        for device_id in DEVICE_LIST:
+            self.deviceStatisticsInfo.insert({'deviceId': device_id, 'time': now, 'cnt': info[device_id]})
+
+    def get_deactive_device_list(self):
+        nonactive = []
+        old_time = int((datetime.now() - timedelta(minutes=1)).timestamp())
+        print(old_time)
+        for device_id in DEVICE_LIST:
+            l = []
+            statistics = self.deviceStatisticsInfo.find({
+                'deviceId': device_id,
+                'time': {'$gt': old_time}
+            })
+            for s in statistics:
+                s.pop('_id')
+                l.append(s)
+
+            if (len(l) > 0 and l[0]['cnt'] == l[-1]['cnt']):
+                nonactive.append(device_id)
+
+        return nonactive
+
 
 if __name__ == '__main__':
     # r = RedisDriver()
+    info = {'device1': 10, 'device2': 20, 'device3': 30, 'device4': 40}
     db = MongoDriver()
-    # a = "//div[@class='wrapper mt20 content']/div[@class='fl cola']/div[@class='haoklil']/div[@class='haoklil1']/dl/dd/span[@class='haoklil113']"
-    # b = "//div[@class='wrapper mt20 content']/div[@class='fl cola']/div[@class='haoklil']/div[@class='haoklil1']/div[@class='haoklil11']/span/a"
-    # print(db.extract(a, b))
-    # pprint(db.get_channel_search_cnt(''))
+    db.set_device_statistics_info(info)
+    db.get_deactive_device_list()

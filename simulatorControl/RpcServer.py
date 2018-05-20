@@ -97,9 +97,9 @@ def restartDevice(deviceId):
     # print("Nox.exe -quit :", p.read())
     while (1):
         time.sleep(2)
-        p = os.popen('tasklist | findstr Nox.exe')
+        p = os.popen('tasklist /v | findstr "douyin0"')
         msg = p.read()
-        print("[rpc_server] tasklist | findstr Nox.exe\n", msg)
+        print('[rpc_server] tasklist /v | findstr "douyin0"\n', msg) # tasklist /fi "imagename eq Nox.exe"
         if len(msg) > 0:
             print("[rpc_server] 模拟器正在 运行 ...")
             os.popen("C:\\Nox\\bin\\Nox.exe -quit")
