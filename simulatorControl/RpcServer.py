@@ -8,7 +8,6 @@ from xmlrpc.server import SimpleXMLRPCServer
 from simulator import Simulator
 
 def runProxy():
-
     os.system("start /B start cmd.exe @cmd /k anyproxy -i")
 
 def runScript():
