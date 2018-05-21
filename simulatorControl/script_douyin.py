@@ -5,7 +5,7 @@ from simulator import Simulator
 
 def run():
     start = datetime.datetime.now()
-    print("[rpc_server] runScript start:", start)
+    print("[rpc_server] run start ...", start)
     try:
         class MySimulator(Simulator):
             def script(self):
@@ -48,11 +48,11 @@ def run():
         }
         mySimulator.run()
         end = datetime.datetime.now()
-        print("[rpc_server] runScript success.", (end - start).seconds)
+        print("[rpc_server] run script success.", (end - start).seconds)
         return True
     except Exception as e:
         end = datetime.datetime.now()
-        print("[rpc_server] runScript error:", (end - start).seconds, e)
+        print("[rpc_server] run script error:", (end - start).seconds, e)
         return False
 
 
