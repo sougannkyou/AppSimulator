@@ -105,7 +105,7 @@
                         <input type="text" placeholder="longitude" v-model="longitude" style="width:35%;">
                         <button v-on:click="setDeviceGPS" class="btn btn-xs btn-info">位置设定</button>
                         <button v-on:click="restartDevice" class="btn btn-xs btn-info">重启</button>
-                        <button v-on:click="runScript" class="btn btn-xs btn-info">运行脚本</button>
+                        <button v-on:click="startScript" class="btn btn-xs btn-info">运行脚本</button>
                     </div>
                 </div>
             </section>
@@ -295,14 +295,14 @@
             $.ajax(opt);
         }
 
-        function runScript(obj) {
-            console.log("runScript ...");
+        function startScript(obj) {
+            console.log("startScriptAPI ...");
             if (obj.deviceId === '') {
                 alert("请选择设备。");
                 return false;
             }
             let opt = {
-                url: '/AppSimulator/runScriptAPI/',
+                url: '/AppSimulator/startScriptAPI/',
                 type: 'GET',
                 data: {
                     deviceId: obj.deviceId
@@ -310,7 +310,7 @@
                 dataType: "json",
                 error: function (xhr, err) {
                     obj.msg = "Failure";
-                    console.error("[dashboard] runScriptAPI", err);
+                    console.error("[dashboard] startScriptAPI", err);
                 },
                 success: function (data, status) {
                     obj.msg = "OK";
@@ -351,8 +351,8 @@
                 restartDevice: function () {
                     restartDevice(this);
                 },
-                runScript: function () {
-                    runScript(this);
+                startScript: function () {
+                    startScript(this);
                 },
                 startProxyServer: function () {
                     startProxyServer(this);

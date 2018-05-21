@@ -97,16 +97,23 @@ def quitAppAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
-def runScriptAPI(request):
-    # deviceId = request.GET.get('deviceId')  # 设备ID
+def startScriptAPI(request):
+    deviceId = request.GET.get('deviceId')  # 设备ID
     with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
-        ret = proxy.runScript()
-    # ret = True
+        ret = proxy.startScript()
     output = JsonResponse({
         'ret': ret,
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
+def stopScriptAPI(request):
+    deviceId = request.GET.get('deviceId')  # 设备ID
+    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
+        ret = proxy.stopScript()
+    output = JsonResponse({
+        'ret': ret,
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 def getDeviceCaptureAPI(request):
     # deviceId = request.POST.get('deviceId')  # 设备ID

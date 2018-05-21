@@ -1,8 +1,8 @@
 import time,datetime
 from simulator import Simulator
 
-def runScript(deviceId):
-    print("[rpc_server] runScript start:",datetime.datetime.now())
+def startScript(deviceId):
+    print("[rpc_server] startScript start:",datetime.datetime.now())
     try:
         class MySimulator(Simulator):
             def script(self):
@@ -44,13 +44,13 @@ def runScript(deviceId):
             u"跳过软件升级": (231, 590)  # 以后再说
         }
         mySimulator.run()
-        print("[rpc_server] runScript end:", datetime.datetime.now())
+        print("[rpc_server] startScript end:", datetime.datetime.now())
         return True
     except Exception as e:
-        print("[rpc_server] runScript error:", datetime.datetime.now() ,e)
+        print("[rpc_server] startScript error:", datetime.datetime.now() ,e)
         return False
 
 if __name__ == "__main__":
     # while(1):
     #     time.sleep(20)
-    runScript('')
+    startScript('')

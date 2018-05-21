@@ -9,7 +9,7 @@ from .views import (
 
 from .restAPI import (
     HubXPathViewAPI, getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI, getRpcServerStatusAPI,
-    setDeviceGPSAPI, restartDeviceAPI, runScriptAPI, quitAppAPI, startProxyServerAPI,
+    setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, quitAppAPI, startProxyServerAPI,
     getDeviceCaptureAPI, getProxyServerInfoAPI
 )
 
@@ -25,7 +25,7 @@ urlpatterns = patterns('',
 
                        url(r'^setDeviceGPSAPI/$', setDeviceGPSAPI, name='setDeviceGPSAPI'),
                        url(r'^restartDeviceAPI/$', restartDeviceAPI, name='restartDeviceAPI'),
-                       url(r'^runScriptAPI/$', runScriptAPI, name='runScriptAPI'),
+                       url(r'^startScriptAPI/$', startScriptAPI, name='startScriptAPI'),
                        url(r'^quitAppAPI/$', quitAppAPI, name='quitAppAPI'),
 
                        url(r'^getDeviceCaptureAPI/$', getDeviceCaptureAPI, name='getDeviceCaptureAPI'),
