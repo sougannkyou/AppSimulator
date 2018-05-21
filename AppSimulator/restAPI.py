@@ -30,12 +30,35 @@ import shutil
 
 from .dbDriver import MongoDriver, RedisDriver
 
-from .setting import PAGE_SIZE
+from .setting import *
 
 MDB = MongoDriver()
 RDB = RedisDriver()
 RPC_CLIENT = "http://192.168.186.133:8003/"
 
+
+def getRpcServerStatusAPI(request):
+    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
+        ret = proxy.getRpcServerStatus()
+    output = JsonResponse({
+        'ret': ret,
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
+def startProxyServerAPI(request):
+    if (sys.platform == 'win32'):
+        os.system("start /B start cmd.exe @cmd /k anyproxy -i")
+
+
+def getProxyServerStatusAPI(request):
+    output = JsonResponse({
+        'ret': 'ok',
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
+# popen.system("tasklist /fi anyproxy")
 def setDeviceGPSAPI(request):
     deviceId = request.POST.get('deviceId')  # 设备ID
     latitude = request.POST.get('latitude')  # 经度
@@ -60,6 +83,7 @@ def restartDeviceAPI(request):
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
+
 def quitAppAPI(request):
     deviceId = request.GET.get('deviceId')  # 设备ID
     with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
@@ -70,6 +94,7 @@ def quitAppAPI(request):
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
+
 def runScriptAPI(request):
     # deviceId = request.GET.get('deviceId')  # 设备ID
     with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
@@ -79,6 +104,7 @@ def runScriptAPI(request):
         'ret': ret,
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
 
 def getDeviceCaptureAPI(request):
     # deviceId = request.POST.get('deviceId')  # 设备ID
@@ -117,9 +143,25 @@ def getProxyServerInfoAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
-def getDeviceInfoAPI(request):
+def getDeviceCrawlCntAPI(request):
     ret = RDB.get_crwal_cnt_by_device()
-    MDB.set_device_statistics_info(ret)
+    MDB.update_device_statistics_info(info=ret, scope_times=SCOPE_TIMES)
+    output = JsonResponse({
+        'ret': ret,
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
+def getDevicesStatusAPI(request):
+    ret = MDB.get_devices_status()  # {'device1':'running','device2':'unkown'}
+    for device in DEVICE_LIST:
+        # if (ret[device] == DEVICE_STATUS_UNKOWN):
+        try:
+            status = getRpcServerStatusAPI(request)
+            ret[device] = DEVICE_STATUS_RUNNING if status == DEVICE_STATUS_RUNNING else DEVICE_STATUS_RPCSERVER_ERROR
+        except Exception as e:
+            ret[device] = DEVICE_STATUS_RPCSERVER_ERROR
+
     output = JsonResponse({
         'ret': ret,
     })
@@ -138,19 +180,17 @@ class HubXPathViewAPI(APIView):
     def _get_data(self, args):
         taskId = args.get('taskId')
         level = args.get('level')
-        info = MDB.get_hub_xpath_info(taskId, int(level))
-        return info
+        return 0
 
     def _set_data(self, args):
-        return ret
+        return 0
 
     def _remove_data(self, args):
         taskId = args.get('taskId')
         hub_url = args.get('hub_url', '')
 
-        ret = MDB.remove_hub_xpath_info(taskId)
         msg = '删除了一条信息。'
-        return ret, msg
+        return 0
 
     def get(self, request, *args, **kwargs):
         ret = self._get_data(request.GET)

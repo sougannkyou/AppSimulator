@@ -58,8 +58,8 @@
             <div class="col-lg-3 col-xs-6">
                 <div class="small-box bg-red">
                     <div class="inner">
-                        <p>采集总量</p>
-                        <h3>[[ device1_cnt + device2_cnt + device3_cnt + device4_cnt]]</h3>
+                        <p>采集总量(10s)</p>
+                        <h3>[[ device1.cnt + device2.cnt + device3.cnt + device4.cnt]]</h3>
                     </div>
                     <div class="icon">
                         <i class="fa fa-mobile-phone"></i>
@@ -71,31 +71,16 @@
                 </div>
             </div>
         </div>
-
         <div class="row">
-            {#            <section class="col-md-6 connectedSortable"><!-- 内存使用率 -->#}
-            {#                <div class="box box-success">#}
-            {#                    <div class="box-header with-border">#}
-            {#                        <label class="box-title">内存使用率</label>#}
-            {#                        <span class="badge">[[ memorySize ]]</span>#}
-            {#                        <div class="box-tools pull-left">#}
-            {#                            <span class="label label-success"><i class="fa fa-clock-o"></i>&nbsp;&nbsp;2s 刷新</span>#}
-            {#                        </div>#}
-            {#                    </div>#}
-            {#                    <div class="box-body">#}
-            {#                        <div id="memory_monitor" style="width:100%;height:235px;">#}
-            {#                            <img src="/static/AppSimulator/images/loading.gif" class="loading">#}
-            {#                        </div>#}
-            {#                    </div>#}
-            {#                </div>#}
-            {#            </section>#}
-            <section class="col-md-3 connectedSortable"><!-- device1 -->
+            <!-- device1 -->
+            <section class="col-md-3 connectedSortable">
                 <div class="box box-info">
                     <div class="box-header with-border">
-                        <h3 class="box-title">device1 <span class="badge">[[ device1_cnt ]]</span></h3>
+                        <h3 class="box-title">device1
+                            <span class="badge badge-warning">[[ device1.status ]]</span>
+                            <span class="badge">[[ device1.cnt ]]</span>
+                        </h3>
                         <div class="box-tools pull-left">
-                            <button v-on:click="restartDevice" class="btn btn-sm btn-info">重启</button>
-                            <button v-on:click="runScript" class="btn btn-sm btn-info">运行脚本</button>
                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                 <i class="fa fa-minus"></i>
                             </button>
@@ -107,28 +92,35 @@
                     <div class="box-body">
                         <div id="device1" class="device-img">
                             <div class="col-md-6" title="before">
-                                <img src="{% static 'AppSimulator/images/capture_before.png' %}" height="240">
+                                <img src="{% static 'AppSimulator/images/capture_before.png' %}" height="240"
+                                     style="border-radius:3px;">
                                 <label>before</label>
                             </div>
                             <div class="col-md-6" title="current">
-                                <img src="{% static 'AppSimulator/images/capture.png' %}" height="240">
+                                <img src="{% static 'AppSimulator/images/capture.png' %}" height="240"
+                                     style="border-radius:3px;">
                                 <label>current</label>
-                            </div>
-                            <div class="col-md-6">
-                                <input type="text" placeholder="latitude" v-model="latitude">
-                                <input type="text" placeholder="longitude" v-model="longitude">
-                                <button class="btn btn-info" v-on:click="setDeviceGPS">设定</button>
                             </div>
                         </div>
                     </div>
+                    <div class="box-footer">
+                        <input type="text" placeholder="latitude" v-model="latitude" style="width:35%;">
+                        <input type="text" placeholder="longitude" v-model="longitude" style="width:35%;">
+                        <button v-on:click="setDeviceGPS" class="btn btn-xs btn-info">位置设定</button>
+                        <button v-on:click="restartDevice" class="btn btn-xs btn-info">重启</button>
+                        <button v-on:click="runScript" class="btn btn-xs btn-info">运行脚本</button>
+                    </div>
                 </div>
             </section>
-            <section class="col-md-3 connectedSortable"><!-- device2 -->
+            <!-- device2 -->
+            <section class="col-md-3 connectedSortable">
                 <div class="box box-success">
                     <div class="box-header with-border">
-                        <h3 class="box-title">device2 <span class="badge">[[ device2_cnt ]]</span></h3>
+                        <h3 class="box-title">device2
+                            <span class="badge badge-warning">[[ device2.status ]]</span>
+                            <span class="badge">[[ device2.cnt ]]</span>
+                        </h3>
                         <div class="box-tools pull-left">
-                            <button class="btn btn-sm btn-success">重启</button>
                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                 <i class="fa fa-minus"></i>
                             </button>
@@ -141,14 +133,22 @@
                         <div id="device2" class="device-img">
                         </div>
                     </div>
+                    <div class="box-footer">
+                        <input type="text" placeholder="latitude" v-model="latitude" style="width:35%;">
+                        <input type="text" placeholder="longitude" v-model="longitude" style="width:35%;">
+                        <button v-on:click="setDeviceGPS" class="btn btn-xs btn-info">位置设定</button>
+                        <button class="btn btn-xs btn-success">重启</button>
+                    </div>
                 </div>
             </section>
             <section class="col-md-3 connectedSortable"><!-- device3 -->
                 <div class="box box-warning">
                     <div class="box-header with-border">
-                        <h3 class="box-title">device3 <span class="badge">[[ device3_cnt ]]</span></h3>
+                        <h3 class="box-title">device3
+                            <span class="badge badge-warning">[[ device3.status ]]</span>
+                            <span class="badge">[[ device3.cnt ]]</span>
+                        </h3>
                         <div class="box-tools pull-left">
-                            <button class="btn btn-sm btn-warning">重启</button>
                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                 <i class="fa fa-minus"></i>
                             </button>
@@ -161,14 +161,22 @@
                         <div id="device3" class="device-img">
                         </div>
                     </div>
+                    <div class="box-footer">
+                        <input type="text" placeholder="latitude" v-model="latitude" style="width:35%;">
+                        <input type="text" placeholder="longitude" v-model="longitude" style="width:35%;">
+                        <button v-on:click="setDeviceGPS" class="btn btn-xs btn-info">位置设定</button>
+                        <button class="btn btn-xs btn-success">重启</button>
+                    </div>
                 </div>
             </section>
             <section class="col-md-3 connectedSortable"><!-- device4 -->
                 <div class="box box-danger">
                     <div class="box-header with-border">
-                        <h3 class="box-title">device4 <span class="badge">[[ device4_cnt ]]</span></h3>
+                        <h3 class="box-title">device4
+                            <span class="badge badge-warning">[[ device4.status ]]</span>
+                            <span class="badge">[[ device4.cnt ]]</span>
+                        </h3>
                         <div class="box-tools pull-left">
-                            <button class="btn btn-sm btn-danger">重启</button>
                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                 <i class="fa fa-minus"></i>
                             </button>
@@ -180,6 +188,12 @@
                     <div class="box-body">
                         <div id="device4" class="device-img">
                         </div>
+                    </div>
+                    <div class="box-footer">
+                        <input type="text" placeholder="latitude" v-model="latitude" style="width:35%;">
+                        <input type="text" placeholder="longitude" v-model="longitude" style="width:35%;">
+                        <button v-on:click="setDeviceGPS" class="btn btn-xs btn-info">位置设定</button>
+                        <button class="btn btn-xs btn-success">重启</button>
                     </div>
                 </div>
             </section>
@@ -209,36 +223,9 @@
     <script type="text/javascript">
         {#const HOST = "http://172.16.55.155:8000";#}
         {#const HOST = "http://192.168.31.227:8000";#}
-
-        setInterval(function getProxyServerInfoAPI() {
-            if (mainVue.deviceId === '') {
-                alert("请选择设备。");
-                return false;
-            }
-            let opt = {
-                url: '/AppSimulator/getProxyServerInfoAPI/',
-                type: 'GET',
-                data: {
-                    deviceId: mainVue.deviceId,
-                },
-                dataType: "json",
-                error: function (xhr, err) {
-                    mainVue.msg = "Failure";
-                    console.error("[dashboard] setDeviceGPSAPI", err);
-                },
-                success: function (data, status) {
-                    console.log("data", data);
-                    mainVue.proxyServerInfo.memory_rate =
-                        (data['mem_info']['free'] * 100 / data['mem_info']['total']).toFixed(1);
-                    mainVue.proxyServerInfo.cpu_rate = data['cpu_info']['available'];
-                    mainVue.msg = "OK";
-                }
-            };
-            $.ajaxSetup({
-                data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
-            });
-            $.ajax(opt);
-        }, 5000);
+        const DEVICE_STATUS_UNKOWN = 'unkown';
+        const DEVICE_STATUS_RUNNING = 'running';
+        const DEVICE_STATUS_SUSPEND = 'suspend';
 
         function setDeviceGPS(obj) {
             if (obj.deviceId === '') {
@@ -324,10 +311,10 @@
                     cpu_rate: 10
                 },
                 deviceId: 'device1',
-                device1_cnt: 0,
-                device2_cnt: 0,
-                device3_cnt: 0,
-                device4_cnt: 0,
+                device1: {cnt: 0, status: DEVICE_STATUS_UNKOWN},
+                device2: {cnt: 0, status: DEVICE_STATUS_UNKOWN},
+                device3: {cnt: 0, status: DEVICE_STATUS_UNKOWN},
+                device4: {cnt: 0, status: DEVICE_STATUS_UNKOWN},
                 district: '海淀区',
                 lng_lat: "",
                 latitude: 39.6099202570, // 经度

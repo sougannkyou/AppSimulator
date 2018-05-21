@@ -8,8 +8,8 @@ from .views import (
 )
 
 from .restAPI import (
-    HubXPathViewAPI, getDeviceInfoAPI, getResultSampleAPI,
-    setDeviceGPSAPI, restartDeviceAPI, runScriptAPI, quitAppAPI,
+    HubXPathViewAPI, getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI, getRpcServerStatusAPI,
+    setDeviceGPSAPI, restartDeviceAPI, runScriptAPI, quitAppAPI, startProxyServerAPI,
     getDeviceCaptureAPI, getProxyServerInfoAPI
 )
 
@@ -17,8 +17,11 @@ cache_time_out = 60 * 3
 
 urlpatterns = patterns('',
                        url(r'^dashboard/$', DashBoardView.as_view(), name='dashboard'),
-                       url(r'^getDeviceInfoAPI/$', getDeviceInfoAPI, name='getDeviceInfoAPI'),
+                       url(r'^getDeviceCrawlCntAPI/$', getDeviceCrawlCntAPI, name='getDeviceCrawlCntAPI'),
+                       url(r'^getDevicesStatusAPI/$', getDevicesStatusAPI, name='getDevicesStatusAPI'),
                        url(r'^getResultSampleAPI/$', getResultSampleAPI, name='getResultSampleAPI'),
+                       url(r'^getRpcServerStatusAPI/$', getRpcServerStatusAPI, name='getRpcServerStatusAPI'),
+                       url(r'^startProxyServerAPI/$', startProxyServerAPI, name='startProxyServerAPI'),
 
                        url(r'^setDeviceGPSAPI/$', setDeviceGPSAPI, name='setDeviceGPSAPI'),
                        url(r'^restartDeviceAPI/$', restartDeviceAPI, name='restartDeviceAPI'),

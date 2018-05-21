@@ -7,8 +7,11 @@ import shutil
 from xmlrpc.server import SimpleXMLRPCServer
 from simulator import Simulator
 
-def runProxy():
-    os.system("start /B start cmd.exe @cmd /k anyproxy -i")
+def getRpcServerStatus():
+    return "running"
+
+def simulatorStatus():
+    return "running"
 
 def runScript():
     start = datetime.datetime.now()
@@ -71,6 +74,7 @@ def send2web(pic_path):
     except Exception as e:
         print("[rpc_server] send2web err", e)
 
+    return True
 
 def run_captrue():
     print("[rpc_server] run_captrue")
@@ -131,7 +135,8 @@ server = SimpleXMLRPCServer(("0.0.0.0", 8003))
 server.register_function(restartDevice, "restartDevice")
 server.register_function(setDeviceGPS, 'setDeviceGPS')
 server.register_function(runScript, "runScript")
+server.register_function(getRpcServerStatus, "getRpcServerStatus")
+server.register_function(simulatorStatus, "simulatorStatus")
 # server.register_function(quitApp, "quitApp")
-# run_captrue()
 print("[rpc_server] start ...")
 server.serve_forever()

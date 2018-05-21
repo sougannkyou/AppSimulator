@@ -1,13 +1,13 @@
-let THEME = 'shine';//dark infographic macarons roma shine vintage
+const THEME = 'shine';//dark infographic macarons roma shine vintage
 
 function ajaxError(err, msg) {
     // alert('[错误信息]' + msg + err);
 }
 
-// ------------------ DeviceInfo  ------------------
-window.setInterval(function () {
+// ------------------ DeviceCrawlCntInfo  ------------------
+setInterval(function () {
     $.ajax({
-        url: '/AppSimulator/getDeviceInfoAPI/',
+        url: '/AppSimulator/getDeviceCrawlCntAPI/',
         type: 'get',
         contentType: "application/json; charset=UTF-8",
         error: function (xhr, err) {
@@ -15,15 +15,62 @@ window.setInterval(function () {
         },
         success: function (data, textStatus) {
             let ret = data.ret;
-            mainVue.device1_cnt = ret.device1;
-            mainVue.device2_cnt = ret.device2;
-            mainVue.device3_cnt = ret.device3;
-            mainVue.device4_cnt = ret.device4;
-            // $('#device1').text(ret.device1);
+            mainVue.device1.cnt = ret.device1;
+            mainVue.device2.cnt = ret.device2;
+            mainVue.device3.cnt = ret.device3;
+            mainVue.device4.cnt = ret.device4;
         }
     });
-}, 5000)
+}, 10 * 1000);
 
+setInterval(function getProxyServerInfoAPI() {
+    if (mainVue.deviceId === '') {
+        alert("请选择设备。");
+        return false;
+    }
+    let opt = {
+        url: '/AppSimulator/getProxyServerInfoAPI/',
+        type: 'GET',
+        data: {
+            deviceId: mainVue.deviceId,
+        },
+        dataType: "json",
+        error: function (xhr, err) {
+            mainVue.msg = "Failure";
+            console.error("[dashboard] setDeviceGPSAPI", err);
+        },
+        success: function (data, status) {
+            mainVue.proxyServerInfo.memory_rate =
+                (data['mem_info']['free'] * 100 / data['mem_info']['total']).toFixed(1);
+            mainVue.proxyServerInfo.cpu_rate = data['cpu_info']['available'];
+            mainVue.msg = "OK";
+        }
+    };
+    $.ajax(opt);
+}, 10 * 1000);
+
+setInterval(function getDevicesStatusAPI() {
+    let opt = {
+        url: '/AppSimulator/getDevicesStatusAPI/',
+        type: 'GET',
+        data: {scope_times: 30, interval_times: 10}, // 单位秒
+        dataType: "json",
+        error: function (xhr, err) {
+            mainVue.msg = "Failure";
+            console.error("[dashboard] getDevicesStatusAPI", err);
+        },
+        success: function (data, status) {
+            let ret = data.ret;
+            console.log("getDevicesStatusAPI", ret);
+            mainVue.device1.status = ret.device1;
+            mainVue.device2.status = ret.device2;
+            mainVue.device3.status = ret.device3;
+            mainVue.device4.status = ret.device4;
+            mainVue.msg = "OK";
+        }
+    };
+    $.ajax(opt);
+}, 30 * 1000); // 单位秒
 
 function getDeviceCaptureAPI() {
     $.ajax({

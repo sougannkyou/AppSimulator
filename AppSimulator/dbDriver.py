@@ -9,24 +9,7 @@ from bson.objectid import ObjectId
 import requests
 from urllib.parse import urlparse, urlunparse
 
-# from .setting import MONGODB_SERVER, MONGODB_PORT
-
-# LOCAL_DEBUG = False
-#
-# if LOCAL_DEBUG:  # os.name == 'nt':
-#     MONGODB_SERVER = '127.0.0.1:37017'
-#     MONGODB_PORT = 27017
-#     REDIS_SERVER = 'redis://127.0.0.1:6379/2'
-# else:
-#     MONGODB_SERVER = '192.168.16.223:37017'
-#     MONGODB_PORT = 37017
-#     REDIS_SERVER = 'redis://192.168.16.223:6379/2'
-
-REDIS_SERVER = 'redis://127.0.0.1/11'
-REDIS_SERVER_RESULT = 'redis://127.0.0.1/10'
-MONGODB_SERVER = '127.0.0.1'
-MONGODB_PORT = 27017
-DEVICE_LIST = ['device1', 'device2', 'device3', 'device4']
+from .setting import *
 
 
 class RedisDriver(object):
@@ -67,34 +50,35 @@ class MongoDriver(object):
         if info: info.pop('_id')
         return info
 
-    def set_device_statistics_info(self, info):
+    def update_device_statistics_info(self, info, scope_times):  # 时间窗式记录采集量
+        old_time = int((datetime.now() - timedelta(seconds=scope_times)).timestamp())
+        self.deviceStatisticsInfo.remove({'time': {'$lt': old_time}})
         now = int(datetime.now().timestamp())
         for device_id in DEVICE_LIST:
             self.deviceStatisticsInfo.insert({'deviceId': device_id, 'time': now, 'cnt': info[device_id]})
 
-    def get_deactive_device_list(self):
-        nonactive = []
-        old_time = int((datetime.now() - timedelta(minutes=1)).timestamp())
-        print(old_time)
+    def get_devices_status(self):  # 时间窗
+        devices_status = {}
         for device_id in DEVICE_LIST:
             l = []
-            statistics = self.deviceStatisticsInfo.find({
-                'deviceId': device_id,
-                'time': {'$gt': old_time}
-            })
+            devices_status[device_id] = DEVICE_STATUS_UNKOWN
+            statistics = self.deviceStatisticsInfo.find({'deviceId': device_id})
             for s in statistics:
                 s.pop('_id')
-                l.append(s)
+                l.append(s['cnt'])
 
-            if (len(l) > 0 and l[0]['cnt'] == l[-1]['cnt']):
-                nonactive.append(device_id)
+            if (len(l) > 0 and l[-1] > 0):
+                if (l[0] == l[-1]):
+                    devices_status[device_id] = DEVICE_STATUS_SUSPEND
+                else:
+                    devices_status[device_id] = DEVICE_STATUS_RUNNING
 
-        return nonactive
+        return devices_status  # {'device1':'running','device2':'unkown'}
 
 
 if __name__ == '__main__':
     # r = RedisDriver()
     info = {'device1': 10, 'device2': 20, 'device3': 30, 'device4': 40}
     db = MongoDriver()
-    db.set_device_statistics_info(info)
-    db.get_deactive_device_list()
+    db.update_device_statistics_info(info, SCOPE_TIMES)
+    pprint(db.get_devices_status(times=10 * 60))
