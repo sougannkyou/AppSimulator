@@ -13,11 +13,13 @@ def getRpcServerStatus():
 def simulatorStatus():
     return "running"
 
-def runScript():
-    if (sys.platform == 'win32'):
-        os.system('start /B start cmd.exe @cmd /k python %RPCSERVER_HOME%script_douyin.py')
+def startScript():
+    os.system('start /B start "script" cmd.exe @cmd /k python %RPCSERVER_HOME%script_douyin.py')
     return True
 
+def stopScript():
+    os.system('taskkill /fi "WINDOWTITLE eq script"')
+    return True
 
 def send2web(pic_path):
     try:
@@ -87,7 +89,7 @@ def setDeviceGPS(deviceId, latitude, longitude):
 server = SimpleXMLRPCServer(("0.0.0.0", 8003))
 server.register_function(restartDevice, "restartDevice")
 server.register_function(setDeviceGPS, 'setDeviceGPS')
-server.register_function(runScript, "runScript")
+server.register_function(startScript, "startScript")
 server.register_function(getRpcServerStatus, "getRpcServerStatus")
 server.register_function(simulatorStatus, "simulatorStatus")
 # server.register_function(quitApp, "quitApp")
