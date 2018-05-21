@@ -15,7 +15,7 @@ def simulatorStatus():
 
 def runScript():
     if (sys.platform == 'win32'):
-        os.system('start /B python %RPCSERVER_HOME%script_douyin.py')
+        os.system('start /B start cmd.exe @cmd /k python %RPCSERVER_HOME%script_douyin.py')
     return True
 
 
