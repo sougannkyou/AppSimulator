@@ -9,9 +9,13 @@ MONGODB_PORT = 27017
 
 DEVICE_LIST = ['device1', 'device2', 'device3', 'device4']
 
-DEVICE_STATUS_RPCSERVER_ERROR = 'rpc_server_error'
+DEVICE_STATUS_RPC_TIMEOUT = 'rpc_timeout'
 DEVICE_STATUS_UNKOWN = 'unkown'
 DEVICE_STATUS_RUNNING = 'running'
 DEVICE_STATUS_SUSPEND = 'suspend'
 
 SCOPE_TIMES = 1 * 60
+
+RPC_CLIENT = "http://192.168.186.133:8003/"
+
+RPC_SERVER_TIMEOUT = 5

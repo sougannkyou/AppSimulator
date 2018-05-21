@@ -10,9 +10,7 @@ import bson.binary
 import traceback
 import requests
 import re
-from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-from lxml.cssselect import CSSSelector
 import subprocess
 from pprint import pprint
 from django.core.paginator import Paginator
@@ -23,23 +21,21 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response as restResponse
 from rest_framework import status
-
-import win32gui
-from PIL import ImageGrab
-import shutil
+import socket
 
 from .dbDriver import MongoDriver, RedisDriver
-
 from .setting import *
 
 MDB = MongoDriver()
 RDB = RedisDriver()
-RPC_CLIENT = "http://192.168.186.133:8003/"
 
 
 def getRpcServerStatusAPI(request):
+    socket.setdefaulttimeout(RPC_SERVER_TIMEOUT)
     with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
         ret = proxy.getRpcServerStatus()
+    socket.setdefaulttimeout(None)
+
     output = JsonResponse({
         'ret': ret,
     })
@@ -154,13 +150,13 @@ def getDeviceCrawlCntAPI(request):
 
 def getDevicesStatusAPI(request):
     ret = MDB.get_devices_status()  # {'device1':'running','device2':'unkown'}
+    print('[restAPI] getDevicesStatusAPI(1)', ret)
     for device in DEVICE_LIST:
-        # if (ret[device] == DEVICE_STATUS_UNKOWN):
         try:
-            status = getRpcServerStatusAPI(request)
-            ret[device] = DEVICE_STATUS_RUNNING if status == DEVICE_STATUS_RUNNING else DEVICE_STATUS_RPCSERVER_ERROR
+            getRpcServerStatusAPI(request)
         except Exception as e:
-            ret[device] = DEVICE_STATUS_RPCSERVER_ERROR
+            ret[device] = DEVICE_STATUS_RPC_TIMEOUT
+            print('[restAPI] getDevicesStatusAPI(2)', device, e)
 
     output = JsonResponse({
         'ret': ret,
