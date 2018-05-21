@@ -19,17 +19,14 @@
                     <div class="icon">
                         <i class="fa fa-mobile-phone"></i>
                     </div>
-                    <a href="/AppSimulator/dashboard/" class="small-box-footer">
-                        详情&nbsp;
-                        <i class="fa fa-arrow-circle-right"></i>
-                    </a>
+                    <button v-on:click="startProxyServer" class="btn btn-xs btn-success">重启代理服务</button>
                 </div>
             </div>
             <div class="col-lg-3 col-xs-6">
                 <div class="small-box bg-green">
                     <div class="inner">
                         <p>代理服务器-使用CPU</p>
-                        <h3>[[ proxyServerInfo.cpu_rate ]]%</h3>
+                        <h3>[[ proxyServerInfo.cpu_percent ]]%</h3>
                     </div>
                     <div class="icon">
                         <i class="fa fa-mobile-phone"></i>
@@ -276,6 +273,28 @@
             $.ajax(opt);
         }
 
+        function startProxyServer(obj) {
+            console.log("start proxy server ...");
+            if (obj.deviceId === '') {
+                alert("请选择设备。");
+                return false;
+            }
+            let opt = {
+                url: '/AppSimulator/startProxyServerAPI/',
+                type: 'GET',
+                data: {},
+                dataType: "json",
+                error: function (xhr, err) {
+                    obj.msg = "Failure";
+                    console.error("[dashboard] startProxyServerAPI", err);
+                },
+                success: function (data, status) {
+                    obj.msg = "OK";
+                }
+            };
+            $.ajax(opt);
+        }
+
         function runScript(obj) {
             console.log("runScript ...");
             if (obj.deviceId === '') {
@@ -307,8 +326,8 @@
             el: "#main",
             data: {
                 proxyServerInfo: {
-                    memory_rate: 10,
-                    cpu_rate: 10
+                    memory_rate: 0,
+                    cpu_percent: 0
                 },
                 deviceId: 'device1',
                 device1: {cnt: 0, status: DEVICE_STATUS_UNKOWN},
@@ -334,6 +353,9 @@
                 },
                 runScript: function () {
                     runScript(this);
+                },
+                startProxyServer: function () {
+                    startProxyServer(this);
                 }
             },
             ready: function () {

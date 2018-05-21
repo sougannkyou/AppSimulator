@@ -1,5 +1,5 @@
 # coding=utf8
-import os
+import os,sys
 import time, datetime
 import win32gui
 from PIL import ImageGrab
@@ -14,6 +14,8 @@ def simulatorStatus():
     return "running"
 
 def runScript():
+    if (sys.platform == 'win32'):
+        os.system('start /B python %RPCSERVER_HOME%script_douyin.py')
     return True
 
 

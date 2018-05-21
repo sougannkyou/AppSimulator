@@ -42,7 +42,7 @@ setInterval(function getProxyServerInfoAPI() {
         success: function (data, status) {
             mainVue.proxyServerInfo.memory_rate =
                 (data['mem_info']['free'] * 100 / data['mem_info']['total']).toFixed(1);
-            mainVue.proxyServerInfo.cpu_rate = data['cpu_info']['available'];
+            mainVue.proxyServerInfo.cpu_percent = data['cpu_info']['percent'];
             mainVue.msg = "OK";
         }
     };

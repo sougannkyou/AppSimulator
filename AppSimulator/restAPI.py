@@ -44,7 +44,13 @@ def getRpcServerStatusAPI(request):
 
 def startProxyServerAPI(request):
     if (sys.platform == 'win32'):
-        os.system("start /B start cmd.exe @cmd /k anyproxy -i")
+        os.system('taskkill /t /f /fi "WINDOWTITLE eq ProxyServer"')
+        os.system('start "ProxyServer" node.exe %ANYPROXY_HOME%\main.js')
+
+    output = JsonResponse({
+        'ret': 'ok',
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
 def getProxyServerStatusAPI(request):
@@ -123,10 +129,14 @@ def getDeviceCaptureAPI(request):
 
 
 def getProxyServerInfoAPI(request):
-    cpu_info = {'user': 0, 'system': 0, 'idle': 0, 'percent': 0}
     mem_info = psutil.virtual_memory()
     output = JsonResponse({
-        'cpu_info': cpu_info,
+        'cpu_info': {
+            'user': 0,
+            'system': 0,
+            'idle': 0,
+            'percent': psutil.cpu_percent()
+        },
         'mem_info': {
             'total': mem_info.total,
             'avaiable': mem_info.available,
