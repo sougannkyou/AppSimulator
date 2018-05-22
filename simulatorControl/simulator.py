@@ -10,6 +10,7 @@ import pyautogui
 
 DEBUG_ENV = False
 
+
 class Simulator(object):
     def __init__(self, app_name):
         self._UNLOCK_POS = {
@@ -71,9 +72,12 @@ class Simulator(object):
 
     def send2web(self, pic_path):
         APPSIMULATOR_IMAGES_HOME = os.environ["APPSIMULATOR_IMAGES_HOME"]
-        shutil.copyfile(APPSIMULATOR_IMAGES_HOME + 'capture.png',
-                        APPSIMULATOR_IMAGES_HOME + 'capture_before.png')
-        shutil.copyfile(pic_path, APPSIMULATOR_IMAGES_HOME + 'capture.png')
+        try:
+            shutil.copyfile(APPSIMULATOR_IMAGES_HOME + 'capture.png',
+                            APPSIMULATOR_IMAGES_HOME + 'capture_before.png')
+            shutil.copyfile(pic_path, APPSIMULATOR_IMAGES_HOME + 'capture.png')
+        except Exception as e:
+            pass
         return True
 
     def find_element(self, comment, timeout):
