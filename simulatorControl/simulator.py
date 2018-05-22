@@ -75,9 +75,10 @@ class Simulator(object):
         try:
             shutil.copyfile(APPSIMULATOR_IMAGES_HOME + 'capture.png',
                             APPSIMULATOR_IMAGES_HOME + 'capture_before.png')
-            shutil.copyfile(pic_path, APPSIMULATOR_IMAGES_HOME + 'capture.png')
         except Exception as e:
             pass
+
+        shutil.copyfile(pic_path, APPSIMULATOR_IMAGES_HOME + 'capture.png')
         return True
 
     def find_element(self, comment, timeout):
