@@ -69,7 +69,7 @@ setInterval(function getDevicesStatusAPI() {
         },
         success: function (data, status) {
             let ret = data.ret;
-            console.log("getDevicesStatusAPI", ret);
+            // console.log("getDevicesStatusAPI", ret);
             mainVue.device1.status = ret.device1;
             mainVue.device2.status = ret.device2;
             mainVue.device3.status = ret.device3;
