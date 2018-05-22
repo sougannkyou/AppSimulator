@@ -106,6 +106,7 @@
                         <button v-on:click="setDeviceGPS" class="btn btn-xs btn-info">位置设定</button>
                         <button v-on:click="restartDevice" class="btn btn-xs btn-info">重启</button>
                         <button v-on:click="startScript" class="btn btn-xs btn-info">运行脚本</button>
+                        <button v-on:click="stopScript" class="btn btn-xs btn-info">停止脚本</button>
                     </div>
                 </div>
             </section>
@@ -296,7 +297,7 @@
         }
 
         function startScript(obj) {
-            console.log("startScriptAPI ...");
+            console.log("startScript ...");
             if (obj.deviceId === '') {
                 alert("请选择设备。");
                 return false;
@@ -311,6 +312,30 @@
                 error: function (xhr, err) {
                     obj.msg = "Failure";
                     console.error("[dashboard] startScriptAPI", err);
+                },
+                success: function (data, status) {
+                    obj.msg = "OK";
+                }
+            };
+            $.ajax(opt);
+        }
+
+        function stopScript(obj) {
+            console.log("stopScript ...");
+            if (obj.deviceId === '') {
+                alert("请选择设备。");
+                return false;
+            }
+            let opt = {
+                url: '/AppSimulator/stopScriptAPI/',
+                type: 'GET',
+                data: {
+                    deviceId: obj.deviceId
+                },
+                dataType: "json",
+                error: function (xhr, err) {
+                    obj.msg = "Failure";
+                    console.error("[dashboard] stopScriptAPI", err);
                 },
                 success: function (data, status) {
                     obj.msg = "OK";
@@ -353,6 +378,9 @@
                 },
                 startScript: function () {
                     startScript(this);
+                },
+                stopScript: function () {
+                    stopScript(this);
                 },
                 startProxyServer: function () {
                     startProxyServer(this);

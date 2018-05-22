@@ -8,8 +8,8 @@ from .views import (
 )
 
 from .restAPI import (
-    HubXPathViewAPI, getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI, getRpcServerStatusAPI,
-    setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, quitAppAPI, startProxyServerAPI,
+    HubXPathViewAPI, getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI,
+    setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,
     getDeviceCaptureAPI, getProxyServerInfoAPI
 )
 
@@ -20,12 +20,12 @@ urlpatterns = patterns('',
                        url(r'^getDeviceCrawlCntAPI/$', getDeviceCrawlCntAPI, name='getDeviceCrawlCntAPI'),
                        url(r'^getDevicesStatusAPI/$', getDevicesStatusAPI, name='getDevicesStatusAPI'),
                        url(r'^getResultSampleAPI/$', getResultSampleAPI, name='getResultSampleAPI'),
-                       url(r'^getRpcServerStatusAPI/$', getRpcServerStatusAPI, name='getRpcServerStatusAPI'),
                        url(r'^startProxyServerAPI/$', startProxyServerAPI, name='startProxyServerAPI'),
 
                        url(r'^setDeviceGPSAPI/$', setDeviceGPSAPI, name='setDeviceGPSAPI'),
                        url(r'^restartDeviceAPI/$', restartDeviceAPI, name='restartDeviceAPI'),
                        url(r'^startScriptAPI/$', startScriptAPI, name='startScriptAPI'),
+                       url(r'^stopScriptAPI/$', stopScriptAPI, name='stopScriptAPI'),
                        url(r'^quitAppAPI/$', quitAppAPI, name='quitAppAPI'),
 
                        url(r'^getDeviceCaptureAPI/$', getDeviceCaptureAPI, name='getDeviceCaptureAPI'),
