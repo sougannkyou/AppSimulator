@@ -15,6 +15,7 @@ def simulatorStatus():
 
 def startScript():
     os.system('taskkill /fi "WINDOWTITLE eq script"')
+
     os.system('start /B start "script" cmd.exe @cmd /k python %RPCSERVER_HOME%script_douyin.py')
     return True
 
