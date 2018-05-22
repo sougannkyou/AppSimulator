@@ -9,8 +9,6 @@ import shutil
 import pyautogui
 
 DEBUG_ENV = False
-APPSIMULATOR_IMAGES_HOME = os.environ["APPSIMULATOR_IMAGES_HOME"]
-
 
 class Simulator(object):
     def __init__(self, app_name):
@@ -72,9 +70,10 @@ class Simulator(object):
             cv2.destroyAllWindows()
 
     def send2web(self, pic_path):
-        shutil.copyfile(APPSIMULATOR_IMAGES_HOME + '/capture.png',
-                        APPSIMULATOR_IMAGES_HOME + '/capture_before.png')
-        shutil.copyfile(pic_path, APPSIMULATOR_IMAGES_HOME + '/capture.png')
+        APPSIMULATOR_IMAGES_HOME = os.environ["APPSIMULATOR_IMAGES_HOME"]
+        shutil.copyfile(APPSIMULATOR_IMAGES_HOME + 'capture.png',
+                        APPSIMULATOR_IMAGES_HOME + 'capture_before.png')
+        shutil.copyfile(pic_path, APPSIMULATOR_IMAGES_HOME + 'capture.png')
         return True
 
     def find_element(self, comment, timeout):
