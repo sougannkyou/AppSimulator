@@ -4,6 +4,7 @@ function ajaxError(err, msg) {
     // alert('[错误信息]' + msg + err);
 }
 
+const DEBUG_TIME = 1;
 // ------------------ DeviceCrawlCntInfo  ------------------
 setInterval(function () {
     $.ajax({
@@ -21,7 +22,7 @@ setInterval(function () {
             mainVue.device4.cnt = ret.device4;
         }
     });
-}, 10 * 1000);
+}, 10 * 1000 * DEBUG_TIME);
 
 setInterval(function getProxyServerInfoAPI() {
     if (mainVue.deviceId === '') {
@@ -47,7 +48,7 @@ setInterval(function getProxyServerInfoAPI() {
         }
     };
     $.ajax(opt);
-}, 10 * 1000);
+}, 10 * 1000 * DEBUG_TIME);
 
 setInterval(function getDevicesStatusAPI() {
     let opt = {
@@ -70,7 +71,7 @@ setInterval(function getDevicesStatusAPI() {
         }
     };
     $.ajax(opt);
-}, 30 * 1000); // 单位秒
+}, 30 * 1000 * DEBUG_TIME); // 单位秒
 
 function getDeviceCaptureAPI() {
     $.ajax({

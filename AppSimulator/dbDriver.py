@@ -41,12 +41,13 @@ class MongoDriver(object):
         self._client = pymongo.MongoClient(host=MONGODB_SERVER, port=MONGODB_PORT)
         self._db = self._client.AppSimulator
         self.deviceStatisticsInfo = self._db.deviceStatisticsInfo
+        self.deviceConfig = self._db.deviceConfig
 
     def get_device_list(self):
         return DEVICE_LIST
 
-    def get_entry_info(self, taskId):
-        info = self.deviceStatisticsInfo.find_one({'deviceId': taskId})
+    def get_config_info(self, deviceId):
+        info = self.deviceConfig.find_one({'deviceId': deviceId})
         if info: info.pop('_id')
         return info
 
@@ -81,4 +82,4 @@ if __name__ == '__main__':
     info = {'device1': 10, 'device2': 20, 'device3': 30, 'device4': 40}
     db = MongoDriver()
     db.update_device_statistics_info(info, SCOPE_TIMES)
-    pprint(db.get_devices_status(times=10 * 60))
+    pprint(db.get_devices_status())

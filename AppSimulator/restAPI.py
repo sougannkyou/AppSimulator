@@ -30,9 +30,11 @@ MDB = MongoDriver()
 RDB = RedisDriver()
 
 
-def getRpcServerStatusAPI(request):
+def getRpcServerStatus(deviceId):
+    info = MDB.get_config_info(deviceId)
+    # print('get_config_info', deviceId, info['ip'])
     socket.setdefaulttimeout(RPC_SERVER_TIMEOUT)
-    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
+    with xmlrpc.client.ServerProxy("http://" + info['ip'] + ":" + str(RPC_PORT)) as proxy:
         ret = proxy.getRpcServerStatus()
     socket.setdefaulttimeout(None)
 
@@ -106,6 +108,7 @@ def startScriptAPI(request):
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
+
 def stopScriptAPI(request):
     deviceId = request.GET.get('deviceId')  # 设备ID
     with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
@@ -114,6 +117,7 @@ def stopScriptAPI(request):
         'ret': ret,
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
 
 def getDeviceCaptureAPI(request):
     # deviceId = request.POST.get('deviceId')  # 设备ID
@@ -167,13 +171,13 @@ def getDeviceCrawlCntAPI(request):
 
 def getDevicesStatusAPI(request):
     ret = MDB.get_devices_status()  # {'device1':'running','device2':'unkown'}
-    print('[restAPI] getDevicesStatusAPI(1)', ret)
-    for device in DEVICE_LIST:
+    print('[restAPI] getDevicesStatusAPI:', ret)
+    for deviceId in DEVICE_LIST:
         try:
-            getRpcServerStatusAPI(request)
+            getRpcServerStatus(deviceId)
         except Exception as e:
-            ret[device] = DEVICE_STATUS_RPC_TIMEOUT
-            print('[restAPI] getDevicesStatusAPI(2)', device, e)
+            ret[deviceId] = DEVICE_STATUS_RPC_TIMEOUT
+            print('[restAPI] getDevicesStatusAPI error', deviceId, e)
 
     output = JsonResponse({
         'ret': ret,
