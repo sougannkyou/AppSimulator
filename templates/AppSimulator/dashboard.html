@@ -41,7 +41,7 @@
                 <div class="small-box bg-yellow">
                     <div class="inner">
                         <p>HD（C:）</p>
-                        <h3>0</h3>
+                        <h3>[[ proxyServerInfo.hd_percent ]]</h3>
                     </div>
                     <div class="icon">
                         <i class="fa fa-mobile-phone"></i>
@@ -90,7 +90,8 @@
                     <div class="box-body">
                         <div id="device1" class="device-img">
                             <div class="col-md-6" title="before">
-                                <img id="before" src="{% static 'AppSimulator/images/capture_before.png' %}" height="240"
+                                <img id="before" src="{% static 'AppSimulator/images/capture_before.png' %}"
+                                     height="240"
                                      style="border-radius:3px;">
                                 <label>before</label>
                             </div>
@@ -359,7 +360,8 @@
             data: {
                 proxyServerInfo: {
                     memory_rate: 0,
-                    cpu_percent: 0
+                    cpu_percent: 0,
+                    hd_percent: 0
                 },
                 deviceId: 'device1',
                 device1: {cnt: 0, status: DEVICE_STATUS_UNKOWN},

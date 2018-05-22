@@ -7,10 +7,8 @@ function ajaxError(err, msg) {
 const DEBUG_TIME = 1;
 // ------------------ DeviceCrawlCntInfo  ------------------
 setInterval(function () {
-
     $("#before").attr('src', src = "AppSimulator/images/capture_before.png?t=" + Math.random());
     $("#current").attr('src', src = "AppSimulator/images/capture.png?t=" + Math.random());
-
 }, 1000);
 
 setInterval(function () {
@@ -48,8 +46,9 @@ setInterval(function getProxyServerInfoAPI() {
             console.error("[dashboard] setDeviceGPSAPI", err);
         },
         success: function (data, status) {
-            mainVue.proxyServerInfo.memory_rate =
-                ((data['mem_info']['total'] - data['mem_info']['free']) * 100 / data['mem_info']['total']).toFixed(1);
+            mainVue.proxyServerInfo.hd_percent = data['hd_info']['percent'];
+            mainVue.proxyServerInfo.memory_rate = data['mem_info']['free'];
+            ((data['mem_info']['total'] - data['mem_info']['free']) * 100 / data['mem_info']['total']).toFixed(1);
             mainVue.proxyServerInfo.cpu_percent = data['cpu_info']['percent'];
             mainVue.msg = "OK";
         }

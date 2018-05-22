@@ -141,8 +141,12 @@ def getDeviceCaptureAPI(request):
 
 
 def getProxyServerInfoAPI(request):
+    partition = psutil.disk_usage('/')
     mem_info = psutil.virtual_memory()
     output = JsonResponse({
+        'hd_info': {
+            'percent': partition.percent
+        },
         'cpu_info': {
             'user': 0,
             'system': 0,
