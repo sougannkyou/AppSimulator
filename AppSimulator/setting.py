@@ -6,7 +6,7 @@ REDIS_SERVER = 'redis://172.16.55.155/11'
 REDIS_SERVER_RESULT = 'redis://172.16.55.155/10'
 # REDIS_SERVER_RESULT = 'redis://127.0.0.1/10'
 
-MONGODB_SERVER = '127.0.0.1'
+MONGODB_SERVER = '172.16.55.155'
 MONGODB_PORT = 27017
 
 DEVICE_LIST = ['device1', 'device2', 'device3', 'device4']
