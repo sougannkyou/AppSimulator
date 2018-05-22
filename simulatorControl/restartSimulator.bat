@@ -1,7 +1,7 @@
 rem taskkill /t /f /fi "WINDOWTITLE eq taskeng.exe"
 C:\Nox\bin\Nox.exe -quit
 timeout 10
-start /b /ABOVENORMAL C:\Nox\bin\Nox.exe
+start /b /HIGH C:\Nox\bin\Nox.exe
 timeout 30
 tasklist | findstr "Nox.exe"
 cd %RPCSERVER_HOME%
