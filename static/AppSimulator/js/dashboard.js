@@ -47,8 +47,7 @@ setInterval(function getProxyServerInfoAPI() {
         },
         success: function (data, status) {
             mainVue.proxyServerInfo.hd_percent = data['hd_info']['percent'];
-            mainVue.proxyServerInfo.memory_rate = data['mem_info']['free'];
-            ((data['mem_info']['total'] - data['mem_info']['free']) * 100 / data['mem_info']['total']).toFixed(1);
+            mainVue.proxyServerInfo.memory_rate = ((data['mem_info']['total'] - data['mem_info']['free']) * 100 / data['mem_info']['total']).toFixed(1);
             mainVue.proxyServerInfo.cpu_percent = data['cpu_info']['percent'];
             mainVue.msg = "OK";
         }
