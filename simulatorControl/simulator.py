@@ -73,13 +73,13 @@ class Simulator(object):
     def send2web(self, pic_path):
         # APPSIMULATOR_IMAGES_HOME = os.environ["APPSIMULATOR_IMAGES_HOME"]
         try:
-            shutil.copyfile('Z:\images\capture.png',
-                            'Z:\images\capture_before.png')
+            shutil.copyfile('Z:/images/capture.png',
+                            'Z:/images/capture_before.png')
         except Exception as e:
             print("send2web error:", e)
             pass
 
-        shutil.copyfile(pic_path, 'Z:\images\capture.png')
+        shutil.copyfile(pic_path, 'Z:/images/capture.png')
         return True
 
     def find_element(self, comment, timeout):
@@ -92,7 +92,7 @@ class Simulator(object):
             app_bg_box = (left, top, right, bottom)
             im = ImageGrab.grab(app_bg_box)
             im.save('images/capture.png')
-            self.send2web('images/capture.png')
+            # self.send2web('images/capture.png')
 
             img_capture = ac.imread('images/capture.png')
             img_obj = ac.imread(obj_pic_path)

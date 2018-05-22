@@ -27,7 +27,7 @@ def run():
                             if ret: ret = self.click(u"分享", timeout=1)
 
                     if ret: ret = self.click(u"复制链接", timeout=1)
-                    if not ret: self.send2web('images/offline.jpeg')
+                    # if not ret: self.send2web('images/offline.jpeg')
 
         mySimulator = MySimulator("douyin0")
         mySimulator._PIC_PATH = {
