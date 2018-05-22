@@ -1,4 +1,4 @@
-import time
+import os, time
 import win32con as WCON
 import win32api
 import win32gui
@@ -9,6 +9,8 @@ import shutil
 import pyautogui
 
 DEBUG_ENV = False
+APPSIMULATOR_IMAGES_HOME = os.environ["APPSIMULATOR_IMAGES_HOME"]
+
 
 class Simulator(object):
     def __init__(self, app_name):
@@ -70,9 +72,9 @@ class Simulator(object):
             cv2.destroyAllWindows()
 
     def send2web(self, pic_path):
-        shutil.copyfile('../static/AppSimulator/images/capture.png',
-                        '../static/AppSimulator/images/capture_before.png')
-        shutil.copyfile(pic_path, '../static/AppSimulator/images/capture.png')
+        shutil.copyfile(APPSIMULATOR_IMAGES_HOME + '/capture.png',
+                        APPSIMULATOR_IMAGES_HOME + '/capture_before.png')
+        shutil.copyfile(pic_path, APPSIMULATOR_IMAGES_HOME + '/capture.png')
         return True
 
     def find_element(self, comment, timeout):
@@ -160,12 +162,15 @@ class Simulator(object):
         ret = None
         # hwnd = win32gui.FindWindow("Qt5QWindowIcon", None)
         if self.hwnd: ret = self.find_element(comment='锁屏', timeout=5)
-        if ret: ret = self.unlock(1)
-        else: ret = self.app_quit()
+        if ret:
+            ret = self.unlock(1)
+        else:
+            ret = self.app_quit()
         if ret: self.script()
 
     def script(self):
         pass
+
 
 if __name__ == "__main__":
     pass
