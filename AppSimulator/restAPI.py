@@ -79,6 +79,7 @@ def setDeviceGPSAPI(request):
 
 def restartDeviceAPI(request):
     deviceId = request.GET.get('deviceId')  # 设备ID
+
     with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
         ret = proxy.restartDevice(deviceId)
 
@@ -171,13 +172,13 @@ def getDeviceCrawlCntAPI(request):
 
 def getDevicesStatusAPI(request):
     ret = MDB.get_devices_status()  # {'device1':'running','device2':'unkown'}
-    print('[restAPI] getDevicesStatusAPI:', ret)
-    for deviceId in DEVICE_LIST:
-        try:
-            getRpcServerStatus(deviceId)
-        except Exception as e:
-            ret[deviceId] = DEVICE_STATUS_RPC_TIMEOUT
-            print('[restAPI] getDevicesStatusAPI error', deviceId, e)
+    # print('[restAPI] getDevicesStatusAPI:', ret)
+    # for deviceId in DEVICE_LIST:
+    #     try:
+    #         getRpcServerStatus(deviceId)
+    #     except Exception as e:
+    #         ret[deviceId] = DEVICE_STATUS_RPC_TIMEOUT
+    #         print('[restAPI] getDevicesStatusAPI error', deviceId, e)
 
     output = JsonResponse({
         'ret': ret,
