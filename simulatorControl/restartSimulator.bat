@@ -6,4 +6,5 @@ cd %RPCSERVER_HOME%
 python script_douyin.py
 timeout 10
 C:\Nox\bin\Nox.exe -quit
+timeout 30
 

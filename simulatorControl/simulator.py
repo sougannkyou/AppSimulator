@@ -71,14 +71,15 @@ class Simulator(object):
             cv2.destroyAllWindows()
 
     def send2web(self, pic_path):
-        APPSIMULATOR_IMAGES_HOME = os.environ["APPSIMULATOR_IMAGES_HOME"]
+        # APPSIMULATOR_IMAGES_HOME = os.environ["APPSIMULATOR_IMAGES_HOME"]
         try:
-            shutil.copyfile(APPSIMULATOR_IMAGES_HOME + 'capture.png',
-                            APPSIMULATOR_IMAGES_HOME + 'capture_before.png')
+            shutil.copyfile('Z:\images\capture.png',
+                            'Z:\images\capture_before.png')
         except Exception as e:
-            print("send2web",e)
-            # pass
-        shutil.copyfile(pic_path, APPSIMULATOR_IMAGES_HOME + 'capture.png')
+            print("send2web error:", e)
+            pass
+
+        shutil.copyfile(pic_path, 'Z:\images\capture.png')
         return True
 
     def find_element(self, comment, timeout):
