@@ -29,7 +29,10 @@ class RedisDriver(object):
     def get_crwal_cnt_by_device(self):
         ret = {}
         for device_id in DEVICE_LIST:
-            ret[device_id] = self._conn.scard(device_id + '_org')
+            ret[device_id] = {
+                'cnt': self._conn.scard(device_id + '_org'),
+                'dedup_cnt': self._conn_result.zcard('dedup_douyin_id')
+            }
         return ret
 
     def get_device_history(self, device_id):
@@ -56,7 +59,7 @@ class MongoDriver(object):
         self.deviceStatisticsInfo.remove({'time': {'$lt': old_time}})
         now = int(datetime.now().timestamp())
         for device_id in DEVICE_LIST:
-            self.deviceStatisticsInfo.insert({'deviceId': device_id, 'time': now, 'cnt': info[device_id]})
+            self.deviceStatisticsInfo.insert({'deviceId': device_id, 'time': now, 'cnt': info[device_id]['cnt']})
 
     def get_devices_status(self):  # 时间窗
         devices_status = {}
