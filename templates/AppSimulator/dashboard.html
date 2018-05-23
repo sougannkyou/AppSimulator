@@ -55,8 +55,9 @@
             <div class="col-lg-3 col-xs-6">
                 <div class="small-box bg-red">
                     <div class="inner">
-                        <p>Total(10s)</p>
-                        <h3>[[ device1.cnt + device2.cnt + device3.cnt + device4.cnt]]</h3>
+                        <p>Dedup/Total (10s)</p>
+                        <h3>[[ device1.dedup_cnt + device2.dedup_cnt + device3.dedup_cnt + device4.dedup_cnt]]/
+                            <small>[[ device1.cnt + device2.cnt + device3.cnt + device4.cnt]]</small>></h3>
                     </div>
                     <div class="icon">
                         <i class="fa fa-mobile-phone"></i>
@@ -364,10 +365,10 @@
                     hd_percent: 0
                 },
                 deviceId: 'device1',
-                device1: {cnt: 0, status: DEVICE_STATUS_UNKOWN},
-                device2: {cnt: 0, status: DEVICE_STATUS_UNKOWN},
-                device3: {cnt: 0, status: DEVICE_STATUS_UNKOWN},
-                device4: {cnt: 0, status: DEVICE_STATUS_UNKOWN},
+                device1: {cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN},
+                device2: {cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN},
+                device3: {cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN},
+                device4: {cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN},
                 district: '海淀区',
                 lng_lat: "",
                 latitude: 39.6099202570, // 经度
