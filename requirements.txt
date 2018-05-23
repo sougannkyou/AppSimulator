@@ -30,3 +30,4 @@ vine==1.1.3
 xlrd==1.0.0
 django-cors-headers==2.2.0
 w3lib===1.19.0
+psutil===5.4.5
