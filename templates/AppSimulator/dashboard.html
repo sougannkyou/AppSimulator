@@ -17,7 +17,7 @@
                         <h3>[[ proxyServerInfo.memory_rate ]]%</h3>
                     </div>
                     <div class="icon">
-                        <i class="fa fa-mobile-phone"></i>
+                        <img src="{% static 'AppSimulator/images/memory.png'%}">
                     </div>
                     <button v-on:click="startProxyServer" class="btn btn-xs btn-success">重启代理服务</button>
                 </div>
@@ -29,7 +29,7 @@
                         <h3>[[ proxyServerInfo.cpu_percent ]]%</h3>
                     </div>
                     <div class="icon">
-                        <i class="fa fa-mobile-phone"></i>
+                         <img src="{% static 'AppSimulator/images/cpu.png'%}">
                     </div>
                     <a href="/AppSimulator/dashboard/" class="small-box-footer">
                         详情&nbsp;
@@ -40,11 +40,11 @@
             <div class="col-lg-3 col-xs-6">
                 <div class="small-box bg-yellow">
                     <div class="inner">
-                        <p>HD（C:）</p>
+                        <p>HD</p>
                         <h3>[[ proxyServerInfo.hd_percent ]]%</h3>
                     </div>
                     <div class="icon">
-                        <i class="fa fa-mobile-phone"></i>
+                         <img src="{% static 'AppSimulator/images/hd.png'%}">
                     </div>
                     <a href="/AppSimulator/dashboard/" class="small-box-footer">
                         详情&nbsp;
@@ -61,7 +61,7 @@
                         </h3>
                     </div>
                     <div class="icon">
-                        <i class="fa fa-mobile-phone"></i>
+                        <i class="fa fa-star-half-empty"></i>
                     </div>
                     <a href="/AppSimulator/dashboard/" class="small-box-footer">
                         详情&nbsp;
