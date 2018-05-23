@@ -4,7 +4,7 @@ timeout 10
 start /b /HIGH C:\Nox\bin\Nox.exe
 timeout 30
 tasklist | findstr "Nox.exe"
-cd %RPCSERVER_HOME%
+cd %SIMULATOR_CONTROL_HOME%
 start /b /HIGH python script_douyin.py
 timeout 10
 rem C:\Nox\bin\Nox.exe -quit
