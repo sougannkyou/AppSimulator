@@ -21,10 +21,14 @@ setInterval(function () {
         },
         success: function (data, textStatus) {
             let ret = data.ret;
-            mainVue.device1.cnt = ret.device1;
-            mainVue.device2.cnt = ret.device2;
-            mainVue.device3.cnt = ret.device3;
-            mainVue.device4.cnt = ret.device4;
+            mainVue.device1.cnt = ret.device1.cnt;
+            mainVue.device1.dedup_cnt = ret.device1.dedup_cnt;
+            mainVue.device2.cnt = ret.device2.cnt;
+            mainVue.device2.dedup_cnt = ret.device2.dedup_cnt;
+            mainVue.device3.cnt = ret.device3.cnt;
+            mainVue.device3.dedup_cnt = ret.device3.dedup_cnt;
+            mainVue.device4.cnt = ret.device4.cnt;
+            mainVue.device4.dedup_cnt = ret.device4.dedup_cnt;
         }
     });
 }, 10 * 1000 * DEBUG_TIME);
