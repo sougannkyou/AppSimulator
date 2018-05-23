@@ -27,12 +27,10 @@ class RedisDriver(object):
         return ret
 
     def get_crwal_cnt_by_device(self):
-        ret = {}
+        ret = {'devices': {'dedup_cnt': self._conn_result.zcard('dedup_douyin_id')}}
         for device_id in DEVICE_LIST:
-            ret[device_id] = {
-                'cnt': self._conn.scard(device_id + '_org'),
-                'dedup_cnt': self._conn_result.zcard('dedup_douyin_id')
-            }
+            ret[device_id] = {'cnt': self._conn.scard(device_id + '_org')}
+
         return ret
 
     def get_device_history(self, device_id):
