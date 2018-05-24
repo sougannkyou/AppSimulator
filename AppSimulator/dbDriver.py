@@ -16,10 +16,6 @@ class RedisDriver(object):
     def __init__(self):
         self._conn = redis.StrictRedis.from_url(REDIS_SERVER)
         self._conn_result = redis.StrictRedis.from_url(REDIS_SERVER_RESULT)
-        self.device1 = 'device1'
-        self.device2 = 'device2'
-        self.device3 = 'device3'
-        self.device4 = 'device4'
 
     def get_result_sample(self):
         cnt = self._conn_result.llen('douyin_data')
@@ -28,8 +24,8 @@ class RedisDriver(object):
 
     def get_crwal_cnt_by_device(self):
         ret = {'devices': {'dedup_cnt': self._conn_result.zcard('dedup_douyin_id')}}
-        for device_id in DEVICE_LIST:
-            ret[device_id] = {'cnt': self._conn.scard(device_id + '_org')}
+        for device in DEVICE_LIST:
+            ret[device['deviceId']] = {'cnt': self._conn.scard(device['deviceId'] + '_org')}
 
         return ret
 
@@ -45,7 +41,13 @@ class MongoDriver(object):
         self.deviceConfig = self._db.deviceConfig
 
     def get_device_list(self):
-        return DEVICE_LIST
+        devices_list = []
+        l = self.deviceConfig.find()
+        for r in l:
+            devices_list.append({'deviceId': r['deviceId'], 'ip': r['ip']})
+
+        pprint(devices_list)
+        return devices_list
 
     def get_config_info(self, deviceId):
         info = self.deviceConfig.find_one({'deviceId': deviceId})
@@ -56,24 +58,26 @@ class MongoDriver(object):
         old_time = int((datetime.now() - timedelta(seconds=scope_times)).timestamp())
         self.deviceStatisticsInfo.remove({'time': {'$lt': old_time}})
         now = int(datetime.now().timestamp())
-        for device_id in DEVICE_LIST:
-            self.deviceStatisticsInfo.insert({'deviceId': device_id, 'time': now, 'cnt': info[device_id]['cnt']})
+        for device in DEVICE_LIST:
+            self.deviceStatisticsInfo.insert({
+                'deviceId': device['deviceId'], 'time': now, 'cnt': info[device['deviceId']]['cnt']
+            })
 
     def get_devices_status(self):  # 时间窗
         devices_status = {}
-        for device_id in DEVICE_LIST:
+        for device in DEVICE_LIST:
             l = []
-            devices_status[device_id] = DEVICE_STATUS_UNKOWN
-            statistics = self.deviceStatisticsInfo.find({'deviceId': device_id})
+            devices_status[device['deviceId']] = DEVICE_STATUS_UNKOWN
+            statistics = self.deviceStatisticsInfo.find({'deviceId': device['deviceId']})
             for s in statistics:
                 s.pop('_id')
                 l.append(s['cnt'])
 
             if (len(l) > 0 and l[-1] > 0):
                 if (l[0] == l[-1]):
-                    devices_status[device_id] = DEVICE_STATUS_SUSPEND
+                    devices_status[device['deviceId']] = DEVICE_STATUS_SUSPEND
                 else:
-                    devices_status[device_id] = DEVICE_STATUS_RUNNING
+                    devices_status[device['deviceId']] = DEVICE_STATUS_RUNNING
 
         return devices_status  # {'device1':'running','device2':'unkown'}
 
