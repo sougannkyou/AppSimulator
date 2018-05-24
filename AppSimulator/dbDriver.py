@@ -24,7 +24,8 @@ class RedisDriver(object):
 
     def get_crwal_cnt_by_device(self):
         ret = {'devices': {'dedup_cnt': self._conn_result.zcard('dedup_douyin_id')}}
-        for device in DEVICE_LIST:
+        devices = MongoDriver().get_device_list()
+        for device in devices:
             ret[device['deviceId']] = {'cnt': self._conn.scard(device['deviceId'] + '_org')}
 
         return ret
@@ -46,7 +47,6 @@ class MongoDriver(object):
         for r in l:
             devices_list.append({'deviceId': r['deviceId'], 'ip': r['ip']})
 
-        pprint(devices_list)
         return devices_list
 
     def get_config_info(self, deviceId):
@@ -58,14 +58,14 @@ class MongoDriver(object):
         old_time = int((datetime.now() - timedelta(seconds=scope_times)).timestamp())
         self.deviceStatisticsInfo.remove({'time': {'$lt': old_time}})
         now = int(datetime.now().timestamp())
-        for device in DEVICE_LIST:
+        for device in self.get_device_list():
             self.deviceStatisticsInfo.insert({
                 'deviceId': device['deviceId'], 'time': now, 'cnt': info[device['deviceId']]['cnt']
             })
 
     def get_devices_status(self):  # 时间窗
         devices_status = {}
-        for device in DEVICE_LIST:
+        for device in self.get_device_list():
             l = []
             devices_status[device['deviceId']] = DEVICE_STATUS_UNKOWN
             statistics = self.deviceStatisticsInfo.find({'deviceId': device['deviceId']})

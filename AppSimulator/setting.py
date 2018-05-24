@@ -1,15 +1,13 @@
 # coding=utf-8
+import os
+
 PAGE_SIZE = 20
 
-REDIS_SERVER = 'redis://172.16.55.155/11'
-# REDIS_SERVER = 'redis://127.0.0.1/11'
-REDIS_SERVER_RESULT = 'redis://172.16.55.155/10'
-# REDIS_SERVER_RESULT = 'redis://127.0.0.1/10'
+REDIS_SERVER = os.environ["REDIS_SERVER"] + '/11'  # 'redis://172.16.55.155'
+REDIS_SERVER_RESULT = os.environ["REDIS_SERVER"] + '/10'
 
-MONGODB_SERVER = '172.16.55.155'
+MONGODB_SERVER = os.environ["MONGODB_SERVER"]  # "172.16.55.155"
 MONGODB_PORT = 27017
-
-DEVICE_LIST = ['device1', 'device2', 'device3', 'device4']
 
 DEVICE_STATUS_RPC_TIMEOUT = 'rpc_timeout'
 DEVICE_STATUS_UNKOWN = 'unkown'
@@ -21,4 +19,3 @@ SCOPE_TIMES = 1 * 60
 RPC_CLIENT = "http://172.16.252.238:8003/"
 RPC_PORT = 8003
 RPC_SERVER_TIMEOUT = 5
-
