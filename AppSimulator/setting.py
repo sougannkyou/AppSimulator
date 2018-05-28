@@ -3,10 +3,13 @@ import os
 
 PAGE_SIZE = 20
 
-REDIS_SERVER = os.environ["REDIS_SERVER"] + '/11'  # 'redis://172.16.55.155'
-REDIS_SERVER_RESULT = os.environ["REDIS_SERVER"] + '/10'
+# REDIS_SERVER = os.environ["REDIS_SERVER"] + '/11'  # 'redis://172.16.55.155'
+REDIS_SERVER = 'redis://172.16.3.2/11'
+# REDIS_SERVER_RESULT = os.environ["REDIS_SERVER"] + '/10'
+REDIS_SERVER_RESULT = 'redis://172.16.3.2/10'
 
-MONGODB_SERVER = os.environ["MONGODB_SERVER"]  # "172.16.55.155"
+# MONGODB_SERVER = os.environ["MONGODB_SERVER"]  # "172.16.55.155"
+MONGODB_SERVER = "172.16.3.2"
 MONGODB_PORT = 27017
 
 DEVICE_STATUS_RPC_TIMEOUT = 'rpc_timeout'
