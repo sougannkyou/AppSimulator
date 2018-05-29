@@ -18,3 +18,8 @@ MDB = MongoDriver()
 class DashBoardView(TemplateView):
     queryset = []
     template_name = 'AppSimulator/dashboard.html'
+
+# [数据面板]
+class DevicesManagerView(TemplateView):
+    queryset = []
+    template_name = 'AppSimulator/devicesManager.html'

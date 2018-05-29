@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
 
 from .views import (
-    DashBoardView
+    DashBoardView, DevicesManagerView
 )
 
 from .restAPI import (
@@ -17,6 +17,7 @@ cache_time_out = 60 * 3
 
 urlpatterns = patterns('',
                        url(r'^dashboard/$', DashBoardView.as_view(), name='dashboard'),
+                       url(r'^devices/$', DevicesManagerView.as_view(), name='devices'),
                        url(r'^getDeviceCrawlCntAPI/$', getDeviceCrawlCntAPI, name='getDeviceCrawlCntAPI'),
                        url(r'^getDevicesStatusAPI/$', getDevicesStatusAPI, name='getDevicesStatusAPI'),
                        url(r'^getResultSampleAPI/$', getResultSampleAPI, name='getResultSampleAPI'),

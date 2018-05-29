@@ -1,0 +1,156 @@
+{% extends 'base_backend_frameless.html' %}
+{% load static %}
+
+{% block header_tail %}
+    {#    <meta http-equiv="refresh" content="5">#}
+    <link rel="stylesheet" href="{% static 'AppSimulator/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
+{% endblock header_tail %}
+
+{% block section_content %}
+    <div id="main" v-cloak>
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Devices Manager</h3>
+                    <div class="box-tools">
+                        <div class="input-group input-group-sm" style="width: 150px;">
+                            <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
+                            <div class="input-group-btn">
+                                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover">
+                        <tbody>
+                        <tr>
+                            <th>deviceID</th>
+                            <th>IP</th>
+                            <th>PhoneNum</th>
+                            <th>IMEI</th>
+                            <th>APP</th>
+                            <th>Status</th>
+                        </tr>
+                        <tr>
+                            <td>183</td>
+                            <td>John Doe</td>
+                            <td>John Doe</td>
+                            <td>11-7-2014</td>
+                            <td>douyin</td>
+                            <td><span class="label label-success">running</span></td>
+                        </tr>
+                        <tr>
+                            <td>219</td>
+                            <td>Alexander Pierce</td>
+                            <td>Alexander Pierce</td>
+                            <td>11-7-2014</td>
+                            <td>douyin</td>
+                            <td><span class="label label-warning">suspend</span></td>
+                        </tr>
+                        <tr>
+                            <td>657</td>
+                            <td>Bob Doe</td>
+                            <td>Bob Doe</td>
+                            <td>11-7-2014</td>
+                            <td>douyin</td>
+                            <td><span class="label label-default">unkown</span></td>
+                        </tr>
+                        <tr>
+                            <td>175</td>
+                            <td>Mike Doe</td>
+                            <td>Mike Doe</td>
+                            <td>11-7-2014</td>
+                            <td>douyin</td>
+                            <td><span class="label label-default">unkown</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock section_content %}
+
+{% block jquery_js %}
+
+{% endblock jquery_js %}
+
+{% block body_tail %}
+    <!-- page script -->
+    <script type="text/javascript"
+            src="{% static 'plugins/echarts/extension/dataTool.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/echarts/echarts-all-3.js' %}"></script>
+    <script type="text/javascript" src="{% static 'dist/js/demo.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/dark.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/infographic.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/macarons.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/roma.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/shine.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/vintage.js' %}"></script>
+    <script type="text/javascript" src="{% static 'AppSimulator/js/csrf.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/vue1/vue.js' %}"></script>
+    <script type="text/javascript" src="{% static 'AppSimulator/js/deviceManager.js' %}"></script>
+    <script type="text/javascript">
+        {#const HOST = "http://172.16.55.155:8000";#}
+        {#const HOST = "http://192.168.31.227:8000";#}
+        const DEVICE_STATUS_UNKOWN = 'unkown';
+        const DEVICE_STATUS_RUNNING = 'running';
+        const DEVICE_STATUS_SUSPEND = 'suspend';
+
+
+        //----------------------------------------------------------------------------
+        Vue.config.delimiters = ['[[', ']]'];
+        //----------------------------------------------------------------------------
+        let mainVue = new Vue({
+            el: "#main",
+            data: {
+                proxyServerInfo: {
+                    memory_rate: 0,
+                    cpu_percent: 0,
+                    hd_percent: 0
+                },
+                devices: {cnt: 0, dedup_cnt: 0},
+                deviceId: 'device1',
+                device1: {cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN},
+                device2: {cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN},
+                device3: {cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN},
+                device4: {cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN},
+                district: '海淀区',
+                lng_lat: "",
+                latitude: 39.6099202570, // 经度
+                longitude: 118.1799316404, // 纬度
+                current_address: "",
+                search_address: '',
+                msg: ""
+            },
+            methods: {
+                trace: function () {
+                },
+                setDeviceGPS: function () {
+                    setDeviceGPS(this);
+                },
+                restartDevice: function () {
+                    restartDevice(this);
+                },
+                startScript: function () {
+                    startScript(this);
+                },
+                stopScript: function () {
+                    stopScript(this);
+                },
+                startProxyServer: function () {
+                    startProxyServer(this);
+                }
+            },
+            ready: function () {
+            },
+            watch: {},
+            computed: {}
+        });
+    </script>
+{% endblock body_tail %}
+
+
+
