@@ -32,14 +32,15 @@ def run():
 
                     # if not ret: self.send2web('images/offline.jpeg')
 
-        mySimulator = MySimulator("douyin3")
+        mySimulator = MySimulator("douyin0")
         mySimulator._PIC_PATH = {
-            u"APP图标": 'images/app_ready.png',
-            u"更新": 'images/update.png',
-            u"分享": 'images/share.png',
-            u"复制链接": 'images/copylink.png',
-            u"跳过软件升级": 'images/is_upgrade.png',
-            u"锁屏": 'images/screen_lock.png'
+            u"APP图标": 'images_xiaoyao/app_ready.png',
+            u"更新": 'images_xiaoyao/update.png',
+            u"分享": 'images_xiaoyao/share.png',
+            u"复制链接": 'images_xiaoyao/copylink.png',
+            u"跳过软件升级": 'images_xiaoyao/is_upgrade.png',
+            u"锁屏": 'images_xiaoyao/screen_lock.png',
+            u"锁屏图案": 'images_xiaoyao/screen_lock_9point.png'
         }
 
         mySimulator._CLICK_POS = {

@@ -151,42 +151,53 @@ class Simulator(object):
         self.send_key(WCON.VK_ESCAPE, 1)
         return True
 
-    def unlock(self, timeout):
+    def check_screen_lock(self, timeout):
         win32gui.SetForegroundWindow(self.hwnd)
         left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
-        top += 20
         self._sleep(timeout)
 
-        (x, y) = self._UNLOCK_POS['step1']
-        x = left + x
-        y = top + y
-        pyautogui.moveTo(x, y)
-        pyautogui.mouseDown()
+        ret, x, y = self.find_element(comment='锁屏', timeout=10)
+        if not ret:
+            return False
+        else:
+            _x = left + x
+            _y = top + y
+            pyautogui.moveTo(_x, _y)
+            pyautogui.dragTo(_x, _y - 400, 0.5, button='left')
+            self._sleep(timeout)
 
-        (x, y) = self._UNLOCK_POS['step2']
-        x = left + x
-        y = top + y
-        # pyautogui.dragTo(x, y, 0.5, button='left')
-        pyautogui.moveTo(x, y, 1, pyautogui.easeInQuad)
+            ret, x, y = self.find_element(comment='锁屏图案', timeout=10)
+            if not ret:
+                return False
+            else:
+                screen_lock = ac.imread('images_xiaoyao/screen_lock.png')
+                h = screen_lock.shape[0]
+                d = screen_lock.shape[1]
+                _x = left + x - d
+                _y = top + y - h
+                pyautogui.moveTo(_x, _y)
+                pyautogui.mouseDown()
 
-        (x, y) = self._UNLOCK_POS['step3']
-        x = left + x
-        y = top + y
-        # pyautogui.dragTo(x, y, 0.5, button='left')
-        pyautogui.moveTo(x, y, 1, pyautogui.easeInBounce)
-        pyautogui.mouseUp()
-        self._sleep(timeout)
-        return True
+                _x = left + x - d
+                _y = top + y + h
+                pyautogui.moveTo(_x, _y, 1, pyautogui.easeInQuad)
+
+                _x = left + x + d
+                _y = top + y + h
+                # pyautogui.dragTo(x, y, 0.5, button='left')
+                pyautogui.moveTo(_x, _y, 1, pyautogui.easeInBounce)
+                pyautogui.mouseUp()
+                self._sleep(timeout)
+                return True
 
     def run(self):
         ret = None
         # hwnd = win32gui.FindWindow("Qt5QWindowIcon", None)
-        if self.hwnd: ret, _, _ = self.find_element(comment='锁屏', timeout=5)
-        if ret:
-            ret = self.unlock(1)
-        else:
-            ret = self.app_quit()
-        if ret: self.script()
+        if self.hwnd:
+            ret = self.check_screen_lock(timeout=1)
+            if not ret:
+                ret = self.app_quit()
+            if ret: self.script()
 
     def script(self):
         pass
