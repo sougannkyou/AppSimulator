@@ -6,10 +6,10 @@ function ajaxError(err, msg) {
 
 const DEBUG_TIME = 1;
 // ------------------ DeviceCrawlCntInfo  ------------------
-setInterval(function () {
-    $("#before").attr('src', src = "/static/AppSimulator/images/capture_before.png?t=" + Math.random());
-    $("#current").attr('src', src = "/static/AppSimulator/images/capture.png?t=" + Math.random());
-}, 1000);
+// setInterval(function () {
+//     $("#before").attr('src', src = "/static/AppSimulator/images/capture_before.png?t=" + Math.random());
+//     $("#current").attr('src', src = "/static/AppSimulator/images/capture.png?t=" + Math.random());
+// }, 1000);
 
 setInterval(function () {
     $.ajax({

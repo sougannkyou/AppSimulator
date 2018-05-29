@@ -15,19 +15,18 @@ from .setting import *
 class RedisDriver(object):
     def __init__(self):
         self._conn = redis.StrictRedis.from_url(REDIS_SERVER)
-        self._conn_result = redis.StrictRedis.from_url(REDIS_SERVER_RESULT)
 
     def get_result_sample(self):
-        cnt = self._conn_result.llen('douyin_data')
-        ret = self._conn_result.blrange('douyin_data', -1, -1)
+        cnt = self._conn.llen('douyin_data')
+        ret = self._conn.blrange('douyin_data', -1, -1)
         return ret
 
     def get_crwal_cnt_by_device(self):
-        # ret = {'devices': {'dedup_cnt': self._conn_result.zcard('dedup_douyin_id')}}
-        ret = {'devices': {'dedup_cnt': 0}}
+        ret = {'devices': {'dedup_cnt': self._conn.zcard('APP:iesdouyin:dedup_id')}}
+        # ret = {'devices': {'dedup_cnt': 0}}
         devices = MongoDriver().get_device_list()
         for device in devices:
-            ret[device['deviceId']] = {'cnt': self._conn.scard(device['ip'] + '_org')}
+            ret[device['deviceId']] = {'cnt': self._conn.scard("devices:" + device['ip'] + '_org')}
 
         return ret
 
