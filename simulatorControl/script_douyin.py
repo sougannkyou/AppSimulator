@@ -13,7 +13,7 @@ def run():
                 if self.hwnd: ret = self.find_element(comment='APP图标', timeout=10)  # unlock ok
                 if ret: ret = self.click(u"APP图标", timeout=2)
                 while (ret):
-                    if ret: ret = self.find_element(comment='更新', timeout=10)
+                    if ret: ret = self.find_element(comment='更新', timeout=30)
                     if ret: ret = self.click(u"更新", timeout=1)
 
                     if ret: ret = self.find_element(comment='分享', timeout=10)

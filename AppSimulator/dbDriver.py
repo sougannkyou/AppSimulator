@@ -28,6 +28,7 @@ class RedisDriver(object):
         for device in devices:
             ret[device['deviceId']] = {'cnt': self._conn.scard("devices:" + device['ip'] + '_org')}
 
+        pprint("get_crwal_cnt_by_device:", ret)
         return ret
 
     def get_device_history(self, device_id):
