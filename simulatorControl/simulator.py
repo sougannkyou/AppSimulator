@@ -7,6 +7,7 @@ import cv2
 import aircv as ac
 import shutil
 import pyautogui
+import ftplib
 
 DEBUG_ENV = False
 
@@ -22,6 +23,30 @@ class Simulator(object):
         self._CLICK_POS = {}
         self.is_proxy_active = True
         self.hwnd = win32gui.FindWindow(None, app_name)
+
+    def ftp_upload(local_file, remote_dir, remote_file):
+        host = '172.16.3.2'
+        username = 'admin'
+        password = 'zhxg@2018'
+
+        f = ftplib.FTP(host)
+        f.login(username, password)
+        pwd_path = f.pwd()
+        print("FTP当前路径:", pwd_path)
+
+        bufsize = 1024  # 设置缓冲器大小
+        fp = open(local_file, 'rb')
+        # f.set_debuglevel(2)
+        try:
+            f.delete(remote_file)
+            f.rmd(remote_dir)
+        except Exception as e:
+            print("ftp_upload:", e)
+
+        f.mkd(remote_dir)
+        f.storbinary('STOR ' + remote_dir + '/' + remote_file, fp, bufsize)
+        f.set_debuglevel(0)
+        fp.close()
 
     def is_upgrade(self, img_capture, comment):
         img_obj = ac.imread(self._PIC_PATH[comment])
@@ -70,16 +95,30 @@ class Simulator(object):
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 
+        # def send2web(self, pic_path):
+        #     # APPSIMULATOR_IMAGES_HOME = os.environ["APPSIMULATOR_IMAGES_HOME"]
+        #     try:
+        #         shutil.copyfile('Z:/images/capture.png',
+        #                         'Z:/images/capture_before.png')
+        #     except Exception as e:
+        #         print("send2web error:", e)
+        #         pass
+        #
+        #     shutil.copyfile(pic_path, 'Z:/images/capture.png')
+        #     return True
+
     def send2web(self, pic_path):
-        # APPSIMULATOR_IMAGES_HOME = os.environ["APPSIMULATOR_IMAGES_HOME"]
+        local_ip = os.environ['CLIPBOARD_IP']
+        if not local_ip:
+            local_ip = 'unkwon'
+
         try:
-            shutil.copyfile('Z:/images/capture.png',
-                            'Z:/images/capture_before.png')
+            shutil.copyfile('images/capture.png', 'images/capture_before.png')
+            self.ftp_upload('images/capture.png', local_ip, 'capture.png')
+            self.ftp_upload('images/capture_before.png', local_ip, 'capture_before.png')
         except Exception as e:
             print("send2web error:", e)
-            pass
 
-        shutil.copyfile(pic_path, 'Z:/images/capture.png')
         return True
 
     def find_element(self, comment, timeout):
@@ -92,7 +131,7 @@ class Simulator(object):
             app_bg_box = (left, top, right, bottom)
             im = ImageGrab.grab(app_bg_box)
             im.save('images/capture.png')
-            # self.send2web('images/capture.png')
+            self.send2web('images/capture.png')
 
             img_capture = ac.imread('images/capture.png')
             img_obj = ac.imread(obj_pic_path)

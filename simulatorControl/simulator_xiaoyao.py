@@ -8,8 +8,6 @@ import aircv as ac
 import shutil
 import pyautogui
 
-DEBUG_ENV = False
-
 
 class Simulator(object):
     def __init__(self, app_name):

@@ -166,24 +166,19 @@ def getProxyServerInfoAPI(request):
 
 
 def getDeviceCrawlCntAPI(request):
-    ret = RDB.get_crwal_cnt_by_device()
-    MDB.update_device_statistics_info(info=ret, scope_times=SCOPE_TIMES)
+    info = RDB.get_crwal_cnt_by_device()
+    print('getDeviceCrawlCntAPI:', info)
+    MDB.update_device_statistics_info(info=info, scope_times=SCOPE_TIMES)
+    print("getDeviceCrawlCntAPI end", info)
+    # info.pop('dedup_cnt')
     output = JsonResponse({
-        'ret': ret,
+        'ret': info,
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
 def getDevicesStatusAPI(request):
     ret = MDB.get_devices_status()  # {'device1':'running','device2':'unkown'}
-    # print('[restAPI] getDevicesStatusAPI:', ret)
-    # for deviceId in DEVICE_LIST:
-    #     try:
-    #         getRpcServerStatus(deviceId)
-    #     except Exception as e:
-    #         ret[deviceId] = DEVICE_STATUS_RPC_TIMEOUT
-    #         print('[restAPI] getDevicesStatusAPI error', deviceId, e)
-
     output = JsonResponse({
         'ret': ret,
     })

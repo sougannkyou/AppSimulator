@@ -21,13 +21,8 @@ setInterval(function () {
         },
         success: function (data, textStatus) {
             let ret = data.ret;
-            mainVue.device1.cnt = ret.device1.cnt;
-            mainVue.device2.cnt = ret.device2.cnt;
-            mainVue.device3.cnt = ret.device3.cnt;
-            mainVue.device4.cnt = ret.device4.cnt;
-            mainVue.devices.cnt =
-                (mainVue.device1.cnt + mainVue.device2.cnt + mainVue.device3.cnt + mainVue.device4.cnt);
-            mainVue.devices.dedup_cnt = ret.devices.dedup_cnt;
+            mainVue.devices.dedup_cnt = ret.dedup_cnt;
+            mainVue.devices.cnt = ret.cnt;
         }
     });
 }, 10 * 1000 * DEBUG_TIME);
@@ -69,17 +64,18 @@ setInterval(function getDevicesStatusAPI() {
             console.error("[dashboard] getDevicesStatusAPI", err);
         },
         success: function (data, status) {
-            let ret = data.ret;
-            // console.log("getDevicesStatusAPI", ret);
-            mainVue.device1.status = ret.device1;
-            mainVue.device2.status = ret.device2;
-            mainVue.device3.status = ret.device3;
-            mainVue.device4.status = ret.device4;
+            console.log("getDevicesStatusAPI", mainVue.devices.statusList.length, data.ret);
+            for (let i = 0; i < 100; i++) {
+                mainVue.devices.statusList.shift();
+            }
+            for (let i = 0; i < data.ret.length; i++) {
+                mainVue.devices.statusList.push(data.ret[i]);
+            }
             mainVue.msg = "OK";
         }
     };
     $.ajax(opt);
-}, 30 * 1000 * DEBUG_TIME); // 单位秒
+}, 10 * 1000 * DEBUG_TIME); // 单位秒
 
 function getDeviceCaptureAPI() {
     $.ajax({

@@ -21,14 +21,30 @@ class RedisDriver(object):
         ret = self._conn.blrange('douyin_data', -1, -1)
         return ret
 
-    def get_crwal_cnt_by_device(self):
-        ret = {'devices': {'dedup_cnt': self._conn.zcard('APP:iesdouyin:dedup_id')}}
-        # ret = {'devices': {'dedup_cnt': 0}}
-        devices = MongoDriver().get_device_list()
-        for device in devices:
-            ret[device['deviceId']] = {'cnt': self._conn.scard("devices:" + device['ip'] + '_org')}
+    def get_devices_ip_list(self):
+        l = []
+        for key in self._conn.keys():
+            name = key.decode('utf-8')
+            if name.startswith('devices:') and name.endswith('_org'):
+                l.append(name[len('devices:'):-4])
+        print("get_devices_ip_list:", l)
+        return l
 
-        pprint("get_crwal_cnt_by_device:", ret)
+    def get_crwal_cnt_by_device(self):
+        ret = {'cnt': self._conn.get('APP:iesdouyin:count:acquire_url').decode('ascii'),
+               'dedup_cnt': self._conn.get('APP:iesdouyin:count:get_url').decode('ascii'),
+               'statusList': []}
+        ips = self.get_devices_ip_list()
+        # {deviceId: 'device1', ip: '172.16.251.27', cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN},
+        for ip in ips:
+            ret['statusList'].append({
+                'deviceId': ip,
+                'ip': ip,
+                'cnt': int(str(self._conn.scard("devices:" + ip + '_org'))),
+                'dedup_cnt': 0,
+                'status': DEVICE_STATUS_UNKOWN
+            })
+
         return ret
 
     def get_device_history(self, device_id):
@@ -42,54 +58,57 @@ class MongoDriver(object):
         self.deviceStatisticsInfo = self._db.deviceStatisticsInfo
         self.deviceConfig = self._db.deviceConfig
 
-    def get_device_list(self):
-        devices_list = []
-        l = self.deviceConfig.find()
-        for r in l:
-            r.pop('_id')
-            devices_list.append(r)
-
-        return devices_list
-
     def get_config_info(self, deviceId):
         info = self.deviceConfig.find_one({'deviceId': deviceId})
-        if info: info.pop('_id')
+        if info:
+            info.pop('_id')
         return info
 
     def update_device_statistics_info(self, info, scope_times):  # 时间窗式记录采集量
+        print("update_device_statistics_info start", info)
         old_time = int((datetime.now() - timedelta(seconds=scope_times)).timestamp())
         self.deviceStatisticsInfo.remove({'time': {'$lt': old_time}})
         now = int(datetime.now().timestamp())
-        for device in self.get_device_list():
-            self.deviceStatisticsInfo.insert({
-                'deviceId': device['deviceId'],
-                'ip': device['ip'],
-                'time': now,
-                'cnt': info[device['deviceId']]['cnt']
-            })
+        # ips = RedisDriver().get_devices_ip_list()
+        # print("update_device_statistics_info ips:", ips)
+        for m in info['statusList']:
+            m['time'] = now
+            # print("update_device_statistics_info:", m)
+            self.deviceStatisticsInfo.insert(m)
+            m.pop('_id')
 
     def get_devices_status(self):  # 时间窗
-        devices_status = {}
-        for device in self.get_device_list():
+        devices_status = []
+        ips = RedisDriver().get_devices_ip_list()
+        print("get_devices_status ips", ips)
+        for ip in ips:
+            status = {'deviceId': ip, 'ip': ip, 'cnt': 0, 'dedup_cnt': 0, 'status': DEVICE_STATUS_UNKOWN}
             l = []
-            devices_status[device['deviceId']] = DEVICE_STATUS_UNKOWN
-            statistics = self.deviceStatisticsInfo.find({'deviceId': device['deviceId']})
+            statistics = self.deviceStatisticsInfo.find({'deviceId': ip})
             for s in statistics:
                 s.pop('_id')
                 l.append(s['cnt'])
 
             if (len(l) > 0 and l[-1] > 0):
+                status['cnt'] = l[-1]
                 if (l[0] == l[-1]):
-                    devices_status[device['deviceId']] = DEVICE_STATUS_SUSPEND
+                    status['status'] = DEVICE_STATUS_SUSPEND
                 else:
-                    devices_status[device['deviceId']] = DEVICE_STATUS_RUNNING
+                    status['status'] = DEVICE_STATUS_RUNNING
 
-        return devices_status  # {'device1':'running','device2':'unkown'}
+            devices_status.append(status)
+
+        # {deviceId: '172.16.251.27', ip: '172.16.251.27', cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN}
+        # {deviceId: '172.16.251.28', ip: '172.16.251.28', cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN}
+        return devices_status  # {'172.16.250.247':'running','172.16.250.252':'unkown'}
 
 
 if __name__ == '__main__':
-    # r = RedisDriver()
+    # from .setting import
+    r = RedisDriver()
+    pprint(r.get_crwal_cnt_by_device())
+
     info = {'device1': 10, 'device2': 20, 'device3': 30, 'device4': 40}
     db = MongoDriver()
-    db.update_device_statistics_info(info, SCOPE_TIMES)
-    pprint(db.get_devices_status())
+    # db.update_device_statistics_info(info, SCOPE_TIMES)
+    # pprint(db.get_devices_status())
