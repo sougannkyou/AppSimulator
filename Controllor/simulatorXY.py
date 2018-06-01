@@ -147,6 +147,12 @@ class Simulator(object):
                 print('未匹配到', comment, timeout)
                 self._sleep(1)
                 timeout -= 1
+                img_obj = ac.imread(self._PIC_PATH[comment])
+                pos = ac.find_template(img_capture, img_obj)
+                if pos and pos['confidence'] > 0.9:
+                    print('版本更新提示', self._PIC_PATH[comment])
+                    self.click(u"跳过软件升级", 1)
+                    self.click(u"分享", 1)
                 self.is_upgrade(img_capture, comment=u"跳过软件升级")
 
         return False

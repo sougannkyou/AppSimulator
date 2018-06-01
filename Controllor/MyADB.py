@@ -2,14 +2,13 @@
 try:
     import sys
     import re
-    # from os import popen3 as pipe
     import subprocess
 except ImportError as e:
-    print("[f] Required module missing.", e.args[0])
+    print("[MyADB] ERROR:", e.args[0])
     sys.exit(-1)
 
 
-class ADB(object):
+class MyADB(object):
     _MYADB_VERSION = "0.0.1"
     _DEBUG = True
     _adb_binary_path = None
@@ -40,26 +39,13 @@ class ADB(object):
         self._stdout = None
         self._stderr = None
 
-    def __read_output__(self, fd):
-        ret = ''
-        while 1:
-            line = fd.readline()
-            if not line:
-                break
-            ret += line
-
-        if len(ret) == 0:
-            ret = None
-
-        return ret
-
     def _make_command(self, cmd):
         if self._devices is not None and len(self._devices) > 1 and self.__target is None:
             self._stderr = "Must set target device first"
             return None
 
         cmd_str = self._adb_binary_path + ' ' + cmd if self.__target is None else self._adb_binary_path + ' ' + ' -s ' + self.__target + ' ' + cmd
-        self._log('[_make_command]', cmd_str)
+        # self._log('[_make_command]', cmd_str)
         return cmd_str
 
     def get_stdout(self):
@@ -88,11 +74,12 @@ class ADB(object):
 
         try:
             cmdline = self._make_command(cmd)
-            self._log('[adb_cmd] cmdline:', cmdline)
+            self._log('[adb_cmd]', cmdline)
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process.wait()
             (stdout, stderr) = process.communicate()
-            self._stdout = stdout
-            self._stderr = stderr
+            self._stdout = stdout.decode('utf8')
+            self._stderr = stderr.decode('utf8')
         except Exception as e:
             self._log('[adb_cmd] err:', e)
 
@@ -166,22 +153,23 @@ class ADB(object):
         return self._stdout
 
     def get_devices(self):
-        error = 0  # success
+        err_msg = ''
         self.adb_cmd("devices")
-        if self._stderr is not None:
-            return ''
-        try:
-            self._devices = self._stdout.partition('\n')[2].replace('device', '').split()
-            if self._devices[1:] == ['no', 'permissions']:
-                error = 2  # permissions
-                self._devices = None
-                self._log('[get_devices] err: permissions')
-        except Exception as e:
-            self._log('[get_devices] err:', e)
+        if self._stderr:
             self._devices = None
-            error = 1  # not found
+            err_msg = self._stderr
+        else:
+            try:
+                self._devices = self._stdout.partition('\n')[2].replace('device', '').split()
+                if self._devices[1:] == ['no', 'permissions']:
+                    err_msg ='permissions'
+                    self._devices = None
+                    self._log('[get_devices] err: permissions')
+            except Exception as e:
+                err_msg = e  # not found
+                self._log('[get_devices] err:', e)
 
-        return error, self._devices
+        return (err_msg, self._devices)
 
     def set_target_device(self, device):
         self.__clean__()
@@ -227,6 +215,7 @@ class ADB(object):
         if not mode in (self.REBOOT_RECOVERY, self.REBOOT_BOOTLOADER):
             self._stderr = "mode must be REBOOT_RECOVERY/REBOOT_BOOTLOADER"
             return self._stdout
+
         self.adb_cmd("reboot %s" % "recovery" if mode == self.REBOOT_RECOVERY else "bootloader")
         return self._stdout
 
