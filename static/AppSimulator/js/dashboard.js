@@ -16,6 +16,9 @@ setInterval(function () {
         url: '/AppSimulator/getDeviceCrawlCntAPI/',
         type: 'get',
         contentType: "application/json; charset=UTF-8",
+        data: {
+            appName: mainVue.appName,
+        },
         error: function (xhr, err) {
             ajaxError(err, 'DeviceInfo');
         },
@@ -59,6 +62,10 @@ setInterval(function getDevicesStatusAPI() {
         type: 'GET',
         data: {scope_times: 30, interval_times: 10}, // 单位秒
         dataType: "json",
+        data: {
+            deviceId: mainVue.deviceId,
+            appName: mainVue.appName,
+        },
         error: function (xhr, err) {
             mainVue.msg = "Failure";
             console.error("[dashboard] getDevicesStatusAPI", err);

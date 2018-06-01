@@ -1,36 +1,25 @@
-#!/usr/bin/env python
-#
-# Very basic PyADB example
-#
-
 try:
     import sys
-    from .adb import ADB
+    from MyADB3 import ADB
 except ImportError as e:
     # should never be reached
-    print("[f] Required module missing. %s" % e.args[0])
+    print("[f] Required module missing.", e.args[0])
     sys.exit(-1)
 
 
 def main():
-    # creates the ADB object
-    adb = ADB(adb_path='C:\\Nox\\bin\\adb.exe')
-    # IMPORTANT: You should supply the absolute path to ADB binary
-    if adb.set_adb_path('C:\\Nox\\bin\\adb.exe') is True:
-        print("Version: %s" % adb.get_version())
-    else:
-        print("Check ADB binary path")
+    adb = ADB(adb_binary_path='C:\\Nox\\bin\\adb.exe')
+    print(adb.get_android_version())
 
-    print("Waiting for device...")
     adb.wait_for_device()
-    err, dev = adb.get_devices()
+    err, devices = adb.get_devices()
 
-    if not dev:
+    if not devices:
         print("Unexpected error, may be you're a very fast guy?")
         return
 
-    print("Selecting: %s" % dev[0])
-    adb.set_target_device(dev[0])
+    print("Selecting: %s" % devices[0])
+    adb.set_target_device(devices[0])
 
     print("Executing 'ls' command")
     adb.shell_command('ls')

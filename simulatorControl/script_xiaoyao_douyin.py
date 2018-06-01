@@ -5,7 +5,7 @@ from simulator_xiaoyao import Simulator
 
 def run():
     start = datetime.datetime.now()
-    print("[rpc_server] run start ...", start)
+    print("[script] run start ...", start)
     try:
         class MySimulator(Simulator):
             def script(self):
@@ -32,7 +32,7 @@ def run():
 
                     # if not ret: self.send2web('images/offline.jpeg')
 
-        mySimulator = MySimulator("douyin0")
+        mySimulator = MySimulator("simulator")
         mySimulator._PIC_PATH = {
             u"APP图标": 'images_xiaoyao/app_ready.png',
             u"更新": 'images_xiaoyao/update.png',
@@ -52,11 +52,11 @@ def run():
         }
         mySimulator.run()
         end = datetime.datetime.now()
-        print("[rpc_server] run script success.", (end - start).seconds)
+        print("[script] run script success.", (end - start).seconds)
         return True
     except Exception as e:
         end = datetime.datetime.now()
-        print("[rpc_server] run script error:", (end - start).seconds, e)
+        print("[script] run script error:", (end - start).seconds, e)
         return False
 
 

@@ -21,26 +21,26 @@ class RedisDriver(object):
         ret = self._conn.blrange('douyin_data', -1, -1)
         return ret
 
-    def get_devices_ip_list(self):
+    def get_devices_ip_list(self, app_name):
         l = []
         for key in self._conn.keys():
             name = key.decode('utf-8')
-            if name.startswith('devices:') and name.endswith('_org'):
-                l.append(name[len('devices:'):-4])
+            if name.startswith('devices:' + app_name + ':') and name.endswith('_org'):
+                l.append(name.split(':')[2][:-4])
         print("get_devices_ip_list:", l)
         return l
 
-    def get_crwal_cnt_by_device(self):
-        ret = {'cnt': self._conn.get('APP:iesdouyin:count:acquire_url').decode('ascii'),
-               'dedup_cnt': self._conn.get('APP:iesdouyin:count:get_url').decode('ascii'),
+    def get_crwal_cnt_by_device(self, app_name):
+        ret = {'cnt': self._conn.get('APP:' + app_name + ':count:acquire_url').decode('ascii'),  # douyin, miaopai
+               'dedup_cnt': self._conn.get('APP:' + app_name + ':count:get_url').decode('ascii'),
                'statusList': []}
-        ips = self.get_devices_ip_list()
+        ips = self.get_devices_ip_list(app_name)
         # {deviceId: 'device1', ip: '172.16.251.27', cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN},
         for ip in ips:
             ret['statusList'].append({
                 'deviceId': ip,
                 'ip': ip,
-                'cnt': int(str(self._conn.scard("devices:" + ip + '_org'))),
+                'cnt': int(str(self._conn.scard("devices:" + app_name + ":" + ip + '_org'))),
                 'dedup_cnt': 0,
                 'status': DEVICE_STATUS_UNKOWN
             })
@@ -77,10 +77,10 @@ class MongoDriver(object):
             self.deviceStatisticsInfo.insert(m)
             m.pop('_id')
 
-    def get_devices_status(self):  # 时间窗
+    def get_devices_status(self, app_name):  # 时间窗
         devices_status = []
-        ips = RedisDriver().get_devices_ip_list()
-        print("get_devices_status ips", ips)
+        ips = RedisDriver().get_devices_ip_list(app_name)
+        print("get_devices_status ips")
         for ip in ips:
             status = {'deviceId': ip, 'ip': ip, 'cnt': 0, 'dedup_cnt': 0, 'status': DEVICE_STATUS_UNKOWN}
             l = []

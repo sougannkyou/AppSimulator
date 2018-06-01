@@ -5,7 +5,7 @@ from simulator_yeshen import Simulator
 
 def run():
     start = datetime.datetime.now()
-    print("[rpc_server] run start ...", start)
+    print("[script] run start ...", start)
     try:
         class MySimulator(Simulator):
             DEBUG_ENV = False
@@ -34,7 +34,7 @@ def run():
 
                     # if not ret: self.send2web('images/offline.jpeg')
 
-        mySimulator = MySimulator("miaopai0")
+        mySimulator = MySimulator("simulator")
         mySimulator._PIC_PATH = {
             u"锁屏": 'images_yeshen/screen_lock.png',
             u"锁屏图案": 'images_yeshen/screen_lock_6_1.png',
@@ -55,11 +55,11 @@ def run():
 
         mySimulator.run()
         end = datetime.datetime.now()
-        print("[rpc_server] run script success.", (end - start).seconds)
+        print("[script] run script success.", (end - start).seconds)
         return True
     except Exception as e:
         end = datetime.datetime.now()
-        print("[rpc_server] run script error:", (end - start).seconds, e)
+        print("[script] run script error:", (end - start).seconds, e)
         return False
 
 

@@ -9,6 +9,7 @@
 
 {% block section_content %}
     <div id="main" v-cloak>
+        <input type="text" placeholder="app name" v-model="appName">
         <div class="row">
             <div class="col-lg-3 col-xs-6">
                 <div class="small-box bg-aqua">
@@ -19,7 +20,11 @@
                     <div class="icon">
                         <img src="{% static 'AppSimulator/images/memory.png' %}">
                     </div>
-{#                    <button v-on:click="startProxyServer" class="btn btn-xs btn-success">重启代理服务</button>#}
+                    <a href="/AppSimulator/dashboard/" class="small-box-footer">
+                        详情&nbsp;
+                        <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                    {#                    <button v-on:click="startProxyServer" class="btn btn-xs btn-success">重启代理服务</button>#}
                 </div>
             </div>
             <div class="col-lg-3 col-xs-6">
@@ -71,6 +76,7 @@
             </div>
         </div>
         <div class="row">
+
             <section v-for="info in devices.statusList" class="col-md-3 connectedSortable"><!-- device -->
                 <div class="box box-info">
                     <div class="box-header with-border">
@@ -103,12 +109,12 @@
                         </div>
                     </div>
                     <div class="box-footer">
-{#                        <input type="text" placeholder="latitude" v-model="latitude" style="width:35%;">#}
-{#                        <input type="text" placeholder="longitude" v-model="longitude" style="width:35%;">#}
-{#                        <button v-on:click="setDeviceGPS" class="btn btn-xs btn-info">位置设定</button>#}
-{#                        <button v-on:click="restartDevice" class="btn btn-xs btn-info">重启</button>#}
-{#                        <button v-on:click="startScript" class="btn btn-xs btn-info">运行脚本</button>#}
-{#                        <button v-on:click="stopScript" class="btn btn-xs btn-info">停止脚本</button>#}
+                        {#                        <input type="text" placeholder="latitude" v-model="latitude" style="width:35%;">#}
+                        {#                        <input type="text" placeholder="longitude" v-model="longitude" style="width:35%;">#}
+                        {#                        <button v-on:click="setDeviceGPS" class="btn btn-xs btn-info">位置设定</button>#}
+                        {#                        <button v-on:click="restartDevice" class="btn btn-xs btn-info">重启</button>#}
+                        {#                        <button v-on:click="startScript" class="btn btn-xs btn-info">运行脚本</button>#}
+                        {#                        <button v-on:click="stopScript" class="btn btn-xs btn-info">停止脚本</button>#}
                     </div>
                 </div>
             </section>
@@ -272,6 +278,7 @@
                     cpu_percent: 0,
                     hd_percent: 0
                 },
+                appName: 'douyin',
                 deviceId: 'device1',
                 devices: {
                     cnt: 0,
