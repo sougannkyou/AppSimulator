@@ -11,6 +11,7 @@ import pyautogui
 
 class Simulator(object):
     def __init__(self, app_name):
+        self.DEBUG_ENV = False
         self._UNLOCK_POS = {
             "step1": (133, 496),
             "step2": (132, 705),
@@ -77,7 +78,7 @@ class Simulator(object):
             time.sleep(times)
 
     def _detect_obj(self, img, circle_center_pos, circle_radius, color, line_width):
-        if DEBUG_ENV:
+        if self.DEBUG_ENV:
             cv2.circle(img, circle_center_pos, circle_radius, color, line_width)
             cv2.imshow('detect_obj', img)
             cv2.waitKey(0)
@@ -158,11 +159,11 @@ class Simulator(object):
         if not ret:
             return False
         else:
-            _x = left + x
-            _y = top + y
-            pyautogui.moveTo(_x, _y)
-            pyautogui.dragTo(_x, _y - 400, 0.5, button='left')
-            self._sleep(timeout)
+            # _x = left + x
+            # _y = top + y
+            # pyautogui.moveTo(_x, _y)
+            # pyautogui.dragTo(_x, _y - 400, 0.5, button='left')
+            # self._sleep(timeout)
 
             ret, x, y = self.find_element(comment='锁屏图案', timeout=10)
             if not ret:
