@@ -2,6 +2,7 @@
 try:
     import sys
     import re
+    import random
     import subprocess
 except ImportError as e:
     print("[MyADB] ERROR:", e.args[0])
@@ -23,6 +24,37 @@ class MyADB(object):
     DEFAULT_TCP_HOST = "localhost"
     DEFAULT_TCP_PORT = 62001  # 5555
 
+    def __init__(self, adb_binary_path=None):
+        self._adb_binary_path = adb_binary_path
+
+    def __clean__(self):
+        self._stdout = None
+        self._stderr = None
+
+    def _get_phoneNumber(self):
+        num = '186'
+        for i in range(8):
+            num += str(random.randrange(0, 9))
+        return num
+
+    def _luhn_residue(self, digits):
+        return sum(sum(divmod(int(d) * (1 + i % 2), 10))
+                   for i, d in enumerate(digits[::-1])) % 10
+
+    def _get_IMEI(self, N):
+        part = ''.join(str(random.randrange(0, 9)) for _ in range(N - 1))
+        res = self._luhn_residue('{}{}'.format(part, 0))
+        return '{}{}'.format(part, -res % 10)
+
+    def get_new_phone(self):
+        imei = self._get_IMEI(15)
+        phoneNumber = self._get_phoneNumber()
+        self.adb_shell("setprop persist.nox.modem.imei " + imei)
+        # "adb shell setprop persist.nox.modem.imsi 460000000000000"
+        self.adb_shell("setprop persist.nox.modem.phonumber " + phoneNumber)
+        # "adb shell setprop persist.nox.modem.serial 89860000000000000000"
+        return True
+
     def _log(self, prefix, log):
         if self._DEBUG:
             print(prefix, log)
@@ -31,13 +63,6 @@ class MyADB(object):
         self.__clean__()
         self.adb_shell("getprop ro.build.version.release")
         return self._stdout.decode('utf8')
-
-    def __init__(self, adb_binary_path=None):
-        self._adb_binary_path = adb_binary_path
-
-    def __clean__(self):
-        self._stdout = None
-        self._stderr = None
 
     def _make_command(self, cmd):
         if self._devices is not None and len(self._devices) > 1 and self.__target is None:
@@ -162,7 +187,7 @@ class MyADB(object):
             try:
                 self._devices = self._stdout.partition('\n')[2].replace('device', '').split()
                 if self._devices[1:] == ['no', 'permissions']:
-                    err_msg ='permissions'
+                    err_msg = 'permissions'
                     self._devices = None
                     self._log('[get_devices] err: permissions')
             except Exception as e:

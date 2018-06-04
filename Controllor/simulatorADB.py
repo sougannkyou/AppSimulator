@@ -1,7 +1,7 @@
 # coding:utf-8
 try:
     import sys
-    import time, datetime
+    import time, datetime, random
     from pprint import pprint
     from PIL import ImageGrab
     import cv2
@@ -99,11 +99,17 @@ class Simulator(object):
         time.sleep(timeout)
         return True
 
+    def get_new_phone(self, timeout):
+        ret = self._adb.get_new_phone()
+        time.sleep(timeout)
+        return ret
+
     def script(self):
         pass
 
     def run(self):
         ret = self.unlock(timeout=1)
+        self.get_new_phone(timeout=1)
         if ret:
             ret = self.app_quit(timeout=1)
 
