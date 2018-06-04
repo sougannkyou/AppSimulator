@@ -4,7 +4,7 @@ DEBUG_ENV = False
 
 
 def ftp_upload(local_file, remote_dir, remote_file):
-    host = '172.16.3.2'
+    host = '172.16.1.1'
     username = 'admin'
     password = 'zhxg@2018'
 
@@ -29,7 +29,7 @@ def ftp_upload(local_file, remote_dir, remote_file):
 
 
 if __name__ == "__main__":
-    local_file = 'images/app_ready.png'
+    local_file = 'images/miaopai/app_icon.png'
     remote_dir = '172.16.3.2'
     remote_file = 'app_ready.png'
     ftp_upload(local_file, remote_dir, remote_file)

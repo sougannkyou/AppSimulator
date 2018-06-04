@@ -6,10 +6,37 @@ try:
     from PIL import ImageGrab
     import cv2
     import aircv as ac
+    import ftplib
     from MyADB import MyADB
 except ImportError as e:
     print("[Simulator] ERROR:", e.args[0])
     sys.exit(-1)
+
+
+def ftp_upload(local_file, remote_dir, remote_file):
+    ftp_server_ip = '172.16.3.2'
+    username = 'admin'
+    password = 'zhxg@2018'
+
+    f = ftplib.FTP(ftp_server_ip)
+    f.login(username, password)
+    pwd_path = f.pwd()
+    print("[Simulator] FTP当前路径:", pwd_path)
+
+    bufsize = 1024  # 设置缓冲器大小
+    fp = open(local_file, 'rb')
+    # f.set_debuglevel(2)
+    try:
+        f.delete(remote_file)
+        f.rmd(remote_dir)
+    except Exception as e:
+        print("[Simulator] ftp_upload error:", e)
+        pass
+
+    f.mkd(remote_dir)
+    f.storbinary('STOR ' + remote_dir + '/' + remote_file, fp, bufsize)
+    f.set_debuglevel(0)
+    fp.close()
 
 
 class Simulator(object):
@@ -40,10 +67,11 @@ class Simulator(object):
         #     print('[Simulator' + str(self._adb_idx) + '] 跳过软件升级.')
         #     x, y = pos['result']
         #     self.click_xy(x, y, timeout=1)
-
+        remote_ip = "172.16.1.1"
         while (timeout > 0):
             self._adb.adb_shell("screencap -p /sdcard/" + capture_name)
             self._adb.adb_cmd("pull /sdcard/" + capture_name)
+            ftp_upload(capture_name, remote_ip, 'capture.png')
             # print "\nOutput:%s" % _adb.get_output()
             self._img_capture = ac.imread(capture_name)
             img_obj = ac.imread(self._PIC_PATH[comment])
