@@ -46,11 +46,11 @@ def run(idx):
         mySimulator._PIC_PATH = {
             u"锁屏": 'images/screen_lock.png',
             u"锁屏图案": 'images/screen_lock_9point.png',
-            u"APP图标": 'images/douyin/app_icon.png',
-            u"更新": 'images/douyin/update.png',
-            u"分享": 'images/douyin/share.png',
-            u"复制链接": 'images/douyin/copylink.png',
-            u"跳过软件升级": 'images/douyin/ignore_upgrade.png',
+            u"APP图标": 'images/miaopai/app_icon.png',
+            u"更新": 'images/miaopai/update.png',
+            u"分享": 'images/miaopai/share.png',
+            u"复制链接": 'images/miaopai/copylink.png',
+            # u"跳过软件升级": 'images/miaopai/ignore_upgrade.png',
         }
 
         # if not ret: self.send2web('images/offline.jpeg')

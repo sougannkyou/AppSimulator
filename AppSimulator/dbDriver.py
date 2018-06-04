@@ -31,8 +31,18 @@ class RedisDriver(object):
         return l
 
     def get_crwal_cnt_by_device(self, app_name):
-        ret = {'cnt': self._conn.get('APP:' + app_name + ':count:acquire_url').decode('ascii'),  # douyin, miaopai
-               'dedup_cnt': self._conn.get('APP:' + app_name + ':count:get_url').decode('ascii'),
+        keys = [x.decode('utf8') for x in self._conn.keys()]
+        key_acquire_url_cnt = '0'
+        key_get_url_cnt = '0'
+        key_acquire_url = 'APP:' + app_name + ':count:acquire_url'
+        key_get_url = 'APP:' + app_name + ':count:get_url'
+        if key_acquire_url in keys:
+            key_acquire_url_cnt = self._conn.get(key_acquire_url).decode('ascii')
+        if key_acquire_url in keys:
+            key_get_url_cnt = self._conn.get(key_get_url).decode('ascii')
+
+        ret = {'cnt': key_acquire_url_cnt,  # douyin, miaopai
+               'dedup_cnt': key_get_url_cnt,
                'statusList': []}
         ips = self.get_devices_ip_list(app_name)
         # {deviceId: 'device1', ip: '172.16.251.27', cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN},

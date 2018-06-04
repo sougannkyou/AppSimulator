@@ -22,7 +22,7 @@ class Simulator(object):
 
         self._adb.wait_for_device()
         (err_msg, devices) = self._adb.get_devices()
-        print('[Simulator' + str(self._adb_idx) + '] get_devices:', err_msg)
+        print('[Simulator-' + str(self._adb_idx) + '] get_devices:', err_msg)
         pprint(devices)
 
         if not err_msg:
@@ -30,15 +30,16 @@ class Simulator(object):
 
     def find_element(self, comment, timeout):
         capture_name = "capture" + str(self._adb_idx) + ".png"
-        self._adb.adb_shell("screencap -p /sdcard/" + capture_name)
-        self._adb.adb_cmd("pull /sdcard/" + capture_name)
-        self._img_capture = ac.imread(capture_name)
-        img_obj = ac.imread(self._PIC_PATH[u"跳过软件升级"])
-        pos = ac.find_template(self._img_capture, img_obj)
-        if pos and pos['confidence'] > 0.9:
-            print('[Simulator' + str(self._adb_idx) + '] 跳过软件升级.')
-            x, y = pos['result']
-            self.click_xy(x, y, timeout=1)
+
+        # self._adb.adb_shell("screencap -p /sdcard/" + capture_name)
+        # self._adb.adb_cmd("pull /sdcard/" + capture_name)
+        # self._img_capture = ac.imread(capture_name)
+        # img_obj = ac.imread(self._PIC_PATH[u"跳过软件升级"])
+        # pos = ac.find_template(self._img_capture, img_obj)
+        # if pos and pos['confidence'] > 0.9:
+        #     print('[Simulator' + str(self._adb_idx) + '] 跳过软件升级.')
+        #     x, y = pos['result']
+        #     self.click_xy(x, y, timeout=1)
 
         while (timeout > 0):
             self._adb.adb_shell("screencap -p /sdcard/" + capture_name)
@@ -48,14 +49,15 @@ class Simulator(object):
             img_obj = ac.imread(self._PIC_PATH[comment])
             pos = ac.find_template(self._img_capture, img_obj)
             if pos and pos['confidence'] > 0.9:
-                print('[Simulator' + str(self._adb_idx) + '] 匹配到:', comment, str(timeout) + 's')
+                print('[Simulator-' + str(self._adb_idx) + '] 匹配到:', comment, str(timeout) + 's')
                 x, y = pos['result']
                 return True, x, y
             else:
                 time.sleep(1)
                 timeout = timeout - 1
-                print('[Simulator' + str(self._adb_idx) + '] 未匹配: ', comment, str(timeout) + 's')
-                return False, -1, -1
+                print('[Simulator-' + str(self._adb_idx) + '] 未匹配: ', comment, str(timeout) + 's')
+
+        return False, -1, -1
 
     def _debug(self, pos, timeout):
         if self._DEBUG:
@@ -76,7 +78,7 @@ class Simulator(object):
     def check_upgrade(self, timeout):
         ret, x, y = self.find_element(u"跳过软件升级", timeout)
         if ret:
-            print('[Simulator' + str(self._adb_idx) + '] 提示版本更新.')
+            print('[Simulator-' + str(self._adb_idx) + '] 提示版本更新.')
             self.click_xy(x, y, 2)
 
         return ret
@@ -86,8 +88,11 @@ class Simulator(object):
         time.sleep(timeout)
 
     def app_quit(self, timeout):
-        self._adb.adb_shell('input keyevent 4')  # KEYCODE_BACK
-        time.sleep(timeout)
+        for i in range(4):
+            print('[Simulator-' + str(self._adb_idx) + '] app_quit')
+            self._adb.adb_shell('input keyevent 4')  # KEYCODE_BACK
+            time.sleep(timeout)
+        return True
 
     def unlock(self, timeout):
         self._adb.adb_shell('rm /data/system/*.key')  # rm /data/system/*.key
@@ -99,7 +104,8 @@ class Simulator(object):
 
     def run(self):
         ret = self.unlock(timeout=1)
-        if not ret:
+        if ret:
             ret = self.app_quit(timeout=1)
 
-        if ret: self.script()
+        if ret:
+            self.script()
