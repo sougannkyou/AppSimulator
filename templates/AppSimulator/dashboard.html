@@ -76,7 +76,6 @@
             </div>
         </div>
         <div class="row">
-
             <section v-for="info in devices.statusList" class="col-md-3 connectedSortable"><!-- device -->
                 <div class="box box-info">
                     <div class="box-header with-border">
@@ -97,13 +96,13 @@
                     <div class="box-body">
                         <div id="device1" class="device-img">
                             <div class="col-md-6" title="before">
-                                {#                                <img id="before" src="{% static 'AppSimulator/images/capture_before.png' %}"#}
-                                {#                                     height="240" style="border-radius:3px;">#}
+                                <img id="before" height="240" style="border-radius:3px;"
+                                     src="/AppSimulator/images/"&[[ info.ip ]]&"/capture_before.png">
                                 <label>before</label>
                             </div>
                             <div class="col-md-6" title="current">
-                                {#                                <img id="current" src="{% static 'AppSimulator/images/capture.png' %}" height="240"#}
-                                {#                                     style="border-radius:3px;">#}
+                                <img id="current" style="border-radius:3px;"
+                                     src="{% static 'AppSimulator/images/'[[ info.ip ]]'/capture.png' %}" height="240">
                                 <label>current</label>
                             </div>
                         </div>

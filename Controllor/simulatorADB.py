@@ -13,32 +13,6 @@ except ImportError as e:
     sys.exit(-1)
 
 
-def ftp_upload(local_file, remote_dir, remote_file):
-    ftp_server_ip = '172.16.3.2'
-    username = 'admin'
-    password = 'zhxg@2018'
-
-    f = ftplib.FTP(ftp_server_ip)
-    f.login(username, password)
-    pwd_path = f.pwd()
-    print("[Simulator] FTP当前路径:", pwd_path)
-
-    bufsize = 1024  # 设置缓冲器大小
-    fp = open(local_file, 'rb')
-    # f.set_debuglevel(2)
-    try:
-        f.delete(remote_file)
-        f.rmd(remote_dir)
-    except Exception as e:
-        print("[Simulator] ftp_upload error:", e)
-        pass
-
-    f.mkd(remote_dir)
-    f.storbinary('STOR ' + remote_dir + '/' + remote_file, fp, bufsize)
-    f.set_debuglevel(0)
-    fp.close()
-
-
 class Simulator(object):
     def __init__(self, adb_path, idx):
         self._DEBUG = False
@@ -76,7 +50,7 @@ class Simulator(object):
         #     print('[Simulator' + str(self._adb_idx) + '] 跳过软件升级.')
         #     x, y = pos['result']
         #     self.click_xy(x, y, timeout=1)
-        remote_ip = "172.16.1.1"
+        remote_ip = "172.16.253.36"
         while timeout > 0:
             self.get_capture(capture_name)
             pos = ac.find_template(self._img_capture, img_obj)
@@ -95,6 +69,7 @@ class Simulator(object):
         self._adb.adb_shell("screencap -p /sdcard/" + capture_name)
         self._adb.adb_cmd("pull /sdcard/" + capture_name)
         self._img_capture = ac.imread(capture_name)
+        self.ftp_upload(local_file=capture_name, remote_dir='172.16.253.36', remote_file=capture_name)
 
     def find_elements(self, comment, timeout):
         cnt = 0
@@ -197,6 +172,35 @@ class Simulator(object):
         ret = self._adb.get_new_phone()
         time.sleep(timeout)
         return ret
+
+    def ftp_upload(self, local_file, remote_dir, remote_file):
+        ftp_server_ip = '172.16.3.2'
+        username = 'admin'
+        password = 'zhxg@2018'
+
+        f = ftplib.FTP(ftp_server_ip)
+        f.login(username, password)
+        pwd_path = f.pwd()
+        print("[Simulator] FTP当前路径:", pwd_path)
+
+        bufsize = 1024  # 设置缓冲器大小
+        fp = open(local_file, 'rb')
+        before_local_file = local_file[:-len('.png')] + '_before.png'
+        fp_before = open(before_local_file, 'rb')
+        # f.set_debuglevel(2)
+        try:
+            f.delete(remote_dir + '/' + remote_file)
+            f.delete(remote_dir + '/' + remote_file + "_before")
+            f.rmd(remote_dir)
+        except Exception as e:
+            print("[Simulator] ftp_upload error:", e)
+            pass
+
+        f.mkd(remote_dir)
+        f.storbinary('STOR ' + remote_dir + '/' + remote_file, fp, bufsize)
+        f.storbinary('STOR ' + remote_dir + '/' + remote_file + "_before", fp_before, bufsize)
+        f.set_debuglevel(0)
+        fp.close()
 
     def script(self):
         pass
