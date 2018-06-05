@@ -136,7 +136,7 @@ class Simulator(object):
             # putText(img, text, org, fontFace, fontScale, color, thickness=None, lineType=None, bottomLeftOrigin=None)
             cv2.putText(img, 'without', (int(x) - 30, int(y) + 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1)
             cv2.startWindowThread()
-            cv2.imshow('match', img)
+            cv2.imshow('Debugger', img)
             cv2.waitKey(timeout * 1000)
             cv2.destroyAllWindows()
             cv2.waitKey(100)
@@ -145,10 +145,9 @@ class Simulator(object):
         if self._DEBUG:
             cv2.circle(img=self._img_capture, center=(int(x), int(y)), radius=30, color=(0, 0, 255), thickness=1)
             cv2.putText(img=self._img_capture, text='click', org=(int(x) - 40, int(y) + 10),
-                        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1,
-                        color=(0, 0, 255), thickness=1)
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(0, 0, 255), thickness=1)
             cv2.startWindowThread()
-            cv2.imshow('match', self._img_capture)
+            cv2.imshow('Debugger', self._img_capture)
             cv2.waitKey(timeout * 1000)
             cv2.destroyAllWindows()
             cv2.waitKey(100)
