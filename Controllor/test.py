@@ -54,7 +54,7 @@ def run(idx):
         }
 
         # if not ret: self.send2web('images/offline.jpeg')
-        mySimulator.run()
+        mySimulator.run(is_app_restart=True)
 
         end = datetime.datetime.now()
         print("[Script" + str(idx) + "] run success. ", (end - start).seconds, "s")

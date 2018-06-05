@@ -54,7 +54,7 @@ def run(idx):
         }
 
         # if not ret: self.send2web('images/offline.jpeg')
-        mySimulator.run()
+        mySimulator.run(is_app_restart=True)
 
         end = datetime.datetime.now()
         print("[Script" + str(idx) + "] run success. ", (end - start).seconds, "s")
@@ -70,7 +70,7 @@ def run(idx):
 
 if __name__ == "__main__":
     pool = multiprocessing.Pool(processes=4)
-    for idx in range(1):
+    for idx in range(2):
         pool.apply_async(run, (idx,))
     pool.close()
     pool.join()

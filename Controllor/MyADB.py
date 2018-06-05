@@ -73,6 +73,16 @@ class MyADB(object):
         # self._log('[_make_command]', cmd_str)
         return cmd_str
 
+    def set_gps(self, latitude, longitude):
+        self.adb_shell("setprop persist.nox.gps.latitude " + str(latitude))
+        self.adb_shell("setprop persist.nox.gps.longitude " + str(longitude))
+        return True
+
+    def start_web(self, url):
+        # adb shell am start -a android.intent.action.VIEW -d http://testerhome.com
+        self.adb_shell("am start -a android.intent.action.VIEW -d " + url)
+        return True
+
     def get_stdout(self):
         return self._stdout
 

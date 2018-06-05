@@ -55,8 +55,17 @@ class Simulator(object):
         if not err_msg:
             self._adb.set_target_device(devices[idx])
 
+    def start_web(self, url, timeout):
+        self._adb.start_web(url)
+        time.sleep(timeout)
+        return True
+
+    def set_gps(self, latitude, longitude):
+        return self._adb.set_gps(latitude, longitude)
+
     def find_element(self, comment, timeout):
         capture_name = "capture" + str(self._adb_idx) + ".png"
+        img_obj = ac.imread(self._PIC_PATH[comment])
 
         # self._adb.adb_shell("screencap -p /sdcard/" + capture_name)
         # self._adb.adb_cmd("pull /sdcard/" + capture_name)
@@ -68,13 +77,8 @@ class Simulator(object):
         #     x, y = pos['result']
         #     self.click_xy(x, y, timeout=1)
         remote_ip = "172.16.1.1"
-        while (timeout > 0):
-            self._adb.adb_shell("screencap -p /sdcard/" + capture_name)
-            self._adb.adb_cmd("pull /sdcard/" + capture_name)
-            ftp_upload(capture_name, remote_ip, 'capture.png')
-            # print "\nOutput:%s" % _adb.get_output()
-            self._img_capture = ac.imread(capture_name)
-            img_obj = ac.imread(self._PIC_PATH[comment])
+        while timeout > 0:
+            self.get_capture(capture_name)
             pos = ac.find_template(self._img_capture, img_obj)
             if pos and pos['confidence'] > 0.9:
                 print('[Simulator-' + str(self._adb_idx) + '] 匹配到:', comment, str(timeout) + 's')
@@ -87,19 +91,76 @@ class Simulator(object):
 
         return False, -1, -1
 
-    def _debug(self, pos, timeout):
+    def get_capture(self, capture_name):
+        self._adb.adb_shell("screencap -p /sdcard/" + capture_name)
+        self._adb.adb_cmd("pull /sdcard/" + capture_name)
+        self._img_capture = ac.imread(capture_name)
+
+    def find_elements(self, comment, timeout):
+        cnt = 0
+        ret = False
+        pos_list = []
+        capture_name = "capture" + str(self._adb_idx) + ".png"
+        self.get_capture(capture_name)
+        img_obj = ac.imread(self._PIC_PATH[comment])
+
+        while timeout > 0:
+            pos = ac.find_template(self._img_capture, img_obj)
+            if pos and pos['confidence'] > 0.9:
+                x, y = pos['result']
+                pos_list.append((x, y))
+                ret = True
+                self._without(x, y, 2)
+                cnt += 1
+                print('[Simulator-' + str(self._adb_idx) + '] 匹配到:', cnt, '件', x, y, comment, str(timeout) + 's')
+            else:
+                print('[Simulator-' + str(self._adb_idx) + '] 未匹配: ', comment, str(timeout) + 's')
+                if cnt > 0:
+                    break
+                else:
+                    self.get_capture(capture_name)
+
+            timeout = timeout - 1
+
+        return ret, pos_list
+
+    def next_page(self, timeout):
+        print('[Simulator-' + str(self._adb_idx) + '] next_page')
+        self._adb.adb_shell("input swipe 10 400 10 10")
+        time.sleep(timeout)
+        return True
+
+    def _without(self, x, y, timeout):
+        img = cv2.circle(img=self._img_capture, center=(int(x), int(y)), radius=10, color=(0, 0, 0), thickness=10)
         if self._DEBUG:
-            # cv.Circle(img, center, radius, color, thickness=1, lineType=8, shift=0)
-            cv2.circle(img=self._img_capture, center=pos, radius=30, color=(0, 0, 255), thickness=2)
+            # putText(img, text, org, fontFace, fontScale, color, thickness=None, lineType=None, bottomLeftOrigin=None)
+            cv2.putText(img, 'without', (int(x) - 30, int(y) + 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1)
+            cv2.startWindowThread()
+            cv2.imshow('match', img)
+            cv2.waitKey(timeout * 1000)
+            cv2.destroyAllWindows()
+            cv2.waitKey(100)
+
+    def _debug(self, x, y, timeout):
+        if self._DEBUG:
+            cv2.circle(img=self._img_capture, center=(int(x), int(y)), radius=30, color=(0, 0, 255), thickness=1)
+            cv2.putText(img=self._img_capture, text='click', org=(int(x) - 40, int(y) + 10),
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1,
+                        color=(0, 0, 255), thickness=1)
             cv2.startWindowThread()
             cv2.imshow('match', self._img_capture)
-            cv2.waitKey(timeout)
+            cv2.waitKey(timeout * 1000)
             cv2.destroyAllWindows()
             cv2.waitKey(100)
 
     def click_xy(self, x, y, timeout):
-        self._debug(pos=(int(x), int(y)), timeout=2000)
+        self._debug(x, y, timeout=2)
         self._adb.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)))
+        time.sleep(timeout)
+        return True
+
+    def input(self, text, timeout):
+        self._adb.adb_shell('input text ' + text)
         time.sleep(timeout)
         return True
 
@@ -114,6 +175,12 @@ class Simulator(object):
     def reboot(self, timeout):
         self._adb.adb_cmd('reboot')
         time.sleep(timeout)
+
+    def back(self, timeout):
+        print('[Simulator-' + str(self._adb_idx) + '] back')
+        self._adb.adb_shell('input keyevent 4')  # KEYCODE_BACK
+        time.sleep(timeout)
+        return True
 
     def app_quit(self, timeout):
         for i in range(4):
@@ -135,10 +202,10 @@ class Simulator(object):
     def script(self):
         pass
 
-    def run(self):
+    def run(self, is_app_restart):
         ret = self.unlock(timeout=1)
         self.get_new_phone(timeout=1)
-        if ret:
+        if ret and is_app_restart:
             ret = self.app_quit(timeout=1)
 
         if ret:
