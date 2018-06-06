@@ -12,25 +12,20 @@ except ImportError as e:
 
 ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
 
+urls = [
+    "http://www.dianping.com/shop/98535009",  # 深夜食堂
+    "http://www.dianping.com/shop/18385524",  # 2168
+    "http://www.dianping.com/shop/24981944",  # 936
+    "http://www.dianping.com/shop/72459852",  # 1061
+]
+
 
 class MySimulator(Simulator):
     def script(self):
-        url = "http://www.dianping.com/shop/98535009"
-        self.start_web(url, 3)
+        self.start_web(urls[self._adb_idx], 3)
         ret, x, y = self.find_element(comment='web打开APP', timeout=10)
         if ret: ret = self.click_xy(x, y, timeout=2)
         ret, x, y = self.find_element(comment='APP打开结果OK', timeout=60)
-        # return
-        # ret, x, y = self.find_element(comment='APP图标', timeout=10)
-        # if ret: ret = self.click_xy(x, y, timeout=2)
-        # if ret: ret, x, y = self.find_element(comment='美食', timeout=5)
-        # if ret: ret = self.click_xy(x, y, timeout=1)
-        # if ret: ret, x, y = self.find_element(comment='查找', timeout=5)
-        # if ret: ret = self.click_xy(x, y, timeout=1)
-        # if ret: ret, x, y = self.find_element(comment='查找', timeout=5)
-        # if ret: ret = self.input('深夜食堂', timeout=1)
-        # if ret: ret, x, y = self.find_element(comment='搜索', timeout=5)
-        # if ret: ret = self.click_xy(x, y, timeout=1)
         find = False
         pos_list = []
         for i in range(5):
