@@ -100,8 +100,33 @@ class Simulator(object):
 
         return ret, pos_list
 
+    def __find_elements(self, comment, timeout):
+        pos_list = []
+        capture_name = "capture" + str(self._adb_idx) + ".png"
+        img_obj = ac.imread(self._PIC_PATH[comment])
+        self.get_capture(capture_name)
+
+        while timeout > 0:
+            pos_list = ac.find_all_template(self._img_capture, img_obj)
+            for pos in pos_list:
+                if pos['confidence'] > 0.9:
+                    (x, y) = pos['result']
+                    pos_list.append((int(x), int(y)))
+
+            pprint(pos_list)
+            if len(pos_list) > 0:
+                print('[Simulator-' + str(self._adb_idx) + '] 匹配到:', len(pos_list), '件', comment, str(timeout) + 's')
+                break
+            else:
+                print('[Simulator-' + str(self._adb_idx) + '] 未匹配: ', comment, str(timeout) + 's')
+                self.get_capture(capture_name)
+
+            timeout = timeout - 1
+
+        return len(pos_list) > 0, pos_list
+
     def next_page(self, timeout):
-        print('[Simulator-' + str(self._adb_idx) + '] next_page')
+        print('[Simulator-' + str(self._adb_idx) + '] 翻页')
         self._adb.adb_shell("input swipe 10 400 10 10")
         time.sleep(timeout)
         return True
@@ -137,6 +162,12 @@ class Simulator(object):
 
     def input(self, text, timeout):
         self._adb.adb_shell('input text ' + text)
+        time.sleep(timeout)
+        return True
+
+    def input_cn(self, text, timeout):
+        # adb shell am broadcast -a ADB_INPUT_TEXT --es msg '不错，可以学着品红酒的好工具'
+        self._adb.adb_shell("am broadcast -a ADB_INPUT_TEXT --es msg '" + text + "'")
         time.sleep(timeout)
         return True
 

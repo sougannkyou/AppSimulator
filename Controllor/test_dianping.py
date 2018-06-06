@@ -13,18 +13,36 @@ except ImportError as e:
 ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
 
 urls = [
-    "http://www.dianping.com/shop/98535009",  # 深夜食堂
-    "http://www.dianping.com/shop/18385524",  # 2168
     "http://www.dianping.com/shop/24981944",  # 936
+    "http://www.dianping.com/shop/18385524",  #
+    "http://www.dianping.com/shop/98535009",  # 深夜食堂
     "http://www.dianping.com/shop/72459852",  # 1061
+]
+
+keywords = [
+    '匹夫涮肉城 黄村店',
 ]
 
 
 class MySimulator(Simulator):
     def script(self):
-        self.start_web(urls[self._adb_idx], 3)
-        ret, x, y = self.find_element(comment='web打开APP', timeout=10)
-        if ret: ret = self.click_xy(x, y, timeout=2)
+        # self.start_web(urls[self._adb_idx], 3)
+        # ret, x, y = self.find_element(comment='web打开APP', timeout=10)
+        # if ret: ret = self.click_xy(x, y, timeout=2)
+        ret = True
+        x = -1
+        y = -1
+
+        # ret, x, y = self.find_element(comment='APP图标', timeout=10)
+        # if ret: ret = self.click_xy(x, y, timeout=2)
+        if ret: ret, x, y = self.find_element(comment='附近热搜', timeout=5)
+        if ret: ret = self.click_xy(x, y, timeout=1)
+        time.sleep(3)
+        if ret: ret = self.input_cn("匹夫涮肉城 黄村店", timeout=1)
+        time.sleep(3)
+        if ret: ret, x, y = self.find_element(comment='搜索', timeout=5)
+        if ret: ret = self.click_xy(x, y + 30, timeout=1)
+
         ret, x, y = self.find_element(comment='APP打开结果OK', timeout=60)
         find = False
         pos_list = []
@@ -62,13 +80,10 @@ def run(idx):
     try:
         mySimulator = MySimulator(adb_path=ADB_BINARY_PATH, idx=idx)
         mySimulator._PIC_PATH = {
-            "锁屏": 'images/screen_lock.png',
-            "锁屏图案": 'images/screen_lock_9point.png',
-            "web打开APP": 'images/dianping/webOpenApp.png',
-            "APP打开结果OK": 'images/dianping/search_ready.png',
+            # "web打开APP": 'images/dianping/webOpenApp.png',
+            # "APP打开结果OK": 'images/dianping/search_ready.png',
             "APP图标": 'images/dianping/app_icon.png',
-            '美食': 'images/dianping/meishi.png',
-            '查找': 'images/dianping/search.png',
+            '附近热搜': 'images/dianping/search.png',
             '搜索': 'images/dianping/search_btn.png',
             "网友点评": 'images/dianping/wangyoudianping.png',
             "全部网友点评": 'images/dianping/wangyoudianping-all.png',
@@ -78,7 +93,7 @@ def run(idx):
         }
         mySimulator._DEBUG = True
         # if not ret: self.send2web('images/offline.jpeg')
-        mySimulator.set_gps(39.984727, 116.310050)
+        mySimulator.set_gps(39.984727, 116.310050)  # 中关村
         mySimulator.run(is_app_restart=False)
 
         end = datetime.datetime.now()
