@@ -18,7 +18,6 @@
                         <h3>[[ proxyServerInfo.memory_rate ]]%</h3>
                     </div>
                     <div class="icon">
-                        <img src="{% static 'AppSimulator/images/memory.png' %}">
                     </div>
                     <a href="/AppSimulator/dashboard/" class="small-box-footer">
                         详情&nbsp;
@@ -96,13 +95,13 @@
                     <div class="box-body">
                         <div id="device1" class="device-img">
                             <div class="col-md-6" title="before">
-                                <img id="before" height="240" style="border-radius:3px;"
-                                     src="/AppSimulator/images/"&[[ info.ip ]]&"/capture_before.png">
+                                {#                                <img id="before" height="240" style="border-radius:3px;"#}
+                                {#                                     src="/AppSimulator/images/capture_before.png">#}
                                 <label>before</label>
                             </div>
                             <div class="col-md-6" title="current">
                                 <img id="current" style="border-radius:3px;"
-                                     src="{% static 'AppSimulator/images/'[[ info.ip ]]'/capture.png' %}" height="240">
+                                     src="{% static 'AppSimulator/images/capture.png' %}" height="240">
                                 <label>current</label>
                             </div>
                         </div>
@@ -112,7 +111,7 @@
                         {#                        <input type="text" placeholder="longitude" v-model="longitude" style="width:35%;">#}
                         {#                        <button v-on:click="setDeviceGPS" class="btn btn-xs btn-info">位置设定</button>#}
                         {#                        <button v-on:click="restartDevice" class="btn btn-xs btn-info">重启</button>#}
-                        {#                        <button v-on:click="startScript" class="btn btn-xs btn-info">运行脚本</button>#}
+                        <button v-on:click="startTasks" class="btn btn-xs btn-info">运行任务</button>
                         {#                        <button v-on:click="stopScript" class="btn btn-xs btn-info">停止脚本</button>#}
                     </div>
                 </div>
@@ -258,6 +257,31 @@
                 error: function (xhr, err) {
                     obj.msg = "Failure";
                     console.error("[dashboard] stopScriptAPI", err);
+                },
+                success: function (data, status) {
+                    obj.msg = "OK";
+                }
+            };
+            $.ajax(opt);
+        }
+
+        function runTasks(obj) {
+            console.log("runTasks ...");
+            if (obj.deviceId === '') {
+                alert("请选择设备。");
+                return false;
+            }
+            let opt = {
+                url: '/AppSimulator/runTasksAPI/',
+                type: 'GET',
+                data: {
+                    app_name: obj.app_name,
+                    tasks_cnt:obj.tasks_cnt
+                },
+                dataType: "json",
+                error: function (xhr, err) {
+                    obj.msg = "Failure";
+                    console.error("[dashboard] runTasksAPI", err);
                 },
                 success: function (data, status) {
                     obj.msg = "OK";

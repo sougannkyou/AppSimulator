@@ -1,15 +1,15 @@
 const THEME = 'shine';//dark infographic macarons roma shine vintage
 
 function ajaxError(err, msg) {
-    // alert('[错误信息]' + msg + err);
+    alert('[错误信息]' + msg + err);
 }
 
 const DEBUG_TIME = 1;
 // ------------------ DeviceCrawlCntInfo  ------------------
-setInterval(function () {
-    $("#before").attr('src', src = "/static/AppSimulator/images/capture_before.png?t=" + Math.random());
-    $("#current").attr('src', src = "/static/AppSimulator/images/capture.png?t=" + Math.random());
-}, 1000);
+// setInterval(function () {
+//     $("#before").attr('src', src = "/static/AppSimulator/images/capture_before.png?t=" + Math.random());
+//     $("#current").attr('src', src = "/static/AppSimulator/images/capture.png?t=" + Math.random());
+// }, 1000);
 
 setInterval(function () {
     $.ajax({

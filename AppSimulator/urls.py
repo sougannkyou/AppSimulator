@@ -10,7 +10,8 @@ from .views import (
 from .restAPI import (
     HubXPathViewAPI, getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI,
     setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,
-    getDeviceCaptureAPI, getProxyServerInfoAPI
+    getDeviceCaptureAPI, getProxyServerInfoAPI,
+    runTasksAPI,
 )
 
 cache_time_out = 60 * 3
@@ -28,6 +29,7 @@ urlpatterns = patterns('',
                        url(r'^startScriptAPI/$', startScriptAPI, name='startScriptAPI'),
                        url(r'^stopScriptAPI/$', stopScriptAPI, name='stopScriptAPI'),
                        url(r'^quitAppAPI/$', quitAppAPI, name='quitAppAPI'),
+                       url(r'^runTasksAPI/$', runTasksAPI, name='runTasksAPI'),
 
                        url(r'^getDeviceCaptureAPI/$', getDeviceCaptureAPI, name='getDeviceCaptureAPI'),
                        url(r'^getProxyServerInfoAPI/$', getProxyServerInfoAPI, name='getProxyServerInfoAPI'),

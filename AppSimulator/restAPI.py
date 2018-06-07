@@ -45,7 +45,7 @@ def getRpcServerStatus(deviceId):
 
 
 def startProxyServerAPI(request):
-    if (sys.platform == 'win32'):
+    if sys.platform == 'win32':
         os.system('taskkill /t /f /fi "WINDOWTITLE eq ProxyServer"')
         os.system('start "ProxyServer" node.exe %ANYPROXY_HOME%\main.js')
 
