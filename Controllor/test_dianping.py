@@ -41,7 +41,7 @@ class MySimulator(Simulator):
         if ret: ret = self.click_xy(x, y, timeout=1)
         time.sleep(3)
         if ret: ret = self.input_cn(keywords[self._adb_idx], timeout=1)
-        time.sleep(3)
+        time.sleep(5)
         if ret: ret, x, y = self.find_element(comment='搜索', timeout=5)
         if ret: ret = self.click_xy(x, y + 30, timeout=1)
 
