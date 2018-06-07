@@ -20,9 +20,16 @@ urls = [
 ]
 
 keywords = [
+    '九本しんいち居酒屋(亚运村店)',
     '匹夫涮肉城 黄村店',
     '鲜牛记潮汕牛肉火锅 亚运村店',
-    '海底捞火锅(大屯北路店)'
+    '海底捞火锅(大屯北路店)',
+    '小吊梨汤(新奥店)',
+    '盘古七星酒店聚福园自助餐厅',
+    '丰茂烤串l羊肉现穿才好吃(金泉美食宫店)',
+    '初色海鲜姿造自助火锅(时代名门商场店)',
+    '鱼图腾·好吃的鱼头泡饼(亚运村店)',
+    '金鼎轩·南北菜(亚运村店)',
 ]
 
 
@@ -83,7 +90,7 @@ def run(idx):
         mySimulator = MySimulator(adb_path=ADB_BINARY_PATH, idx=idx)
         mySimulator._PIC_PATH = {
             # "web打开APP": 'images/dianping/webOpenApp.png',
-            # "APP打开结果OK": 'images/dianping/search_ready.png',
+            "APP打开结果OK": 'images/dianping/search_ready.png',
             "APP图标": 'images/dianping/app_icon.png',
             '附近热搜': 'images/dianping/search.png',
             '搜索': 'images/dianping/search_btn.png',
@@ -111,10 +118,10 @@ def run(idx):
 
 
 if __name__ == "__main__":
-    devices_cnt = 3
+    devices_cnt = 1
     pool = multiprocessing.Pool(processes=4)
     for idx in range(devices_cnt):
         pool.apply_async(run, (idx,))
     pool.close()
     pool.join()
-    print("Sub-process(es) done.")
+    print("process done.")

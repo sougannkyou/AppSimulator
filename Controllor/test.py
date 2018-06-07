@@ -15,7 +15,7 @@ class MySimulator(Simulator):
     def script(self):
         ret, x, y = self.find_element(comment=u'APP图标', timeout=10)  # unlock ok
         if ret: ret = self.click_xy(x, y, timeout=2)
-        while (ret):  # 更新 -> 分享 -> 复制链接
+        while ret:  # 更新 -> 分享 -> 复制链接
             if ret: ret, x, y = self.find_element(comment=u'更新', timeout=10)
             if ret: ret = self.click_xy(x, y, timeout=1)
 

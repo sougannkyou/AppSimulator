@@ -166,7 +166,7 @@ class Simulator(object):
         return True
 
     def input_cn(self, text, timeout):
-        # adb shell am broadcast -a ADB_INPUT_TEXT --es msg '不错，可以学着品红酒的好工具'
+        # adb shell am broadcast -a ADB_INPUT_TEXT --es msg '输入汉字'
         self._adb.adb_shell("am broadcast -a ADB_INPUT_TEXT --es msg '" + text + "'")
         time.sleep(timeout)
         return True
