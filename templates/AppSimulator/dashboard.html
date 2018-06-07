@@ -275,8 +275,8 @@
                 url: '/AppSimulator/runTasksAPI/',
                 type: 'GET',
                 data: {
-                    app_name: obj.app_name,
-                    tasks_cnt:obj.tasks_cnt
+                    app_name: obj.appName,
+                    tasks_cnt: obj.tasksCnt
                 },
                 dataType: "json",
                 error: function (xhr, err) {
@@ -302,6 +302,7 @@
                     hd_percent: 0
                 },
                 appName: 'douyin',
+                tasksCnt: 4,
                 deviceId: 'device1',
                 devices: {
                     cnt: 0,
@@ -344,6 +345,9 @@
                 },
                 startProxyServer: function () {
                     startProxyServer(this);
+                },
+                runTasks: function () {
+                    runTasks(this);
                 }
             },
             ready: function () {
