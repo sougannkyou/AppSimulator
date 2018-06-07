@@ -21,6 +21,8 @@ urls = [
 
 keywords = [
     '匹夫涮肉城 黄村店',
+    '鲜牛记潮汕牛肉火锅 亚运村店',
+    '海底捞火锅(大屯北路店)'
 ]
 
 
@@ -33,12 +35,12 @@ class MySimulator(Simulator):
         x = -1
         y = -1
 
-        # ret, x, y = self.find_element(comment='APP图标', timeout=10)
-        # if ret: ret = self.click_xy(x, y, timeout=2)
+        ret, x, y = self.find_element(comment='APP图标', timeout=10)
+        if ret: ret = self.click_xy(x, y, timeout=2)
         if ret: ret, x, y = self.find_element(comment='附近热搜', timeout=5)
         if ret: ret = self.click_xy(x, y, timeout=1)
         time.sleep(3)
-        if ret: ret = self.input_cn("匹夫涮肉城 黄村店", timeout=1)
+        if ret: ret = self.input_cn(keywords[self._adb_idx], timeout=1)
         time.sleep(3)
         if ret: ret, x, y = self.find_element(comment='搜索', timeout=5)
         if ret: ret = self.click_xy(x, y + 30, timeout=1)
@@ -91,7 +93,7 @@ def run(idx):
             "复制链接": 'images/dianping/copy_link.png',
             "打分": 'images/dianping/dafen.png',
         }
-        mySimulator._DEBUG = True
+        mySimulator._DEBUG = False
         # if not ret: self.send2web('images/offline.jpeg')
         mySimulator.set_gps(39.984727, 116.310050)  # 中关村
         mySimulator.run(is_app_restart=False)
@@ -109,8 +111,9 @@ def run(idx):
 
 
 if __name__ == "__main__":
+    devices_cnt = 3
     pool = multiprocessing.Pool(processes=4)
-    for idx in range(1):
+    for idx in range(devices_cnt):
         pool.apply_async(run, (idx,))
     pool.close()
     pool.join()

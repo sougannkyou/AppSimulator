@@ -70,7 +70,7 @@ def run(idx):
 
 if __name__ == "__main__":
     pool = multiprocessing.Pool(processes=4)
-    for idx in range(2):
+    for idx in range(3):
         pool.apply_async(run, (idx,))
     pool.close()
     pool.join()
