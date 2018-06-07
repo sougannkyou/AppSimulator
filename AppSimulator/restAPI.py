@@ -121,10 +121,12 @@ def stopScriptAPI(request):
 
 
 def runTasksAPI(request):
+    ret = True
     app_name = request.GET.get('app_name')  # 'dianping'
     tasks_cnt = request.GET.get('tasks_cnt')  # tasks
     with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
-        ret = proxy.runTasks(app_name, tasks_cnt)
+        # ret = proxy.runTasks(app_name, tasks_cnt)
+        ret = proxy.runTasks()
 
     output = JsonResponse({
         'ret': ret,

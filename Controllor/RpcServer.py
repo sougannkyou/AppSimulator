@@ -89,10 +89,34 @@ def setDeviceGPS(deviceId, latitude, longitude):
     print(p.read())
     return True
 
+import subprocess
+def _exec_cmd(cmdline):
+    _stdout = ''
+    _stderr = ''
+    try:
+        print('[rpc] cmdline: ', cmdline)
+        process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process.wait()
+        (stdout, stderr) = process.communicate()
+        _stdout = stdout.decode('utf8')
+        _stderr = stderr.decode('utf8')
+    except Exception as e:
+        print('[rpc] Exception:', e)
 
-def runTasks(app_name, task_cnt):
-    p = os.popen("[rpc_server] python script_" + app_name + ".py " + task_cnt)
-    print(p.read())
+    print('[rpc] stdout:', _stdout)
+    if _stderr:
+        print('[rpc] stderr:', _stderr)
+        return ''
+    else:
+        return _stdout
+
+def runTasks():
+    app_name = 'dianping'
+    task_cnt = 4
+    cmd = "python script_" + app_name + ".py " + str(task_cnt)
+    _exec_cmd(cmd)
+    # print(p.read())
+    return True
 
 
 ######################################################################
