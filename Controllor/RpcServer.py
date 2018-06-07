@@ -1,12 +1,10 @@
 # coding=utf8
-import os, sys
-import time, datetime
+import os
+import time
 import win32gui
 from PIL import ImageGrab
 import shutil
-import subprocess
 from xmlrpc.server import SimpleXMLRPCServer
-from simulator import Simulator
 
 
 def getRpcServerStatus():
@@ -62,7 +60,7 @@ def capture(app_name):
 def restartDevice(deviceId):
     print("[rpc_server] restartDevice")
     # print("Nox.exe -quit :", p.read())
-    while (1):
+    while True:
         time.sleep(2)
         p = os.popen('tasklist /v | findstr "douyin0"')
         msg = p.read()
