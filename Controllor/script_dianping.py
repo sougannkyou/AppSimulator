@@ -128,6 +128,7 @@ if __name__ == "__main__":
     tasks_cnt = int(sys.argv[1])
     emulator = Emulator()
     for i in range(tasks_cnt):
+        print('launch_emulator nox-' + str(i))
         emulator.launch_emulator('nox-' + str(i), force=True)
 
     time.sleep(30)
