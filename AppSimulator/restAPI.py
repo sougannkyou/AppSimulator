@@ -120,6 +120,18 @@ def stopScriptAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
+def runTasksAPI(request):
+    app_name = request.GET.get('app_name')  # 'dianping'
+    tasks_cnt = request.GET.get('tasks_cnt')  # tasks
+    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
+        ret = proxy.runTasks(app_name, tasks_cnt)
+
+    output = JsonResponse({
+        'ret': ret,
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
 def getDeviceCaptureAPI(request):
     # deviceId = request.POST.get('deviceId')  # 设备ID
     # try:

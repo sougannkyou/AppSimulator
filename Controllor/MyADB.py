@@ -109,7 +109,8 @@ class MyADB(object):
 
         try:
             cmdline = self._make_command(cmd)
-            self._log('[adb_cmd]', cmdline)
+            if self._DEBUG:
+                self._log('[adb_cmd]', cmdline)
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()
             (stdout, stderr) = process.communicate()

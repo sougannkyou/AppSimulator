@@ -1,61 +1,77 @@
-# coding=utf8
-import os
-import datetime
-from simulator_yeshen  import Simulator
+# coding:utf-8
+try:
+    import sys
+    import time, datetime
+    import multiprocessing
+    from simulatorADB import Simulator
+except ImportError as e:
+    print("[Script] ERROR:", e.args[0])
+    sys.exit(-1)
+
+ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
 
 
-def run():
+class MySimulator(Simulator):
+    def script(self):
+        ret, x, y = self.find_element(comment=u'APP图标', timeout=10)  # unlock ok
+        if ret: ret = self.click_xy(x, y, timeout=2)
+        while ret:  # 更新 -> 分享 -> 复制链接
+            if ret: ret, x, y = self.find_element(comment=u'更新', timeout=10)
+            if ret: ret = self.click_xy(x, y, timeout=1)
+
+            if ret: ret, x, y = self.find_element(comment=u'分享', timeout=10)
+            if ret: ret = self.click_xy(x, y, timeout=1)
+
+            if ret:
+                ret, x, y = self.find_element(comment=u'复制链接', timeout=10)
+                if ret:
+                    ret = self.click_xy(x, y, timeout=1)
+                else:  # upgrade?
+                    # ret = self.check_upgrade(timeout=2)
+                    # if ret:
+                    print(u"重试 click 分享 按钮 ...")
+                    ret, x, y = self.find_element(comment=u'分享', timeout=10)
+                    if ret: ret = self.click_xy(x, y, timeout=1)
+
+                    if ret: ret, x, y = self.find_element(comment=u'复制链接', timeout=10)
+                    if ret: ret = self.click_xy(x, y, timeout=1)
+
+
+##################################################################################
+def run(idx):
     start = datetime.datetime.now()
-    print("[script] run start ...", start)
+    print("[Script" + str(idx) + "] run start.", start)
     try:
-        class MySimulator(Simulator):
-            def script(self):
-                ret = None
-                if self.hwnd: ret = self.find_element(comment='APP图标', timeout=10)  # unlock ok
-                if ret: ret = self.click(u"APP图标", timeout=2)
-                while (ret):
-                    if ret: ret = self.find_element(comment='更新', timeout=30)
-                    if ret: ret = self.click(u"更新", timeout=1)
-
-                    if ret: ret = self.find_element(comment='分享', timeout=10)
-                    if ret: ret = self.click(u"分享", timeout=1)
-
-                    if ret:
-                        ret = self.find_element(comment='复制链接', timeout=10)
-                        if not ret:
-                            print("重试 click 分享 按钮 ...")
-                            ret = self.find_element(comment='分享', timeout=10)
-                            if ret: ret = self.click(u"分享", timeout=1)
-
-                    if ret: ret = self.click(u"复制链接", timeout=1)
-                    # if not ret: self.send2web('images_yeshen/offline.jpeg')
-
-        mySimulator = MySimulator("simulator")
+        mySimulator = MySimulator(adb_path=ADB_BINARY_PATH, idx=idx)
         mySimulator._PIC_PATH = {
-            u"APP图标": 'images_yeshen/douyin/app_icon.png',
-            u"更新": 'images_yeshen/douyin/update.png',
-            u"分享": 'images_yeshen/douyin/share.png',
-            u"复制链接": 'images_yeshen/douyin/copylink.png',
-            u"跳过软件升级": 'images_yeshen/douyin/is_upgrade.png',
-            u"锁屏": 'images_yeshen/screen_lock.png'
+            u"锁屏": 'images/screen_lock.png',
+            u"锁屏图案": 'images/screen_lock_9point.png',
+            u"APP图标": 'images/douyin/app_icon.png',
+            u"更新": 'images/douyin/update.png',
+            u"分享": 'images/douyin/share.png',
+            u"复制链接": 'images/douyin/copylink.png',
+            u"跳过软件升级": 'images/douyin/ignore_upgrade.png',
         }
 
-        mySimulator._CLICK_POS = {
-            u"APP图标": (38, 793),
-            u"更新": (68, 793),
-            u"分享": (451, 628),
-            u"复制链接": (47, 720),
-            u"跳过软件升级": (231, 590)  # 以后再说
-        }
-        mySimulator.run()
+        # if not ret: self.send2web('images/offline.jpeg')
+        mySimulator.run(is_app_restart=True)
+
         end = datetime.datetime.now()
-        print("[script] run script success.", (end - start).seconds)
+        print("[Script" + str(idx) + "] run success. ", (end - start).seconds, "s")
         return True
     except Exception as e:
         end = datetime.datetime.now()
-        print("[script] run script error:", (end - start).seconds, e)
+        print("[Script" + str(idx) + "] ERROR:", (end - start).seconds, e)
         return False
 
 
+# run()
+
+
 if __name__ == "__main__":
-    run()
+    pool = multiprocessing.Pool(processes=4)
+    for idx in range(2):
+        pool.apply_async(run, (idx,))
+    pool.close()
+    pool.join()
+    print("Sub-process(es) done.")

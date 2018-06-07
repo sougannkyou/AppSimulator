@@ -38,6 +38,11 @@ class Simulator(object):
     def set_gps(self, latitude, longitude):
         return self._adb.set_gps(latitude, longitude)
 
+    def open_settings(self):
+        # adb shell am start -n com.android.settings/.Settings
+        self._adb.adb_shell("am start -n com.android.settings/.Settings")
+        return True
+
     def find_element(self, comment, timeout):
         capture_name = "capture" + str(self._adb_idx) + ".png"
         img_obj = ac.imread(self._PIC_PATH[comment])

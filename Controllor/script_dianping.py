@@ -6,6 +6,7 @@ try:
     import datetime
     import multiprocessing
     from simulatorADB import Simulator
+    from EmulaotrNox import Emulator
 except ImportError as e:
     print("[Script] ERROR:", e.args[0])
     sys.exit(-1)
@@ -35,14 +36,11 @@ keywords = [
 
 class MySimulator(Simulator):
     def script(self):
+        ret = True, x = -1, y = -1, page_cnt = 0
         # self.start_web(urls[self._adb_idx], 3)
         # ret, x, y = self.find_element(comment='web打开APP', timeout=10)
         # if ret: ret = self.click_xy(x, y, timeout=2)
-        ret = True
-        x = -1
-        y = -1
-
-        ret, x, y = self.find_element(comment='APP图标', timeout=10)
+        if ret: ret, x, y = self.find_element(comment='APP图标', timeout=10)
         if ret: ret = self.click_xy(x, y, timeout=2)
         if ret: ret, x, y = self.find_element(comment='附近热搜', timeout=5)
         if ret: ret = self.click_xy(x, y, timeout=1)
@@ -69,11 +67,18 @@ class MySimulator(Simulator):
                 ret, pos_list = self.find_elements(comment='打分', timeout=10)
                 if not ret:
                     ret = self.next_page(timeout=1)
+                    print('next_page:', page_cnt)
 
             for pos in pos_list:
                 (x, y) = pos
                 if ret: ret = self.click_xy(x, y, timeout=1)
-                if ret: ret, x, y = self.find_element(comment='分享', timeout=10)
+                if ret:
+                    ret, x, y = self.find_element(comment='分享', timeout=10)
+                else:
+                    (x, y) = pos
+                    if ret: ret = self.click_xy(x, y, timeout=1)
+                    if ret: ret, x, y = self.find_element(comment='分享', timeout=10)
+
                 if ret: ret = self.click_xy(x, y, timeout=1)
                 if ret: ret, x, y = self.find_element(comment='复制链接', timeout=10)
                 if ret: ret = self.click_xy(x, y, timeout=1)
@@ -101,6 +106,7 @@ def run(idx):
             "打分": 'images/dianping/dafen.png',
         }
         mySimulator._DEBUG = False
+        mySimulator._adb._DEBUG = False
         # if not ret: self.send2web('images/offline.jpeg')
         mySimulator.set_gps(39.984727, 116.310050)  # 中关村
         mySimulator.run(is_app_restart=False)
@@ -114,13 +120,17 @@ def run(idx):
         return False
 
 
-# run()
-
-
+#################################################################################
 if __name__ == "__main__":
-    devices_cnt = 1
+    tasks_cnt = int(sys.argv[1])
+    emulator = Emulator()
+    for i in range(tasks_cnt):
+        emulator.launch_emulator('nox-' + str(i), force=True)
+
+    time.sleep(30)
+
     pool = multiprocessing.Pool(processes=4)
-    for idx in range(devices_cnt):
+    for idx in range(tasks_cnt):
         pool.apply_async(run, (idx,))
     pool.close()
     pool.join()

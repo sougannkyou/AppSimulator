@@ -1,26 +1,32 @@
 # coding=utf8
-import os,sys
+import os, sys
 import time, datetime
 import win32gui
 from PIL import ImageGrab
 import shutil
+import subprocess
 from xmlrpc.server import SimpleXMLRPCServer
 from simulator import Simulator
+
 
 def getRpcServerStatus():
     return "running"
 
+
 def simulatorStatus():
     return "running"
+
 
 def startScript():
     os.system('taskkill /f /t /fi "WINDOWTITLE eq script"')
     os.system('start /B start "script" cmd.exe @cmd /k python %RPCSERVER_HOME%script_douyin.py')
     return True
 
+
 def stopScript():
     os.system('taskkill /f /t /fi "WINDOWTITLE eq script"')
     return True
+
 
 def send2web(pic_path):
     try:
@@ -31,6 +37,7 @@ def send2web(pic_path):
         print("[rpc_server] send2web err", e)
 
     return True
+
 
 def run_captrue():
     print("[rpc_server] run_captrue")
@@ -59,7 +66,7 @@ def restartDevice(deviceId):
         time.sleep(2)
         p = os.popen('tasklist /v | findstr "douyin0"')
         msg = p.read()
-        print('[rpc_server] tasklist /v | findstr "douyin0"\n', msg) # tasklist /fi "imagename eq Nox.exe"
+        print('[rpc_server] tasklist /v | findstr "douyin0"\n', msg)  # tasklist /fi "imagename eq Nox.exe"
         if len(msg) > 0:
             print("[rpc_server] 模拟器正在 运行 ...")
             os.popen("C:\\Nox\\bin\\Nox.exe -quit")
@@ -85,6 +92,11 @@ def setDeviceGPS(deviceId, latitude, longitude):
     return True
 
 
+def runTasks(app_name, task_cnt):
+    p = os.popen("[rpc_server] python script_" + app_name + ".py " + task_cnt)
+    print(p.read())
+
+
 ######################################################################
 # netstat -ano | findstr "8003"
 server = SimpleXMLRPCServer(("0.0.0.0", 8003))
@@ -94,6 +106,7 @@ server.register_function(startScript, "startScript")
 server.register_function(stopScript, "stopScript")
 server.register_function(getRpcServerStatus, "getRpcServerStatus")
 server.register_function(simulatorStatus, "simulatorStatus")
+server.register_function(runTasks, "runTasks")
 # server.register_function(quitApp, "quitApp")
 print("[rpc_server] start ...")
 server.serve_forever()
