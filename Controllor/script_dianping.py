@@ -6,7 +6,7 @@ try:
     import datetime
     import multiprocessing
     from simulatorADB import Simulator
-    from EmulaotrNox import Emulator
+    from EmulatorNox import Emulator
 except ImportError as e:
     print("[Script] ERROR:", e.args[0])
     sys.exit(-1)
@@ -36,7 +36,10 @@ keywords = [
 
 class MySimulator(Simulator):
     def script(self):
-        ret = True, x = -1, y = -1, page_cnt = 0
+        ret = True
+        x = -1
+        y = -1
+        page_cnt = 0
         # self.start_web(urls[self._adb_idx], 3)
         # ret, x, y = self.find_element(comment='web打开APP', timeout=10)
         # if ret: ret = self.click_xy(x, y, timeout=2)
@@ -125,6 +128,7 @@ if __name__ == "__main__":
     tasks_cnt = int(sys.argv[1])
     emulator = Emulator()
     for i in range(tasks_cnt):
+        print('launch_emulator nox-' + str(i))
         emulator.launch_emulator('nox-' + str(i), force=True)
 
     time.sleep(30)

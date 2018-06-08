@@ -9,7 +9,7 @@ class Emulator(object):
         self._emulator_cnt = 10
 
     def _make_cmd(self, cmd):
-        return 'NoxConsole ' + cmd
+        return 'C:\\Nox\\bin\\NoxConsole.exe ' + cmd
 
     def emulator_quit(self, name):
         self._exec_emulator_cmd(self._make_cmd(" quit -name:" + name))
