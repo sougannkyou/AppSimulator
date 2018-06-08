@@ -6,6 +6,7 @@ from PIL import ImageGrab
 import shutil
 from xmlrpc.server import SimpleXMLRPCServer
 
+RPC_PORT = 8003
 
 def getRpcServerStatus():
     return "running"
@@ -97,7 +98,7 @@ def runTasks(app_name, task_cnt):
 
 ######################################################################
 # netstat -ano | findstr "8003"
-server = SimpleXMLRPCServer(("0.0.0.0", 8003))
+server = SimpleXMLRPCServer(("0.0.0.0", RPC_PORT))
 server.register_function(restartDevice, "restartDevice")
 server.register_function(setDeviceGPS, 'setDeviceGPS')
 server.register_function(startScript, "startScript")
