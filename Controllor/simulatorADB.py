@@ -139,7 +139,7 @@ class Simulator(object):
     def next_page_browser(self, timeout):
         print('[Simulator-' + str(self._adb_idx) + '] 浏览器翻页')
         # KEYCODE_PAGE_UP = 92
-        self._adb.adb_shell("input keyevent 93") # KEYCODE_PAGE_DOWN = 93
+        self._adb.adb_shell("input keyevent 93")  # KEYCODE_PAGE_DOWN = 93
         time.sleep(timeout)
         return True
 
