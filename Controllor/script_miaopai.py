@@ -9,11 +9,17 @@ except ImportError as e:
     sys.exit(-1)
 
 ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
-
+urls = [
+    "http://www.miaopai.com/show/6NWi1Bp5fx9GV0tdwCUGYWNzaQm9hVJe.htm",  # 936
+]
 
 class MySimulator(Simulator):
     def script(self):
-        ret, x, y = self.find_element(comment=u'APP图标', timeout=10)  # unlock ok
+        self.start_web(urls[0])
+        ret, x, y = self.find_element(comment='web打开APP', timeout=10)
+        if ret: ret = self.click_xy(x, y, timeout=2)
+
+        # ret, x, y = self.find_element(comment=u'APP图标', timeout=10)  # unlock ok
         if ret: ret = self.click_xy(x, y, timeout=2)
         while (ret):  # 更新 -> 分享 -> 复制链接
             if ret: ret, x, y = self.find_element(comment=u'更新', timeout=10)

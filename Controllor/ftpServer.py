@@ -1,3 +1,4 @@
+# coding:utf-8
 import ftplib
 
 DEBUG_ENV = False
