@@ -36,32 +36,32 @@ comments = [
 ]
 
 
-def next_page(window_title, timeout):
-    # 10 400 -> 10 10
-    hwnd = win32gui.FindWindow(None, window_title)
-    if not hwnd:
-        return False
-
-    # win32gui.SetForegroundWindow(hwnd)
-    left, top, right, bottom = win32gui.GetWindowRect(hwnd)
-    top += 20
-    time.sleep(timeout)
-
-    (x, y) = (10, 400)
-    x = left + x
-    y = top + y
-    pyautogui.moveTo(x, y)
-    pyautogui.mouseDown()
-
-    (x, y) = (10, 10)
-    x = left + x
-    y = top + y
-    pyautogui.dragTo(x, y, 0.5, button='left')
-    # pyautogui.moveTo(x, y, 1, pyautogui.easeInQuad)
-
-    # pyautogui.mouseUp()
-    time.sleep(timeout)
-    return True
+# def next_page(window_title, timeout):
+#     # 10 400 -> 10 10
+#     hwnd = win32gui.FindWindow(None, window_title)
+#     if not hwnd:
+#         return False
+#
+#     # win32gui.SetForegroundWindow(hwnd)
+#     left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+#     top += 20
+#     time.sleep(timeout)
+#
+#     (x, y) = (10, 400)
+#     x = left + x
+#     y = top + y
+#     pyautogui.moveTo(x, y)
+#     pyautogui.mouseDown()
+#
+#     (x, y) = (10, 10)
+#     x = left + x
+#     y = top + y
+#     pyautogui.dragTo(x, y, 0.5, button='left')
+#     # pyautogui.moveTo(x, y, 1, pyautogui.easeInQuad)
+#
+#     # pyautogui.mouseUp()
+#     time.sleep(timeout)
+#     return True
 
 
 class MySimulator(Simulator):
@@ -76,13 +76,13 @@ class MySimulator(Simulator):
             ret = self.click_xy(x, y, timeout=2)
         else:
             # ret = self.next_page(timeout=1)
-            ret = next_page('nox-2', 1)
+            ret = self.next_page_browser(1)
             ret, x, y = self.find_element(comment='打开APP', timeout=10)
             if ret:
                 ret = self.click_xy(x, y, timeout=2)
             else:
                 # ret = self.next_page(timeout=1)
-                ret = next_page('nox-2', 1)
+                ret = self.next_page_browser(1)
                 ret, x, y = self.find_element(comment='打开APP', timeout=10)
                 if ret: ret = self.click_xy(x, y, timeout=2)
 
