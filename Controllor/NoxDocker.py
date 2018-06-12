@@ -35,7 +35,7 @@ class NoxDocker(object):
             return False, msg
 
         mem = psutil.virtual_memory()
-        if mem.free < 1 * GB:  # < 1GB
+        if mem.free < 0.5 * GB:  # < 1GB
             msg = 'memory less than 1GB.'
             self._log('_check', msg)
             return False, msg
@@ -183,9 +183,16 @@ def run(docker_name):
 
 if __name__ == "__main__":
     # tasks_cnt = 3
-    pool = multiprocessing.Pool(processes=4)
-    for docker_name in ['nox-3', 'nox-4', 'nox-5']:  # range(tasks_cnt):
-        pool.apply_async(run, (docker_name,))
-    pool.close()
-    pool.join()
+    os.chdir('c:\\Nox\\bin')
+    # pool = multiprocessing.Pool(processes=4)
+    # for docker_name in ['nox-3', 'nox-4', 'nox-5']:  # range(tasks_cnt):
+    # # for docker_name in ['nox-3']:  # range(tasks_cnt):
+    #     pool.apply_async(run, (docker_name,))
+    # pool.close()
+    # pool.join()
+
+    for docker_name in ['nox-3', 'nox-4', 'nox-5']:
+    # for docker_name in ['nox-6', 'nox-7', 'nox-8']:
+        run(docker_name)
+
     print("process done.")
