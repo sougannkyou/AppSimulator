@@ -11,7 +11,7 @@ try:
     import aircv as ac
     import pyautogui
     from simulatorADB import Simulator
-    from EmulatorNox import Emulator
+    from NoxDocker import NoxDocker
 
 except ImportError as e:
     print("[Script] ERROR:", e.args[0])
@@ -109,6 +109,7 @@ def run(idx):
         }
         mySimulator._DEBUG = True
         mySimulator._adb._DEBUG = False
+        mySimulator.get_new_phone(1)
         # if not ret: self.send2web('images/offline.jpeg')
         mySimulator.set_gps(39.984727, 116.310050)  # 中关村
         mySimulator.run(is_app_restart=False)
@@ -126,12 +127,12 @@ def run(idx):
 if __name__ == "__main__":
     # tasks_cnt = int(sys.argv[1])
     tasks_cnt = 1
-    # emulator = Emulator('dianping')
-    # for i in range(1, 1 + tasks_cnt):
-    #     print('launch_emulator nox-' + str(i))
-    #     emulator.launch_emulator('nox-' + str(i), force=True)
-    #
-    # time.sleep(30)
+    docker = NoxDocker('dianping')
+    for i in range(1, 1 + tasks_cnt):
+        print('launch_emulator nox-' + str(i))
+        docker.launch_emulator('nox-' + str(i), force=True)
+
+    time.sleep(30)
 
     pool = multiprocessing.Pool(processes=4)
     for idx in range(tasks_cnt):

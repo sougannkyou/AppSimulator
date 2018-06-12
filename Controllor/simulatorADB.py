@@ -213,7 +213,7 @@ class Simulator(object):
         time.sleep(timeout)
         return True
 
-    def get_new_phone(self, timeout):
+    def get_new_phone(self, timeout=1):
         ret = self._adb.get_new_phone()
         time.sleep(timeout)
         return ret
