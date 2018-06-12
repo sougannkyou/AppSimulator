@@ -6,6 +6,9 @@ import win32gui
 import subprocess
 import multiprocessing
 from pprint import pprint
+from PIL import ImageGrab
+import cv2
+import aircv as ac
 
 GB = 1024 * 1024 * 1024
 
@@ -169,12 +172,34 @@ class NoxDocker(object):
 
         return True, msg
 
+    def start_check(self, hwnd, app_icon_path, timeout):
+        win32gui.SetForegroundWindow(hwnd)
+        while (timeout > 0):
+            left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+            app_bg_box = (left, top, right, bottom)
+            im = ImageGrab.grab(app_bg_box)
+            im.save('images/capture.png')
+
+            img_capture = ac.imread('images/capture.png')
+            img_obj = ac.imread(app_icon_path)
+            pos = ac.find_template(img_capture, img_obj)
+            if pos and pos['confidence'] > 0.9:
+                self._log('start_check', 'ok. ' + str(timeout) + 's')
+                return True
+            else:
+                time.sleep(1)
+                timeout = timeout - 1
+                self._log('start_check', 'retry ' + str(timeout) + 's')
+
+        return False
+
     def start(self, docker_name, wait_time=30):
         self._exec_nox_cmd(self._make_cmd("launch -name:" + docker_name))
         while wait_time > 0:
             hwnd = win32gui.FindWindow(None, docker_name)
             if hwnd:
                 self._log('start', docker_name + ' ok.')
+
                 return True
             else:  # hwnd is 0 if not found
                 time.sleep(1)
