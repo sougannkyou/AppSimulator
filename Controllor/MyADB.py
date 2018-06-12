@@ -5,12 +5,11 @@ try:
     import random
     import subprocess
 except ImportError as e:
-    print("[MyADB] ERROR:", e.args[0])
+    print("[MyADB] error:", e.args[0])
     sys.exit(-1)
 
 
 class MyADB(object):
-    _MYADB_VERSION = "0.0.1"
     _DEBUG = True
     _adb_binary_path = None
     _stdout = None
