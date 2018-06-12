@@ -30,13 +30,13 @@ class NoxDocker(object):
             return False, msg
 
         if not os.access('c:\\Nox\\backup\\nox-' + self._app_name + '.npbk', os.R_OK):
-            msg = 'not found: ' + self._app_name + '.npbk'
+            msg = 'not found: nox-' + self._app_name + '.npbk'
             self._log('_check', msg)
             return False, msg
 
         mem = psutil.virtual_memory()
         if mem.free < 0.5 * GB:  # < 1GB
-            msg = 'memory less than 1GB.'
+            msg = 'memory less than 0.5 GB.'
             self._log('_check', msg)
             return False, msg
 
@@ -46,7 +46,7 @@ class NoxDocker(object):
             return False, msg
 
         if len(self.ps(docker_status=self.STATUS_RUNNING)) >= self.DOCKERS_MAX_CNT:
-            msg = 'over the DOCKERS_MAX_CNT.'
+            msg = 'cannot launch over ' + str(self.DOCKERS_MAX_CNT) + ' dockers.'
             self._log('_check', msg)
             return False, msg
 
@@ -60,19 +60,21 @@ class NoxDocker(object):
         _stderr = ''
         try:
             self._log('_exec_nox_cmd', cmdline)
+            time.sleep(1)
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             # process.wait()
             (stdout, stderr) = process.communicate()
             _stdout = stdout.decode('utf8')
             _stderr = stderr.decode('utf8')
         except Exception as e:
-            self._log('_exec_nox_cmd Exception:', e)
+            self._log('_exec_nox_cmd exception:', e)
 
         self._log('_exec_nox_cmd stdout:\n', _stdout)
         if _stderr:
             self._log('_exec_nox_cmd stderr:\n', _stderr)
             return ''
         else:
+            time.sleep(1)
             return _stdout
 
     def stop(self, docker_name, wait_time=30):
@@ -89,10 +91,12 @@ class NoxDocker(object):
         if wait_time == 0:  # retry
             self._exec_nox_cmd(self._make_cmd("quit -name:" + docker_name))
 
+        time.sleep(10)
         return True
 
     def stop_all(self):
         self._exec_nox_cmd(self._make_cmd('quitall'))
+        time.sleep(10)
         return True
 
     def ps(self, docker_name=None, docker_status=None):
@@ -121,14 +125,21 @@ class NoxDocker(object):
 
     def pull(self, docker_name, app_name):  # restore
         self._log('pull', docker_name + ' ' + app_name)
+        time.sleep(1)
         self._exec_nox_cmd(self._make_cmd(
             'restore -name:' + docker_name + ' -file:"c:\\Nox\\backup\\nox-' + app_name + '.npbk"'
         ))
+        time.sleep(5)
         return True
 
     def copy(self, docker_name, org):
         self._log('copy', docker_name)
         self._exec_nox_cmd(self._make_cmd("copy -name:" + docker_name + " -from:" + org))
+        return True
+
+    def add(self, docker_name):
+        self._log('add', docker_name)
+        self._exec_nox_cmd(self._make_cmd("add -name:" + docker_name))
         return True
 
     def create(self, docker_name, force=False):
@@ -143,13 +154,15 @@ class NoxDocker(object):
             return False, msg
 
         if len(dockers) == 0:
-            self.copy(docker_name, 'nox-org')
+            # self.copy(docker_name, 'nox-org')
+            self.add(docker_name)
 
         if len(dockers) == 1:
             if dockers[0]['status'] == self.STATUS_RUNNING:
                 self.stop(docker_name, 30)
                 self.remove(dockers[0]['name'])
-                self.copy(docker_name, 'nox-org')
+                # self.copy(docker_name, 'nox-org')
+                self.add(docker_name)
 
         if force:
             self.pull(docker_name, self._app_name)
@@ -171,14 +184,22 @@ class NoxDocker(object):
         return False
 
     def run(self, docker_name=None, force=False, time_out=30):  # run = create and start
-        self.create(docker_name, force)
-        self.start(docker_name, wait_time=time_out)
+        ret, msg = self.create(docker_name, force)
+        if ret:
+            ret = self.start(docker_name, wait_time=time_out)
+            if ret:
+                time.sleep(10)
+            else:  # retry
+                ret = self.start(docker_name, wait_time=time_out)
+                if ret:
+                    time.sleep(10)
 
 
 def run(docker_name):
     docker = NoxDocker(app_name='toutiao')
     docker._DEBUG = True
     docker.run(docker_name=docker_name, force=True, time_out=30)
+    # docker.stop_all()
 
 
 if __name__ == "__main__":
@@ -191,8 +212,10 @@ if __name__ == "__main__":
     # pool.close()
     # pool.join()
 
-    for docker_name in ['nox-3', 'nox-4', 'nox-5']:
-    # for docker_name in ['nox-6', 'nox-7', 'nox-8']:
+    # for docker_name in ['nox-10', 'nox-11', 'nox-12']:
+    # for docker_name in ['nox-20', 'nox-21', 'nox-22']:
+    # for docker_name in ['nox-30', 'nox-31', 'nox-32']:
+    for docker_name in ['nox-40', 'nox-41', 'nox-42']:
         run(docker_name)
 
     print("process done.")
