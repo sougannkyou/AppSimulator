@@ -33,19 +33,19 @@ class NoxDocker(object):
             self._log('_check', msg)
             return False, msg
 
-        if not os.access('c:\\Nox\\backup\\nox-' + self._app_name + '.npbk', os.R_OK):
-            msg = 'not found: nox-' + self._app_name + '.npbk'
-            self._log('_check', msg)
-            return False, msg
-
         if not self._work_path:
             msg = 'env not found: APPSIMULATOR_WORK_PATH'
             self._log('_check', msg)
             return False, msg
 
         mem = psutil.virtual_memory()
-        if mem.free < 0.5 * GB:  # < 1GB
-            msg = 'memory less than 0.5 GB.'
+        if mem.free < 1 * GB:  # < 1GB
+            msg = 'memory less than 1GB.'
+            self._log('_check', msg)
+            return False, msg
+
+        if not os.access('c:\\Nox\\backup\\nox-' + self._app_name + '.npbk', os.R_OK):
+            msg = 'not found: nox-' + self._app_name + '.npbk'
             self._log('_check', msg)
             return False, msg
 
@@ -62,7 +62,7 @@ class NoxDocker(object):
         return True, msg
 
     def _make_cmd(self, cmd):
-        return 'C:\\Nox\\bin\\NoxConsole.exe ' + cmd
+        return 'NoxConsole ' + cmd
 
     def _exec_nox_cmd(self, cmdline):
         _stdout = ''
@@ -86,7 +86,7 @@ class NoxDocker(object):
             time.sleep(1)
             return _stdout
 
-    def _cmd_kill_task(self, docker_name):
+    def _cmd_kill_task(self, docker_name):  # 不能强杀，会造成 ERR：1037
         dockers = self.ps(docker_name=docker_name, docker_status=STATUS_RUNNING)
         for d in dockers:
             cmd = 'TASKKILL /F /T /PID ' + str(d['pid'])
@@ -108,7 +108,7 @@ class NoxDocker(object):
             self._exec_nox_cmd(self._make_cmd("quit -name:" + docker_name))
 
         time.sleep(10)
-        self._cmd_kill_task(docker_name)
+        # self._cmd_kill_task(docker_name)  # 不能强杀，会造成 ERR：1037
         return True
 
     def stop_all(self):
@@ -217,7 +217,7 @@ class NoxDocker(object):
             if hwnd:
                 self._log('start', docker_name + ' ok.')
                 app_icon_path = self._work_path + '\\Controllor\\images\\' + self._app_name + '\\app_icon.png'
-                return self.start_check(hwnd, app_icon_path, 60)
+                return self.start_check(hwnd, app_icon_path, 30)
             else:  # hwnd is 0 if not found
                 time.sleep(1)
                 wait_time -= 1
@@ -231,10 +231,14 @@ class NoxDocker(object):
             ret = self.start(docker_name, wait_time=time_out)
             if ret:
                 time.sleep(10)
-            else:  # retry
-                ret = self.start(docker_name, wait_time=time_out)
-                if ret:
-                    time.sleep(10)  # wait 10s
+            else:
+                self.stop(docker_name)
+
+            # else:  # retry
+            #     ret = self.start(docker_name, wait_time=time_out)
+            #     if ret:
+            #         time.sleep(10)  # wait 10s
+            #     else:
 
         return ret
 
@@ -257,12 +261,12 @@ if __name__ == "__main__":
     # pool.close()
     # pool.join()
 
-    # for docker_name in ['nox-11', 'nox-12', 'nox-13']:
-    # for docker_name in ['nox-21', 'nox-22', 'nox-23']:
+    # for docker_name in ['nox-11', 'nox-12', 'nox-13', 'nox-14', 'nox-15']:
+    for docker_name in ['nox-21', 'nox-22', 'nox-23', 'nox-24', 'nox-25', 'nox-26', 'nox-27']:
         # for docker_name in ['nox-31', 'nox-32', 'nox-33']:
         # for docker_name in ['nox-41', 'nox-42', 'nox-43']:
-    for docker_name in ['nox-11']:
+        # for docker_name in ['nox-11']:
         if run(docker_name):
             complete_cnt += 1
 
-    print("start simulator: ", str(complete_cnt))
+    print("start success:", str(complete_cnt))
