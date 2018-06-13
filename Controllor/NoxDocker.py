@@ -200,7 +200,7 @@ class NoxDocker(object):
         return True, msg
 
     def start_check(self, hwnd, target_path, timeout):
-        self._log('start_check', 'hwnd:' + str(hwnd))
+        self._log('start_check', 'match:' + target_path)
         win32gui.SetForegroundWindow(hwnd)
         while timeout > 0:
             left, top, right, bottom = win32gui.GetWindowRect(hwnd)
