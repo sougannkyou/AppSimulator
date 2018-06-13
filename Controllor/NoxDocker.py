@@ -86,6 +86,13 @@ class NoxDocker(object):
             time.sleep(1)
             return _stdout
 
+    def _cmd_kill_task(self, docker_name):
+        dockers = self.ps(docker_name=docker_name, docker_status=STATUS_RUNNING)
+        for d in dockers:
+            cmd = 'TASKKILL /F /T /PID ' + str(d['pid'])
+            self._log('_cmd_kill_task', cmd)
+            os.system(cmd)
+
     def stop(self, docker_name, wait_time=30):
         self._exec_nox_cmd(self._make_cmd("quit -name:" + docker_name))
         while wait_time > 0:
@@ -101,6 +108,7 @@ class NoxDocker(object):
             self._exec_nox_cmd(self._make_cmd("quit -name:" + docker_name))
 
         time.sleep(10)
+        self._cmd_kill_task(docker_name)
         return True
 
     def stop_all(self):
@@ -209,8 +217,7 @@ class NoxDocker(object):
             if hwnd:
                 self._log('start', docker_name + ' ok.')
                 app_icon_path = self._work_path + '\\Controllor\\images\\' + self._app_name + '\\app_icon.png'
-                self.start_check(hwnd, app_icon_path, 60)
-                return True
+                return self.start_check(hwnd, app_icon_path, 60)
             else:  # hwnd is 0 if not found
                 time.sleep(1)
                 wait_time -= 1
@@ -227,18 +234,21 @@ class NoxDocker(object):
             else:  # retry
                 ret = self.start(docker_name, wait_time=time_out)
                 if ret:
-                    time.sleep(10)
+                    time.sleep(10)  # wait 10s
+
+        return ret
 
 
 def run(docker_name):
     docker = NoxDocker(app_name='toutiao')
     docker._DEBUG = True
-    docker.run(docker_name=docker_name, force=True, time_out=30)
+    return docker.run(docker_name=docker_name, force=True, time_out=30)
     # docker.stop_all()
 
 
 if __name__ == "__main__":
     # tasks_cnt = 3
+    complete_cnt = 0
     os.chdir('c:\\Nox\\bin')
     # pool = multiprocessing.Pool(processes=4)
     # for docker_name in ['nox-3', 'nox-4', 'nox-5']:  # range(tasks_cnt):
@@ -247,11 +257,12 @@ if __name__ == "__main__":
     # pool.close()
     # pool.join()
 
-    for docker_name in ['nox-11', 'nox-12', 'nox-13']:
-        # for docker_name in ['nox-21', 'nox-22', 'nox-23']:
+    # for docker_name in ['nox-11', 'nox-12', 'nox-13']:
+    # for docker_name in ['nox-21', 'nox-22', 'nox-23']:
         # for docker_name in ['nox-31', 'nox-32', 'nox-33']:
         # for docker_name in ['nox-41', 'nox-42', 'nox-43']:
-        # for docker_name in ['nox-11']:
-        run(docker_name)
+    for docker_name in ['nox-11']:
+        if run(docker_name):
+            complete_cnt += 1
 
-    print("process done.")
+    print("start simulator: ", str(complete_cnt))
