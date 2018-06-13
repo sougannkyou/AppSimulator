@@ -8,6 +8,8 @@ except ImportError as e:
     print("[MyADB] error:", e.args[0])
     sys.exit(-1)
 
+ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
+
 
 class MyADB(object):
     _DEBUG = True
@@ -16,6 +18,7 @@ class MyADB(object):
     _stderr = None
     _devices = None
     __target = None
+    _docker_id = None
 
     REBOOT_RECOVERY = 1
     REBOOT_BOOTLOADER = 2
@@ -23,7 +26,7 @@ class MyADB(object):
     DEFAULT_TCP_HOST = "localhost"
     DEFAULT_TCP_PORT = 62001  # 5555
 
-    def __init__(self, adb_binary_path=None):
+    def __init__(self, adb_binary_path=ADB_BINARY_PATH):
         self._adb_binary_path = adb_binary_path
 
     def __clean__(self):
@@ -40,13 +43,18 @@ class MyADB(object):
         return sum(sum(divmod(int(d) * (1 + i % 2), 10))
                    for i, d in enumerate(digits[::-1])) % 10
 
-    def _get_IMEI(self, N):
+    def _get_imei(self, N):
         part = ''.join(str(random.randrange(0, 9)) for _ in range(N - 1))
         res = self._luhn_residue('{}{}'.format(part, 0))
         return '{}{}'.format(part, -res % 10)
 
+    def get_docker_id(self):
+        self._docker_id = self.adb_shell("getprop persist.nox.dockerid")
+        self._log('get_docker_id', self.get_stdout())
+        self._log('get_docker_id', self._docker_id)
+
     def get_new_phone(self):
-        imei = self._get_IMEI(15)
+        imei = self._get_imei(15)
         phoneNumber = self._get_phoneNumber()
         self.adb_shell("setprop persist.nox.modem.imei " + imei)
         # "adb shell setprop persist.nox.modem.imsi 460000000000000"
@@ -54,9 +62,9 @@ class MyADB(object):
         # "adb shell setprop persist.nox.modem.serial 89860000000000000000"
         return True
 
-    def _log(self, prefix, log):
+    def _log(self, prefix, msg):
         if self._DEBUG:
-            print(prefix, log)
+            print(prefix, msg)
 
     def get_android_version(self):
         self.__clean__()
@@ -470,3 +478,18 @@ class MyADB(object):
         if m:
             return "{height}x{width}".format(height=m.group(2), width=m.group(1))
         return "1920x1080"
+
+
+if __name__ == "__main__":
+    myadb = MyADB()
+    myadb._DEBUG = True
+    myadb.wait_for_device()
+    err_msg, devices = myadb.get_devices()
+    print(devices)
+
+    if not err_msg:
+        myadb.set_target_device(devices[0])
+
+    myadb.get_docker_id()
+    print(myadb._stdout)
+    print(myadb._docker_id)

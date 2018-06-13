@@ -99,8 +99,14 @@ class NoxDocker(object):
             self._log('_cmd_kill_task', cmd)
             os.system(cmd)
 
-    def shake(self):
+    def shake(self, docker_name):
         self._exec_nox_cmd(self._make_cmd("action -name:" + docker_name + " -key:call.shake -value:null"))
+        return True
+
+    def set_docker_id(self, docker_name):
+        self._exec_nox_cmd(self._make_cmd(
+            'adb -name:' + docker_name + ' -command:" shell setprop persist.nox.dockerid ' + docker_name + '"'
+        ))
         return True
 
     def stop(self, docker_name, wait_time=30):
