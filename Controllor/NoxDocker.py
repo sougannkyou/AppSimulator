@@ -11,15 +11,16 @@ import cv2
 import aircv as ac
 
 GB = 1024 * 1024 * 1024
+STATUS_RUNNING = 'running'
+STATUS_IDLE = 'idle'
 
 
 class NoxDocker(object):
     def __init__(self, app_name):
-        self.STATUS_RUNNING = 'running'
-        self.STATUS_IDLE = 'idle'
         self.DOCKERS_MAX_CNT = 10
         self._DEBUG = True
         self._app_name = app_name
+        self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
 
     def _log(self, prefix, info):
         if self._DEBUG:
@@ -37,6 +38,11 @@ class NoxDocker(object):
             self._log('_check', msg)
             return False, msg
 
+        if not self._work_path:
+            msg = 'env not found: APPSIMULATOR_WORK_PATH'
+            self._log('_check', msg)
+            return False, msg
+
         mem = psutil.virtual_memory()
         if mem.free < 0.5 * GB:  # < 1GB
             msg = 'memory less than 0.5 GB.'
@@ -48,7 +54,7 @@ class NoxDocker(object):
             self._log('_check', msg)
             return False, msg
 
-        if len(self.ps(docker_status=self.STATUS_RUNNING)) >= self.DOCKERS_MAX_CNT:
+        if len(self.ps(docker_status=STATUS_RUNNING)) >= self.DOCKERS_MAX_CNT:
             msg = 'cannot launch over ' + str(self.DOCKERS_MAX_CNT) + ' dockers.'
             self._log('_check', msg)
             return False, msg
@@ -110,7 +116,7 @@ class NoxDocker(object):
             # 虚拟机名称，标题，顶层窗口句柄，工具栏窗口句柄，绑定窗口句柄，进程PID
             for s in ret.split('\r\n'):
                 if s.startswith('nox') or s.startswith('Nox'):
-                    status = self.STATUS_IDLE if s.split(',')[-1] == '-1' else self.STATUS_RUNNING
+                    status = STATUS_IDLE if s.split(',')[-1] == '-1' else STATUS_RUNNING
                     name = s.split(',')[1]
                     id = s.split(',')[0]
                     pid = s.split(',')[-1]
@@ -142,7 +148,9 @@ class NoxDocker(object):
 
     def add(self, docker_name):
         self._log('add', docker_name)
+        time.sleep(2)
         self._exec_nox_cmd(self._make_cmd("add -name:" + docker_name))
+        time.sleep(2)
         return True
 
     def create(self, docker_name, force=False):
@@ -161,11 +169,12 @@ class NoxDocker(object):
             self.add(docker_name)
 
         if len(dockers) == 1:
-            if dockers[0]['status'] == self.STATUS_RUNNING:
+            if dockers[0]['status'] == STATUS_RUNNING:
                 self.stop(docker_name, 30)
-                self.remove(dockers[0]['name'])
-                # self.copy(docker_name, 'nox-org')
-                self.add(docker_name)
+
+            self.remove(dockers[0]['name'])
+            # self.copy(docker_name, 'nox-org')
+            self.add(docker_name)
 
         if force:
             self.pull(docker_name, self._app_name)
@@ -174,13 +183,13 @@ class NoxDocker(object):
 
     def start_check(self, hwnd, app_icon_path, timeout):
         win32gui.SetForegroundWindow(hwnd)
-        while (timeout > 0):
+        while timeout > 0:
             left, top, right, bottom = win32gui.GetWindowRect(hwnd)
             app_bg_box = (left, top, right, bottom)
             im = ImageGrab.grab(app_bg_box)
-            im.save('images/capture.png')
+            im.save(self._work_path + '\\Controllor\\images\\start.png')
 
-            img_capture = ac.imread('images/capture.png')
+            img_capture = ac.imread(self._work_path + '\\Controllor\\images\\start.png')
             img_obj = ac.imread(app_icon_path)
             pos = ac.find_template(img_capture, img_obj)
             if pos and pos['confidence'] > 0.9:
@@ -199,7 +208,8 @@ class NoxDocker(object):
             hwnd = win32gui.FindWindow(None, docker_name)
             if hwnd:
                 self._log('start', docker_name + ' ok.')
-
+                app_icon_path = self._work_path + '\\Controllor\\images\\' + self._app_name + '\\app_icon.png'
+                self.start_check(hwnd, app_icon_path, 60)
                 return True
             else:  # hwnd is 0 if not found
                 time.sleep(1)
@@ -237,10 +247,11 @@ if __name__ == "__main__":
     # pool.close()
     # pool.join()
 
-    # for docker_name in ['nox-10', 'nox-11', 'nox-12']:
-    # for docker_name in ['nox-20', 'nox-21', 'nox-22']:
-    # for docker_name in ['nox-30', 'nox-31', 'nox-32']:
-    for docker_name in ['nox-40', 'nox-41', 'nox-42']:
+    for docker_name in ['nox-11', 'nox-12', 'nox-13']:
+        # for docker_name in ['nox-21', 'nox-22', 'nox-23']:
+        # for docker_name in ['nox-31', 'nox-32', 'nox-33']:
+        # for docker_name in ['nox-41', 'nox-42', 'nox-43']:
+        # for docker_name in ['nox-11']:
         run(docker_name)
 
     print("process done.")
