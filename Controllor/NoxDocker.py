@@ -43,6 +43,8 @@ class NoxDocker(object):
             msg = 'memory less than 1GB.'
             self._log('_check', msg)
             return False, msg
+        else:
+            self._log('_check', 'memory:' + str(mem.free / GB))
 
         if not os.access('c:\\Nox\\backup\\nox-' + self._app_name + '.npbk', os.R_OK):
             msg = 'not found: nox-' + self._app_name + '.npbk'
@@ -54,10 +56,13 @@ class NoxDocker(object):
             self._log('_check', msg)
             return False, msg
 
-        if len(self.ps(docker_status=STATUS_RUNNING)) >= self.DOCKERS_MAX_CNT:
+        running_dockers = self.ps(docker_status=STATUS_RUNNING)
+        if len(running_dockers) >= self.DOCKERS_MAX_CNT:
             msg = 'cannot launch over ' + str(self.DOCKERS_MAX_CNT) + ' dockers.'
             self._log('_check', msg)
             return False, msg
+        else:
+            self._log('_check', 'running dockers: ' + str(len(running_dockers)))
 
         return True, msg
 
