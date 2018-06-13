@@ -68,7 +68,8 @@ class MyADB(object):
             self._stderr = "Must set target device first"
             return None
 
-        cmd_str = self._adb_binary_path + ' ' + cmd if self.__target is None else self._adb_binary_path + ' ' + ' -s ' + self.__target + ' ' + cmd
+        cmd_str = self._adb_binary_path + ' ' + cmd if self.__target is None else \
+            self._adb_binary_path + ' ' + ' -s ' + self.__target + ' ' + cmd
         # self._log('[_make_command]', cmd_str)
         return cmd_str
 
@@ -204,7 +205,7 @@ class MyADB(object):
                 err_msg = e  # not found
                 self._log('[get_devices] err:', e)
 
-        return (err_msg, self._devices)
+        return err_msg, self._devices
 
     def set_target_device(self, device):
         self.__clean__()

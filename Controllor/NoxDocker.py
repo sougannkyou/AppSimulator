@@ -67,6 +67,7 @@ class NoxDocker(object):
         return True, msg
 
     def _make_cmd(self, cmd):
+        # os.chdir('c:\\Nox\\bin')
         return 'NoxConsole ' + cmd
 
     def _exec_nox_cmd(self, cmdline):
@@ -97,6 +98,10 @@ class NoxDocker(object):
             cmd = 'TASKKILL /F /T /PID ' + str(d['pid'])
             self._log('_cmd_kill_task', cmd)
             os.system(cmd)
+
+    def shake(self):
+        self._exec_nox_cmd(self._make_cmd("action -name:" + docker_name + " -key:call.shake -value:null"))
+        return True
 
     def stop(self, docker_name, wait_time=30):
         self._exec_nox_cmd(self._make_cmd("quit -name:" + docker_name))
@@ -241,6 +246,7 @@ class NoxDocker(object):
             ret = self.start(docker_name, wait_time=time_out)
             if ret:
                 time.sleep(10)
+                self.shake()
             else:
                 self.stop(docker_name)
 

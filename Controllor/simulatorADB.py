@@ -23,7 +23,7 @@ class Simulator(object):
         self._adb_idx = idx
 
         self._adb.wait_for_device()
-        (err_msg, devices) = self._adb.get_devices()
+        err_msg, devices = self._adb.get_devices()
         print('[Simulator-' + str(self._adb_idx) + '] get_devices:', err_msg)
         pprint(devices)
 
@@ -145,7 +145,8 @@ class Simulator(object):
 
     def _without(self, x, y, timeout):
         img = cv2.circle(img=self._img_capture, center=(int(x), int(y)), radius=10, color=(0, 0, 0), thickness=10)
-        if not self._DEBUG: return
+        if not self._DEBUG:
+            return
 
         cv2.putText(img, 'without', (int(x) - 30, int(y) + 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1)
         cv2.startWindowThread()
