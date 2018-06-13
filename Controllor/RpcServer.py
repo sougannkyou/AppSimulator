@@ -91,13 +91,14 @@ def setDeviceGPS(deviceId, latitude, longitude):
     return True
 
 import subprocess
+
 def _exec_cmd(cmdline):
     _stdout = ''
     _stderr = ''
     try:
         print('[rpc] cmdline: ', cmdline)
         process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        process.wait()
+        # process.wait(timeout=30)
         (stdout, stderr) = process.communicate()
         _stdout = stdout.decode('utf8')
         _stderr = stderr.decode('utf8')

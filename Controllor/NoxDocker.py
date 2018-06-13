@@ -49,7 +49,6 @@ class NoxDocker(object):
             self._log('_check', msg)
             return False, msg
 
-
         if len(self.ps(docker_name='nox-org')) == 0:
             msg = 'not found the nox-org.'
             self._log('_check', msg)
@@ -190,7 +189,8 @@ class NoxDocker(object):
 
         return True, msg
 
-    def start_check(self, hwnd, app_icon_path, timeout):
+    def start_check(self, hwnd, target_path, timeout):
+        self._log('start_check', 'hwnd:' + str(hwnd))
         win32gui.SetForegroundWindow(hwnd)
         while timeout > 0:
             left, top, right, bottom = win32gui.GetWindowRect(hwnd)
@@ -199,10 +199,10 @@ class NoxDocker(object):
             im.save(self._work_path + '\\Controllor\\images\\start.png')
 
             img_capture = ac.imread(self._work_path + '\\Controllor\\images\\start.png')
-            img_obj = ac.imread(app_icon_path)
+            img_obj = ac.imread(target_path)
             pos = ac.find_template(img_capture, img_obj)
             if pos and pos['confidence'] > 0.9:
-                self._log('start_check', 'ok. ' + str(timeout) + 's')
+                self._log('start_check', 'matched. ' + str(timeout) + 's')
                 return True
             else:
                 time.sleep(1)
@@ -218,7 +218,11 @@ class NoxDocker(object):
             if hwnd:
                 self._log('start', docker_name + ' ok.')
                 app_icon_path = self._work_path + '\\Controllor\\images\\' + self._app_name + '\\app_icon.png'
-                return self.start_check(hwnd, app_icon_path, 30)
+                im_sorry_path = self._work_path + '\\Controllor\\images\\im_sorry.png'
+                if self.start_check(hwnd, im_sorry_path, 30):
+                    return False
+                else:
+                    return self.start_check(hwnd, app_icon_path, 30)
             else:  # hwnd is 0 if not found
                 time.sleep(1)
                 wait_time -= 1
