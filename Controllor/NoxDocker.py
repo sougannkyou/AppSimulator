@@ -49,6 +49,7 @@ class NoxDocker(object):
             self._log('_check', msg)
             return False, msg
 
+
         if len(self.ps(docker_name='nox-org')) == 0:
             msg = 'not found the nox-org.'
             self._log('_check', msg)
