@@ -1,12 +1,15 @@
 # coding:utf-8
 try:
+    import os
     import sys
-    import time, datetime, random
+    import random
+    import time
     from pprint import pprint
     from PIL import ImageGrab
     import cv2
     import aircv as ac
     import ftplib
+    from Manager import Manager
     from MyADB import MyADB
 except ImportError as e:
     print("[Simulator] ERROR:", e.args[0])
@@ -14,21 +17,33 @@ except ImportError as e:
 
 
 class Simulator(object):
-    def __init__(self, adb_path, idx):
+    def __init__(self, adb_path, app_name):
+        self._manager = Manager()
         self._DEBUG = False
         self._FTP_TRANSMISSION = False
         self._PIC_PATH = {}
         self._img_capture = None
+        self._docker_name = None
+        self._app_name = app_name
+        self._ip = os.getenv('APPSIMULATOR_IP')
         self._adb = MyADB(adb_binary_path=adb_path)
-        self._adb_idx = idx
+        self._adb_port = None
 
         self._adb.wait_for_device()
         err_msg, devices = self._adb.get_devices()
-        print('[Simulator-' + str(self._adb_idx) + '] get_devices:', err_msg)
-        pprint(devices)
-
+        # pprint(devices)
         if not err_msg:
-            self._adb.set_target_device(devices[idx])
+            running_devices = self._manager.get_devices(status='running', app_name=app_name, ip=self._ip)
+            self._adb_port = devices - running_devices
+            if self._adb_port:
+                self._adb.set_target_device('127.0.0.1:' + str(self._adb_port))
+                self._docker_name = self._adb.get_docker_name()
+                self._manager.set_docker_info(docker_name=self._docker_name, port=devices[idx])
+            else:
+                print('[Simulator] error: cannot get any port.')
+
+    def task_trace(self, task_id, app_name, action):
+        self._manager.task_trace(task_id, app_name, self._docker_name, action)
 
     def start_web(self, url, timeout):
         self._adb.start_web(url)
@@ -156,7 +171,8 @@ class Simulator(object):
         cv2.waitKey(100)
 
     def _debug(self, x, y, timeout):
-        if not self._DEBUG: return
+        if not self._DEBUG:
+            return
 
         cv2.circle(img=self._img_capture, center=(int(x), int(y)), radius=30, color=(0, 0, 255), thickness=1)
         cv2.putText(img=self._img_capture, text='click', org=(int(x) - 40, int(y) + 10),

@@ -8,31 +8,27 @@ except ImportError as e:
     print("[MyADB] error:", e.args[0])
     sys.exit(-1)
 
-ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
 
-
-class MyADB(object):
+class MyNoxConsole(object):
     REBOOT_RECOVERY = 1
     REBOOT_BOOTLOADER = 2
 
     DEFAULT_TCP_HOST = "localhost"
     DEFAULT_TCP_PORT = 62001  # 5555
 
-    def __init__(self, adb_binary_path=ADB_BINARY_PATH):
+    def __init__(self, docker_name):
         self._DEBUG = True
-        self._adb_binary_path = None
         self._stdout = None
         self._stderr = None
         self._devices = None
         self.__target = None
-        self._docker_name = None
-        self._adb_binary_path = adb_binary_path
+        self._docker_name = docker_name
 
     def __clean__(self):
         self._stdout = None
         self._stderr = None
 
-    def _get_phoneNumber(self):
+    def _get_phone_number(self):
         num = '186'
         for i in range(8):
             num += str(random.randrange(0, 9))

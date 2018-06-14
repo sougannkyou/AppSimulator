@@ -94,6 +94,7 @@ class MySimulator(Simulator):
         time.sleep(5)
         if ret: ret, x, y = self.find_element(comment='发布', timeout=5)
         if ret: ret = self.click_xy(x, y, timeout=1)
+        self.task_trace()
 
 
 ##################################################################################
@@ -101,7 +102,7 @@ def run(idx):
     start = datetime.datetime.now()
     print("[Script" + str(idx) + "] run start.", start)
     try:
-        mySimulator = MySimulator(adb_path=ADB_BINARY_PATH, idx=idx)
+        mySimulator = MySimulator(adb_path=ADB_BINARY_PATH, app_name='toutiao')
         mySimulator._PIC_PATH = {
             "打开APP": 'images/toutiao/jump2app.png',
             "写评论": 'images/toutiao/writeComment.png',
@@ -115,7 +116,7 @@ def run(idx):
         mySimulator.run(is_app_restart=False)
 
         end = datetime.datetime.now()
-        print("[Script" + str(idx) + "] run success. ", (end - start).seconds, "s")
+        print("[Script" + mySimulator. + "] run success. ", (end - start).seconds, "s")
         return True
     except Exception as e:
         end = datetime.datetime.now()
@@ -127,8 +128,8 @@ def run(idx):
 if __name__ == "__main__":
     # tasks_cnt = int(sys.argv[1])
     tasks_cnt = 1
-    docker = NoxDocker('dianping')
     for i in range(1, 1 + tasks_cnt):
+        docker = NoxDocker(app_name='dianping', docker_name='nox-' + str(i))
         print('launch_emulator nox-' + str(i))
         docker.launch_emulator('nox-' + str(i), force=True)
 
