@@ -8,6 +8,8 @@ except ImportError as e:
     print("[MyADB] error:", e.args[0])
     sys.exit(-1)
 
+CONSOLE_BINARY_PATH = 'C:\\Nox\\bin\\NoxConsole.exe'
+
 
 class MyNoxConsole(object):
     REBOOT_RECOVERY = 1
@@ -22,6 +24,7 @@ class MyNoxConsole(object):
         self._stderr = None
         self._devices = None
         self.__target = None
+        self._console_binary = CONSOLE_BINARY_PATH
         self._docker_name = docker_name
 
     def __clean__(self):
@@ -68,16 +71,6 @@ class MyNoxConsole(object):
         self.adb_shell("getprop ro.build.version.release")
         return self._stdout.decode('utf8')
 
-    def _make_command(self, cmd):
-        if self._devices is not None and len(self._devices) > 1 and self.__target is None:
-            self._stderr = "Must set target device first"
-            return None
-
-        cmd_str = self._adb_binary_path + ' ' + cmd if self.__target is None else \
-            self._adb_binary_path + ' ' + ' -s ' + self.__target + ' ' + cmd
-        # self._log('[_make_command]', cmd_str)
-        return cmd_str
-
     def set_gps(self, latitude, longitude):
         self.adb_shell("setprop persist.nox.gps.latitude " + str(latitude))
         self.adb_shell("setprop persist.nox.gps.longitude " + str(longitude))
@@ -102,12 +95,14 @@ class MyNoxConsole(object):
             return True
         return False
 
-    def adb_cmd(self, cmd):
-        """
-        Run a command against adb tool ($ adb <cmd>)
-        """
-        self.__clean__()
+    def _make_command(self, cmd):
+        # NoxConsole.exe adb -name:nox-22 -command:"version"
+        cmd_str = self._console_binary + ' adb -name:' + self._docker_name + ' -command:"' + cmd + '"'
+        self._log('[_make_command]', cmd_str)
+        return cmd_str
 
+    def adb_cmd(self, cmd):
+        self.__clean__()
         if self._adb_binary_path is None:
             self._stderr = "ADB path not set"
             return
@@ -126,6 +121,11 @@ class MyNoxConsole(object):
 
         return
 
+    def adb_shell(self, cmd):
+        self.__clean__()
+        self.adb_cmd('shell ' + cmd)
+        return self._stdout
+
     def get_adb_version(self):
         self.adb_cmd("version")
         try:
@@ -142,13 +142,6 @@ class MyNoxConsole(object):
         if self.get_adb_version() is None:
             return False
         return True
-
-    def set_adb_path(self, adb_path):
-        self._adb_binary_path = adb_path
-        return True
-
-    def get_adb_path(self):
-        return self._adb_binary_path
 
     def start_server(self):
         self.__clean__()
@@ -179,46 +172,10 @@ class MyNoxConsole(object):
         self.adb_cmd('restore %s' % file_name)
         return self._stdout
 
-    def wait_for_device(self):
-        """
-        Block until device is online
-        adb wait-for-device
-        """
-        self.__clean__()
-        self.adb_cmd('wait-for-device')
-        return self._stdout
-
     def get_adb_help(self):
         self.__clean__()
         self.adb_cmd('help')
         return self._stdout
-
-    def get_devices(self):
-        err_msg = ''
-        self.adb_cmd("devices")
-        if self._stderr:
-            self._devices = None
-            err_msg = self._stderr
-        else:
-            try:
-                self._devices = self._stdout.partition('\n')[2].replace('device', '').split()
-                if self._devices[1:] == ['no', 'permissions']:
-                    err_msg = 'permissions'
-                    self._devices = None
-                    self._log('[get_devices] err: permissions')
-            except Exception as e:
-                err_msg = e  # not found
-                self._log('[get_devices] err:', e)
-
-        return err_msg, self._devices
-
-    def set_target_device(self, device):  # docker attach
-        self.__clean__()
-        if device is None or not device in self._devices:
-            self._stderr = 'Must get devices list first'
-            return False
-        self.__target = device
-        return True
 
     def get_target_device(self):
         """
@@ -297,14 +254,6 @@ class MyNoxConsole(object):
         """
         self.__clean__()
         self.adb_cmd('push \"%s\" \"%s\"' % (local, remote))
-        return self._stdout
-
-    def adb_shell(self, cmd):
-        """
-        adb shell <cmd>
-        """
-        self.__clean__()
-        self.adb_cmd('shell ' + cmd)
         return self._stdout
 
     def listen_usb(self):
@@ -478,13 +427,13 @@ class MyNoxConsole(object):
 
 
 if __name__ == "__main__":
-    myadb = MyADB()
-    myadb._DEBUG = True
-    myadb.wait_for_device()
-    err_msg, devices = myadb.get_devices()
+    my = MyNoxConsole()
+    my._DEBUG = True
+    my.wait_for_device()
+    err_msg, devices = my.get_devices()
     print(devices)
 
     if not err_msg:
-        myadb.set_target_device(devices[0])
+        my.set_target_device(devices[0])
 
-    print(myadb.docker_name())
+    print(my.docker_name())
