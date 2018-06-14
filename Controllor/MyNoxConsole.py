@@ -103,10 +103,6 @@ class MyNoxConsole(object):
 
     def adb_cmd(self, cmd):
         self.__clean__()
-        if self._adb_binary_path is None:
-            self._stderr = "ADB path not set"
-            return
-
         try:
             cmdline = self._make_command(cmd)
             if self._DEBUG:
@@ -114,8 +110,8 @@ class MyNoxConsole(object):
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()
             (stdout, stderr) = process.communicate()
-            self._stdout = stdout.decode('utf8')
-            self._stderr = stderr.decode('utf8')
+            self._stdout = stdout.decode('utf8').replace('\r','').replace('\n','')
+            self._stderr = stderr.decode('utf8').replace('\r','').replace('\n','')
         except Exception as e:
             self._log('[adb_cmd] err:', e)
 
@@ -427,13 +423,8 @@ class MyNoxConsole(object):
 
 
 if __name__ == "__main__":
-    my = MyNoxConsole()
+    my = MyNoxConsole('nox-99')
     my._DEBUG = True
-    my.wait_for_device()
-    err_msg, devices = my.get_devices()
-    print(devices)
 
-    if not err_msg:
-        my.set_target_device(devices[0])
-
-    print(my.docker_name())
+    print(my.get_serialno())
+    print(my.adb_shell('input keyevent 4'))

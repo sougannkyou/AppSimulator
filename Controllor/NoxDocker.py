@@ -7,7 +7,7 @@ import subprocess
 import aircv as ac
 from PIL import ImageGrab
 from pprint import pprint
-from Manager import Manager
+from TaskManager import TaskManager
 
 GB = 1024 * 1024 * 1024
 STATUS_RUNNING = 'running'
@@ -16,7 +16,7 @@ STATUS_IDLE = 'idle'
 
 class NoxDocker(object):
     def __init__(self, app_name, docker_name):
-        self._manager = Manager()
+        self._manager = TaskManager()
         self.DOCKERS_MAX_CNT = 10
         self._DEBUG = True
         self._ip = os.getenv('APPSIMULATOR_IP')
@@ -51,7 +51,7 @@ class NoxDocker(object):
             self._log('_check', msg)
             return False, msg
         else:
-            self._log('_check', 'memory:' + str(mem.free / GB))
+            self._log('_check', 'memory: %.2f' % (mem.free / GB) + 'GB')
 
         if not os.access('c:\\Nox\\backup\\nox-' + self._app_name + '.npbk', os.R_OK):
             msg = 'not found: nox-' + self._app_name + '.npbk'
@@ -166,11 +166,14 @@ class NoxDocker(object):
     def pull(self, app_name):  # restore
         self._log('pull', self._docker_name + ' ' + app_name)
         time.sleep(1)
-        self._exec_nox_cmd(self._make_cmd(
+        ret = self._exec_nox_cmd(self._make_cmd(
             'restore -name:' + self._docker_name + ' -file:"c:\\Nox\\backup\\nox-' + app_name + '.npbk"'
         ))
-        time.sleep(5)
-        return True
+        if ret.find('failed') > 0:
+            return False
+        else:
+            time.sleep(5)
+            return True
 
     def copy(self, org):
         self._log('copy', self._docker_name)
@@ -203,12 +206,15 @@ class NoxDocker(object):
             if dockers[0]['status'] == STATUS_RUNNING:
                 self.stop(30)
 
-            self.remove(dockers[0]['name'])
+            self.remove()
             # self.copy('nox-org')
             self.add()
 
         if force:
-            self.pull(self._app_name)
+            ret = self.pull(self._app_name)
+            if not ret:
+                msg = 'pull failed!'
+                return False, msg
 
         return True, msg
 

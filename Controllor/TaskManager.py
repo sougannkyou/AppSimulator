@@ -8,7 +8,7 @@ MONGODB_SERVER = "172.16.252.174"
 MONGODB_PORT = 27017
 
 
-class Manager(object):
+class TaskManager(object):
     def __init__(self):
         self._client = pymongo.MongoClient(host=MONGODB_SERVER, port=MONGODB_PORT)
         self._db = self._client.AppSimulator
