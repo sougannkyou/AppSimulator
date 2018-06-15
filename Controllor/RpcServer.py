@@ -65,22 +65,6 @@ def capture(app_name):
 def restartDevice(deviceId):
     print("[rpc_server] restartDevice")
     # print("Nox.exe -quit :", p.read())
-    while True:
-        time.sleep(2)
-        p = os.popen('tasklist /v | findstr "douyin0"')
-        msg = p.read()
-        print('[rpc_server] tasklist /v | findstr "douyin0"\n', msg)  # tasklist /fi "imagename eq Nox.exe"
-        if len(msg) > 0:
-            print("[rpc_server] 模拟器正在 运行 ...")
-            os.popen("C:\\Nox\\bin\\Nox.exe -quit")
-            # os.popen("taskkill /f /t /im Nox.exe")
-            # os.popen("taskkill /f /t /im NoxVMSVC.exe")
-            # os.popen("taskkill /f /t /im NoxVMHandle.exe")
-        else:
-            print("[rpc_server] 将重启模拟器 ...")
-            p = os.popen("C:\\Nox\\bin\\Nox.exe")
-            # msg = p.read() # 不能使用 会将命令阻塞
-            break
 
     return True
 
@@ -95,7 +79,17 @@ def setDeviceGPS(deviceId, latitude, longitude):
     return True
 
 
-def registor():
+def get_free_mem():
+    mem = psutil.virtual_memory()
+    return '%.2f' % (mem.free / GB)
+
+
+def _clean():
+    os.system("c:\\Nox\\bin\\NoxConsole quitall")
+    time.sleep(10)
+
+
+def _registor():
     manager = TaskManager()
     mem = psutil.virtual_memory()
     manager.registor_rpc_server({
@@ -109,6 +103,7 @@ def registor():
 
 ######################################################################
 # netstat -ano | findstr "8003"
+_clean()
 server = SimpleXMLRPCServer(("0.0.0.0", RPC_PORT))
 server.register_function(restartDevice, "restartDevice")
 server.register_function(setDeviceGPS, 'setDeviceGPS')
@@ -116,7 +111,8 @@ server.register_function(startScript, "startScript")
 server.register_function(stopScript, "stopScript")
 server.register_function(getRpcServerStatus, "getRpcServerStatus")
 server.register_function(simulatorStatus, "simulatorStatus")
-# server.register_function(quitApp, "quitApp")
-registor()
+server.register_function(get_free_mem, "get_free_mem")
+_registor()
 print("[rpc_server] start ...")
-server.serve_forever()
+server.serve_forever()  # never stop
+print("[rpc_server] done.")
