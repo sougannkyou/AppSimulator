@@ -24,6 +24,11 @@ class NoxDocker(object):
         self._docker_name = docker_name
         self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
 
+        self._PIC_PATH = {
+            "APP图标": self._work_path + '\\Controllor\\images\\' + self._app_name + '\\app_icon.png',
+            "很抱歉": self._work_path + '\\Controllor\\images\\im_sorry.png',
+        }
+
     def _log(self, prefix, info):
         if self._DEBUG:
             print('[NoxDocker] ', prefix, info)
@@ -31,50 +36,50 @@ class NoxDocker(object):
     def _check(self):
         msg = ''
         if not self._ip:
-            msg = 'ip is None'
+            msg = 'ip 不能为空，请设置：APPSIMULATOR_IP'
             self._log('_check', msg)
             return False, msg
 
         if not self._app_name:
-            msg = 'app_name is None'
+            msg = 'app_name 不能为空.'
             self._log('_check', msg)
             return False, msg
 
         if not self._work_path:
-            msg = 'env not found: APPSIMULATOR_WORK_PATH'
+            msg = '请设置: APPSIMULATOR_WORK_PATH'
             self._log('_check', msg)
             return False, msg
 
         mem = psutil.virtual_memory()
         if mem.free < 1 * GB:  # < 1GB
-            msg = 'memory less than 1GB.'
+            msg = '内存剩余必须大于 1GB.'
             self._log('_check', msg)
             return False, msg
         else:
             self._log('_check', 'memory: %.2f' % (mem.free / GB) + 'GB')
 
         if not os.access('c:\\Nox\\backup\\nox-' + self._app_name + '.npbk', os.R_OK):
-            msg = 'not found: nox-' + self._app_name + '.npbk'
+            msg = '未找到 nox-' + self._app_name + '.npbk'
             self._log('_check', msg)
             return False, msg
 
         if len(self.ps(docker_name='nox-org')) == 0:
-            msg = 'not found the nox-org.'
+            msg = '未找到 nox-org.'
             self._log('_check', msg)
             return False, msg
 
         running_dockers = self.ps(docker_status=STATUS_RUNNING)
         if len(running_dockers) >= self.DOCKERS_MAX_CNT:
-            msg = 'cannot launch over ' + str(self.DOCKERS_MAX_CNT) + ' dockers.'
+            msg = '启动数量不能大于 ' + str(self.DOCKERS_MAX_CNT)
             self._log('_check', msg)
             return False, msg
         else:
-            self._log('_check', 'running dockers: ' + str(len(running_dockers)))
+            self._log('_check', '当前运行中的docker数: ' + str(len(running_dockers)))
 
         return True, msg
 
     def _make_cmd(self, cmd):
-        # os.chdir('c:\\Nox\\bin')
+        os.chdir('c:\\Nox\\bin')
         return 'NoxConsole ' + cmd
 
     def _exec_nox_cmd(self, cmdline):
@@ -99,18 +104,28 @@ class NoxDocker(object):
             time.sleep(1)
             return _stdout
 
-    def _cmd_kill_task(self, docker_name):  # 不能强杀，会造成 ERR：1037
+    def _cmd_kill_task(self, docker_name):
         dockers = self.ps(docker_name=docker_name, docker_status=STATUS_RUNNING)
         for d in dockers:
-            cmd = 'TASKKILL /F /T /PID ' + str(d['pid'])
+            cmd = 'TASKKILL /F /T /PID ' + str(d['pid'])  # 不能强杀，会造成 ERR：1037
             self._log('_cmd_kill_task', cmd)
             os.system(cmd)
 
-    def shake(self):
-        self._exec_nox_cmd(self._make_cmd("action -name:" + self._docker_name + " -key:call.shake -value:null"))
+    def get_port(self):
+        self._log('shake', '获取adb端口')
+        ret = self._exec_nox_cmd(self._make_cmd(
+            'adb -name:' + self._docker_name + ' -command:"get-serialno"'
+        ))
+        return ret.replace('\r', '').replace('\n', '').replace('127.0.0.1:', '')
+
+    def shake(self, cnt):
+        self._log('shake', '振动提示 ...')
+        for i in range(cnt):
+            self._exec_nox_cmd(self._make_cmd("action -name:" + self._docker_name + " -key:call.shake -value:null"))
         return True
 
     def set_docker_name(self):
+        self._log('shake', '设置docker名称为:' + self._docker_name)
         self._exec_nox_cmd(self._make_cmd(
             'adb -name:' + self._docker_name + ' -command:" shell setprop persist.nox.docker_name ' + self._docker_name + '"'
         ))
@@ -122,7 +137,7 @@ class NoxDocker(object):
             hwnd = win32gui.FindWindow(None, self._docker_name)
             if hwnd:  # hwnd is 0 if not found
                 time.sleep(1)
-                self._log('stop', 'wait for stop ' + self._docker_name + ' ' + str(wait_time) + 's')
+                self._log('stop', '正在等待 ' + self._docker_name + ' 停止，剩余：' + str(wait_time) + 's')
                 wait_time -= 1
             else:
                 break
@@ -160,7 +175,9 @@ class NoxDocker(object):
 
     def remove(self):
         self._log('remove', self._docker_name)
+        time.sleep(2)
         self._exec_nox_cmd(self._make_cmd("remove -name:" + self._docker_name))
+        time.sleep(2)
         return True
 
     def pull(self, app_name):  # restore
@@ -183,9 +200,9 @@ class NoxDocker(object):
     def add(self):
         self._log('add', self._docker_name)
         time.sleep(2)
-        self._exec_nox_cmd(self._make_cmd("add -name:" + self._docker_name))
+        ret = self._exec_nox_cmd(self._make_cmd("add -name:" + self._docker_name))
         time.sleep(2)
-        return True
+        return False if ret.find('failed') > 0 or ret.find('not') > 0 else True
 
     def create(self, force=False):
         ret, msg = self._check()
@@ -194,21 +211,29 @@ class NoxDocker(object):
 
         dockers = self.ps(docker_name=self._docker_name)
         if len(dockers) > 1:
-            msg = 'found docker more than 1.'
+            msg = '找到的 docker 数大于1个.'
             self._log('create', msg)
             return False, msg
 
         if len(dockers) == 0:
             # self.copy('nox-org')
-            self.add()
+            ret = self.add()
 
         if len(dockers) == 1:
             if dockers[0]['status'] == STATUS_RUNNING:
                 self.stop(30)
 
-            self.remove()
+            ret = self.remove()
+            if not ret:
+                msg = 'remove failed!'
+                return False, msg
+
+            # time.sleep(10)
             # self.copy('nox-org')
-            self.add()
+            ret = self.add()
+            if not ret:
+                msg = 'add failed!'
+                return False, msg
 
         if force:
             ret = self.pull(self._app_name)
@@ -218,8 +243,8 @@ class NoxDocker(object):
 
         return True, msg
 
-    def start_check(self, hwnd, target_path, timeout):
-        self._log('start_check', 'match:' + target_path)
+    def find_element(self, hwnd, comment, timeout):
+        self._log('find_element', '尝试在 ' + str(timeout) + 's内匹配: ' + comment)
         win32gui.SetForegroundWindow(hwnd)
         while timeout > 0:
             left, top, right, bottom = win32gui.GetWindowRect(hwnd)
@@ -228,15 +253,15 @@ class NoxDocker(object):
             im.save(self._work_path + '\\Controllor\\images\\start.png')
 
             img_capture = ac.imread(self._work_path + '\\Controllor\\images\\start.png')
-            img_obj = ac.imread(target_path)
+            img_obj = ac.imread(self._PIC_PATH[comment])
             pos = ac.find_template(img_capture, img_obj)
             if pos and pos['confidence'] > 0.9:
-                self._log('start_check', 'matched. ' + str(timeout) + 's')
+                self._log('find_element', '已匹配到:' + comment + ' ' + str(timeout) + 's')
                 return True
             else:
                 time.sleep(1)
                 timeout = timeout - 1
-                self._log('start_check', 'retry ' + str(timeout) + 's')
+                self._log('find_element', '未匹配到:' + comment + ',重试剩余: ' + str(timeout) + 's')
 
         return False
 
@@ -246,18 +271,16 @@ class NoxDocker(object):
             hwnd = win32gui.FindWindow(None, self._docker_name)
             if hwnd:
                 self._log('start', self._docker_name + ' ok.')
-                app_icon_path = self._work_path + '\\Controllor\\images\\' + self._app_name + '\\app_icon.png'
-                im_sorry_path = self._work_path + '\\Controllor\\images\\im_sorry.png'
-                ret = self.start_check(hwnd, im_sorry_path, 30)  # 匹配“很抱歉”字样
+                ret = self.find_element(hwnd, '很抱歉', 30)  # 匹配“很抱歉”字样
                 if ret:
                     return False
                 else:
-                    return self.start_check(hwnd, app_icon_path, 30)  # 可匹配到app图标
+                    return self.find_element(hwnd, 'APP图标', 30)  # 可匹配到app图标
 
             else:  # hwnd is 0 if not found
                 time.sleep(1)
                 wait_time -= 1
-                self._log('start', 'wait for find window ' + self._docker_name + ' ' + str(wait_time) + 's')
+                self._log('start', '等待 ' + self._docker_name + ' 窗口创建，剩余：' + str(wait_time) + 's')
 
         return False
 
@@ -267,13 +290,14 @@ class NoxDocker(object):
             ret = self.start(wait_time=time_out)
             if ret:  # start success
                 time.sleep(10)
-                self.shake()
+                self.shake(3)
                 self.set_docker_name()
+                port = self.get_port()
                 self._manager.task_trace(
                     task_id='unkown', app_name=self._app_name, docker_name=self._docker_name, action='start'
                 )
                 self._manager.set_docker_info(
-                    docker_name=self._docker_name, ip=self._ip, port=None, task_id='unkown', app_name=self._app_name
+                    docker_name=self._docker_name, ip=self._ip, port=port, task_id='unkown', app_name=self._app_name
                 )
             else:
                 self.stop()
