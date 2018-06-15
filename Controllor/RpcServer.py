@@ -1,12 +1,16 @@
 # coding=utf8
 import os
 import time
+import psutil
 import win32gui
 from PIL import ImageGrab
+from TaskManager import TaskManager
 import shutil
 from xmlrpc.server import SimpleXMLRPCServer
 
 RPC_PORT = 8003
+GB = 1024 * 1024 * 1024
+
 
 def getRpcServerStatus():
     return "running"
@@ -90,35 +94,17 @@ def setDeviceGPS(deviceId, latitude, longitude):
     print(p.read())
     return True
 
-import subprocess
 
-def _exec_cmd(cmdline):
-    _stdout = ''
-    _stderr = ''
-    try:
-        print('[rpc] cmdline: ', cmdline)
-        process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # process.wait(timeout=30)
-        (stdout, stderr) = process.communicate()
-        _stdout = stdout.decode('utf8')
-        _stderr = stderr.decode('utf8')
-    except Exception as e:
-        print('[rpc] Exception:', e)
-
-    print('[rpc] stdout:', _stdout)
-    if _stderr:
-        print('[rpc] stderr:', _stderr)
-        return ''
-    else:
-        return _stdout
-
-def runTasks():
-    app_name = 'dianping'
-    task_cnt = 4
-    cmd = "python script_" + app_name + ".py " + str(task_cnt)
-    _exec_cmd(cmd)
-    # print(p.read())
-    return True
+def registor():
+    manager = TaskManager()
+    mem = psutil.virtual_memory()
+    manager.registor_rpc_server({
+        'ip': os.getenv('APPSIMULATOR_IP'),
+        'port': RPC_PORT,
+        'mem_free': '%.2f' % (mem.free / GB),
+        'mem_total': '%.2f' % (mem.total / GB),
+    })
+    return
 
 
 ######################################################################
@@ -130,7 +116,7 @@ server.register_function(startScript, "startScript")
 server.register_function(stopScript, "stopScript")
 server.register_function(getRpcServerStatus, "getRpcServerStatus")
 server.register_function(simulatorStatus, "simulatorStatus")
-server.register_function(runTasks, "runTasks")
 # server.register_function(quitApp, "quitApp")
+registor()
 print("[rpc_server] start ...")
 server.serve_forever()
