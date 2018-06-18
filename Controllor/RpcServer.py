@@ -81,7 +81,7 @@ def setDeviceGPS(deviceId, latitude, longitude):
 
 def get_free_mem():
     mem = psutil.virtual_memory()
-    return '%.2f' % (mem.free / GB)
+    return '%.1f' % (mem.free / GB)
 
 
 def _clean():
@@ -106,9 +106,9 @@ def _registor():
     manager.registor_rpc_server({
         'ip': os.getenv('APPSIMULATOR_IP'),
         'port': RPC_PORT,
-        'app': _backup_app(),
-        'mem_free': '%.2f' % (mem.free / GB),
-        'mem_total': '%.2f' % (mem.total / GB),
+        'appName': _backup_app(),
+        'mem_free': '%.1f' % (mem.free / GB),
+        'mem_total': '%.1f' % (mem.total / GB),
     })
     return
 

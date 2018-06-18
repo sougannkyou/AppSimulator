@@ -9,7 +9,7 @@ from bson.objectid import ObjectId
 import requests
 from urllib.parse import urlparse, urlunparse
 
-from .setting import *
+from setting import *
 
 
 class RedisDriver(object):
@@ -67,6 +67,7 @@ class MongoDriver(object):
         self._db = self._client.AppSimulator
         self.deviceStatisticsInfo = self._db.deviceStatisticsInfo
         self.deviceConfig = self._db.deviceConfig
+        self.rpcServer = self._db.rpcServer
         self.tasks = self._db.tasks
 
     def _get_max_task_id(self):
@@ -82,7 +83,7 @@ class MongoDriver(object):
         self.tasks.insert({
             "taskId": taskId,
             "script": task['script'],
-            "app": task['appName'],
+            "appName": task['appName'],
             "status": STATUS_WAIT,
             "docker": {
                 "ip": "",
@@ -93,11 +94,36 @@ class MongoDriver(object):
             }})
         return taskId
 
+    def get_tasks(self, status=None):
+        ret = []
+        if status:
+            l = self.tasks.find({'status': status})
+        else:
+            l = self.tasks.find()
+
+        for r in l:
+            r.pop('_id')
+            ret.append(r)
+
+        return ret
+
     def get_config_info(self, deviceId):
         info = self.deviceConfig.find_one({'deviceId': deviceId})
         if info:
             info.pop('_id')
         return info
+
+    def get_rpc_server(self, appName=None):
+        ret = []
+        if appName:
+            l = self.rpcServer.find({'appName': {'$in': [appName]}})
+        else:
+            l = self.rpcServer.find()
+
+        for r in l:
+            r.pop('_id')
+            ret.append(r)
+        return ret
 
     def update_device_statistics_info(self, info, scope_times):  # 时间窗式记录采集量
         print("update_device_statistics_info start", info)

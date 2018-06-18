@@ -15,16 +15,16 @@ import subprocess
 from pprint import pprint
 from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
-from rest_framework import filters, pagination, serializers
-from rest_framework.generics import ListAPIView
-from rest_framework.views import APIView
-from rest_framework.response import Response as restResponse
-from rest_framework import status
+# from django.views.decorators.csrf import csrf_protect, csrf_exempt
+# from rest_framework import filters, pagination, serializers
+# from rest_framework.generics import ListAPIView
+# from rest_framework.views import APIView
+# from rest_framework.response import Response as restResponse
+# from rest_framework import status
 import socket
 
-from .dbDriver import MongoDriver, RedisDriver
-from .setting import *
+from dbDriver import MongoDriver, RedisDriver
+from setting import *
 
 MDB = MongoDriver()
 RDB = RedisDriver()
@@ -214,48 +214,40 @@ def addTaskAPI(request):
     script = request.POST.get('script')
     ret = MDB.add_task({'script': script, 'appName': appName})
     output = JsonResponse({
-        'ret': 'ok',
+        'ret': ret
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
-class HubXPathViewAPI(APIView):
-    def _get_data(self, args):
-        taskId = args.get('taskId')
-        level = args.get('level')
-        return 0
+def runTasks():
+    tasks = MDB.get_tasks(status=STATUS_WAIT)
+    for task in tasks:
+        rpcServers = MDB.get_rpc_server(appName=task['appName'])
+        for server in rpcServers:
+            rpcServer = "http://" + server['ip'] + ":" + str(server['port'])
+            with xmlrpc.client.ServerProxy(rpcServer) as proxy:
+                # ret = proxy.runTasks(app_name, tasks_cnt)
+                free_mem = proxy.get_free_mem()
+                if free_mem > 1:
+                    print(free_mem)
 
-    def _set_data(self, args):
-        return 0
+    output = JsonResponse({
+        'ret': ret
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
-    def _remove_data(self, args):
-        taskId = args.get('taskId')
-        hub_url = args.get('hub_url', '')
 
-        msg = '删除了一条信息。'
-        return 0
+def test():
+    tasks = MDB.get_tasks(status=STATUS_WAIT)
+    for task in tasks:
+        rpcServers = MDB.get_rpc_server(appName=task['appName'])
+        for server in rpcServers:
+            rpcServer = "http://" + server['ip'] + ":" + str(server['port'])
+            with xmlrpc.client.ServerProxy(rpcServer) as proxy:
+                # ret = proxy.runTasks(app_name, tasks_cnt)
+                free_mem = proxy.get_free_mem()
+                print(free_mem)
 
-    def get(self, request, *args, **kwargs):
-        ret = self._get_data(request.GET)
-        output = JsonResponse(ret)
-        return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
-    def post(self, request, *args, **kwargs):
-        ret, msg = self._set_data(request.POST)
-        # if 'upserted' in ret:
-        #     ret.pop('upserted')  # 含有objectId 无法json编码
-        output = JsonResponse({'ret': ret, 'msg': msg})
-        return HttpResponse(output, content_type='application/json; charset=UTF-8')
-
-    def put(self, request, *args, **kwargs):  # print('put:', request.POST)
-        ret, msg = self._set_data(request.POST)
-        output = JsonResponse({'ret': ret, 'msg': msg})
-        return HttpResponse(output, content_type='application/json; charset=UTF-8')
-
-    def delete(self, request, *args, **kwargs):
-        if request.POST:
-            ret, msg = self._remove_data(request.POST)
-        else:
-            ret, msg = self._remove_data(request.query_params)
-        output = JsonResponse({'ret': ret, 'msg': msg})
-        return HttpResponse(output, content_type='application/json; charset=UTF-8')
+if __name__ == "__main__":
+    test()

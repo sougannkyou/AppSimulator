@@ -29,6 +29,8 @@ class NoxDocker(object):
             "很抱歉": self._work_path + '\\Controllor\\images\\im_sorry.png',
         }
 
+        os.chdir('c:\\Nox\\bin')  # 防止 BignoxVMS 写入py本地
+
     def _log(self, prefix, msg):
         if self._DEBUG:
             print('[NoxDocker] ', prefix, msg)
