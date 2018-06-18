@@ -126,7 +126,7 @@ def run(docker_name):
 if __name__ == "__main__":
     # tasks_cnt = int(sys.argv[1])
     tasks_cnt = 1
-    docker = NoxDocker('dianping', 'nox-99')
+    docker = NoxDocker('toutiao', 'nox-99')
     for i in range(1, 1 + tasks_cnt):
         docker.run(force=True)
 

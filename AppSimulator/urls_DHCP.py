@@ -4,11 +4,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
 
 from .views import (
-    DashBoardView, TasksView
+    DashBoardView, DevicesManagerView
 )
 
-from .api import (
-    addTaskAPI,
+from .restAPI import (
     HubXPathViewAPI, getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI,
     setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,
     getDeviceCaptureAPI, getProxyServerInfoAPI,
@@ -19,9 +18,7 @@ cache_time_out = 60 * 3
 
 urlpatterns = patterns('',
                        url(r'^dashboard/$', DashBoardView.as_view(), name='dashboard'),
-                       url(r'^tasks/$', TasksView.as_view(), name='tasks'),
-                       url(r'^addTaskAPI/$', addTaskAPI, name='addTaskAPI'),
-
+                       url(r'^devices/$', DevicesManagerView.as_view(), name='devices'),
                        url(r'^getDeviceCrawlCntAPI/$', getDeviceCrawlCntAPI, name='getDeviceCrawlCntAPI'),
                        url(r'^getDevicesStatusAPI/$', getDevicesStatusAPI, name='getDevicesStatusAPI'),
                        url(r'^getResultSampleAPI/$', getResultSampleAPI, name='getResultSampleAPI'),

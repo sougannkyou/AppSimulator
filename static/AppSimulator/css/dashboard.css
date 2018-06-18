@@ -1,8 +1,34 @@
-div.device-img {
+div.docker {
+    padding: 5px 0 0 5px;
+    border-radius: 3px;
+    border: 1px solid gray;
+}
+
+div.docker-capture {
+    margin-top: 5px;
+    padding: 0 10px 0 10px;
     width: 100%;
     height: 280px;
 }
 
-img.device-img {
-    height: 240px;
+img.app-icon {
+    height: 40px;
+    border-radius: 3px;
+    margin: 0 5px 0 5px;
+}
+
+img.app-icon-big {
+    height: 50px;
+    border-radius: 3px;
+    margin: 0 5px 0 5px;
+}
+
+img.capture {
+    border-radius: 3px;
+    margin: 5px 10px 0 10px;
+}
+
+img.top-icon {
+    border-radius: 3px;
+    height: 50px;
 }

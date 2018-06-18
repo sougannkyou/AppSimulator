@@ -1,7 +1,7 @@
 const THEME = 'shine';//dark infographic macarons roma shine vintage
 
 function ajaxError(err, msg) {
-    alert('[错误信息]' + msg + err);
+    // alert('[错误信息]' + msg + err);
 }
 
 const DEBUG_TIME = 1;

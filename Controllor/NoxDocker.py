@@ -29,9 +29,9 @@ class NoxDocker(object):
             "很抱歉": self._work_path + '\\Controllor\\images\\im_sorry.png',
         }
 
-    def _log(self, prefix, info):
+    def _log(self, prefix, msg):
         if self._DEBUG:
-            print('[NoxDocker] ', prefix, info)
+            print('[NoxDocker] ', prefix, msg)
 
     def _check(self):
         msg = ''

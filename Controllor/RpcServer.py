@@ -89,30 +89,47 @@ def _clean():
     time.sleep(10)
 
 
+def _backup_app():
+    l = []
+    for root, dirs, files in os.walk('C:\\Nox\\backup'):
+        for file in files:
+            if os.path.splitext(file)[1] == '.npbk':
+                p = os.path.splitext(file)[0]
+                l.append(p[4:])
+
+    return l
+
+
 def _registor():
     manager = TaskManager()
     mem = psutil.virtual_memory()
     manager.registor_rpc_server({
         'ip': os.getenv('APPSIMULATOR_IP'),
         'port': RPC_PORT,
+        'app': _backup_app(),
         'mem_free': '%.2f' % (mem.free / GB),
         'mem_total': '%.2f' % (mem.total / GB),
     })
     return
 
 
+def start_rpc_server():
+    # netstat -ano | findstr "8003"
+    _clean()
+    server = SimpleXMLRPCServer(("0.0.0.0", RPC_PORT))
+    server.register_function(restartDevice, "restartDevice")
+    server.register_function(setDeviceGPS, 'setDeviceGPS')
+    server.register_function(startScript, "startScript")
+    server.register_function(stopScript, "stopScript")
+    server.register_function(getRpcServerStatus, "getRpcServerStatus")
+    server.register_function(simulatorStatus, "simulatorStatus")
+    server.register_function(get_free_mem, "get_free_mem")
+    _registor()
+    print("[rpc_server] start ...")
+    server.serve_forever()  # never stop
+    print("[rpc_server] done.")
+
+
 ######################################################################
-# netstat -ano | findstr "8003"
-_clean()
-server = SimpleXMLRPCServer(("0.0.0.0", RPC_PORT))
-server.register_function(restartDevice, "restartDevice")
-server.register_function(setDeviceGPS, 'setDeviceGPS')
-server.register_function(startScript, "startScript")
-server.register_function(stopScript, "stopScript")
-server.register_function(getRpcServerStatus, "getRpcServerStatus")
-server.register_function(simulatorStatus, "simulatorStatus")
-server.register_function(get_free_mem, "get_free_mem")
-_registor()
-print("[rpc_server] start ...")
-server.serve_forever()  # never stop
-print("[rpc_server] done.")
+if __name__ == "__main__":
+    start_rpc_server()

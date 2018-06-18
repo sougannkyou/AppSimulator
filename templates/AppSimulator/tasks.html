@@ -1,0 +1,171 @@
+{% extends 'base_backend_frameless.html' %}
+{% load static %}
+
+{% block header_tail %}
+    {#    <meta http-equiv="refresh" content="5">#}
+    <link rel="stylesheet" href="{% static 'AppSimulator/css/tasks.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
+{% endblock header_tail %}
+
+{% block section_content %}
+    <div id="main" v-cloak>
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Tasks</h3>
+                    <div class="box-tools">
+                        <div class="input-group input-group-sm" style="width: 150px;">
+                            <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
+                            <div class="input-group-btn">
+                                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover">
+                        <tbody>
+                        <tr>
+                            <th width="5%">TaskId</th>
+                            <th width="10%">IP</th>
+                            <th width="5%">Port</th>
+                            <th width="20%">Script</th>
+                            <th width="20%">APP</th>
+                            <th width="20%">Status</th>
+                        </tr>
+                        <tr>
+                            <td><input type="text" v-model="task.taskId" placeholder="等待分配" readonly></td>
+                            <td><input type="text" v-model="task.ip" placeholder="等待分配" readonly></td>
+                            <td><input type="text" v-model="task.port" placeholder="等待分配" readonly></td>
+                            <td><input type="text" v-model="task.script" placeholder="code" readonly></td>
+                            <td>
+                                <label v-for="app in appAll">
+                                    <img v-bind:class="[task.appName===app?'app-icon-big':'app-icon']"
+                                         v-on:click="setAppName(app)"
+                                         v-bind:src="'/static/AppSimulator/images/' + app + '/app_icon.png'">
+                                </label>
+                            </td>
+                            <td>
+                                <span class="label label-default">[[ task.status ]]</span>
+                                <button v-on:click="addTask" class="fa fa-2x fa-plus-circle pull-right"
+                                        style="color:orange;" title="增加"></button>
+                            </td>
+                        </tr>
+                        <tr v-for="t in tasks">
+                            <td>[[ t.taskId ]]</td>
+                            <td>[[ t.ip ]]</td>
+                            <td>[[ t.port ]]</td>
+                            <td>[[ t.script ]]</td>
+                            <td><img class="app" v-bind:src="'/static/AppSimulator/images/'+t.appName+'/app_icon.png'">
+                            </td>
+                            <td><span class="label label-success">[[ t.status ]]</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock section_content %}
+
+{% block jquery_js %}
+
+{% endblock jquery_js %}
+
+{% block body_tail %}
+    <!-- page script -->
+    <script type="text/javascript"
+            src="{% static 'plugins/echarts/extension/dataTool.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/echarts/echarts-all-3.js' %}"></script>
+    <script type="text/javascript" src="{% static 'dist/js/demo.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/dark.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/infographic.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/macarons.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/roma.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/shine.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/vintage.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/vue1/vue.js' %}"></script>
+    <script type="text/javascript" src="{% static 'AppSimulator/js/csrf.js' %}"></script>
+    <script type="text/javascript">
+        const STATUS_UNKOWN = 'unkown';
+        const STATUS_RUNNING = 'running';
+        const STATUS_SUSPEND = 'suspend';
+
+        function addTask(obj) {
+            let opt = {
+                url: '/AppSimulator/addTaskAPI/',
+                type: 'POST',
+                data: {
+                    script: obj.task.script,
+                    appName: obj.task.appName,
+                },
+                dataType: "json",
+                error: function (xhr, err) {
+                    obj.msg = "failure";
+                    console.error("[tasks] addTaskAPI", err);
+                },
+                success: function (data, status) {
+                    obj.msg = "success";
+                }
+            };
+            $.ajax(opt);
+        }
+
+        //----------------------------------------------------------------------------
+        Vue.config.delimiters = ['[[', ']]'];
+        //----------------------------------------------------------------------------
+        let mainVue = new Vue({
+            el: "#main",
+            data: {
+                appAll: ['douyin', 'miaopai', 'dianping'],
+                task: {taskId: '', ip: '', port: '', script: '', appName: '', status: ''},
+                tasks: [],
+                msg: ""
+            },
+            methods: {
+                setAppName: function (appName) {
+                    if (this.task.appName !== appName) {
+                        this.task.appName = appName;
+                        this.task.script = 'script_' + appName + '.py';
+                    } else {
+                        this.task.appName = '';
+                        this.task.script = '';
+                    }
+                },
+                addTask: function () {
+                    this.tasks.push(this.task);
+                    addTask(this);
+                }
+            },
+            created: function () {
+                this.tasks = [{
+                    taskId: 1,
+                    ip: '192.168.31.227',
+                    port: '62001',
+                    script: 'script_douyin.py',
+                    appName: 'douyin',
+                    status: STATUS_RUNNING,
+                }, {
+                    taskId: 2,
+                    ip: '192.168.31.228',
+                    port: '62003',
+                    script: 'script_miaopai.py',
+                    appName: 'miaopai',
+                    status: STATUS_RUNNING,
+                }, {
+                    taskId: 3,
+                    ip: '192.168.31.229',
+                    port: '62005',
+                    script: 'script_dianping.py',
+                    appName: 'dianping',
+                    status: STATUS_RUNNING,
+                }];
+            },
+            watch: {},
+            computed: {}
+        });
+    </script>
+{% endblock body_tail %}
+
+
+

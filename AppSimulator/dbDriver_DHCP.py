@@ -52,7 +52,7 @@ class RedisDriver(object):
                 'ip': ip,
                 'cnt': int(str(self._conn.scard("devices:" + app_name + ":" + ip + '_org'))),
                 'dedup_cnt': 0,
-                'status': STATUS_UNKOWN
+                'status': DEVICE_STATUS_UNKOWN
             })
 
         return ret
@@ -67,31 +67,6 @@ class MongoDriver(object):
         self._db = self._client.AppSimulator
         self.deviceStatisticsInfo = self._db.deviceStatisticsInfo
         self.deviceConfig = self._db.deviceConfig
-        self.tasks = self._db.tasks
-
-    def _get_max_task_id(self):
-        taskId = 1
-        m = self.tasks.aggregate([{"$group": {'_id': '', 'max_id': {"$max": "$taskId"}}}])
-        for i in m:
-            taskId = i['max_id'] + 1  # taskId自增
-
-        return taskId
-
-    def add_task(self, task):
-        taskId = self._get_max_task_id()
-        self.tasks.insert({
-            "taskId": taskId,
-            "script": task['script'],
-            "app": task['appName'],
-            "status": STATUS_WAIT,
-            "docker": {
-                "ip": "",
-                "port": "",
-                "name": "",
-                "start": 0,
-                "end": 0
-            }})
-        return taskId
 
     def get_config_info(self, deviceId):
         info = self.deviceConfig.find_one({'deviceId': deviceId})
@@ -117,7 +92,7 @@ class MongoDriver(object):
         ips = RedisDriver().get_devices_ip_list(app_name)
         print("get_devices_status ips")
         for ip in ips:
-            status = {'deviceId': ip, 'ip': ip, 'cnt': 0, 'dedup_cnt': 0, 'status': STATUS_UNKOWN}
+            status = {'deviceId': ip, 'ip': ip, 'cnt': 0, 'dedup_cnt': 0, 'status': DEVICE_STATUS_UNKOWN}
             l = []
             statistics = self.deviceStatisticsInfo.find({'deviceId': ip})
             for s in statistics:
@@ -127,9 +102,9 @@ class MongoDriver(object):
             if (len(l) > 0 and l[-1] > 0):
                 status['cnt'] = l[-1]
                 if (l[0] == l[-1]):
-                    status['status'] = STATUS_SUSPEND
+                    status['status'] = DEVICE_STATUS_SUSPEND
                 else:
-                    status['status'] = STATUS_RUNNING
+                    status['status'] = DEVICE_STATUS_RUNNING
 
             devices_status.append(status)
 

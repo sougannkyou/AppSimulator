@@ -20,6 +20,6 @@ class DashBoardView(TemplateView):
     template_name = 'AppSimulator/dashboard.html'
 
 # [数据面板]
-class DevicesManagerView(TemplateView):
+class TasksView(TemplateView):
     queryset = []
-    template_name = 'AppSimulator/devicesManager.html'
+    template_name = 'AppSimulator/tasks.html'
