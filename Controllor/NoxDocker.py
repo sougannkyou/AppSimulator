@@ -133,7 +133,7 @@ class NoxDocker(object):
         ))
         return True
 
-    def stop(self, wait_time=30):
+    def stop(self, retry=False, wait_time=30):
         self._exec_nox_cmd(self._make_cmd("quit -name:" + self._docker_name))
         while wait_time > 0:
             hwnd = win32gui.FindWindow(None, self._docker_name)
@@ -144,7 +144,7 @@ class NoxDocker(object):
             else:
                 break
 
-        if wait_time == 0:  # retry
+        if retry and wait_time == 0:  # retry
             self._exec_nox_cmd(self._make_cmd("quit -name:" + self._docker_name))
 
         time.sleep(10)
@@ -217,31 +217,26 @@ class NoxDocker(object):
             self._log('create', msg)
             return False, msg
 
-        if len(dockers) == 0:
-            # self.copy('nox-org')
-            ret = self.add()
-
         if len(dockers) == 1:
             if dockers[0]['status'] == STATUS_RUNNING:
-                self.stop(30)
+                self.stop(retry=False, wait_time=30)
 
             ret = self.remove()
             if not ret:
                 msg = 'remove failed!'
                 return False, msg
 
-            # time.sleep(10)
-            # self.copy('nox-org')
-            ret = self.add()
-            if not ret:
-                msg = 'add failed!'
-                return False, msg
+        # time.sleep(10)
+        # self.copy('nox-org')
+        ret = self.add()
+        if not ret:
+            msg = 'add failed!'
+            return False, msg
 
-        if force:
-            ret = self.pull(self._app_name)
-            if not ret:
-                msg = 'pull failed!'
-                return False, msg
+        ret = self.pull(self._app_name)
+        if not ret:
+            msg = 'pull failed!'
+            return False, msg
 
         return True, msg
 
@@ -286,23 +281,41 @@ class NoxDocker(object):
 
         return False
 
-    def run(self, force=False, time_out=30):  # run = create and start
+    def on_success(self):
+        time.sleep(10)
+        self.shake(3)
+        self.set_docker_name()
+        port = self.get_port()
+        self._manager.task_trace(
+            task_id='unkown', app_name=self._app_name, docker_name=self._docker_name, action='start'
+        )
+        self._manager.set_docker_info(
+            docker_name=self._docker_name, ip=self._ip, port=port, task_id='unkown', app_name=self._app_name
+        )
+        return True
+
+    def on_error(self, retry_cnt=0):
+        while retry_cnt > 0:
+            ret, msg = self.create(force=True)
+            if ret:
+                ret = self.start(wait_time=30)
+                if ret:  # start success
+                    return True
+            else:
+                retry_cnt -= 1
+        else:
+            self.stop()
+
+        return False
+
+    def run(self, force=False, retry_cnt=2, time_out=30):  # run = create and start
         ret, msg = self.create(force)
         if ret:
             ret = self.start(wait_time=time_out)
             if ret:  # start success
-                time.sleep(10)
-                self.shake(3)
-                self.set_docker_name()
-                port = self.get_port()
-                self._manager.task_trace(
-                    task_id='unkown', app_name=self._app_name, docker_name=self._docker_name, action='start'
-                )
-                self._manager.set_docker_info(
-                    docker_name=self._docker_name, ip=self._ip, port=port, task_id='unkown', app_name=self._app_name
-                )
+                ret = self.on_success()
             else:
-                self.stop()
+                ret = self.on_error(retry_cnt=retry_cnt)
 
             # else:  # retry
             #     ret = self.start(wait_time=time_out)
@@ -316,7 +329,7 @@ class NoxDocker(object):
 def run(app_name, docker_name):
     docker = NoxDocker(app_name=app_name, docker_name=docker_name)
     docker._DEBUG = True
-    return docker.run(force=True, time_out=30)
+    return docker.run(force=True, retry_cnt=2, time_out=30)
     # docker.stop_all()
 
 
