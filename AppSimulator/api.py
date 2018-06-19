@@ -23,8 +23,8 @@ from django.http import HttpResponse, JsonResponse
 # from rest_framework import status
 import socket
 
-from dbDriver import MongoDriver, RedisDriver
-from setting import *
+from .dbDriver import MongoDriver, RedisDriver
+from .setting import *
 
 MDB = MongoDriver()
 RDB = RedisDriver()

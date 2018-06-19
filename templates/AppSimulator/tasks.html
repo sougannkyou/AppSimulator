@@ -46,7 +46,8 @@
                                 </label>
                             </td>
                             <td>
-                                <span class="label label-default">[[ task.status ]]</span>
+                                <span v-bind:class="[task.status==='unkown'?'label label-default':
+                                (task.status==='running'?'label label-success':'label label-warring')]">[[ task.status ]]</span>
                                 <button v-on:click="addTask" class="fa fa-2x fa-plus-circle pull-right"
                                         style="color:orange;" title="增加"></button>
                             </td>
@@ -58,7 +59,9 @@
                             <td>[[ t.script ]]</td>
                             <td><img class="app" v-bind:src="'/static/AppSimulator/images/'+t.appName+'/app_icon.png'">
                             </td>
-                            <td><span class="label label-success">[[ t.status ]]</span></td>
+                            <td><span v-bind:class="[t.status==='unkown'?'label label-default':
+                                (t.status==='running'?'label label-success':'label label-warring')]">[[ t.status ]]</span>
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -117,8 +120,8 @@
         let mainVue = new Vue({
             el: "#main",
             data: {
-                appAll: ['douyin', 'miaopai', 'dianping'],
-                task: {taskId: '', ip: '', port: '', script: '', appName: '', status: ''},
+                appAll: ['douyin', 'miaopai', 'dianping', 'toutiao'],
+                task: {taskId: '等待分配', ip: '等待分配', port: '等待分配', script: '', appName: '', status: STATUS_UNKOWN},
                 tasks: [],
                 msg: ""
             },

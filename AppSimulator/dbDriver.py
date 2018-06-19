@@ -9,7 +9,7 @@ from bson.objectid import ObjectId
 import requests
 from urllib.parse import urlparse, urlunparse
 
-from setting import *
+from .setting import *
 
 
 class RedisDriver(object):
