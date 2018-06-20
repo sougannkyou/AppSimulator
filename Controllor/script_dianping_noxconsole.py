@@ -5,8 +5,8 @@ try:
     import time
     import datetime
     import multiprocessing
-    from SimulatorNoxConsole import Simulator
-    from NoxDocker import NoxDocker
+    from Controllor.SimulatorNoxConsole import Simulator
+    from Controllor.NoxDocker import NoxDocker
 except ImportError as e:
     print("[Script] ERROR:", e.args[0])
     sys.exit(-1)
@@ -40,7 +40,7 @@ class MySimulator(Simulator):
         x = -1
         y = -1
         page_cnt = 0
-        # self.start_web(urls[self._adb_idx], 3)
+        self.start_web(urls[self._adb_idx], 3)
         # ret, x, y = self.find_element(comment='web打开APP', timeout=10)
         # if ret: ret = self.click_xy(x, y, timeout=2)
         if ret: ret, x, y = self.find_element(comment='APP图标', timeout=10)
@@ -121,6 +121,7 @@ def run(docker_name):
         end = datetime.datetime.now()
         print("[Script " + docker_name + "] ERROR:", (end - start).seconds, e)
         return False
+
 
 #################################################################################
 if __name__ == "__main__":

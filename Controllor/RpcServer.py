@@ -25,6 +25,11 @@ def startScript():
     os.system('start /B start "script" cmd.exe @cmd /k python %RPCSERVER_HOME%script_douyin.py')
     return True
 
+def startTask(appName):
+    os.system('taskkill /f /t /fi "WINDOWTITLE eq script"')
+    os.system('start /B start "script" cmd.exe @cmd /k python %RPCSERVER_HOME%script_douyin.py')
+    return True
+
 
 def stopScript():
     os.system('taskkill /f /t /fi "WINDOWTITLE eq script"')

@@ -70,7 +70,7 @@ class MongoDriver(object):
         self.rpcServer = self._db.rpcServer
         self.tasks = self._db.tasks
 
-    def _get_max_task_id(self):
+    def _get_task_id(self):
         taskId = 1
         m = self.tasks.aggregate([{"$group": {'_id': '', 'max_id': {"$max": "$taskId"}}}])
         for i in m:
@@ -79,7 +79,7 @@ class MongoDriver(object):
         return taskId
 
     def add_task(self, task):
-        taskId = self._get_max_task_id()
+        taskId = self._get_task_id()
         self.tasks.insert({
             "taskId": taskId,
             "script": task['script'],

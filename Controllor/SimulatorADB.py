@@ -9,8 +9,8 @@ try:
     import cv2
     import aircv as ac
     import ftplib
-    from Manager import Manager
-    from MyADB import MyADB
+    from Controllor.TaskManager import TaskManager
+    from Controllor.MyADB import MyADB
 except ImportError as e:
     print("[Simulator] ERROR:", e.args[0])
     sys.exit(-1)
@@ -18,7 +18,7 @@ except ImportError as e:
 
 class Simulator(object):
     def __init__(self, adb_path, app_name):
-        self._manager = Manager()
+        self._manager = TaskManager()
         self._DEBUG = False
         self._FTP_TRANSMISSION = False
         self._PIC_PATH = {}

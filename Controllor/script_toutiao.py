@@ -1,21 +1,17 @@
 # coding:utf-8
-try:
-    import sys
-    from pprint import pprint
-    import time
-    import datetime
-    import multiprocessing
-    import win32gui
-    from PIL import ImageGrab
-    import cv2
-    import aircv as ac
-    import pyautogui
-    from simulatorADB import Simulator
-    from NoxDocker import NoxDocker
+import sys
+from pprint import pprint
+import time
+import datetime
+import multiprocessing
+import win32gui
+from PIL import ImageGrab
+import cv2
+import aircv as ac
+import pyautogui
+from Controllor.simulatorADB import Simulator
+from Controllor.NoxDocker import NoxDocker
 
-except ImportError as e:
-    print("[Script] ERROR:", e.args[0])
-    sys.exit(-1)
 
 ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
 
@@ -72,7 +68,8 @@ class MySimulator(Simulator):
         x = -1
         y = -1
         page_cnt = 0
-        self.start_web(urls[self._adb_idx], 5)
+        self.start_web(urls[0], 5)
+        self.next_page_browser(1)
         ret, x, y = self.find_element(comment='打开APP', timeout=5)
         if ret:
             ret = self.click_xy(x, y, timeout=2)
@@ -116,7 +113,7 @@ def run(idx):
         mySimulator.run(is_app_restart=False)
 
         end = datetime.datetime.now()
-        print("[Script" + mySimulator. + "] run success. ", (end - start).seconds, "s")
+        print("[Script] run success. ", (end - start).seconds, "s")
         return True
     except Exception as e:
         end = datetime.datetime.now()
@@ -128,12 +125,12 @@ def run(idx):
 if __name__ == "__main__":
     # tasks_cnt = int(sys.argv[1])
     tasks_cnt = 1
-    for i in range(1, 1 + tasks_cnt):
-        docker = NoxDocker(app_name='dianping', docker_name='nox-' + str(i))
-        print('launch_emulator nox-' + str(i))
-        docker.launch_emulator('nox-' + str(i), force=True)
-
-    time.sleep(30)
+    # for i in range(1, 1 + tasks_cnt):
+    #     docker = NoxDocker(app_name='dianping', docker_name='nox-' + str(i))
+    #     print('launch_emulator nox-' + str(i))
+    #     docker.launch_emulator('nox-' + str(i), force=True)
+    #
+    # time.sleep(30)
 
     pool = multiprocessing.Pool(processes=4)
     for idx in range(tasks_cnt):

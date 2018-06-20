@@ -1,19 +1,15 @@
 # coding:utf-8
-try:
-    import os
-    import sys
-    import random
-    import time
-    from pprint import pprint
-    from PIL import ImageGrab
-    import cv2
-    import aircv as ac
-    import ftplib
-    from TaskManager import TaskManager
-    from MyNoxConsole import MyNoxConsole
-except ImportError as e:
-    print("[Simulator] ERROR:", e.args[0])
-    sys.exit(-1)
+import os
+import sys
+import random
+import time
+from pprint import pprint
+from PIL import ImageGrab
+import cv2
+import aircv as ac
+import ftplib
+from Controllor.TaskManager import TaskManager
+from Controllor.MyNoxConsole import MyNoxConsole
 
 
 class Simulator(object):
@@ -23,12 +19,12 @@ class Simulator(object):
         self._FTP_TRANSMISSION = False
         self._PIC_PATH = {}
         self._img_capture = None
-        self._docker_name = None
+        self._docker_name = docker_name
         self._app_name = app_name
         self._ip = os.getenv('APPSIMULATOR_IP')
         self._adb = MyNoxConsole(docker_name=docker_name)
         self._adb_port = None
-        self._manager.set_docker_info(docker_name=self._docker_name, port=devices[idx])
+        # self._manager.set_docker_info(docker_name=self._docker_name, port=devices[idx])
 
     def _log(self, prefix, msg):
         if self._DEBUG:

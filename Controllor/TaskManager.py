@@ -1,12 +1,10 @@
 # coding:utf-8
 import os
+import time
 from datetime import datetime, timedelta
 import pymongo
-
-MONGODB_SERVER_IP = os.environ["MONGODB_SERVER_IP"]  # "172.16.252.174"
-# MONGODB_SERVER = "172.16.252.174"
-MONGODB_SERVER_PORT = int(os.environ["MONGODB_SERVER_PORT"])
-# MONGODB_PORT = 27017
+from Controllor.setting import *
+# from Controllor.NoxDocker import NoxDocker
 
 
 class TaskManager(object):
@@ -15,6 +13,7 @@ class TaskManager(object):
         self._db = self._client.AppSimulator
         self.dockerConfig = self._db.dockerConfig
         self.tasksTrace = self._db.tasksTrace
+        self.tasks = self._db.tasks
         self.rpcServer = self._db.rpcServer
 
     def task_trace(self, task_id, app_name, docker_name, action):  # after docker start success
@@ -37,6 +36,30 @@ class TaskManager(object):
 
     def registor_rpc_server(self, controllor_info):
         self.rpcServer.update({'ip': controllor_info['ip']}, {"$set": controllor_info}, upsert=True)
+
+    def get_one_wait_task(self):
+        while True:
+            l = self.tasks.find({'status': STATUS_START})
+            if not l:
+                task = self.tasks.find_one({'status': STATUS_WAIT, 'docker.ip': ''})
+                task.pop('_id')
+                return task
+            else:
+                time.sleep(1 * 60)
+
+    def start_tasks(self, app_name):
+        while True:
+            l = self.tasks.find({'status': STATUS_START})
+            if not l:
+                task = self.tasks.find_one({'status': STATUS_WAIT, 'docker.ip': ''})
+                id = task.pop('_id')
+                self.tasks.update({'_id': id, '$set': {'status': STATUS_START}})
+                docker = NoxDocker(task['appName'], 'nox-' + task['taskId'])
+                docker.run(force=True)
+            else:
+                time.sleep(1 * 60)
+
+        return True
 
     def update_device_statistics_info(self, info, scope_times):  # 时间窗式记录采集量
         print("update_device_statistics_info start", info)

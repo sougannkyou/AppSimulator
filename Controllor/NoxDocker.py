@@ -6,8 +6,7 @@ import win32gui
 import subprocess
 import aircv as ac
 from PIL import ImageGrab
-from pprint import pprint
-from TaskManager import TaskManager
+from Controllor.TaskManager import TaskManager
 
 GB = 1024 * 1024 * 1024
 STATUS_RUNNING = 'running'

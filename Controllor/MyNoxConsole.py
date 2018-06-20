@@ -1,12 +1,9 @@
 # coding:utf-8
-try:
-    import sys
-    import re
-    import random
-    import subprocess
-except ImportError as e:
-    print("[MyADB] error:", e.args[0])
-    sys.exit(-1)
+import sys
+import re
+import random
+import subprocess
+
 
 CONSOLE_BINARY_PATH = 'C:\\Nox\\bin\\NoxConsole.exe'
 
