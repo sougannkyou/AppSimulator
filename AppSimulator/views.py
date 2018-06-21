@@ -4,10 +4,12 @@ from AppSimulator.DBLib import MongoDriver
 
 MDB = MongoDriver()
 
+
 # [数据面板]
 class DashBoardView(TemplateView):
     queryset = []
     template_name = 'AppSimulator/dashboard.html'
+
 
 # [数据面板]
 class TasksView(TemplateView):

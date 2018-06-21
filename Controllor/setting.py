@@ -10,13 +10,13 @@ STATUS_RPC_TIMEOUT = 'rpc_timeout'
 
 STATUS_UNKOWN = 'unkown'
 
-STATUS_WAIT = 'wait' # wait
+STATUS_WAIT = 'wait'  # wait
 
-STATUS_BUILDING = 'building' # docker building ...
+STATUS_BUILDING = 'building'  # docker building ...
 STATUS_BUILD_OK = 'build_ok'
 STATUS_BUILD_NG = 'build_ng'
 
-STATUS_RUNNING = 'running' # script running ...
+STATUS_RUNNING = 'running'  # script running ...
 STATUS_RUN_OK = 'run_ok'
 STATUS_RUN_NG = 'run_ng'
 

@@ -57,6 +57,14 @@ class MongoDriver(object):
             self.deviceStatisticsInfo.insert(m)
             m.pop('_id')
 
+    def add_docker(self):
+        docker = {
+            "ip": "",
+            "port": "",
+            "name": "nox-" + str(taskId),
+            "start": 0,
+            "end": 0
+        }
 
 # ------------------------ docker db lib ----------------------
 if __name__ == '__main__':

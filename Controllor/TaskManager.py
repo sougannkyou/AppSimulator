@@ -12,7 +12,7 @@ class TaskManager(object):
 
     def start_tasks(self, app_name):
         while True:
-            task = self.driver.get_one_wait_task() # STATUS_WAIT
+            task = self.driver.get_one_wait_task()  # STATUS_WAIT
             if task:
                 task['status'] = STATUS_BUILDING
                 self.driver.change_task_status(task)
@@ -21,7 +21,6 @@ class TaskManager(object):
                 ret = docker.build(force=True, retry_cnt=2, wait_time=30)
                 task['status'] = STATUS_BUILD_OK if ret else STATUS_BUILD_NG
                 self.driver.change_task_status(task)
-
 
                 break
             else:
