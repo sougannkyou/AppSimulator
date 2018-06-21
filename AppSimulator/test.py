@@ -8,7 +8,7 @@ RDB = RedisDriver()
 def test():
     tasks = MDB.get_tasks(status='wait')
     for task in tasks:
-        rpcServers = MDB.get_rpc_server(appName=task['appName'])
+        rpcServers = MDB.get_rpc_server(app_name=task['app_name'])
         print(rpcServers)
         for server in rpcServers:
             rpcServer = "http://" + server['ip'] + ":" + str(server['port'])

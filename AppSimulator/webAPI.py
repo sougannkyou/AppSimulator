@@ -2,7 +2,7 @@
 import datetime, time
 import os, sys
 import psutil
-import xmlrpc.client
+
 import json
 import copy
 from io import StringIO
@@ -21,10 +21,9 @@ from django.http import HttpResponse, JsonResponse
 # from rest_framework.views import APIView
 # from rest_framework.response import Response as restResponse
 # from rest_framework import status
-import socket
 
-from .dbDriver import MongoDriver, RedisDriver
-from .setting import *
+from AppSimulator.DBLib import MongoDriver, RedisDriver
+from AppSimulator.RPCLib import *
 
 MDB = MongoDriver()
 RDB = RedisDriver()
@@ -33,10 +32,7 @@ RDB = RedisDriver()
 def getRpcServerStatus(deviceId):
     info = MDB.get_config_info(deviceId)
     # print('get_config_info', deviceId, info['ip'])
-    socket.setdefaulttimeout(RPC_SERVER_TIMEOUT)
-    with xmlrpc.client.ServerProxy("http://" + info['ip'] + ":" + str(RPC_PORT)) as proxy:
-        ret = proxy.getRpcServerStatus()
-    socket.setdefaulttimeout(None)
+
 
     output = JsonResponse({
         'ret': ret,
@@ -67,9 +63,7 @@ def setDeviceGPSAPI(request):
     deviceId = request.POST.get('deviceId')  # 设备ID
     latitude = request.POST.get('latitude')  # 经度
     longitude = request.POST.get('longitude')  # 纬度
-    print(deviceId, latitude, longitude)
-    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
-        ret = proxy.setDeviceGPS(deviceId, latitude, longitude)
+
 
     output = JsonResponse({
         'ret': ret,
@@ -80,8 +74,7 @@ def setDeviceGPSAPI(request):
 def restartDeviceAPI(request):
     deviceId = request.GET.get('deviceId')  # 设备ID
 
-    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
-        ret = proxy.restartDevice(deviceId)
+
 
     output = JsonResponse({
         'ret': ret,
@@ -91,8 +84,7 @@ def restartDeviceAPI(request):
 
 def quitAppAPI(request):
     deviceId = request.GET.get('deviceId')  # 设备ID
-    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
-        ret = proxy.quitApp()
+
     # ret = True
     output = JsonResponse({
         'ret': ret,
@@ -102,8 +94,7 @@ def quitAppAPI(request):
 
 def startScriptAPI(request):
     deviceId = request.GET.get('deviceId')  # 设备ID
-    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
-        ret = proxy.startScript()
+
     output = JsonResponse({
         'ret': ret,
     })
@@ -112,8 +103,7 @@ def startScriptAPI(request):
 
 def stopScriptAPI(request):
     deviceId = request.GET.get('deviceId')  # 设备ID
-    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
-        ret = proxy.stopScript()
+    ret = rpc_stop_script()
     output = JsonResponse({
         'ret': ret,
     })
@@ -124,9 +114,6 @@ def runTasksAPI(request):
     ret = True
     app_name = request.GET.get('app_name')  # 'dianping'
     tasks_cnt = request.GET.get('tasks_cnt')  # tasks
-    with xmlrpc.client.ServerProxy(RPC_CLIENT) as proxy:
-        # ret = proxy.runTasks(app_name, tasks_cnt)
-        ret = proxy.runTasks()
 
     output = JsonResponse({
         'ret': ret,
@@ -180,7 +167,7 @@ def getProxyServerInfoAPI(request):
 
 
 def getDeviceCrawlCntAPI(request):
-    app_name = request.GET.get('appName')
+    app_name = request.GET.get('app_name')
     info = RDB.get_crwal_cnt_by_device(app_name)
     print('getDeviceCrawlCntAPI:', info)
     MDB.update_device_statistics_info(info=info, scope_times=SCOPE_TIMES)
@@ -193,7 +180,7 @@ def getDeviceCrawlCntAPI(request):
 
 
 def getDevicesStatusAPI(request):
-    app_name = request.GET.get('appName')
+    app_name = request.GET.get('app_name')
     ret = MDB.get_devices_status(app_name)  # {'device1':'running','device2':'unkown'}
     output = JsonResponse({
         'ret': ret,
@@ -210,9 +197,9 @@ def getResultSampleAPI(request):
 
 
 def addTaskAPI(request):
-    appName = request.POST.get('appName')
+    app_name = request.POST.get('app_name')
     script = request.POST.get('script')
-    ret = MDB.add_task({'script': script, 'appName': appName})
+    ret = MDB.add_task({'script': script, 'app_name': app_name})
     output = JsonResponse({
         'ret': ret
     })
@@ -221,16 +208,6 @@ def addTaskAPI(request):
 
 def runTasks():
     tasks = MDB.get_tasks(status=STATUS_WAIT)
-    for task in tasks:
-        rpcServers = MDB.get_rpc_server(appName=task['appName'])
-        for server in rpcServers:
-            rpcServer = "http://" + server['ip'] + ":" + str(server['port'])
-            with xmlrpc.client.ServerProxy(rpcServer) as proxy:
-                # ret = proxy.runTasks(app_name, tasks_cnt)
-                free_mem = proxy.get_free_mem()
-                if free_mem > 1:
-                    print(free_mem)
-
     output = JsonResponse({
         'ret': ret
     })
@@ -240,7 +217,7 @@ def runTasks():
 def test():
     tasks = MDB.get_tasks(status=STATUS_WAIT)
     for task in tasks:
-        rpcServers = MDB.get_rpc_server(appName=task['appName'])
+        rpcServers = MDB.get_rpc_server(app_name=task['app_name'])
         for server in rpcServers:
             rpcServer = "http://" + server['ip'] + ":" + str(server['port'])
             with xmlrpc.client.ServerProxy(rpcServer) as proxy:

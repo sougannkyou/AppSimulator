@@ -9,9 +9,10 @@ from bson.objectid import ObjectId
 import requests
 from urllib.parse import urlparse, urlunparse
 
-from .setting import *
+from AppSimulator.setting import *
 
 
+# ------------------------ server db lib ----------------------
 class RedisDriver(object):
     def __init__(self):
         self._conn = redis.StrictRedis.from_url(REDIS_SERVER)
@@ -61,6 +62,7 @@ class RedisDriver(object):
         return self._conn.scard(device_id)
 
 
+# ------------------------ server db lib ----------------------
 class MongoDriver(object):
     def __init__(self):
         self._client = pymongo.MongoClient(host=MONGODB_SERVER_IP, port=MONGODB_SERVER_PORT)
@@ -70,7 +72,7 @@ class MongoDriver(object):
         self.rpcServer = self._db.rpcServer
         self.tasks = self._db.tasks
 
-    def _get_task_id(self):
+    def get_task_id(self):
         taskId = 1
         m = self.tasks.aggregate([{"$group": {'_id': '', 'max_id': {"$max": "$taskId"}}}])
         for i in m:
@@ -79,16 +81,16 @@ class MongoDriver(object):
         return taskId
 
     def add_task(self, task):
-        taskId = self._get_task_id()
+        taskId = self.get_task_id()
         self.tasks.insert({
             "taskId": taskId,
             "script": task['script'],
-            "appName": task['appName'],
+            "app_name": task['app_name'],
             "status": STATUS_WAIT,
             "docker": {
                 "ip": "",
                 "port": "",
-                "name": "",
+                "name": "nox-" + str(taskId),
                 "start": 0,
                 "end": 0
             }})
@@ -107,16 +109,19 @@ class MongoDriver(object):
 
         return ret
 
+    def set_task_docker(self, taskId, ip, port):
+        self.tasks.update({'taskId': taskId}, {'$set': {'docker.ip': ip, 'docker.port': port}})
+
     def get_config_info(self, deviceId):
         info = self.deviceConfig.find_one({'deviceId': deviceId})
         if info:
             info.pop('_id')
         return info
 
-    def get_rpc_server(self, appName=None):
+    def get_rpc_servers(self, app_name=None):
         ret = []
-        if appName:
-            l = self.rpcServer.find({'appName': {'$in': [appName]}})
+        if app_name:
+            l = self.rpcServer.find({'app_name': {'$in': [app_name]}})
         else:
             l = self.rpcServer.find()
 
@@ -124,6 +129,15 @@ class MongoDriver(object):
             r.pop('_id')
             ret.append(r)
         return ret
+
+    def is_allow_build_docker(self, ip):
+        ret = self.tasks.find({'docker.ip': ip, 'status': STATUS_BUILD})
+        return True if ret is None else False
+
+    def get_one_wait_task(self):
+        task = self.tasks.find_one({'status': STATUS_WAIT, 'docker.ip': '', 'docker.port': ''})
+        task.pop('_id')
+        return task
 
     def update_device_statistics_info(self, info, scope_times):  # 时间窗式记录采集量
         print("update_device_statistics_info start", info)
@@ -164,6 +178,7 @@ class MongoDriver(object):
         return devices_status  # {'172.16.250.247':'running','172.16.250.252':'unkown'}
 
 
+# ------------------------ server db lib ----------------------
 if __name__ == '__main__':
     # from .setting import
     r = RedisDriver()

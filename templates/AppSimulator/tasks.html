@@ -40,7 +40,7 @@
                             <td><input type="text" v-model="task.script" placeholder="code" readonly></td>
                             <td>
                                 <label v-for="app in appAll">
-                                    <img v-bind:class="[task.appName===app?'app-icon-big':'app-icon']"
+                                    <img v-bind:class="[task.app_name===app?'app-icon-big':'app-icon']"
                                          v-on:click="setAppName(app)"
                                          v-bind:src="'/static/AppSimulator/images/' + app + '/app_icon.png'">
                                 </label>
@@ -57,7 +57,7 @@
                             <td>[[ t.ip ]]</td>
                             <td>[[ t.port ]]</td>
                             <td>[[ t.script ]]</td>
-                            <td><img class="app" v-bind:src="'/static/AppSimulator/images/'+t.appName+'/app_icon.png'">
+                            <td><img class="app" v-bind:src="'/static/AppSimulator/images/'+t.app_name+'/app_icon.png'">
                             </td>
                             <td><span v-bind:class="[t.status==='unkown'?'label label-default':
                                 (t.status==='running'?'label label-success':'label label-warring')]">[[ t.status ]]</span>
@@ -100,7 +100,7 @@
                 type: 'POST',
                 data: {
                     script: obj.task.script,
-                    appName: obj.task.appName,
+                    app_name: obj.task.app_name,
                 },
                 dataType: "json",
                 error: function (xhr, err) {
@@ -121,17 +121,17 @@
             el: "#main",
             data: {
                 appAll: ['douyin', 'miaopai', 'dianping', 'toutiao'],
-                task: {taskId: '等待分配', ip: '等待分配', port: '等待分配', script: '', appName: '', status: STATUS_UNKOWN},
+                task: {taskId: '等待分配', ip: '等待分配', port: '等待分配', script: '', app_name: '', status: STATUS_UNKOWN},
                 tasks: [],
                 msg: ""
             },
             methods: {
-                setAppName: function (appName) {
-                    if (this.task.appName !== appName) {
-                        this.task.appName = appName;
-                        this.task.script = 'script_' + appName + '.py';
+                setAppName: function (app_name) {
+                    if (this.task.app_name !== app_name) {
+                        this.task.app_name = app_name;
+                        this.task.script = 'script_' + app_name + '.py';
                     } else {
-                        this.task.appName = '';
+                        this.task.app_name = '';
                         this.task.script = '';
                     }
                 },
@@ -146,21 +146,21 @@
                     ip: '192.168.31.227',
                     port: '62001',
                     script: 'script_douyin.py',
-                    appName: 'douyin',
+                    app_name: 'douyin',
                     status: STATUS_RUNNING,
                 }, {
                     taskId: 2,
                     ip: '192.168.31.228',
                     port: '62003',
                     script: 'script_miaopai.py',
-                    appName: 'miaopai',
+                    app_name: 'miaopai',
                     status: STATUS_RUNNING,
                 }, {
                     taskId: 3,
                     ip: '192.168.31.229',
                     port: '62005',
                     script: 'script_dianping.py',
-                    appName: 'dianping',
+                    app_name: 'dianping',
                     status: STATUS_RUNNING,
                 }];
             },

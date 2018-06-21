@@ -180,7 +180,7 @@ def getProxyServerInfoAPI(request):
 
 
 def getDeviceCrawlCntAPI(request):
-    app_name = request.GET.get('appName')
+    app_name = request.GET.get('app_name')
     info = RDB.get_crwal_cnt_by_device(app_name)
     print('getDeviceCrawlCntAPI:', info)
     MDB.update_device_statistics_info(info=info, scope_times=SCOPE_TIMES)
@@ -193,7 +193,7 @@ def getDeviceCrawlCntAPI(request):
 
 
 def getDevicesStatusAPI(request):
-    app_name = request.GET.get('appName')
+    app_name = request.GET.get('app_name')
     ret = MDB.get_devices_status(app_name)  # {'device1':'running','device2':'unkown'}
     output = JsonResponse({
         'ret': ret,

@@ -93,7 +93,7 @@
                     <div class="inner">
                         <p>Support App</p>
                         <label v-for="app in appAll">
-                            <img height="40" v-bind:class="[appName===app?'app-icon-big':'app-icon']"
+                            <img height="40" v-bind:class="[app_name===app?'app-icon-big':'app-icon']"
                                  v-on:click="setAppName(app)"
                                  src="/static/AppSimulator/images/[[app]]/app_icon.png">
                         </label>
@@ -313,7 +313,7 @@
                 url: '/AppSimulator/runTasksAPI/',
                 type: 'GET',
                 data: {
-                    app_name: obj.appName,
+                    app_name: obj.app_name,
                     tasks_cnt: obj.tasksCnt
                 },
                 dataType: "json",
@@ -339,7 +339,7 @@
                     cpu_percent: 0,
                     hd_percent: 0
                 },
-                appName: '', // 'douyin', 'dianping', 'miaopai'
+                app_name: '', // 'douyin', 'dianping', 'miaopai'
                 tasksCnt: 4,
                 dockerName: 'nox-1',
                 dockersCnt: 0,
@@ -442,11 +442,11 @@
             methods: {
                 trace: function () {
                 },
-                setAppName: function (appName) {
-                    if (this.appName !== appName)
-                        this.appName = appName;
+                setAppName: function (app_name) {
+                    if (this.app_name !== app_name)
+                        this.app_name = app_name;
                     else
-                        this.appName = '';
+                        this.app_name = '';
                 },
                 setDeviceGPS: function () {
                     setDeviceGPS(this);

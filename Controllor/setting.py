@@ -7,7 +7,7 @@ MONGODB_SERVER_PORT = int(os.environ["MONGODB_SERVER_PORT"])
 STATUS_RPC_TIMEOUT = 'rpc_timeout'
 STATUS_UNKOWN = 'unkown'
 STATUS_WAIT = 'wait'
-STATUS_START = 'start'
+STATUS_BUILD = 'build'
 STATUS_RUNNING = 'running'
 STATUS_SUSPEND = 'suspend'
 

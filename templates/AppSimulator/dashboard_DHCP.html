@@ -9,7 +9,7 @@
 
 {% block section_content %}
     <div id="main" v-cloak>
-        <input type="text" placeholder="app name" v-model="appName">
+        <input type="text" placeholder="app name" v-model="app_name">
         <div class="row">
             <div class="col-lg-3 col-xs-6">
                 <div class="small-box bg-aqua">
@@ -275,7 +275,7 @@
                 url: '/AppSimulator/runTasksAPI/',
                 type: 'GET',
                 data: {
-                    app_name: obj.appName,
+                    app_name: obj.app_name,
                     tasks_cnt: obj.tasksCnt
                 },
                 dataType: "json",
@@ -301,7 +301,7 @@
                     cpu_percent: 0,
                     hd_percent: 0
                 },
-                appName: 'douyin',
+                app_name: 'douyin',
                 tasksCnt: 4,
                 deviceId: 'device1',
                 devices: {

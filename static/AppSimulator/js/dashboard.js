@@ -17,7 +17,7 @@ setInterval(function () {
         type: 'get',
         contentType: "application/json; charset=UTF-8",
         data: {
-            appName: mainVue.appName,
+            app_name: mainVue.app_name,
         },
         error: function (xhr, err) {
             ajaxError(err, 'DeviceInfo');
@@ -64,7 +64,7 @@ setInterval(function getDevicesStatusAPI() {
         dataType: "json",
         data: {
             deviceId: mainVue.deviceId,
-            appName: mainVue.appName,
+            app_name: mainVue.app_name,
         },
         error: function (xhr, err) {
             mainVue.msg = "Failure";

@@ -4,9 +4,9 @@ import time
 from datetime import datetime, timedelta
 import pymongo
 from Controllor.setting import *
-# from Controllor.NoxDocker import NoxDocker
 
 
+# ------------------------ docker task manager ----------------------
 class TaskManager(object):
     def __init__(self):
         self._client = pymongo.MongoClient(host=MONGODB_SERVER_IP, port=MONGODB_SERVER_PORT)
@@ -39,7 +39,7 @@ class TaskManager(object):
 
     def get_one_wait_task(self):
         while True:
-            l = self.tasks.find({'status': STATUS_START})
+            l = self.tasks.find({'status': STATUS_RUNNING})
             if not l:
                 task = self.tasks.find_one({'status': STATUS_WAIT, 'docker.ip': ''})
                 task.pop('_id')
@@ -49,12 +49,12 @@ class TaskManager(object):
 
     def start_tasks(self, app_name):
         while True:
-            l = self.tasks.find({'status': STATUS_START})
+            l = self.tasks.find({'status': STATUS_RUNNING})
             if not l:
                 task = self.tasks.find_one({'status': STATUS_WAIT, 'docker.ip': ''})
                 id = task.pop('_id')
-                self.tasks.update({'_id': id, '$set': {'status': STATUS_START}})
-                docker = NoxDocker(task['appName'], 'nox-' + task['taskId'])
+                self.tasks.update({'_id': id, '$set': {'status': STATUS_RUNNING}})
+                docker = NoxDocker(task['app_name'], 'nox-' + task['taskId'])
                 docker.run(force=True)
             else:
                 time.sleep(1 * 60)

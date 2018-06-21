@@ -4,14 +4,15 @@ import time
 import psutil
 import win32gui
 from PIL import ImageGrab
-from TaskManager import TaskManager
 import shutil
 from xmlrpc.server import SimpleXMLRPCServer
+from Controllor.TaskManager import TaskManager
 
 RPC_PORT = 8003
 GB = 1024 * 1024 * 1024
 
 
+# ------------------------ docker rpc server ----------------------
 def getRpcServerStatus():
     return "running"
 
@@ -25,7 +26,8 @@ def startScript():
     os.system('start /B start "script" cmd.exe @cmd /k python %RPCSERVER_HOME%script_douyin.py')
     return True
 
-def startTask(appName):
+
+def startTask(app_name):
     os.system('taskkill /f /t /fi "WINDOWTITLE eq script"')
     os.system('start /B start "script" cmd.exe @cmd /k python %RPCSERVER_HOME%script_douyin.py')
     return True
@@ -49,7 +51,7 @@ def send2web(pic_path):
 
 def run_captrue():
     print("[rpc_server] run_captrue")
-    while (1):
+    while True:
         capture('douyin0')
         time.sleep(5)
 
@@ -86,7 +88,8 @@ def setDeviceGPS(deviceId, latitude, longitude):
 
 def get_free_mem():
     mem = psutil.virtual_memory()
-    return '%.1f' % (mem.free / GB)
+    ret = '%.1f' % (mem.free / GB)
+    return ret
 
 
 def _clean():
@@ -111,7 +114,7 @@ def _registor():
     manager.registor_rpc_server({
         'ip': os.getenv('APPSIMULATOR_IP'),
         'port': RPC_PORT,
-        'appName': _backup_app(),
+        'app_name': _backup_app(),
         'mem_free': '%.1f' % (mem.free / GB),
         'mem_total': '%.1f' % (mem.total / GB),
     })

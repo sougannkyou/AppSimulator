@@ -3,11 +3,11 @@ from django.conf.urls import patterns, url
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
 
-from .views import (
+from AppSimulator.views import (
     DashBoardView, TasksView
 )
 
-from .api import (
+from AppSimulator.webAPI import (
     addTaskAPI,
     getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI,
     setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,
