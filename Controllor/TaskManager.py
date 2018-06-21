@@ -1,75 +1,30 @@
 # coding:utf-8
-import os
 import time
-from datetime import datetime, timedelta
-import pymongo
 from Controllor.setting import *
+from Controllor.DBLib import MongoDriver
+from Controllor.NoxDocker import NoxDocker
 
 
 # ------------------------ docker task manager ----------------------
 class TaskManager(object):
     def __init__(self):
-        self._client = pymongo.MongoClient(host=MONGODB_SERVER_IP, port=MONGODB_SERVER_PORT)
-        self._db = self._client.AppSimulator
-        self.dockerConfig = self._db.dockerConfig
-        self.tasksTrace = self._db.tasksTrace
-        self.tasks = self._db.tasks
-        self.rpcServer = self._db.rpcServer
-
-    def task_trace(self, task_id, app_name, docker_name, action):  # after docker start success
-        self.tasksTrace.insert({
-            'task_id': task_id,
-            'app_name': app_name,
-            'docker_name': docker_name,
-            'time': int(datetime.now().timestamp()),
-            'action': action,  # sharelink, start, stop, publish
-        })
-
-    def set_docker_info(self, docker_name, ip, port, task_id, app_name):
-        self.dockerConfig.insert({
-            'docker_name': docker_name,
-            'ip': ip,
-            'port': port,
-            'task_id': task_id,
-            'app_name': app_name,
-        })
-
-    def registor_rpc_server(self, controllor_info):
-        self.rpcServer.update({'ip': controllor_info['ip']}, {"$set": controllor_info}, upsert=True)
-
-    def get_one_wait_task(self):
-        while True:
-            l = self.tasks.find({'status': STATUS_RUNNING})
-            if not l:
-                task = self.tasks.find_one({'status': STATUS_WAIT, 'docker.ip': ''})
-                task.pop('_id')
-                return task
-            else:
-                time.sleep(1 * 60)
+        self.driver = MongoDriver()
 
     def start_tasks(self, app_name):
         while True:
-            l = self.tasks.find({'status': STATUS_RUNNING})
-            if not l:
-                task = self.tasks.find_one({'status': STATUS_WAIT, 'docker.ip': ''})
-                id = task.pop('_id')
-                self.tasks.update({'_id': id, '$set': {'status': STATUS_RUNNING}})
+            task = self.driver.get_one_wait_task() # STATUS_WAIT
+            if task:
+                task['status'] = STATUS_BUILDING
+                self.driver.change_task_status(task)
+
                 docker = NoxDocker(task['app_name'], 'nox-' + task['taskId'])
-                docker.run(force=True)
+                ret = docker.build(force=True, retry_cnt=2, wait_time=30)
+                task['status'] = STATUS_BUILD_OK if ret else STATUS_BUILD_NG
+                self.driver.change_task_status(task)
+
+
+                break
             else:
                 time.sleep(1 * 60)
 
         return True
-
-    def update_device_statistics_info(self, info, scope_times):  # 时间窗式记录采集量
-        print("update_device_statistics_info start", info)
-        old_time = int((datetime.now() - timedelta(seconds=scope_times)).timestamp())
-        self.deviceStatisticsInfo.remove({'time': {'$lt': old_time}})
-        now = int(datetime.now().timestamp())
-        # ips = RedisDriver().get_devices_ip_list()
-        # print("update_device_statistics_info ips:", ips)
-        for m in info['statusList']:
-            m['time'] = now
-            # print("update_device_statistics_info:", m)
-            self.deviceStatisticsInfo.insert(m)
-            m.pop('_id')

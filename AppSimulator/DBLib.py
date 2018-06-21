@@ -1,18 +1,12 @@
 # coding=utf-8
 from pprint import pprint
-import os, time
 from datetime import datetime, timedelta
 import pymongo
 import redis
-import json
-from bson.objectid import ObjectId
-import requests
-from urllib.parse import urlparse, urlunparse
-
 from AppSimulator.setting import *
 
 
-# ------------------------ server db lib ----------------------
+# ------------------------ web server db lib ----------------------
 class RedisDriver(object):
     def __init__(self):
         self._conn = redis.StrictRedis.from_url(REDIS_SERVER)
@@ -62,7 +56,7 @@ class RedisDriver(object):
         return self._conn.scard(device_id)
 
 
-# ------------------------ server db lib ----------------------
+# ------------------------ web server db lib ----------------------
 class MongoDriver(object):
     def __init__(self):
         self._client = pymongo.MongoClient(host=MONGODB_SERVER_IP, port=MONGODB_SERVER_PORT)
@@ -87,13 +81,8 @@ class MongoDriver(object):
             "script": task['script'],
             "app_name": task['app_name'],
             "status": STATUS_WAIT,
-            "docker": {
-                "ip": "",
-                "port": "",
-                "name": "nox-" + str(taskId),
-                "start": 0,
-                "end": 0
-            }})
+            "rpc_server_ip": ''
+        })
         return taskId
 
     def get_tasks(self, status=None):
@@ -109,8 +98,8 @@ class MongoDriver(object):
 
         return ret
 
-    def set_task_docker(self, taskId, ip, port):
-        self.tasks.update({'taskId': taskId}, {'$set': {'docker.ip': ip, 'docker.port': port}})
+    def set_task_docker(self, taskId, ip):
+        self.tasks.update({'taskId': taskId}, {'$set': {'rpc_server_ip': ip}})
 
     def get_config_info(self, deviceId):
         info = self.deviceConfig.find_one({'deviceId': deviceId})

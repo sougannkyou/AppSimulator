@@ -1,7 +1,5 @@
 # coding:utf-8
-import os
 import time
-from datetime import datetime, timedelta
 from AppSimulator.RPCLib import rpc_get_free_mem
 from AppSimulator.DBLib import MongoDriver
 
@@ -19,7 +17,7 @@ class TaskManager(object):
                 for server in servers:
                     ret = rpc_get_free_mem(server['ip'], server['port'])
                     if ret > 1.0:  # free memory > 1GB
-                        self._db.set_task_docker(taskId=task['taskId'], ip=server['ip'], port=server['port'])
+                        self._db.set_task_docker(taskId=task['taskId'], ip=server['ip'])
                         break
             else:
                 time.sleep(1 * 60)

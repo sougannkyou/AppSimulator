@@ -6,10 +6,10 @@ import win32gui
 from PIL import ImageGrab
 import shutil
 from xmlrpc.server import SimpleXMLRPCServer
-from Controllor.TaskManager import TaskManager
+from Controllor.setting import *
+from Controllor.DBLib import MongoDriver
 
-RPC_PORT = 8003
-GB = 1024 * 1024 * 1024
+MDB = MongoDriver()
 
 
 # ------------------------ docker rpc server ----------------------
@@ -109,9 +109,8 @@ def _backup_app():
 
 
 def _registor():
-    manager = TaskManager()
     mem = psutil.virtual_memory()
-    manager.registor_rpc_server({
+    MDB.registor_rpc_server({
         'ip': os.getenv('APPSIMULATOR_IP'),
         'port': RPC_PORT,
         'app_name': _backup_app(),

@@ -1,4 +1,4 @@
-import os, time
+import time
 import win32con as WCON
 import win32api
 import win32gui

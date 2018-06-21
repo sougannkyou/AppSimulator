@@ -6,11 +6,8 @@ import win32gui
 import subprocess
 import aircv as ac
 from PIL import ImageGrab
+from Controllor.setting import *
 from Controllor.TaskManager import TaskManager
-
-GB = 1024 * 1024 * 1024
-STATUS_RUNNING = 'running'
-STATUS_IDLE = 'idle'
 
 
 class NoxDocker(object):
@@ -163,7 +160,7 @@ class NoxDocker(object):
             # 虚拟机名称，标题，顶层窗口句柄，工具栏窗口句柄，绑定窗口句柄，进程PID
             for s in ret.split('\r\n'):
                 if s.startswith('nox') or s.startswith('Nox'):
-                    status = STATUS_IDLE if s.split(',')[-1] == '-1' else STATUS_RUNNING
+                    status = STATUS_WAIT if s.split(',')[-1] == '-1' else STATUS_RUNNING
                     name = s.split(',')[1]
                     id = s.split(',')[0]
                     pid = s.split(',')[-1]
@@ -285,12 +282,12 @@ class NoxDocker(object):
         self.shake(3)
         self.set_docker_name()
         port = self.get_port()
-        self._manager.task_trace(
-            task_id='unkown', app_name=self._app_name, docker_name=self._docker_name, action='start'
-        )
-        self._manager.set_docker_info(
-            docker_name=self._docker_name, ip=self._ip, port=port, task_id='unkown', app_name=self._app_name
-        )
+        # self._manager.task_trace(
+        #     task_id='unkown', app_name=self._app_name, docker_name=self._docker_name, action='start'
+        # )
+        # self._manager.set_docker_info(
+        #     docker_name=self._docker_name, ip=self._ip, port=port, task_id='unkown', app_name=self._app_name
+        # )
         return True
 
     def on_error(self, retry_cnt=0):
@@ -307,10 +304,10 @@ class NoxDocker(object):
 
         return False
 
-    def run(self, force=False, retry_cnt=2, time_out=30):  # run = create and start
+    def build(self, force=False, retry_cnt=2, wait_time=30):  # run = create and start
         ret, msg = self.create(force)
         if ret:
-            ret = self.start(wait_time=time_out)
+            ret = self.start(wait_time=wait_time)
             if ret:  # start success
                 ret = self.on_success()
             else:
@@ -325,10 +322,10 @@ class NoxDocker(object):
         return ret
 
 
-def run(app_name, docker_name):
+def build(app_name, docker_name):
     docker = NoxDocker(app_name=app_name, docker_name=docker_name)
     docker._DEBUG = True
-    return docker.run(force=True, retry_cnt=2, time_out=30)
+    return docker.build(force=True, retry_cnt=2, wait_time=30)
     # docker.stop_all()
 
 
@@ -348,7 +345,7 @@ if __name__ == "__main__":
         # for docker_name in ['nox-31', 'nox-32', 'nox-33']:
         # for docker_name in ['nox-41', 'nox-42', 'nox-43']:
         # for docker_name in ['nox-11']:
-        if run('toutiao', docker_name):  # run = create and start
+        if build('toutiao', docker_name):  # run = create and start
             complete_cnt += 1
 
     print("start success:", str(complete_cnt))
