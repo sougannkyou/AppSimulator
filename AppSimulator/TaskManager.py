@@ -17,7 +17,7 @@ class TaskManager(object):
                 for server in servers:
                     ret = rpc_get_free_mem(server['ip'], server['port'])
                     if ret > 1.0:  # free memory > 1GB
-                        self._db.set_task_docker(taskId=task['taskId'], ip=server['ip'])
+                        self._db.set_task_server_ip(taskId=task['taskId'], ip=server['ip'])
                         break
             else:
                 time.sleep(1 * 60)

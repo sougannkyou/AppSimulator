@@ -19,6 +19,7 @@ STATUS_BUILD_NG = 'build_ng'
 STATUS_RUNNING = 'running'  # script running ...
 STATUS_RUN_OK = 'run_ok'
 STATUS_RUN_NG = 'run_ng'
+STATUS_SUSPEND = 'suspend'  # task interrupt
 
 SCOPE_TIMES = 1 * 60
 

@@ -10,13 +10,19 @@ MONGODB_SERVER_IP = os.environ["MONGODB_SERVER_IP"]  # "172.16.55.155"
 MONGODB_SERVER_PORT = int(os.environ["MONGODB_SERVER_PORT"])
 
 STATUS_RPC_TIMEOUT = 'rpc_timeout'
+
 STATUS_UNKOWN = 'unkown'
+
 STATUS_WAIT = 'wait'
-STATUS_BUILD = 'build'  # build a docker
+
+STATUS_BUILDING = 'building'  # docker building ...
+STATUS_BUILD_OK = 'build_ok'
+STATUS_BUILD_NG = 'build_ng'
+
 STATUS_RUNNING = 'running'  # docker build ok, run script
+STATUS_RUN_OK = 'run_ok'
+STATUS_RUN_NG = 'run_ng'
 STATUS_SUSPEND = 'suspend'  # task interrupt
-STATUS_SUCCESS = 'success'  # task run ok
-STATUS_FAILURE = 'failure'  # task run failed
 
 TASK_TYPE_ONCE = 'once'
 TASK_TYPE_NEVER = 'never'

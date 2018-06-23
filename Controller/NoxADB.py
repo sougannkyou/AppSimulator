@@ -11,7 +11,7 @@ except ImportError as e:
 ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
 
 
-class MyADB(object):
+class NoxADB(object):
     REBOOT_RECOVERY = 1
     REBOOT_BOOTLOADER = 2
 

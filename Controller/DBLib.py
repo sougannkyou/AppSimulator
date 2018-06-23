@@ -3,7 +3,7 @@ from pprint import pprint
 import time
 from datetime import datetime, timedelta
 import pymongo
-from Controllor.setting import *
+from Controller.setting import *
 
 
 # ------------------------ docker db lib ----------------------
@@ -15,7 +15,12 @@ class MongoDriver(object):
         self.deviceConfig = self._db.deviceConfig
         self.rpcServer = self._db.rpcServer
         self.tasks = self._db.tasks
-        self.tasksTrace = self._db.tasksTrace
+        self.dockers = self._db.dockers
+        self._DEBUG = False
+
+    def _log(self, prefix, msg):
+        if self._DEBUG:
+            print(prefix, msg)
 
     # def task_trace(self, task_id, app_name, docker_name, action):  # after docker start success
     #     self.tasksTrace.insert({
@@ -35,14 +40,40 @@ class MongoDriver(object):
     #         'app_name': app_name,
     #     })
 
-    def registor_rpc_server(self, controllor_info):
-        self.rpcServer.update({'ip': controllor_info['ip']}, {"$set": controllor_info}, upsert=True)
+    def rpc_registor_service(self, controller_info):
+        self.rpcServer.update({'ip': controller_info['ip']}, {"$set": controller_info}, upsert=True)
 
-    def get_one_wait_task(self):
-        return self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': LOCAL_IP})
+    def task_get_one_for_build(self):
+        if self.tasks.find({'status': STATUS_BUILDING, 'rpc_server_ip': LOCAL_IP}).count() > 0:
+            return None
+        else:
+            return self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': LOCAL_IP})
 
-    def change_task_status(self, task):
+    def task_get_my_prepare_tasks_cnt(self):
+        return self.tasks.find({'status': {'$in': [STATUS_WAIT, STATUS_BUILDING]}, 'rpc_server_ip': LOCAL_IP}).count()
+
+    def task_change_status(self, task):
+        self._log('change_task_status', task['status'])
         self.tasks.update({'_id': task['_id']}, {"$set": {'status': task['status']}})
+
+    def task_set_docker(self, task, docker):
+        self._log('bind_docker_to_task', task)
+        self.tasks.update({'_id': task['_id']}, {"$set": {'dockerId': docker['_id']}})
+
+    def docker_create(self, task):
+        id = self.dockers.insert({
+            'docker_name': 'nox-' + task['taskId'],
+            'ip': LOCAL_IP,
+            'port': 0,
+            'status': STATUS_BUILDING,
+            'start_time': int(datetime.now().timestamp()),
+            'end_time': 0
+        })
+        return id
+
+    def docker_change_status(self, docker):
+        self._log('change_task_status', docker['status'])
+        self.dockers.update({'_id': docker['_id']}, {"$set": {'status': docker['status']}})
 
     def update_device_statistics_info(self, info, scope_times):  # 时间窗式记录采集量
         print("update_device_statistics_info start", info)
@@ -57,14 +88,6 @@ class MongoDriver(object):
             self.deviceStatisticsInfo.insert(m)
             m.pop('_id')
 
-    def add_docker(self):
-        docker = {
-            "ip": "",
-            "port": "",
-            "name": "nox-" + str(taskId),
-            "start": 0,
-            "end": 0
-        }
 
 # ------------------------ docker db lib ----------------------
 if __name__ == '__main__':

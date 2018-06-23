@@ -81,7 +81,10 @@ class MongoDriver(object):
             "script": task['script'],
             "app_name": task['app_name'],
             "status": STATUS_WAIT,
-            "rpc_server_ip": ''
+            "rpc_server_ip": '',
+            "start_time": int(datetime.now().timestamp()),
+            "end_time": 0,
+            "dockerId": ''
         })
         return taskId
 
@@ -98,7 +101,7 @@ class MongoDriver(object):
 
         return ret
 
-    def set_task_docker(self, taskId, ip):
+    def set_task_server_ip(self, taskId, ip):
         self.tasks.update({'taskId': taskId}, {'$set': {'rpc_server_ip': ip}})
 
     def get_config_info(self, deviceId):
@@ -119,12 +122,8 @@ class MongoDriver(object):
             ret.append(r)
         return ret
 
-    def is_allow_build_docker(self, ip):
-        ret = self.tasks.find({'docker.ip': ip, 'status': STATUS_BUILD})
-        return True if ret is None else False
-
     def get_one_wait_task(self):
-        task = self.tasks.find_one({'status': STATUS_WAIT, 'docker.ip': '', 'docker.port': ''})
+        task = self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': ''})
         task.pop('_id')
         return task
 

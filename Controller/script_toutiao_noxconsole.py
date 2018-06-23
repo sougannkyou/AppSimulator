@@ -1,17 +1,8 @@
 # coding:utf-8
-import sys
-from pprint import pprint
 import time
-import datetime
+from datetime import datetime
 import multiprocessing
-import win32gui
-from PIL import ImageGrab
-import cv2
-import aircv as ac
-import pyautogui
-from Controllor.simulatorADB import Simulator
-from Controllor.NoxDocker import NoxDocker
-
+from Controller.SimulatorNoxConsole import Simulator
 
 ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
 
@@ -69,7 +60,7 @@ class MySimulator(Simulator):
         y = -1
         page_cnt = 0
         self.start_web(urls[0], 5)
-        self.next_page_browser(1)
+        self.next_page_browser(3)
         ret, x, y = self.find_element(comment='打开APP', timeout=5)
         if ret:
             ret = self.click_xy(x, y, timeout=2)
@@ -87,54 +78,56 @@ class MySimulator(Simulator):
 
         ret, x, y = self.find_element(comment='写评论', timeout=5)
         if ret: ret = self.click_xy(x, y, timeout=2)
-        if ret: ret = self.input_cn(comments[self._adb_idx], timeout=1)
+        if ret: ret = self.input_cn(comments[0], timeout=1)
         time.sleep(5)
         if ret: ret, x, y = self.find_element(comment='发布', timeout=5)
         if ret: ret = self.click_xy(x, y, timeout=1)
-        self.task_trace()
+        # self.task_trace()
 
 
 ##################################################################################
-def run(idx):
-    start = datetime.datetime.now()
-    print("[Script" + str(idx) + "] run start.", start)
+def run(docker_name):
+    start = datetime.now()
+    print("[Script " + docker_name + "] run start.", start)
     try:
-        mySimulator = MySimulator(adb_path=ADB_BINARY_PATH, app_name='toutiao')
-        mySimulator._PIC_PATH = {
+        my = MySimulator(docker_name=docker_name, app_name='toutiao')
+        my._PIC_PATH = {
             "打开APP": 'images/toutiao/jump2app.png',
             "写评论": 'images/toutiao/writeComment.png',
             "发布": 'images/toutiao/publish.png',
         }
-        mySimulator._DEBUG = True
-        mySimulator._adb._DEBUG = False
-        mySimulator.get_new_phone(1)
+        my._DEBUG = True
+        my._adb._DEBUG = False
+        # my.get_new_phone(1)
         # if not ret: self.send2web('images/offline.jpeg')
-        mySimulator.set_gps(39.984727, 116.310050)  # 中关村
-        mySimulator.run(is_app_restart=False)
+        my.set_gps(39.984727, 116.310050)  # 中关村
+        my.run(is_app_restart=False)
 
-        end = datetime.datetime.now()
-        print("[Script] run success. ", (end - start).seconds, "s")
+        end = datetime.now()
+        print("[Script " + docker_name + "] run success. ", (end - start).seconds, "s")
         return True
     except Exception as e:
-        end = datetime.datetime.now()
-        print("[Script" + str(idx) + "] ERROR:", (end - start).seconds, e)
+        end = datetime.now()
+        print("[Script " + docker_name + "] ERROR:", (end - start).seconds, e)
         return False
 
 
 #################################################################################
 if __name__ == "__main__":
     # tasks_cnt = int(sys.argv[1])
+    docker_name = 'nox-99'
     tasks_cnt = 1
+
     # for i in range(1, 1 + tasks_cnt):
-    #     docker = NoxDocker(app_name='dianping', docker_name='nox-' + str(i))
-    #     print('launch_emulator nox-' + str(i))
-    #     docker.launch_emulator('nox-' + str(i), force=True)
+    #     docker = NoxDocker(app_name='toutiao', docker_name=docker_name)
+    #     docker.run(force=True)
     #
+    # print('please wait 30s ...')
     # time.sleep(30)
 
     pool = multiprocessing.Pool(processes=4)
     for idx in range(tasks_cnt):
-        pool.apply_async(run, (idx,))
+        pool.apply_async(run, (docker_name,))
     pool.close()
     pool.join()
     print("process done.")

@@ -65,9 +65,6 @@ def run(idx):
         return False
 
 
-# run()
-
-
 if __name__ == "__main__":
     pool = multiprocessing.Pool(processes=4)
     for idx in range(2):

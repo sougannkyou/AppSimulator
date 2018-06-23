@@ -1,5 +1,4 @@
 # coding:utf-8
-import sys
 import re
 import random
 import subprocess
@@ -8,7 +7,7 @@ import subprocess
 CONSOLE_BINARY_PATH = 'C:\\Nox\\bin\\NoxConsole.exe'
 
 
-class MyNoxConsole(object):
+class NoxConADB(object):
     REBOOT_RECOVERY = 1
     REBOOT_BOOTLOADER = 2
 

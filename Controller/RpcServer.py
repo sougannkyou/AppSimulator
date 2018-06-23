@@ -6,8 +6,8 @@ import win32gui
 from PIL import ImageGrab
 import shutil
 from xmlrpc.server import SimpleXMLRPCServer
-from Controllor.setting import *
-from Controllor.DBLib import MongoDriver
+from Controller.setting import *
+from Controller.DBLib import MongoDriver
 
 MDB = MongoDriver()
 
@@ -88,7 +88,9 @@ def setDeviceGPS(deviceId, latitude, longitude):
 
 def get_free_mem():
     mem = psutil.virtual_memory()
-    ret = '%.1f' % (mem.free / GB)
+    # STATUS_WAIT or STATUS_BUILDING
+    mem_free = MDB.get_my_prepare_tasks_cnt() * GB + mem.free
+    ret = '%.1f' % (mem_free / GB)
     return ret
 
 
@@ -97,12 +99,12 @@ def _clean():
     time.sleep(10)
 
 
-def _backup_app():
+def _backup_app_list():
     l = []
     for root, dirs, files in os.walk('C:\\Nox\\backup'):
         for file in files:
             if os.path.splitext(file)[1] == '.npbk':
-                p = os.path.splitext(file)[0]
+                p = os.path.splitext(file)[0]  # nox-dianping.npbk
                 l.append(p[4:])
 
     return l
@@ -113,7 +115,7 @@ def _registor():
     MDB.registor_rpc_server({
         'ip': os.getenv('APPSIMULATOR_IP'),
         'port': RPC_PORT,
-        'app_name': _backup_app(),
+        'app_name': _backup_app_list(),
         'mem_free': '%.1f' % (mem.free / GB),
         'mem_total': '%.1f' % (mem.total / GB),
     })

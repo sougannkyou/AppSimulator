@@ -1,17 +1,8 @@
 # coding:utf-8
-try:
-    import sys
-    from pprint import pprint
-    import time
-    import datetime
-    import multiprocessing
-    from Controllor.SimulatorNoxConsole import Simulator
-    from Controllor.NoxDocker import NoxDocker
-except ImportError as e:
-    print("[Script] ERROR:", e.args[0])
-    sys.exit(-1)
-
-ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
+import time
+from datetime import datetime
+from Controller.NoxConSelenium import NoxConSelenium
+from Controller.NoxConDocker import NoxConDocker
 
 urls = [
     "http://www.dianping.com/shop/24981944",  # 936
@@ -34,7 +25,7 @@ keywords = [
 ]
 
 
-class MySimulator(Simulator):
+class MySelenium(NoxConSelenium):
     def script(self):
         ret = True
         x = -1
@@ -92,11 +83,11 @@ class MySimulator(Simulator):
 
 ##################################################################################
 def run(docker_name):
-    start = datetime.datetime.now()
+    start = datetime.now()
     print("[Script " + docker_name + "] run start.", start)
     try:
-        mySimulator = MySimulator(docker_name=docker_name, app_name='dianping')
-        mySimulator._PIC_PATH = {
+        me = MySelenium(docker_name=docker_name, app_name='dianping')
+        me._PIC_PATH = {
             # "web打开APP": 'images/dianping/webOpenApp.png',
             "APP打开结果OK": 'images/dianping/search_ready.png',
             "APP图标": 'images/dianping/app_icon.png',
@@ -108,17 +99,17 @@ def run(docker_name):
             "复制链接": 'images/dianping/copy_link.png',
             "打分": 'images/dianping/dafen.png',
         }
-        mySimulator._DEBUG = True
-        mySimulator._adb._DEBUG = True
+        me._DEBUG = True
+        me._adb._DEBUG = True
         # if not ret: self.send2web('images/offline.jpeg')
-        mySimulator.set_gps(39.984727, 116.310050)  # 中关村
-        mySimulator.run(is_app_restart=False)
+        me.set_gps(39.984727, 116.310050)  # 中关村
+        me.run(is_app_restart=False)
 
-        end = datetime.datetime.now()
+        end = datetime.now()
         print("[Script " + docker_name + "] run success. ", (end - start).seconds, "s")
         return True
     except Exception as e:
-        end = datetime.datetime.now()
+        end = datetime.now()
         print("[Script " + docker_name + "] ERROR:", (end - start).seconds, e)
         return False
 
@@ -127,9 +118,9 @@ def run(docker_name):
 if __name__ == "__main__":
     # tasks_cnt = int(sys.argv[1])
     tasks_cnt = 1
-    docker = NoxDocker('toutiao', 'nox-99')
+    docker = NoxConDocker('toutiao', 'nox-99')
     for i in range(1, 1 + tasks_cnt):
-        docker.run(force=True)
+        docker.build(force=True)
 
     time.sleep(10)
 

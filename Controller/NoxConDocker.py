@@ -6,11 +6,11 @@ import win32gui
 import subprocess
 import aircv as ac
 from PIL import ImageGrab
-from Controllor.setting import *
-from Controllor.TaskManager import TaskManager
+from Controller.setting import *
+from Controller.TaskManager import TaskManager
 
 
-class NoxDocker(object):
+class NoxConDocker(object):
     def __init__(self, app_name, docker_name):
         self._manager = TaskManager()
         self.DOCKERS_MAX_CNT = 10
@@ -21,8 +21,8 @@ class NoxDocker(object):
         self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
 
         self._PIC_PATH = {
-            "APP图标": self._work_path + '\\Controllor\\images\\' + self._app_name + '\\app_icon.png',
-            "很抱歉": self._work_path + '\\Controllor\\images\\im_sorry.png',
+            "APP图标": self._work_path + '\\Controller\\images\\' + self._app_name + '\\app_icon.png',
+            "很抱歉": self._work_path + '\\Controller\\images\\im_sorry.png',
         }
 
         os.chdir('c:\\Nox\\bin')  # 防止 BignoxVMS 写入py本地
@@ -243,9 +243,9 @@ class NoxDocker(object):
             left, top, right, bottom = win32gui.GetWindowRect(hwnd)
             app_bg_box = (left, top, right, bottom)
             im = ImageGrab.grab(app_bg_box)
-            im.save(self._work_path + '\\Controllor\\images\\start.png')
+            im.save(self._work_path + '\\Controller\\images\\start.png')
 
-            img_capture = ac.imread(self._work_path + '\\Controllor\\images\\start.png')
+            img_capture = ac.imread(self._work_path + '\\Controller\\images\\start.png')
             img_obj = ac.imread(self._PIC_PATH[comment])
             pos = ac.find_template(img_capture, img_obj)
             if pos and pos['confidence'] > 0.9:
@@ -323,7 +323,7 @@ class NoxDocker(object):
 
 
 def build(app_name, docker_name):
-    docker = NoxDocker(app_name=app_name, docker_name=docker_name)
+    docker = NoxConDocker(app_name=app_name, docker_name=docker_name)
     docker._DEBUG = True
     return docker.build(force=True, retry_cnt=2, wait_time=30)
     # docker.stop_all()
