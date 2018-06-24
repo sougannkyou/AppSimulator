@@ -8,13 +8,13 @@ from PIL import ImageGrab
 import cv2
 import aircv as ac
 import ftplib
-from Controller.TaskManager import TaskManager
+from Controller.ControllerManager import Manager
 from Controller.NoxConADB import NoxConADB
 
 
 class NoxConSelenium(object):
     def __init__(self, docker_name, app_name):
-        self._manager = TaskManager()
+        self._manager = Manager()
         self._DEBUG = False
         self._FTP_TRANSMISSION = False
         self._PIC_PATH = {}
@@ -33,7 +33,7 @@ class NoxConSelenium(object):
     def task_trace(self, task_id, app_name, action):
         self._manager.task_trace(task_id, app_name, self._docker_name, action)
 
-    def start_web(self, url, timeout):
+    def get(self, url, timeout):
         self._adb.start_web(url)
         time.sleep(timeout)
         return True

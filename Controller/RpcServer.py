@@ -9,10 +9,16 @@ from xmlrpc.server import SimpleXMLRPCServer
 from Controller.setting import *
 from Controller.DBLib import MongoDriver
 
+_DEBUG = True
 MDB = MongoDriver()
 
 
 # ------------------------ docker rpc server ----------------------
+def _log(prefix, msg):
+    if _DEBUG:
+        print('[RpcServer]', prefix, msg)
+
+
 def getRpcServerStatus():
     return "running"
 
@@ -87,10 +93,12 @@ def setDeviceGPS(deviceId, latitude, longitude):
 
 
 def get_free_mem():
+    _log('get_free_mem', 'start')
     mem = psutil.virtual_memory()
     # STATUS_WAIT or STATUS_BUILDING
-    mem_free = MDB.get_my_prepare_tasks_cnt() * GB + mem.free
+    mem_free = MDB.task_get_my_prepare_tasks_cnt() * GB + mem.free
     ret = '%.1f' % (mem_free / GB)
+    _log('get_free_mem', 'end:' + ret)
     return ret
 
 
@@ -111,14 +119,17 @@ def _backup_app_list():
 
 
 def _registor():
+    _log('_registor', 'start')
     mem = psutil.virtual_memory()
-    MDB.registor_rpc_server({
+    info = {
         'ip': os.getenv('APPSIMULATOR_IP'),
         'port': RPC_PORT,
         'app_name': _backup_app_list(),
         'mem_free': '%.1f' % (mem.free / GB),
         'mem_total': '%.1f' % (mem.total / GB),
-    })
+    }
+    MDB.rpc_registor_service(info)
+    _log('_registor', 'end')
     return
 
 
@@ -134,9 +145,9 @@ def start_rpc_server():
     server.register_function(simulatorStatus, "simulatorStatus")
     server.register_function(get_free_mem, "get_free_mem")
     _registor()
-    print("[rpc_server] start ...")
+    _log("start", "...")
     server.serve_forever()  # never stop
-    print("[rpc_server] done.")
+    _log("end", "")
 
 
 ######################################################################

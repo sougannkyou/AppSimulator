@@ -31,7 +31,7 @@ class MySelenium(NoxConSelenium):
         x = -1
         y = -1
         page_cnt = 0
-        self.start_web(urls[self._adb_idx], 3)
+        # self.get(urls[0], 3)
         # ret, x, y = self.find_element(comment='web打开APP', timeout=10)
         # if ret: ret = self.click_xy(x, y, timeout=2)
         if ret: ret, x, y = self.find_element(comment='APP图标', timeout=10)
@@ -39,7 +39,7 @@ class MySelenium(NoxConSelenium):
         if ret: ret, x, y = self.find_element(comment='附近热搜', timeout=5)
         if ret: ret = self.click_xy(x, y, timeout=1)
         time.sleep(3)
-        if ret: ret = self.input_cn(keywords[self._adb_idx], timeout=1)
+        if ret: ret = self.input_cn(keywords[0], timeout=1)
         time.sleep(5)
         if ret: ret, x, y = self.find_element(comment='搜索', timeout=5)
         if ret: ret = self.click_xy(x, y + 30, timeout=1)

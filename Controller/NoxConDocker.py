@@ -7,12 +7,10 @@ import subprocess
 import aircv as ac
 from PIL import ImageGrab
 from Controller.setting import *
-from Controller.TaskManager import TaskManager
 
 
 class NoxConDocker(object):
     def __init__(self, app_name, docker_name):
-        self._manager = TaskManager()
         self.DOCKERS_MAX_CNT = 10
         self._DEBUG = True
         self._ip = os.getenv('APPSIMULATOR_IP')
@@ -54,7 +52,7 @@ class NoxConDocker(object):
             self._log('_check', msg)
             return False, msg
         else:
-            self._log('_check', 'memory: %.2f' % (mem.free / GB) + 'GB')
+            self._log('_check', 'memory: %.1f' % (mem.free / GB) + ' GB')
 
         if not os.access('c:\\Nox\\backup\\nox-' + self._app_name + '.npbk', os.R_OK):
             msg = '未找到 nox-' + self._app_name + '.npbk'
@@ -84,7 +82,7 @@ class NoxConDocker(object):
         _stdout = ''
         _stderr = ''
         try:
-            self._log('_exec_nox_cmd', cmdline)
+            self._log('cmdline:', cmdline)
             time.sleep(1)
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             # process.wait()
@@ -92,11 +90,11 @@ class NoxConDocker(object):
             _stdout = stdout.decode('utf8')
             _stderr = stderr.decode('utf8')
         except Exception as e:
-            self._log('_exec_nox_cmd exception:', e)
+            self._log('exception:', e)
 
-        self._log('_exec_nox_cmd stdout:\n', _stdout)
+        self._log('stdout:\n', _stdout)
         if _stderr:
-            self._log('_exec_nox_cmd stderr:\n', _stderr)
+            self._log('stderr:\n', _stderr)
             return ''
         else:
             time.sleep(1)
@@ -238,10 +236,12 @@ class NoxConDocker(object):
 
     def find_element(self, hwnd, comment, timeout):
         self._log('find_element', '尝试在 ' + str(timeout) + 's内匹配: ' + comment)
-        win32gui.SetForegroundWindow(hwnd)
+        time.sleep(3)
         while timeout > 0:
+            win32gui.SetForegroundWindow(hwnd)
             left, top, right, bottom = win32gui.GetWindowRect(hwnd)
             app_bg_box = (left, top, right, bottom)
+
             im = ImageGrab.grab(app_bg_box)
             im.save(self._work_path + '\\Controller\\images\\start.png')
 
@@ -254,7 +254,7 @@ class NoxConDocker(object):
             else:
                 time.sleep(1)
                 timeout = timeout - 1
-                self._log('find_element', '未匹配到:' + comment + ',重试剩余: ' + str(timeout) + 's')
+                self._log('find_element', '未匹配到:' + comment + ', 重试剩余: ' + str(timeout) + 's')
 
         return False
 
@@ -282,12 +282,6 @@ class NoxConDocker(object):
         self.shake(3)
         self.set_docker_name()
         port = self.get_port()
-        # self._manager.task_trace(
-        #     task_id='unkown', app_name=self._app_name, docker_name=self._docker_name, action='start'
-        # )
-        # self._manager.set_docker_info(
-        #     docker_name=self._docker_name, ip=self._ip, port=port, task_id='unkown', app_name=self._app_name
-        # )
         return True
 
     def on_error(self, retry_cnt=0):

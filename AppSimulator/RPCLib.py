@@ -4,10 +4,11 @@ from AppSimulator.setting import *
 
 _DEBUG = True
 
+
 # ------------------------ server rpc lib ----------------------
 def _log(prefix, msg):
     if _DEBUG:
-        print(prefix, msg)
+        print('[web server rpc]', prefix, msg)
 
 
 def _rpc_server(ip, port):

@@ -91,7 +91,7 @@ class MySimulator(Simulator):
 
 
 ##################################################################################
-def run(idx):
+def main(idx):
     start = datetime.datetime.now()
     print("[Script" + str(idx) + "] run start.", start)
     try:

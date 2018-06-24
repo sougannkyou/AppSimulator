@@ -65,6 +65,11 @@ class MongoDriver(object):
         self.deviceConfig = self._db.deviceConfig
         self.rpcServer = self._db.rpcServer
         self.tasks = self._db.tasks
+        self._DEBUG = False
+
+    def _log(self, prefix, msg):
+        if self._DEBUG:
+            print('[Server DB]', prefix, msg)
 
     def get_task_id(self):
         taskId = 1
@@ -124,7 +129,10 @@ class MongoDriver(object):
 
     def get_one_wait_task(self):
         task = self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': ''})
-        task.pop('_id')
+        if task:
+            task.pop('_id')
+
+        self._log('get_one_wait_task', task)
         return task
 
     def update_device_statistics_info(self, info, scope_times):  # 时间窗式记录采集量

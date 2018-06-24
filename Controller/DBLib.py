@@ -20,7 +20,7 @@ class MongoDriver(object):
 
     def _log(self, prefix, msg):
         if self._DEBUG:
-            print(prefix, msg)
+            print('[Controller DB]', prefix, msg)
 
     # def task_trace(self, task_id, app_name, docker_name, action):  # after docker start success
     #     self.tasksTrace.insert({
@@ -57,12 +57,12 @@ class MongoDriver(object):
         self.tasks.update({'_id': task['_id']}, {"$set": {'status': task['status']}})
 
     def task_set_docker(self, task, docker):
-        self._log('bind_docker_to_task', task)
+        self._log('task_set_docker', task)
         self.tasks.update({'_id': task['_id']}, {"$set": {'dockerId': docker['_id']}})
 
     def docker_create(self, task):
         id = self.dockers.insert({
-            'docker_name': 'nox-' + task['taskId'],
+            'docker_name': 'nox-' + str(task['taskId']),
             'ip': LOCAL_IP,
             'port': 0,
             'status': STATUS_BUILDING,

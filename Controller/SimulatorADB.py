@@ -1,24 +1,20 @@
 # coding:utf-8
-try:
-    import os
-    import sys
-    import random
-    import time
-    from pprint import pprint
-    from PIL import ImageGrab
-    import cv2
-    import aircv as ac
-    import ftplib
-    from Controller.TaskManager import TaskManager
-    from Controller.MyADB import MyADB
-except ImportError as e:
-    print("[Simulator] ERROR:", e.args[0])
-    sys.exit(-1)
+import os
+import sys
+import random
+import time
+from pprint import pprint
+from PIL import ImageGrab
+import cv2
+import aircv as ac
+import ftplib
+from Controller.ControllerManager import Manager
+from Controller.NoxADB import NoxADB
 
 
 class Simulator(object):
     def __init__(self, adb_path, app_name):
-        self._manager = TaskManager()
+        self._manager = Manager()
         self._DEBUG = False
         self._FTP_TRANSMISSION = False
         self._PIC_PATH = {}
@@ -26,7 +22,7 @@ class Simulator(object):
         self._docker_name = None
         self._app_name = app_name
         self._ip = os.getenv('APPSIMULATOR_IP')
-        self._adb = MyADB(adb_binary_path=adb_path)
+        self._adb = NoxADB(adb_binary_path=adb_path)
         self._adb_port = None
 
         self._adb.wait_for_device()

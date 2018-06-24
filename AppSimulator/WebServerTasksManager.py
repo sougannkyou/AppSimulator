@@ -5,7 +5,7 @@ from AppSimulator.DBLib import MongoDriver
 
 
 # ------------------------ web server task manager ----------------------
-class TaskManager(object):
+class Manager(object):
     def __init__(self):
         self._db = MongoDriver()
 
@@ -21,3 +21,8 @@ class TaskManager(object):
                         break
             else:
                 time.sleep(1 * 60)
+
+
+if __name__ == "__main__":
+    manager = Manager()
+    manager.start_tasks()

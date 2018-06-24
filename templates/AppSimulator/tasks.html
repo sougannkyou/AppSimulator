@@ -37,7 +37,7 @@
                             <td><input type="text" v-model="task.taskId" placeholder="等待分配" readonly></td>
                             <td><input type="text" v-model="task.ip" placeholder="等待分配" readonly></td>
                             <td><input type="text" v-model="task.port" placeholder="等待分配" readonly></td>
-                            <td><input type="text" v-model="task.script" placeholder="code" readonly></td>
+                            <td><input type="text" v-model="task.script" placeholder="script"></td>
                             <td>
                                 <label v-for="app in appAll">
                                     <img v-bind:class="[task.app_name===app?'app-icon-big':'app-icon']"
