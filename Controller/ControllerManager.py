@@ -3,8 +3,6 @@ import time
 import subprocess
 import importlib
 import importlib.util
-import aircv as ac
-from PIL import ImageGrab
 import win32gui
 from Controller.setting import *
 from Controller.DBLib import MongoDriver
