@@ -64,7 +64,7 @@ class NoxADB(object):
         return True
 
     def _log(self, prefix, msg):
-        if self._DEBUG:
+        if self._DEBUG or prefix.find('error') > 0:
             print(prefix, msg)
 
     def get_android_version(self):

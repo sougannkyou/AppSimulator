@@ -1,11 +1,11 @@
-import importlib
-
-try:
-    module = importlib.import_module('Controller.1')
-    module.main('xxxx')
-    print('ok')
-except Exception as e:
-    print(e)
+# import importlib
+#
+# try:
+#     module = importlib.import_module('Controller.1')
+#     module.main('xxxx')
+#     print('ok')
+# except Exception as e:
+#     print(e)
 
 # import importlib.util
 #
@@ -16,3 +16,4 @@ except Exception as e:
 #     module_spec.loader.exec_module(module)
 # else:
 #     print('not found.')
+

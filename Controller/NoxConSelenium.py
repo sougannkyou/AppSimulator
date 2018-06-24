@@ -1,10 +1,6 @@
 # coding:utf-8
 import os
-import sys
-import random
 import time
-from pprint import pprint
-from PIL import ImageGrab
 import cv2
 import aircv as ac
 import ftplib
@@ -13,11 +9,11 @@ from Controller.NoxConADB import NoxConADB
 
 
 class NoxConSelenium(object):
-    def __init__(self, docker_name, app_name):
+    def __init__(self, app_name, docker_name):
         self._manager = Manager()
         self._DEBUG = False
         self._FTP_TRANSMISSION = False
-        self._PIC_PATH = {}
+        self._PIC_PATH = {}  # overwrite
         self._img_capture = None
         self._docker_name = docker_name
         self._app_name = app_name
@@ -27,13 +23,18 @@ class NoxConSelenium(object):
         # self._manager.set_docker_info(docker_name=self._docker_name, port=devices[idx])
 
     def _log(self, prefix, msg):
-        if self._DEBUG:
-            print('[Simulator ' + self._docker_name + ']', prefix, msg)
+        if self._DEBUG or prefix.find('error') > 0:
+            print('[NoxConSelenium ' + self._docker_name + ']', prefix, msg)
 
-    def task_trace(self, task_id, app_name, action):
-        self._manager.task_trace(task_id, app_name, self._docker_name, action)
+    def pre_check(self):
+        ver = self._adb.get_adb_version()
+        self._log('check adb connection ok:', ver)
+        return True if ver else False
 
     def get(self, url, timeout):
+        '''
+        start android web browser
+        '''
         self._adb.start_web(url)
         time.sleep(timeout)
         return True

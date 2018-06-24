@@ -86,7 +86,7 @@ def run(docker_name):
     start = datetime.now()
     print("[Script " + docker_name + "] run start.", start)
     try:
-        me = MySelenium(docker_name=docker_name, app_name='dianping')
+        me = MySelenium(app_name='dianping', docker_name=docker_name)
         me._PIC_PATH = {
             # "web打开APP": 'images/dianping/webOpenApp.png',
             "APP打开结果OK": 'images/dianping/search_ready.png',

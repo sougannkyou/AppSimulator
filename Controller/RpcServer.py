@@ -15,7 +15,7 @@ MDB = MongoDriver()
 
 # ------------------------ docker rpc server ----------------------
 def _log(prefix, msg):
-    if _DEBUG:
+    if _DEBUG or prefix.find('error') > 0:
         print('[RpcServer]', prefix, msg)
 
 

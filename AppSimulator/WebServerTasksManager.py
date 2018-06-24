@@ -8,6 +8,11 @@ from AppSimulator.DBLib import MongoDriver
 class Manager(object):
     def __init__(self):
         self._db = MongoDriver()
+        self._DEBUG = False
+
+    def _log(self, prefix, msg):
+        if self._DEBUG or prefix.find('error') > 0:
+            print(prefix, msg)
 
     def start_tasks(self):
         while True:

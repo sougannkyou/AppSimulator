@@ -1,6 +1,5 @@
 # coding=utf-8
 from pprint import pprint
-import time
 from datetime import datetime, timedelta
 import pymongo
 from Controller.setting import *
@@ -19,7 +18,7 @@ class MongoDriver(object):
         self._DEBUG = False
 
     def _log(self, prefix, msg):
-        if self._DEBUG:
+        if self._DEBUG or prefix.find('error') > 0:
             print('[Controller DB]', prefix, msg)
 
     # def task_trace(self, task_id, app_name, docker_name, action):  # after docker start success
@@ -43,14 +42,14 @@ class MongoDriver(object):
     def rpc_registor_service(self, controller_info):
         self.rpcServer.update({'ip': controller_info['ip']}, {"$set": controller_info}, upsert=True)
 
-    def task_get_one_for_build(self):
-        if self.tasks.find({'status': STATUS_BUILDING, 'rpc_server_ip': LOCAL_IP}).count() > 0:
+    def task_get_one_for_run(self):
+        if self.tasks.find({'status': STATUS_DOCKER_RUNNING, 'rpc_server_ip': LOCAL_IP}).count() > 0:
             return None
         else:
             return self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': LOCAL_IP})
 
     def task_get_my_prepare_tasks_cnt(self):
-        return self.tasks.find({'status': {'$in': [STATUS_WAIT, STATUS_BUILDING]}, 'rpc_server_ip': LOCAL_IP}).count()
+        return self.tasks.find({'status': {'$in': [STATUS_WAIT, STATUS_DOCKER_RUNNING]}, 'rpc_server_ip': LOCAL_IP}).count()
 
     def task_change_status(self, task):
         self._log('change_task_status', task['status'])
@@ -65,7 +64,7 @@ class MongoDriver(object):
             'docker_name': 'nox-' + str(task['taskId']),
             'ip': LOCAL_IP,
             'port': 0,
-            'status': STATUS_BUILDING,
+            'status': STATUS_DOCKER_RUNNING,
             'start_time': int(datetime.now().timestamp()),
             'end_time': 0
         })

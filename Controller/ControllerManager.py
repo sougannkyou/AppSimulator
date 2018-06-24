@@ -3,9 +3,13 @@ import time
 import subprocess
 import importlib
 import importlib.util
+import aircv as ac
+from PIL import ImageGrab
+import win32gui
 from Controller.setting import *
-from Controller.NoxConDocker import NoxConDocker
 from Controller.DBLib import MongoDriver
+from Controller.NoxConDocker import NoxConDocker
+from Controller.NoxConSelenium import NoxConSelenium
 
 
 # ------------------------ docker task manager ----------------------
@@ -14,10 +18,17 @@ class Manager(object):
         self.db = MongoDriver()
         self.db._DEBUG = True
         self._DEBUG = False
+        self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
 
     def _log(self, prefix, msg):
-        if self._DEBUG:
-            print(prefix, msg)
+        if self._DEBUG or prefix.find('error') > 0:
+            print('[Docker Manager]', prefix, msg)
+
+    def _check(self):
+        if not self._work_path:
+            msg = '请设置: APPSIMULATOR_WORK_PATH'
+            self._log('_check error', msg)
+            return False, msg
 
     def run_task(self, task):
         _stdout = ''
@@ -56,27 +67,127 @@ class Manager(object):
             self._log('run_script error:', e)
             return False
 
+    def _find_element(self, hwnd, comment, timeout):
+        self._PIC_PATH = {
+            "APP图标": self._work_path + '\\Controller\\images\\' + self._app_name + '\\app_icon.png',
+            "很抱歉": self._work_path + '\\Controller\\images\\im_sorry.png',
+        }
+
+        self._log('find_element', '尝试在 ' + str(timeout) + 's内匹配: ' + comment)
+        time.sleep(3)
+        while timeout > 0:
+            win32gui.SetForegroundWindow(hwnd)
+            left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+            app_bg_box = (left, top, right, bottom)
+
+            im = ImageGrab.grab(app_bg_box)
+            im.save(self._work_path + '\\Controller\\images\\start.png')
+
+            img_capture = ac.imread(self._work_path + '\\Controller\\images\\start.png')
+            img_obj = ac.imread(self._PIC_PATH[comment])
+            pos = ac.find_template(img_capture, img_obj)
+            if pos and pos['confidence'] > 0.9:
+                self._log('find_element', '已匹配到:' + comment + ' ' + str(timeout) + 's')
+                return True
+            else:
+                time.sleep(1)
+                timeout = timeout - 1
+                self._log('find_element', '未匹配到:' + comment + ', 重试剩余: ' + str(timeout) + 's')
+
+        return False
+
+    def on_success(self, docker):
+        time.sleep(10)
+        docker.shake(3)
+        docker.set_docker_name()
+        # port = docker.get_port()
+        return True
+
+    def on_error(self, docker, retry_cnt=0):
+        while retry_cnt > 0:
+            ret, msg = docker.create(force=True)
+            if ret:
+                ret = docker.start(wait_time=30)
+                if ret:  # start success
+                    return True
+            else:
+                retry_cnt -= 1
+        else:
+            docker.stop()
+            self.check_docker_stop(docker, retry=True, wait_time=30)
+
+        return False
+
+    def check_docker_run(self, app_name, docker_name, wait_time=30):
+        driver = NoxConSelenium(app_name=app_name, docker_name=docker_name)
+        # driver._DEBUG = True
+        driver._PIC_PATH = {
+            "APP图标": self._work_path + '\\Controller\\images\\' + app_name + '\\app_icon.png',
+            "很抱歉": self._work_path + '\\Controller\\images\\im_sorry.png',
+        }
+
+        while wait_time > 0:
+            ret = driver.pre_check()
+            if ret:
+                self._log('start', docker_name + ' ok.')
+                ret = driver.find_element(comment='很抱歉', timeout=30)  # 匹配“很抱歉”字样
+                if ret:
+                    return False
+                else:
+                    return driver.find_element(comment='APP图标', timeout=30)  # 可匹配到app图标
+
+            else:  # hwnd is 0 if not found
+                time.sleep(1)
+                wait_time -= 1
+                self._log('start', '等待 ' + docker_name + ' 窗口创建，剩余：' + str(wait_time) + 's')
+
+    def check_docker_stop(self, docker, retry=False, wait_time=30):
+        while wait_time > 0:
+            hwnd = win32gui.FindWindow(None, docker.get_name())
+            if hwnd:  # hwnd is 0 if not found
+                time.sleep(1)
+                self._log('stop', '正在等待 ' + docker.get_name() + ' 停止，剩余：' + str(wait_time) + 's')
+                wait_time -= 1
+            else:  # not found the window
+                break
+
+        if retry and wait_time == 0:  # retry
+            docker.stop()
+
+        time.sleep(10)
+        # self._cmd_kill_task(self._docker_name)  # 不能强杀，会造成 ERR：1037
+        return True
+
     def start_tasks(self):
         # building -> build_ok(ng) -> running -> run_ok(ng)
         while True:
-            task = self.db.task_get_one_for_build()
+            task = self.db.task_get_one_for_run()
             if task:
-                task['status'] = STATUS_BUILDING
+                docker_name = 'nox-' + str(task['taskId'])
+                app_name = task['app_name']
+
+                task['status'] = STATUS_DOCKER_RUNNING
                 self.db.task_change_status(task)
 
-                d = NoxConDocker(task['app_name'], 'nox-' + str(task['taskId']))
-                ret = d.build(force=True, retry_cnt=2, wait_time=30)
-                status = STATUS_BUILD_OK if ret else STATUS_BUILD_NG
+                docker = NoxConDocker(app_name=task['app_name'], docker_name=docker_name)
+                docker.run(force=True)  # docker run: create and start
+                ret = self.check_docker_run(docker_name, app_name, wait_time=30)
+                if ret:
+                    ret = self.on_success(docker=docker)
+                else:
+                    ret = self.on_error(docker=docker, retry_cnt=2)
 
-                docker = {'_id': self.db.docker_create(task), 'status': status}
-                self.db.docker_change_status(docker)
+                status = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
+
+                docker_info = {'_id': self.db.docker_create(task), 'status': status}
+                self.db.docker_change_status(docker_info)
 
                 task['status'] = status
                 self.db.task_change_status(task)
                 if ret:
-                    self.db.task_set_docker(task, docker)  # bind docker to task
+                    self.db.task_set_docker(task, docker_info)  # bind docker to task
                     ret = self.run_script(task)
-                    task['status'] = STATUS_RUN_OK if ret else STATUS_RUN_NG
+                    task['status'] = STATUS_SCRIPT_RUN_OK if ret else STATUS_SCRIPT_RUN_NG
                     self.db.task_change_status(task)
 
                 # break
@@ -86,4 +197,5 @@ class Manager(object):
 
 if __name__ == '__main__':
     manager = Manager()
+    manager._DEBUG = True
     manager.start_tasks()

@@ -3,7 +3,6 @@ import re
 import random
 import subprocess
 
-
 CONSOLE_BINARY_PATH = 'C:\\Nox\\bin\\NoxConsole.exe'
 
 
@@ -22,6 +21,10 @@ class NoxConADB(object):
         self.__target = None
         self._console_binary = CONSOLE_BINARY_PATH
         self._docker_name = docker_name
+
+    def _log(self, prefix, msg):
+        if self._DEBUG or prefix.find('error') > 0:
+            print('[NoxConADB]', prefix, msg)
 
     def __clean__(self):
         self._stdout = None
@@ -57,10 +60,6 @@ class NoxConADB(object):
         self.adb_shell("setprop persist.nox.modem.phonumber " + phone_number)
         # "adb shell setprop persist.nox.modem.serial 89860000000000000000"
         return True
-
-    def _log(self, prefix, msg):
-        if self._DEBUG:
-            print(prefix, msg)
 
     def get_android_version(self):
         self.__clean__()
@@ -101,15 +100,14 @@ class NoxConADB(object):
         self.__clean__()
         try:
             cmdline = self._make_command(cmd)
-            if self._DEBUG:
-                self._log('[adb_cmd]', cmdline)
+            self._log('[adb_cmd]', cmdline)
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()
             (stdout, stderr) = process.communicate()
-            self._stdout = stdout.decode('utf8').replace('\r','').replace('\n','')
-            self._stderr = stderr.decode('utf8').replace('\r','').replace('\n','')
+            self._stdout = stdout.decode('utf8').replace('\r', '').replace('\n', '')
+            self._stderr = stderr.decode('utf8').replace('\r', '').replace('\n', '')
         except Exception as e:
-            self._log('[adb_cmd] err:', e)
+            self._log('[adb_cmd] error:', e)
 
         return
 
@@ -123,7 +121,7 @@ class NoxConADB(object):
         try:
             ret = self._stdout.split()[-1:][0]
         except Exception as e:
-            self._log('[get_version] err:', e)
+            self._log('get_adb_version err:', e)
             ret = None
         return ret
 

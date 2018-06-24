@@ -12,14 +12,14 @@ STATUS_UNKOWN = 'unkown'
 
 STATUS_WAIT = 'wait'  # wait
 
-STATUS_BUILDING = 'building'  # docker building ...
-STATUS_BUILD_OK = 'build_ok'
-STATUS_BUILD_NG = 'build_ng'
+STATUS_DOCKER_RUNNING = 'docker_running'  # docker running(create and run) ...
+STATUS_DOCKER_RUN_OK = 'docker_run_ok'
+STATUS_DOCKER_RUN_NG = 'docker_run_ng'
 
-STATUS_RUNNING = 'running'  # script running ...
-STATUS_RUN_OK = 'run_ok'
-STATUS_RUN_NG = 'run_ng'
-STATUS_SUSPEND = 'suspend'  # task interrupt
+STATUS_SCRIPT_RUNNING = 'script_running'  # script running ...
+STATUS_SCRIPT_RUN_OK = 'script_run_ok'
+STATUS_SCRIPT_RUN_NG = 'script_run_ng'
+STATUS_SCRIPT_RUN_SUSPEND = 'script_run_suspend'  # task interrupt
 
 SCOPE_TIMES = 1 * 60
 

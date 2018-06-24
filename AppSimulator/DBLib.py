@@ -68,7 +68,7 @@ class MongoDriver(object):
         self._DEBUG = False
 
     def _log(self, prefix, msg):
-        if self._DEBUG:
+        if self._DEBUG or prefix.find('error') > 0:
             print('[Server DB]', prefix, msg)
 
     def get_task_id(self):
@@ -163,9 +163,9 @@ class MongoDriver(object):
             if (len(l) > 0 and l[-1] > 0):
                 status['cnt'] = l[-1]
                 if (l[0] == l[-1]):
-                    status['status'] = STATUS_SUSPEND
+                    status['status'] = STATUS_SCRIPT_RUN_SUSPEND
                 else:
-                    status['status'] = STATUS_RUNNING
+                    status['status'] = STATUS_SCRIPT_RUNNING
 
             devices_status.append(status)
 
