@@ -89,7 +89,7 @@ class NoxConDocker(object):
             return _stdout
 
     def _cmd_kill_task(self, docker_name):
-        dockers = self.ps(docker_name=docker_name, docker_status=STATUS_RUNNING)
+        dockers = self.ps(docker_name=docker_name, docker_status=STATUS_DOCKER_RUNNING)
         for d in dockers:
             cmd = 'TASKKILL /F /T /PID ' + str(d['pid'])  # 不能强杀，会造成 ERR：1037
             self._log('_cmd_kill_task', cmd)
