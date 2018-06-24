@@ -67,34 +67,34 @@ class Manager(object):
             self._log('run_script error:', e)
             return False
 
-    def _find_element(self, hwnd, comment, timeout):
-        self._PIC_PATH = {
-            "APP图标": self._work_path + '\\Controller\\images\\' + self._app_name + '\\app_icon.png',
-            "很抱歉": self._work_path + '\\Controller\\images\\im_sorry.png',
-        }
-
-        self._log('find_element', '尝试在 ' + str(timeout) + 's内匹配: ' + comment)
-        time.sleep(3)
-        while timeout > 0:
-            win32gui.SetForegroundWindow(hwnd)
-            left, top, right, bottom = win32gui.GetWindowRect(hwnd)
-            app_bg_box = (left, top, right, bottom)
-
-            im = ImageGrab.grab(app_bg_box)
-            im.save(self._work_path + '\\Controller\\images\\start.png')
-
-            img_capture = ac.imread(self._work_path + '\\Controller\\images\\start.png')
-            img_obj = ac.imread(self._PIC_PATH[comment])
-            pos = ac.find_template(img_capture, img_obj)
-            if pos and pos['confidence'] > 0.9:
-                self._log('find_element', '已匹配到:' + comment + ' ' + str(timeout) + 's')
-                return True
-            else:
-                time.sleep(1)
-                timeout = timeout - 1
-                self._log('find_element', '未匹配到:' + comment + ', 重试剩余: ' + str(timeout) + 's')
-
-        return False
+    # def _find_element(self, hwnd, comment, timeout):
+    #     self._PIC_PATH = {
+    #         "APP图标": self._work_path + '\\Controller\\images\\' + self._app_name + '\\app_icon.png',
+    #         "很抱歉": self._work_path + '\\Controller\\images\\im_sorry.png',
+    #     }
+    #
+    #     self._log('find_element', '尝试在 ' + str(timeout) + 's内匹配: ' + comment)
+    #     time.sleep(3)
+    #     while timeout > 0:
+    #         win32gui.SetForegroundWindow(hwnd)
+    #         left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+    #         app_bg_box = (left, top, right, bottom)
+    #
+    #         im = ImageGrab.grab(app_bg_box)
+    #         im.save(self._work_path + '\\Controller\\images\\start.png')
+    #
+    #         img_capture = ac.imread(self._work_path + '\\Controller\\images\\start.png')
+    #         img_obj = ac.imread(self._PIC_PATH[comment])
+    #         pos = ac.find_template(img_capture, img_obj)
+    #         if pos and pos['confidence'] > 0.9:
+    #             self._log('find_element', '已匹配到:' + comment + ' ' + str(timeout) + 's')
+    #             return True
+    #         else:
+    #             time.sleep(1)
+    #             timeout = timeout - 1
+    #             self._log('find_element', '未匹配到:' + comment + ', 重试剩余: ' + str(timeout) + 's')
+    #
+    #     return False
 
     def on_success(self, docker):
         time.sleep(10)
@@ -129,7 +129,7 @@ class Manager(object):
         while wait_time > 0:
             ret = driver.pre_check()
             if ret:
-                self._log('start', docker_name + ' ok.')
+                self._log('check_docker_run', docker_name + ' ok.')
                 ret = driver.find_element(comment='很抱歉', timeout=30)  # 匹配“很抱歉”字样
                 if ret:
                     return False
@@ -139,27 +139,28 @@ class Manager(object):
             else:  # hwnd is 0 if not found
                 time.sleep(1)
                 wait_time -= 1
-                self._log('start', '等待 ' + docker_name + ' 窗口创建，剩余：' + str(wait_time) + 's')
+                self._log('check_docker_run', '等待 ' + docker_name + ' 窗口创建，剩余：' + str(wait_time) + 's')
 
     def check_docker_stop(self, docker, retry=False, wait_time=30):
         while wait_time > 0:
             hwnd = win32gui.FindWindow(None, docker.get_name())
             if hwnd:  # hwnd is 0 if not found
                 time.sleep(1)
-                self._log('stop', '正在等待 ' + docker.get_name() + ' 停止，剩余：' + str(wait_time) + 's')
+                self._log('check_docker_stop', '正在等待 ' + docker.get_name() + ' 停止，剩余：' + str(wait_time) + 's')
                 wait_time -= 1
             else:  # not found the window
+                self._log('check_docker_stop', '已停止：' + str(wait_time) + 's')
                 break
 
         if retry and wait_time == 0:  # retry
+            # docker._cmd_kill_task(self._docker_name)  # 不能强杀，会造成 ERR：1037
             docker.stop()
 
         time.sleep(10)
-        # self._cmd_kill_task(self._docker_name)  # 不能强杀，会造成 ERR：1037
         return True
 
     def start_tasks(self):
-        # building -> build_ok(ng) -> running -> run_ok(ng)
+        # 1)docker running -> 2)docker run ok(ng) -> 3)script running -> 4)script run ok(ng)
         while True:
             task = self.db.task_get_one_for_run()
             if task:
@@ -168,7 +169,7 @@ class Manager(object):
 
                 task['status'] = STATUS_DOCKER_RUNNING
                 self.db.task_change_status(task)
-
+                # 1)docker running
                 docker = NoxConDocker(app_name=task['app_name'], docker_name=docker_name)
                 docker.run(force=True)  # docker run: create and start
                 ret = self.check_docker_run(docker_name, app_name, wait_time=30)
@@ -179,15 +180,19 @@ class Manager(object):
 
                 status = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
 
+                # 2)docker run ok(ng)
                 docker_info = {'_id': self.db.docker_create(task), 'status': status}
                 self.db.docker_change_status(docker_info)
-
                 task['status'] = status
                 self.db.task_change_status(task)
+
                 if ret:
                     self.db.task_set_docker(task, docker_info)  # bind docker to task
+                    # 3)script running
                     ret = self.run_script(task)
                     task['status'] = STATUS_SCRIPT_RUN_OK if ret else STATUS_SCRIPT_RUN_NG
+
+                    # 4)script run ok(ng)
                     self.db.task_change_status(task)
 
                 # break
