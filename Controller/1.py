@@ -44,9 +44,11 @@ async def coro2():
     await switch()
     print("C2: Stop")
 
-def main(msg):
+
+def main1(msg):
     print(msg)
     run([coro1(), coro2()])
 
-if __name__  == "__main__":
+
+if __name__ == "__main__":
     main('hello')

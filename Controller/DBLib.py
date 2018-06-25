@@ -18,7 +18,7 @@ class MongoDriver(object):
         self._DEBUG = False
 
     def _log(self, prefix, msg):
-        if self._DEBUG or prefix.find('error') > 0:
+        if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
             print('[Controller DB]', prefix, msg)
 
     # def task_trace(self, task_id, app_name, docker_name, action):  # after docker start success
@@ -49,10 +49,11 @@ class MongoDriver(object):
             return self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': LOCAL_IP})
 
     def task_get_my_prepare_tasks_cnt(self):
-        return self.tasks.find({'status': {'$in': [STATUS_WAIT, STATUS_DOCKER_RUNNING]}, 'rpc_server_ip': LOCAL_IP}).count()
+        return self.tasks.find(
+            {'status': {'$in': [STATUS_WAIT, STATUS_DOCKER_RUNNING]}, 'rpc_server_ip': LOCAL_IP}).count()
 
     def task_change_status(self, task):
-        self._log('change_task_status', task['status'])
+        self._log('task_change_status', task['status'])
         self.tasks.update({'_id': task['_id']}, {"$set": {'status': task['status']}})
 
     def task_set_docker(self, task, docker):
@@ -71,7 +72,7 @@ class MongoDriver(object):
         return id
 
     def docker_change_status(self, docker):
-        self._log('change_task_status', docker['status'])
+        self._log('docker_change_status', docker['status'])
         self.dockers.update({'_id': docker['_id']}, {"$set": {'status': docker['status']}})
 
     def update_device_statistics_info(self, info, scope_times):  # 时间窗式记录采集量

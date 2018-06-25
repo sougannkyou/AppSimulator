@@ -1,4 +1,5 @@
 # coding:utf-8
+import time
 import re
 import random
 import subprocess
@@ -14,7 +15,7 @@ class NoxConADB(object):
     DEFAULT_TCP_PORT = 62001  # 5555
 
     def __init__(self, docker_name):
-        self._DEBUG = True
+        self._DEBUG = False
         self._stdout = None
         self._stderr = None
         self._devices = None
@@ -23,7 +24,7 @@ class NoxConADB(object):
         self._docker_name = docker_name
 
     def _log(self, prefix, msg):
-        if self._DEBUG or prefix.find('error') > 0:
+        if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
             print('[NoxConADB]', prefix, msg)
 
     def __clean__(self):
@@ -93,7 +94,6 @@ class NoxConADB(object):
     def _make_command(self, cmd):
         # NoxConsole.exe adb -name:nox-22 -command:"version"
         cmd_str = self._console_binary + ' adb -name:' + self._docker_name + ' -command:"' + cmd + '"'
-        self._log('[_make_command]', cmd_str)
         return cmd_str
 
     def adb_cmd(self, cmd):
@@ -117,13 +117,33 @@ class NoxConADB(object):
         return self._stdout
 
     def get_adb_version(self):
+        ret = None
         self.adb_cmd("version")
         try:
-            ret = self._stdout.split()[-1:][0]
+            if self._stdout.find('device not exist') == -1:
+                ret = self._stdout
+                self._log('<<info>> get_adb_version ok:\n', ret)
         except Exception as e:
-            self._log('get_adb_version err:', e)
-            ret = None
+            self._log('get_adb_version error:', e)
         return ret
+
+    def wait_for_device(self, timeout=10):
+        """
+        Block until device is online
+        adb wait-for-device
+        """
+        ver = None
+        while timeout > 0:
+            ver = self.get_adb_version()
+            if ver and ver.startswith('Android Debug Bridge'):
+                self._log('<<info>> wait_for_device:', 'ok')
+                break
+            else:
+                self._log('<<info>> wait_for_device:', str(timeout) + 's')
+                timeout -= 2
+                time.sleep(2)
+
+        return True if ver else False
 
     def check_path(self):
         """
@@ -417,8 +437,9 @@ class NoxConADB(object):
 
 
 if __name__ == "__main__":
-    my = MyNoxConsole('nox-99')
+    my = NoxConADB('nox-1')
     my._DEBUG = True
 
+    print(my.get_adb_version())
     print(my.get_serialno())
     print(my.adb_shell('input keyevent 4'))

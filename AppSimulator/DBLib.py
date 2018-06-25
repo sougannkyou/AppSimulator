@@ -68,7 +68,7 @@ class MongoDriver(object):
         self._DEBUG = False
 
     def _log(self, prefix, msg):
-        if self._DEBUG or prefix.find('error') > 0:
+        if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
             print('[Server DB]', prefix, msg)
 
     def get_task_id(self):

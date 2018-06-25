@@ -16,28 +16,33 @@ class NoxConDocker(object):
         self._app_name = app_name
         self._docker_name = docker_name
         self._adb = NoxConADB(docker_name=docker_name)
+        self._path = os.getcwd()
         os.chdir('c:\\Nox\\bin')  # 防止 BignoxVMS 写入py本地
 
+    def __del__(self):
+        print('NoxConDocker.__del__ call()')
+        os.chdir(self._path)
+
     def _log(self, prefix, msg):
-        if self._DEBUG or prefix.find('error') > 0:
+        if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
             print('[NoxDocker] ', prefix, msg)
 
     def _check(self):
         msg = ''
         if not self._ip:
             msg = 'ip 不能为空，请设置：APPSIMULATOR_IP'
-            self._log('_check error', msg)
+            self._log('_check error:', msg)
             return False, msg
 
         if not self._app_name:
             msg = 'app_name 不能为空.'
-            self._log('_check error', msg)
+            self._log('_check error:', msg)
             return False, msg
 
         mem = psutil.virtual_memory()
         if mem.free < 1 * GB:  # < 1GB
             msg = '内存剩余必须大于 1GB.'
-            self._log('_check error', msg)
+            self._log('_check error:', msg)
             return False, msg
         else:
             self._log('_check', 'memory: %.1f' % (mem.free / GB) + ' GB')
@@ -49,13 +54,13 @@ class NoxConDocker(object):
 
         if len(self.ps(docker_name='nox-org')) == 0:
             msg = '未找到 nox-org.'
-            self._log('_check error', msg)
+            self._log('_check error:', msg)
             return False, msg
 
         running_dockers = self.ps(docker_status=STATUS_DOCKER_RUNNING)
         if len(running_dockers) >= self.DOCKERS_MAX_CNT:
             msg = '启动数量不能大于 ' + str(self.DOCKERS_MAX_CNT)
-            self._log('_check error', msg)
+            self._log('_check error:', msg)
             return False, msg
         else:
             self._log('_check ok', '当前运行中的docker数: ' + str(len(running_dockers)))
@@ -70,7 +75,7 @@ class NoxConDocker(object):
         _stdout = ''
         _stderr = ''
         try:
-            self._log('cmdline:', cmdline)
+            self._log('<<nox_cmd>> ', cmdline)
             time.sleep(1)
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             # process.wait()
@@ -106,37 +111,28 @@ class NoxConDocker(object):
         return ret.replace('\r', '').replace('\n', '').replace('127.0.0.1:', '')
 
     def shake(self, cnt):
-        self._log('shake', '振动提示 ...')
-        for i in range(cnt):
+        self._log('<<info>> shake', str(cnt) + '次 振动提示 ...')
+        for _ in range(cnt):
             self._exec_nox_cmd(self._make_cmd("action -name:" + self._docker_name + " -key:call.shake -value:null"))
         return True
 
     def set_docker_name(self):
-        self._log('shake', '设置docker名称为:' + self._docker_name)
+        self._log('set_docker_name', '设置docker名称为:' + self._docker_name)
         self._exec_nox_cmd(self._make_cmd(
             'adb -name:' + self._docker_name + ' -command:" shell setprop persist.nox.docker_name ' + self._docker_name + '"'
         ))
         return True
 
-    def stop(self, retry=False, wait_time=30):
+    def stop(self, wait_time=2):
+        self._log('<<info>> stop', 'wait: ' + str(wait_time) + 's')
+        time.sleep(wait_time)
         self._exec_nox_cmd(self._make_cmd("quit -name:" + self._docker_name))
-        # while wait_time > 0:
-        #     hwnd = win32gui.FindWindow(None, self._docker_name)
-        #     if hwnd:  # hwnd is 0 if not found
-        #         time.sleep(1)
-        #         self._log('stop', '正在等待 ' + self._docker_name + ' 停止，剩余：' + str(wait_time) + 's')
-        #         wait_time -= 1
-        #     else:
-        #         break
-        #
-        # if retry and wait_time == 0:  # retry
-        #     self._exec_nox_cmd(self._make_cmd("quit -name:" + self._docker_name))
-        #
-        # time.sleep(10)
-        # self._cmd_kill_task(self._docker_name)  # 不能强杀，会造成 ERR：1037
+        time.sleep(wait_time)
         return True
 
     def stop_all(self):
+        self._log('<<info>> stop_all', 'wait: 10s')
+        time.sleep(2)
         self._exec_nox_cmd(self._make_cmd('quitall'))
         time.sleep(10)
         return True
@@ -204,7 +200,7 @@ class NoxConDocker(object):
 
         if len(dockers) == 1:
             if dockers[0]['status'] == STATUS_DOCKER_RUNNING:
-                self.stop(retry=False, wait_time=30)
+                self.stop(wait_time=5)
 
             ret = self.remove()
             if not ret:
@@ -231,7 +227,7 @@ class NoxConDocker(object):
         time.sleep(timeout)
         return True
 
-    def run(self, force=False):  # run = create and start
+    def run(self, force=False):  # run = create + start
         ret, msg = self.create(force)
         if ret:
             ret = self.start()
@@ -239,7 +235,7 @@ class NoxConDocker(object):
         return ret
 
 
-def build(app_name, docker_name):
+def test(app_name, docker_name):
     docker = NoxConDocker(app_name=app_name, docker_name=docker_name)
     docker._DEBUG = True
     return docker.run(force=True)
@@ -262,7 +258,7 @@ if __name__ == "__main__":
         # for docker_name in ['nox-31', 'nox-32', 'nox-33']:
         # for docker_name in ['nox-41', 'nox-42', 'nox-43']:
         # for docker_name in ['nox-11']:
-        if build('toutiao', docker_name):  # run = create and start
+        if test('toutiao', docker_name):  # run = create and start
             complete_cnt += 1
 
     print("start success:", str(complete_cnt))
