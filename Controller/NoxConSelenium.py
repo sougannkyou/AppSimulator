@@ -60,7 +60,7 @@ class NoxConSelenium(object):
                 return True, x, y
             else:
                 time.sleep(1)
-                timeout = timeout - 1
+                timeout -= 1
                 self._log('<<info>> 未匹配到:', comment + ' ' + str(timeout) + 's')
 
         return False, -1, -1
@@ -68,8 +68,9 @@ class NoxConSelenium(object):
     def get_capture(self, capture_name):
         self._adb.adb_shell("screencap -p /sdcard/" + capture_name)
         self._adb.adb_cmd("pull /sdcard/" + capture_name)
+        print(os.getcwd())
         self._img_capture = ac.imread(capture_name)
-        self.ftp_upload(local_file=capture_name, remote_dir='172.16.253.36', remote_file=capture_name)
+        # self.ftp_upload(local_file=capture_name, remote_dir='172.16.253.36', remote_file=capture_name)
 
     def find_elements(self, comment, timeout):
         pos_list = []
@@ -92,7 +93,7 @@ class NoxConSelenium(object):
                 self._log('<<info>>未匹配:', comment + ' ' + str(timeout) + 's')
                 self.get_capture(capture_name)
 
-            timeout = timeout - 1
+            timeout -= 1
 
         return len(pos_list) > 0, pos_list
 
@@ -208,7 +209,7 @@ class NoxConSelenium(object):
         fp.close()
 
     def script(self):
-        pass
+        pass  # overwrite
 
     def run(self, is_app_restart):
         ret = self.unlock(timeout=1)

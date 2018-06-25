@@ -27,7 +27,7 @@ class NoxConADB(object):
         if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
             print('[NoxConADB]', prefix, msg)
 
-    def __clean__(self):
+    def _clean(self):
         self._stdout = None
         self._stderr = None
 
@@ -38,8 +38,7 @@ class NoxConADB(object):
         return num
 
     def _luhn_residue(self, digits):
-        return sum(sum(divmod(int(d) * (1 + i % 2), 10))
-                   for i, d in enumerate(digits[::-1])) % 10
+        return sum(sum(divmod(int(d) * (1 + i % 2), 10)) for i, d in enumerate(digits[::-1])) % 10
 
     def _get_imei(self, N):
         part = ''.join(str(random.randrange(0, 9)) for _ in range(N - 1))
@@ -63,7 +62,7 @@ class NoxConADB(object):
         return True
 
     def get_android_version(self):
-        self.__clean__()
+        self._clean()
         self.adb_shell("getprop ro.build.version.release")
         return self._stdout.decode('utf8')
 
@@ -97,10 +96,10 @@ class NoxConADB(object):
         return cmd_str
 
     def adb_cmd(self, cmd):
-        self.__clean__()
+        self._clean()
         try:
             cmdline = self._make_command(cmd)
-            self._log('[adb_cmd]', cmdline)
+            self._log('[adb_cmd]<<info>>', cmdline)
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()
             (stdout, stderr) = process.communicate()
@@ -112,7 +111,7 @@ class NoxConADB(object):
         return
 
     def adb_shell(self, cmd):
-        self.__clean__()
+        self._clean()
         self.adb_cmd('shell ' + cmd)
         return self._stdout
 
@@ -127,7 +126,7 @@ class NoxConADB(object):
             self._log('get_adb_version error:', e)
         return ret
 
-    def wait_for_device(self, timeout=10):
+    def wait_for_device(self, timeout=30):
         """
         Block until device is online
         adb wait-for-device
@@ -140,8 +139,8 @@ class NoxConADB(object):
                 break
             else:
                 self._log('<<info>> wait_for_device:', str(timeout) + 's')
-                timeout -= 2
-                time.sleep(2)
+                timeout -= 5
+                time.sleep(5)
 
         return True if ver else False
 
@@ -154,7 +153,7 @@ class NoxConADB(object):
         return True
 
     def start_server(self):
-        self.__clean__()
+        self._clean()
         self.adb_cmd('start-server')
         return self._stdout
 
@@ -163,7 +162,7 @@ class NoxConADB(object):
         Kills ADB server
         adb kill-server
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd('kill-server')
 
     def restart_server(self):
@@ -178,12 +177,12 @@ class NoxConADB(object):
         Restore device contents from the <file> backup archive
         adb restore <file>
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd('restore %s' % file_name)
         return self._stdout
 
     def get_adb_help(self):
-        self.__clean__()
+        self._clean()
         self.adb_cmd('help')
         return self._stdout
 
@@ -201,7 +200,7 @@ class NoxConADB(object):
             offline：连接出现异常，设备无响应
             unknown：没有连接设备
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd('get-state')
         return self._stdout
 
@@ -210,7 +209,7 @@ class NoxConADB(object):
         Get serialno from target device
         adb get-serialno
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd('get-serialno')
         return self._stdout
 
@@ -219,7 +218,7 @@ class NoxConADB(object):
         Reboot the target device
         adb reboot recovery/bootloader
         """
-        self.__clean__()
+        self._clean()
         if not mode in (self.REBOOT_RECOVERY, self.REBOOT_BOOTLOADER):
             self._stderr = "mode must be REBOOT_RECOVERY/REBOOT_BOOTLOADER"
             return self._stdout
@@ -232,7 +231,7 @@ class NoxConADB(object):
         restarts the adbd daemon with root permissions
         adb root
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd('root')
         return self._stdout
 
@@ -241,7 +240,7 @@ class NoxConADB(object):
         Mounts /system as rw
         adb remount
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd("remount")
         return self._stdout
 
@@ -250,7 +249,7 @@ class NoxConADB(object):
         Pulls a remote file
         adb pull remote local
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd('pull \"%s\" \"%s\"' % (remote, local))
         if "bytes in" in self._stderr:
             self._stdout = self._stderr
@@ -262,7 +261,7 @@ class NoxConADB(object):
         Push a local file
         adb push local remote
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd('push \"%s\" \"%s\"' % (local, remote))
         return self._stdout
 
@@ -271,7 +270,7 @@ class NoxConADB(object):
         Restarts the adbd daemon listening on USB
         adb usb
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd("usb")
         return self._stdout
 
@@ -280,7 +279,7 @@ class NoxConADB(object):
         Restarts the adbd daemon listening on the specified port
         adb tcpip <port>
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd("tcpip %s" % port)
         return self._stdout
 
@@ -289,7 +288,7 @@ class NoxConADB(object):
         Return all information from the device that should be included in a bug report
         adb bugreport
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd("bugreport")
         return self._stdout
 
@@ -298,7 +297,7 @@ class NoxConADB(object):
         List PIDs of processes hosting a JDWP transport
         adb jdwp
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd("jdwp")
         return self._stdout
 
@@ -307,7 +306,7 @@ class NoxConADB(object):
         View device log
         adb logcat <filter>
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd("logcat %s" % lcfilter)
         return self._stdout
 
@@ -315,7 +314,7 @@ class NoxConADB(object):
         """
         Run emulator console command
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd("emu %s" % cmd)
         return self._stdout
 
@@ -324,7 +323,7 @@ class NoxConADB(object):
         Connect to a device via TCP/IP
         adb connect host:port
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd("connect %s:%s" % (host, port))
         return self._stdout
 
@@ -333,7 +332,7 @@ class NoxConADB(object):
         Disconnect from a TCP/IP device
         adb disconnect host:port
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd("disconnect %s:%s" % (host, port))
         return self._stdout
 
@@ -342,7 +341,7 @@ class NoxConADB(object):
         Run PPP over USB
         adb ppp <tty> <params>
         """
-        self.__clean__()
+        self._clean()
         if tty is None:
             return self._stdout
 
@@ -358,7 +357,7 @@ class NoxConADB(object):
         Copy host->device only if changed (-l means list but don't copy)
         adb sync <dir>
         """
-        self.__clean__()
+        self._clean()
         self.adb_cmd("sync %s" % directory)
         return self._stdout
 
@@ -367,7 +366,7 @@ class NoxConADB(object):
         Forward socket connections
         adb forward <local> <remote>
         """
-        self.__clean__()
+        self._clean()
         if local is None or remote is None:
             return self._stdout
         self.adb_cmd("forward %s %s" % (local, remote))
@@ -378,7 +377,7 @@ class NoxConADB(object):
         Remove this app package from the device
         adb uninstall [-k] package
         """
-        self.__clean__()
+        self._clean()
         if package is None:
             return self._stdout
         cmd = "uninstall %s" % (package if keepdata is True else "-k %s" % package)
@@ -394,7 +393,7 @@ class NoxConADB(object):
         -s -> install on sdcard instead of internal storage
         """
 
-        self.__clean__()
+        self._clean()
         if pkgapp is None:
             return self._stdout
 

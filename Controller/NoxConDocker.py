@@ -16,12 +16,11 @@ class NoxConDocker(object):
         self._app_name = app_name
         self._docker_name = docker_name
         self._adb = NoxConADB(docker_name=docker_name)
-        self._path = os.getcwd()
-        os.chdir('c:\\Nox\\bin')  # 防止 BignoxVMS 写入py本地
+        self._org_path = os.getcwd()
 
-    def __del__(self):
-        print('NoxConDocker.__del__ call()')
-        os.chdir(self._path)
+    # def __del__(self):
+    #     print('call NoxConDocker.__del__')
+    #     os.chdir(self._org_path)
 
     def _log(self, prefix, msg):
         if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
@@ -77,6 +76,7 @@ class NoxConDocker(object):
         try:
             self._log('<<nox_cmd>> ', cmdline)
             time.sleep(1)
+            os.chdir('c:\\Nox\\bin')  # 防止 BignoxVMS 写入.py本地
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             # process.wait()
             (stdout, stderr) = process.communicate()
@@ -84,6 +84,8 @@ class NoxConDocker(object):
             _stderr = stderr.decode('utf8')
         except Exception as e:
             self._log('_exec_nox_cmd error:', e)
+        finally:
+            os.chdir(self._org_path)
 
         self._log('stdout:\n', _stdout)
         if _stderr:
@@ -111,7 +113,7 @@ class NoxConDocker(object):
         return ret.replace('\r', '').replace('\n', '').replace('127.0.0.1:', '')
 
     def shake(self, cnt):
-        self._log('<<info>> shake', str(cnt) + '次 振动提示 ...')
+        self._log('<<info>> shake', str(cnt) + '次 振动提示')
         for _ in range(cnt):
             self._exec_nox_cmd(self._make_cmd("action -name:" + self._docker_name + " -key:call.shake -value:null"))
         return True
@@ -140,7 +142,6 @@ class NoxConDocker(object):
     def ps(self, docker_name=None, docker_status=None):
         devices = []
         ret = self._exec_nox_cmd(self._make_cmd('list'))
-        # self._log('ps\n', ret)
         if ret:
             # 虚拟机名称，标题，顶层窗口句柄，工具栏窗口句柄，绑定窗口句柄，进程PID
             for s in ret.split('\r\n'):

@@ -148,7 +148,9 @@ class Manager(object):
                     else:
                         ret = self.docker_run_error(docker=docker, retry_cnt=2)
 
-                docker = None  # NoxConDocker.__del__
+                # call NoxConDocker.__del__
+                docker = None
+                
                 status = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
 
                 # 2)docker run ok(ng)
