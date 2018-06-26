@@ -1,8 +1,17 @@
 # coding:utf-8
-import time
-from datetime import datetime
-from Controller.NoxConSelenium import NoxConSelenium
-from Controller.NoxConDocker import NoxConDocker
+try:
+    import sys
+    from pprint import pprint
+    import time
+    import datetime
+    import multiprocessing
+    from SimulatorADB import Simulator
+    from EmulatorNox import Emulator
+except ImportError as e:
+    print("[Script] ERROR:", e.args[0])
+    sys.exit(-1)
+
+ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
 
 urls = [
     "http://www.dianping.com/shop/24981944",  # 936
@@ -25,13 +34,13 @@ keywords = [
 ]
 
 
-class MySelenium(NoxConSelenium):
+class MySimulator(Simulator):
     def script(self):
         ret = True
         x = -1
         y = -1
         page_cnt = 0
-        # self.get(urls[0], 3)
+        # self.start_web(urls[self._adb_idx], 3)
         # ret, x, y = self.find_element(comment='web打开APP', timeout=10)
         # if ret: ret = self.click_xy(x, y, timeout=2)
         if ret: ret, x, y = self.find_element(comment='APP图标', timeout=10)
@@ -39,7 +48,7 @@ class MySelenium(NoxConSelenium):
         if ret: ret, x, y = self.find_element(comment='附近热搜', timeout=5)
         if ret: ret = self.click_xy(x, y, timeout=1)
         time.sleep(3)
-        if ret: ret = self.input_cn(keywords[0], timeout=1)
+        if ret: ret = self.input_cn(keywords[self._adb_idx], timeout=1)
         time.sleep(5)
         if ret: ret, x, y = self.find_element(comment='搜索', timeout=5)
         if ret: ret = self.click_xy(x, y + 30, timeout=1)
@@ -82,12 +91,12 @@ class MySelenium(NoxConSelenium):
 
 
 ##################################################################################
-def run(docker_name):
-    start = datetime.now()
-    print("[Script " + docker_name + "] run start.", start)
+def main(idx):
+    start = datetime.datetime.now()
+    print("[Script" + str(idx) + "] run start.", start)
     try:
-        me = MySelenium(app_name='dianping', docker_name=docker_name)
-        me._PIC_PATH = {
+        mySimulator = MySimulator(adb_path=ADB_BINARY_PATH, idx=idx)
+        mySimulator._PIC_PATH = {
             # "web打开APP": 'images/dianping/webOpenApp.png',
             "APP打开结果OK": 'images/dianping/search_ready.png',
             "APP图标": 'images/dianping/app_icon.png',
@@ -99,34 +108,34 @@ def run(docker_name):
             "复制链接": 'images/dianping/copy_link.png',
             "打分": 'images/dianping/dafen.png',
         }
-        me._DEBUG = True
-        me._adb._DEBUG = True
+        mySimulator._DEBUG = False
+        mySimulator._adb._DEBUG = False
         # if not ret: self.send2web('images/offline.jpeg')
-        me.set_gps(39.984727, 116.310050)  # 中关村
-        me.run(is_app_restart=False)
+        mySimulator.set_gps(39.984727, 116.310050)  # 中关村
+        mySimulator.run(is_app_restart=False)
 
-        end = datetime.now()
-        print("[Script " + docker_name + "] run success. ", (end - start).seconds, "s")
+        end = datetime.datetime.now()
+        print("[Script" + str(idx) + "] run success. ", (end - start).seconds, "s")
         return True
     except Exception as e:
-        end = datetime.now()
-        print("[Script " + docker_name + "] ERROR:", (end - start).seconds, e)
+        end = datetime.datetime.now()
+        print("[Script" + str(idx) + "] ERROR:", (end - start).seconds, e)
         return False
 
 
 #################################################################################
 if __name__ == "__main__":
-    # tasks_cnt = int(sys.argv[1])
-    tasks_cnt = 1
-    docker = NoxConDocker('toutiao', 'nox-99')
+    tasks_cnt = int(sys.argv[1])
+    emulator = Emulator('dianping')
     for i in range(1, 1 + tasks_cnt):
-        docker.build(force=True)
+        print('launch_emulator nox-' + str(i))
+        emulator.launch_emulator('nox-' + str(i), force=True)
 
-    time.sleep(10)
+    time.sleep(30)
 
-    # pool = multiprocessing.Pool(processes=4)
-    # for idx in range(tasks_cnt):
-    #     pool.apply_async(run, ('nox-99',))
-    # pool.close()
-    # pool.join()
+    pool = multiprocessing.Pool(processes=4)
+    for idx in range(tasks_cnt):
+        pool.apply_async(run, (idx,))
+    pool.close()
+    pool.join()
     print("process done.")

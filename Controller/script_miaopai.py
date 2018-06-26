@@ -1,83 +1,76 @@
 # coding:utf-8
-try:
-    import sys
-    import time, datetime
-    import multiprocessing
-    from simulatorADB import Simulator
-except ImportError as e:
-    print("[Script] ERROR:", e.args[0])
-    sys.exit(-1)
+import time
+from datetime import datetime
+from Controller.NoxConSelenium import NoxConSelenium
 
-ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
 urls = [
     "http://www.miaopai.com/show/6NWi1Bp5fx9GV0tdwCUGYWNzaQm9hVJe.htm",  # 936
 ]
 
-class MySimulator(Simulator):
+
+class MySelenium(NoxConSelenium):
     def script(self):
-        self.start_web(urls[0])
-        ret, x, y = self.find_element(comment='web打开APP', timeout=10)
-        if ret: ret = self.click_xy(x, y, timeout=2)
-
-        # ret, x, y = self.find_element(comment=u'APP图标', timeout=10)  # unlock ok
-        if ret: ret = self.click_xy(x, y, timeout=2)
-        while (ret):  # 更新 -> 分享 -> 复制链接
-            if ret: ret, x, y = self.find_element(comment=u'更新', timeout=10)
-            if ret: ret = self.click_xy(x, y, timeout=1)
-
-            if ret: ret, x, y = self.find_element(comment=u'分享', timeout=10)
-            if ret: ret = self.click_xy(x, y, timeout=1)
-
+        # self.get(urls[0], 5)
+        # ret, x, y = self.find_element(comment='web打开APP', timeout=10)
+        # if ret: ret = self.click_xy(x, y, timeout=2)
+        try:
+            ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
             if ret:
-                ret, x, y = self.find_element(comment=u'复制链接', timeout=10)
-                if ret:
-                    ret = self.click_xy(x, y, timeout=1)
-                else:  # upgrade?
-                    # ret = self.check_upgrade(timeout=2)
-                    # if ret:
-                    print(u"重试 click 分享 按钮 ...")
-                    ret, x, y = self.find_element(comment=u'分享', timeout=10)
-                    if ret: ret = self.click_xy(x, y, timeout=1)
+                ret = self.click_xy(x, y, timeout=2)
 
-                    if ret: ret, x, y = self.find_element(comment=u'复制链接', timeout=10)
-                    if ret: ret = self.click_xy(x, y, timeout=1)
+            while ret:
+                ret, pos_list = self.find_elements(comment='分享', timeout=10)
+                if ret:
+                    for pos in pos_list:
+                        (x, y) = pos
+                        ret = self.click_xy(x, y, timeout=2)
+                        if ret:
+                            ret, x, y = self.find_element(comment='复制链接', timeout=10)
+                            if ret:
+                                ret = self.click_xy(x, y, timeout=1)
+                            else:  # upgrade?
+                                # ret = self.check_upgrade(timeout=2)
+                                # if ret:
+                                # print(u"重试 click 分享 按钮 ...")
+                                ret, x, y = self.find_element(comment='分享', timeout=10)
+                                if ret: ret = self.click_xy(x, y, timeout=1)
+
+                                if ret: ret, x, y = self.find_element(comment='复制链接', timeout=10)
+                                if ret: ret = self.click_xy(x, y, timeout=1)
+
+                self.next_page(timeout=5)
+
+        except Exception as e:
+            self._log('error:', e)
 
 
 ##################################################################################
-def run(idx):
-    start = datetime.datetime.now()
-    print("[Script" + str(idx) + "] run start.", start)
+def main(docker_name):
+    start = datetime.now()
+    print("[Script " + docker_name + "] start at ", start)
     try:
-        mySimulator = MySimulator(adb_path=ADB_BINARY_PATH, idx=idx)
-        mySimulator._PIC_PATH = {
-            u"锁屏": 'images/screen_lock.png',
-            u"锁屏图案": 'images/screen_lock_9point.png',
-            u"APP图标": 'images/miaopai/app_icon.png',
-            u"更新": 'images/miaopai/update.png',
-            u"分享": 'images/miaopai/share.png',
-            u"复制链接": 'images/miaopai/copylink.png',
-            # u"跳过软件升级": 'images/miaopai/ignore_upgrade.png',
-        }
-
-        # if not ret: self.send2web('images/offline.jpeg')
-        mySimulator.run(is_app_restart=True)
-
-        end = datetime.datetime.now()
-        print("[Script" + str(idx) + "] run success. ", (end - start).seconds, "s")
+        me = MySelenium(docker_name=docker_name, app_name='miaopai')
+        me.set_comment_to_pic({
+            "APP图标": 'images/miaopai/app_icon.png',
+            "更新": 'images/miaopai/update.png',
+            "分享": 'images/miaopai/share.png',
+            "复制链接": 'images/miaopai/copylink.png',
+            # "跳过软件升级": 'images/miaopai/ignore_upgrade.png',
+        })
+        me._DEBUG = True
+        me.run(is_app_restart=True)
+        end = datetime.now()
+        print("[Script " + docker_name + "] total times:", (end - start).seconds, "s")
         return True
     except Exception as e:
-        end = datetime.datetime.now()
-        print("[Script" + str(idx) + "] ERROR:", (end - start).seconds, e)
+        end = datetime.now()
+        print("[Script " + docker_name + "] total times:", (end - start).seconds, "s error:", e)
         return False
 
 
-# run()
-
-
 if __name__ == "__main__":
-    pool = multiprocessing.Pool(processes=4)
-    for idx in range(3):
-        pool.apply_async(run, (idx,))
-    pool.close()
-    pool.join()
-    print("Sub-process(es) done.")
+    # docker_name = sys.argv[1]
+    docker_name = 'nox-2'
+    main(docker_name)
+    print("Close after 60 seconds.")
+    time.sleep(60)

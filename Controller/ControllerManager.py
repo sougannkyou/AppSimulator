@@ -28,7 +28,7 @@ class Manager(object):
             self._log('_check error', msg)
             return False, msg
 
-    def run_script(self, task, docker_name):
+    def run_script1(self, task, docker_name):
         _stdout = ''
         _stderr = ''
         try:
@@ -51,7 +51,7 @@ class Manager(object):
             time.sleep(1)
             return True
 
-    def __run_script(self, task, docker_name):
+    def run_script2(self, task, docker_name):
         try:
             script = 'Controller.' + task['script'][:-3]
             importlib.invalidate_caches()
@@ -64,10 +64,23 @@ class Manager(object):
             self._log('run_script error:', e)
             return False
 
+    def run_script(self, task, docker_name):
+        try:
+            cmd = 'START "task-' + str(task['taskId']) + '" '
+            cmd += 'python ' + self._work_path + '\Controller\\' + task['script'] +' '+ docker_name
+            # cmd += ' >>' + self._work_path + '\Controller\log\\task-' + str(task['taskId']) + '.log 2>&1'
+            self._log('<<info>> run_script cmd:\n', cmd)
+            os.system(cmd)
+            # print(os.popen(cmd).read())
+            return True
+        except Exception as e:
+            self._log('run_script error:', e)
+            return False
+
     def docker_run_success(self, docker):
         self._log('<<info>> docker_run_success', docker.get_name())
         time.sleep(5)
-        # docker.shake(3)
+        docker.shake(1)
         # docker.set_docker_name()
         # port = docker.get_port()
         return True
@@ -150,7 +163,7 @@ class Manager(object):
 
                 # call NoxConDocker.__del__
                 docker = None
-                
+
                 status = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
 
                 # 2)docker run ok(ng)
@@ -170,7 +183,7 @@ class Manager(object):
 
                 # break
             else:
-                self._log('<<info>> start_tasks', 'not found wait task, sleep 60s.')
+                self._log('<<info>> start_tasks', 'not found waiting task, retry after 60s.')
                 time.sleep(1 * 60)
 
 

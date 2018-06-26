@@ -1,17 +1,10 @@
 # coding:utf-8
-try:
-    import sys
-    import time, datetime
-    import multiprocessing
-    from simulatorADB import Simulator
-except ImportError as e:
-    print("[Script] ERROR:", e.args[0])
-    sys.exit(-1)
-
-ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
+import time
+from datetime import datetime
+from Controller.NoxConSelenium import NoxConSelenium
 
 
-class MySimulator(Simulator):
+class MySelenium(NoxConSelenium):
     def script(self):
         ret, x, y = self.find_element(comment=u'APP图标', timeout=10)  # unlock ok
         if ret: ret = self.click_xy(x, y, timeout=2)
@@ -38,37 +31,36 @@ class MySimulator(Simulator):
 
 
 ##################################################################################
-def run(idx):
-    start = datetime.datetime.now()
-    print("[Script" + str(idx) + "] run start.", start)
+def main(docker_name):
+    start = datetime.now()
+    print("[Script " + docker_name + "] start at ", start)
     try:
-        mySimulator = MySimulator(adb_path=ADB_BINARY_PATH, idx=idx)
-        mySimulator._PIC_PATH = {
-            u"锁屏": 'images/screen_lock.png',
-            u"锁屏图案": 'images/screen_lock_9point.png',
-            u"APP图标": 'images/douyin/app_icon.png',
-            u"更新": 'images/douyin/update.png',
-            u"分享": 'images/douyin/share.png',
-            u"复制链接": 'images/douyin/copylink.png',
-            u"跳过软件升级": 'images/douyin/ignore_upgrade.png',
-        }
+        me = MySelenium(docker_name=docker_name, app_name='miaopai')
+        me.set_comment_to_pic({
+            "锁屏": 'images/screen_lock.png',
+            "锁屏图案": 'images/screen_lock_9point.png',
+            "APP图标": 'images/douyin/app_icon.png',
+            "更新": 'images/douyin/update.png',
+            "分享": 'images/douyin/share.png',
+            "复制链接": 'images/douyin/copylink.png',
+            "跳过软件升级": 'images/douyin/ignore_upgrade.png',
+        })
 
         # if not ret: self.send2web('images/offline.jpeg')
-        mySimulator.run(is_app_restart=True)
-
-        end = datetime.datetime.now()
-        print("[Script" + str(idx) + "] run success. ", (end - start).seconds, "s")
+        me.run(is_app_restart=True)
+        me._DEBUG = True
+        end = datetime.now()
+        print("[Script " + docker_name + "] total times:", (end - start).seconds, "s")
         return True
     except Exception as e:
-        end = datetime.datetime.now()
-        print("[Script" + str(idx) + "] ERROR:", (end - start).seconds, e)
+        end = datetime.now()
+        print("[Script " + docker_name + "] total times:", (end - start).seconds, "s error:", e)
         return False
 
 
 if __name__ == "__main__":
-    pool = multiprocessing.Pool(processes=4)
-    for idx in range(2):
-        pool.apply_async(run, (idx,))
-    pool.close()
-    pool.join()
-    print("Sub-process(es) done.")
+    # docker_name = sys.argv[1]
+    docker_name = 'nox-3'
+    main(docker_name)
+    print("Close after 60 seconds.")
+    time.sleep(60)

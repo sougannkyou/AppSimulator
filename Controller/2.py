@@ -1,7 +1,7 @@
+import os, sys
 import importlib
 import importlib.util
 import importlib.machinery
-
 
 # try:
 #     module = importlib.import_module('Controller.1')
@@ -47,5 +47,10 @@ import importlib.machinery
 #     # importlib.util.spec_from_file_location(module_name, file_path)
 # except Exception as e:
 #     print(e)
+import subprocess
 
-
+work_path = os.getenv('APPSIMULATOR_WORK_PATH')
+cmd = "start /b start python " + work_path + "\Controller\script_toutiao_NoxCon.py"
+print(cmd)
+# subprocess.check_output(cmd)
+os.system(cmd)

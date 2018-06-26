@@ -482,13 +482,13 @@ class NoxADB(object):
 
 
 if __name__ == "__main__":
-    myadb = MyADB()
-    myadb._DEBUG = True
-    myadb.wait_for_device()
-    err_msg, devices = myadb.get_devices()
+    me = NoxADB()
+    me._DEBUG = True
+    me.wait_for_device()
+    err_msg, devices = me.get_devices()
     print(devices)
 
     if not err_msg:
-        myadb.set_target_device(devices[0])
+        me.set_target_device(devices[0])
 
-    print(myadb.docker_name())
+    print(me.get_docker_name())

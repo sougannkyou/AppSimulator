@@ -33,7 +33,7 @@ class NoxConSelenium(object):
     def wait_online(self, timeout=10):
         return self._adb.wait_for_device(timeout=timeout)
 
-    def get(self, url, timeout):
+    def get(self, url, timeout=5):
         # start android web browser
         self._adb.start_web(url)
         time.sleep(timeout)
@@ -46,6 +46,13 @@ class NoxConSelenium(object):
         # adb shell am start -n com.android.settings/.Settings
         self._adb.adb_shell("am start -n com.android.settings/.Settings")
         return True
+
+    def get_capture(self, capture_name):
+        self._adb.adb_shell("screencap -p /sdcard/" + capture_name)
+        self._adb.adb_cmd("pull /sdcard/" + capture_name)
+        print(os.getcwd())
+        self._img_capture = ac.imread(capture_name)
+        # self.ftp_upload(local_file=capture_name, remote_dir='172.16.253.36', remote_file=capture_name)
 
     def find_element(self, comment, timeout):
         # True(False), x, y
@@ -65,15 +72,8 @@ class NoxConSelenium(object):
 
         return False, -1, -1
 
-    def get_capture(self, capture_name):
-        self._adb.adb_shell("screencap -p /sdcard/" + capture_name)
-        self._adb.adb_cmd("pull /sdcard/" + capture_name)
-        print(os.getcwd())
-        self._img_capture = ac.imread(capture_name)
-        # self.ftp_upload(local_file=capture_name, remote_dir='172.16.253.36', remote_file=capture_name)
-
     def find_elements(self, comment, timeout):
-        pos_list = []
+        ret = []
         capture_name = "capture_" + self._docker_name + ".png"
         img_obj = ac.imread(self._PIC_PATH[comment])
         self.get_capture(capture_name)
@@ -83,19 +83,18 @@ class NoxConSelenium(object):
             for pos in pos_list:
                 if pos['confidence'] > 0.9:
                     (x, y) = pos['result']
-                    pos_list.append((int(x), int(y)))
+                    ret.append((int(x), int(y)))
 
-            # pprint(pos_list)
-            if len(pos_list) > 0:
-                self._log('<<info>>匹配到:', str(len(pos_list)) + '件 ' + comment + ' ' + str(timeout) + 's')
+            if len(ret) > 0:
+                self._log('<<info>> 匹配到:', str(len(ret)) + '件 ' + comment + ' ' + str(timeout) + 's')
                 break
             else:
-                self._log('<<info>>未匹配:', comment + ' ' + str(timeout) + 's')
+                time.sleep(1)
+                timeout -= 1
                 self.get_capture(capture_name)
+                self._log('<<info>> 未匹配:', comment + ' ' + str(timeout) + 's')
 
-            timeout -= 1
-
-        return len(pos_list) > 0, pos_list
+        return len(ret) > 0, ret
 
     def next_page(self, timeout):
         self._log('<<info>> next_page', '翻页')
