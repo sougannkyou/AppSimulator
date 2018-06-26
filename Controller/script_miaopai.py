@@ -1,7 +1,6 @@
 # coding:utf-8
 import time
 from datetime import datetime
-from Controller.DBLib import
 from Controller.NoxConSelenium import NoxConSelenium
 
 urls = [

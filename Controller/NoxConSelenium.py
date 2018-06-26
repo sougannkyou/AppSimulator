@@ -1,6 +1,6 @@
 # coding:utf-8
 import os
-import time
+import time,datetime
 import cv2
 import aircv as ac
 import ftplib
@@ -125,6 +125,7 @@ class NoxConSelenium(object):
     def click_xy(self, x, y, timeout):
         self._debug(x, y, timeout=2)
         self._adb.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)))
+        print(datetime.datetime.now())
         time.sleep(timeout)
         return True
 
