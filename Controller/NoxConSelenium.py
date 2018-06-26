@@ -62,13 +62,13 @@ class NoxConSelenium(object):
             self.get_capture(capture_name)
             pos = ac.find_template(self._img_capture, img_obj)
             if pos and pos['confidence'] > 0.9:
-                self._log('<<info>> 匹配到:', comment + ' ' + str(timeout) + 's')
+                self._log('<<info>> matched:', comment + ' ' + str(timeout) + 's')
                 x, y = pos['result']
                 return True, x, y
             else:
                 time.sleep(1)
                 timeout -= 1
-                self._log('<<info>> 未匹配到:', comment + ' ' + str(timeout) + 's')
+                self._log('<<info>> unmatch:', comment + ' ' + str(timeout) + 's')
 
         return False, -1, -1
 
@@ -86,24 +86,24 @@ class NoxConSelenium(object):
                     ret.append((int(x), int(y)))
 
             if len(ret) > 0:
-                self._log('<<info>> 匹配到:', str(len(ret)) + '件 ' + comment + ' ' + str(timeout) + 's')
+                self._log('<<info>> matched + ' + comment + ' counter:', str(len(ret)))
                 break
             else:
                 time.sleep(1)
                 timeout -= 1
                 self.get_capture(capture_name)
-                self._log('<<info>> 未匹配:', comment + ' ' + str(timeout) + 's')
+                self._log('<<info>> unmatch:', comment + ' ' + str(timeout) + 's')
 
         return len(ret) > 0, ret
 
     def next_page(self, timeout):
-        self._log('<<info>> next_page', '翻页')
+        self._log('<<info>> next_page', 'scroll')
         self._adb.adb_shell("input swipe 10 400 10 10")
         time.sleep(timeout)
         return True
 
     def next_page_browser(self, timeout):
-        self._log('<<info>> next_page_browser', '浏览器翻页')
+        self._log('<<info>> next_page_browser', 'web browser scroll')
         # KEYCODE_PAGE_UP = 92
         self._adb.adb_shell("input keyevent 93")  # KEYCODE_PAGE_DOWN = 93
         time.sleep(timeout)
@@ -142,9 +142,9 @@ class NoxConSelenium(object):
         return True
 
     def check_upgrade(self, timeout):
-        ret, x, y = self.find_element(u"跳过软件升级", timeout)
+        ret, x, y = self.find_element("ignore_upgrade", timeout)
         if ret:
-            self._log('<<info>> check_upgrade', '版本更新提示 .')
+            self._log('<<info>> check_upgrade', 'ignore the upgrade.')
             self.click_xy(x, y, 2)
 
         return ret
@@ -186,7 +186,7 @@ class NoxConSelenium(object):
         f = ftplib.FTP(ftp_server_ip)
         f.login(username, password)
         pwd_path = f.pwd()
-        self._log('FTP当前路径:', pwd_path)
+        self._log('FTP path:', pwd_path)
 
         bufsize = 1024  # 设置缓冲器大小
         fp = open(local_file, 'rb')

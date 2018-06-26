@@ -67,7 +67,7 @@ class Manager(object):
     def run_script(self, task, docker_name):
         try:
             cmd = 'START "task-' + str(task['taskId']) + '" '
-            cmd += 'python ' + self._work_path + '\Controller\\' + task['script'] +' '+ docker_name
+            cmd += 'python ' + self._work_path + '\Controller\\' + task['script'] + ' ' + docker_name
             # cmd += ' >>' + self._work_path + '\Controller\log\\task-' + str(task['taskId']) + '.log 2>&1'
             self._log('<<info>> run_script cmd:\n', cmd)
             os.system(cmd)
@@ -152,7 +152,7 @@ class Manager(object):
                 # 1)docker running
                 task['status'] = STATUS_DOCKER_RUNNING
                 self.db.task_change_status(task)
-                docker = NoxConDocker(app_name=task['app_name'], docker_name=docker_name)
+                docker = NoxConDocker(app_name=task['app_name'], docker_name=docker_name, taskId=task['taskId'])
                 ret = docker.run(force=True)  # docker run: create and start
                 if ret:
                     ret = self.check_docker_run(app_name=app_name, docker_name=docker_name, timeout=60)

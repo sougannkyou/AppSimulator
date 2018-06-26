@@ -2,7 +2,28 @@
 from pprint import pprint
 from datetime import datetime, timedelta
 import pymongo
+import redis
 from Controller.setting import *
+
+
+# ------------------------ docker db lib ----------------------
+class RedisDriver(object):
+    def __init__(self):
+        self._conn = redis.StrictRedis.from_url(REDIS_SERVER)
+
+    def set_current_task(self):
+        cnt = self._conn.llen('douyin_data')
+        ret = self._conn.blrange('douyin_data', -1, -1)
+        return ret
+
+    def get_devices_ip_list(self, app_name):
+        l = []
+        for key in self._conn.keys():
+            name = key.decode('utf-8')
+            if name.startswith('devices:' + app_name + ':') and name.endswith('_org'):
+                l.append(name.split(':')[2][:-4])
+        print("get_devices_ip_list:", l)
+        return l
 
 
 # ------------------------ docker db lib ----------------------

@@ -48,7 +48,7 @@ def main(docker_name):
 
         # if not ret: self.send2web('images/offline.jpeg')
         me.run(is_app_restart=True)
-        me._DEBUG = True
+        # me._DEBUG = True
         end = datetime.now()
         print("[Script " + docker_name + "] total times:", (end - start).seconds, "s")
         return True

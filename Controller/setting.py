@@ -6,6 +6,8 @@ LOCAL_IP = os.getenv('APPSIMULATOR_IP')
 MONGODB_SERVER_IP = os.environ["MONGODB_SERVER_IP"]
 MONGODB_SERVER_PORT = int(os.environ["MONGODB_SERVER_PORT"])
 
+REDIS_SERVER = 'redis://' + os.environ["REDIS_SERVER_IP"] + '/11'
+
 STATUS_RPC_TIMEOUT = 'rpc_timeout'
 
 STATUS_UNKOWN = 'unkown'

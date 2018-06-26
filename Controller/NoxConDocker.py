@@ -9,12 +9,13 @@ from Controller.NoxConADB import NoxConADB
 
 
 class NoxConDocker(object):
-    def __init__(self, app_name, docker_name):
+    def __init__(self, app_name, docker_name, taskId):
         self.DOCKERS_MAX_CNT = 10
         self._DEBUG = True
         self._ip = os.getenv('APPSIMULATOR_IP')
         self._app_name = app_name
         self._docker_name = docker_name
+        self._taskId = taskId
         self._adb = NoxConADB(docker_name=docker_name)
         self._org_path = os.getcwd()
 
@@ -29,40 +30,40 @@ class NoxConDocker(object):
     def _check(self):
         msg = ''
         if not self._ip:
-            msg = 'ip 不能为空，请设置：APPSIMULATOR_IP'
+            msg = 'Must be set APPSIMULATOR_IP'
             self._log('_check error:', msg)
             return False, msg
 
         if not self._app_name:
-            msg = 'app_name 不能为空.'
+            msg = 'Must be set app_name'
             self._log('_check error:', msg)
             return False, msg
 
         mem = psutil.virtual_memory()
         if mem.free < 1 * GB:  # < 1GB
-            msg = '内存剩余必须大于 1GB.'
+            msg = 'Memory must be greater than 1GB.'
             self._log('_check error:', msg)
             return False, msg
         else:
-            self._log('_check', 'memory: %.1f' % (mem.free / GB) + ' GB')
+            self._log('_check', 'Memory: %.1f' % (mem.free / GB) + ' GB')
 
         if not os.access('c:\\Nox\\backup\\nox-' + self._app_name + '.npbk', os.R_OK):
-            msg = '未找到 nox-' + self._app_name + '.npbk'
+            msg = 'Not found nox-' + self._app_name + '.npbk'
             self._log('_check error', msg)
             return False, msg
 
         if len(self.ps(docker_name='nox-org')) == 0:
-            msg = '未找到 nox-org.'
+            msg = 'Not found nox-org.'
             self._log('_check error:', msg)
             return False, msg
 
         running_dockers = self.ps(docker_status=STATUS_DOCKER_RUNNING)
         if len(running_dockers) >= self.DOCKERS_MAX_CNT:
-            msg = '启动数量不能大于 ' + str(self.DOCKERS_MAX_CNT)
+            msg = 'The number of starts can not be greater than ' + str(self.DOCKERS_MAX_CNT)
             self._log('_check error:', msg)
             return False, msg
         else:
-            self._log('_check ok', '当前运行中的docker数: ' + str(len(running_dockers)))
+            self._log('_check ok', 'Running dockers: ' + str(len(running_dockers)))
 
         return True, msg
 
@@ -102,30 +103,36 @@ class NoxConDocker(object):
             self._log('_cmd_kill_task', cmd)
             os.system(cmd)
 
+    def kill_task(self):
+        cmd = 'TASKKILL /F /T /FI "WINDOWTITLE eq task-' + str(self._taskId) + '"'
+        self._log('<<info>> kill_task', cmd)
+        os.system(cmd)
+
     def get_name(self):
         return self._docker_name
 
     def get_port(self):
-        self._log('get_port', '获取adb端口')
+        self._log('get_port', 'Get the adb port')
         ret = self._exec_nox_cmd(self._make_cmd(
             'adb -name:' + self._docker_name + ' -command:"get-serialno"'
         ))
         return ret.replace('\r', '').replace('\n', '').replace('127.0.0.1:', '')
 
     def shake(self, cnt):
-        self._log('<<info>> shake', str(cnt) + '次 振动提示')
+        self._log('<<info>> shake', 'Remind ' + str(cnt) + ' times')
         for _ in range(cnt):
             self._exec_nox_cmd(self._make_cmd("action -name:" + self._docker_name + " -key:call.shake -value:null"))
         return True
 
     def set_docker_name(self):
-        self._log('set_docker_name', '设置docker名称为:' + self._docker_name)
+        self._log('set_docker_name', 'Set docker name:' + self._docker_name)
         self._exec_nox_cmd(self._make_cmd(
             'adb -name:' + self._docker_name + ' -command:" shell setprop persist.nox.docker_name ' + self._docker_name + '"'
         ))
         return True
 
     def stop(self, wait_time=2):
+        self.kill_task()
         self._log('<<info>> stop', 'wait: ' + str(wait_time) + 's')
         time.sleep(wait_time)
         self._exec_nox_cmd(self._make_cmd("quit -name:" + self._docker_name))
@@ -195,7 +202,7 @@ class NoxConDocker(object):
 
         dockers = self.ps(docker_name=self._docker_name)
         if len(dockers) > 1:
-            msg = '找到的 docker 数大于1个.'
+            msg = 'The number of docker found is more than 1.'
             self._log('create', msg)
             return False, msg
 

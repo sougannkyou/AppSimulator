@@ -26,26 +26,26 @@ class MySelenium(NoxConSelenium):
     def script(self):
         self.get(url=urls[0], timeout=5)
         self.next_page_browser(3)
-        ret, x, y = self.find_element(comment='打开APP', timeout=5)
+        ret, x, y = self.find_element(comment='jump2app', timeout=5)
         if ret:
             ret = self.click_xy(x, y, timeout=2)
         else:
             # ret = self.next_page(timeout=1)
             ret = self.next_page_browser(1)
-            ret, x, y = self.find_element(comment='打开APP', timeout=10)
+            ret, x, y = self.find_element(comment='jump2app', timeout=10)
             if ret:
                 ret = self.click_xy(x, y, timeout=2)
             else:
                 # ret = self.next_page(timeout=1)
                 ret = self.next_page_browser(1)
-                ret, x, y = self.find_element(comment='打开APP', timeout=10)
+                ret, x, y = self.find_element(comment='jump2app', timeout=10)
                 if ret: ret = self.click_xy(x, y, timeout=2)
 
-        ret, x, y = self.find_element(comment='写评论', timeout=5)
+        ret, x, y = self.find_element(comment='writeComment', timeout=5)
         if ret: ret = self.click_xy(x, y, timeout=2)
         if ret: ret = self.input_cn(comments[0], timeout=1)
         time.sleep(5)
-        if ret: ret, x, y = self.find_element(comment='发布', timeout=5)
+        if ret: ret, x, y = self.find_element(comment='publish', timeout=5)
         if ret: ret = self.click_xy(x, y, timeout=1)
         # self.task_trace()
 
@@ -57,9 +57,9 @@ def main(docker_name):
     try:
         me = MySelenium(docker_name=docker_name, app_name='toutiao')
         me.set_comment_to_pic({
-            "打开APP": 'images/toutiao/jump2app.png',
-            "写评论": 'images/toutiao/writeComment.png',
-            "发布": 'images/toutiao/publish.png',
+            "jump2app": 'images/toutiao/jump2app.png',
+            "writeComment": 'images/toutiao/writeComment.png',
+            "publish": 'images/toutiao/publish.png',
         })
         me._DEBUG = True
         # me.set_gps(39.984727, 116.310050)  # 中关村
