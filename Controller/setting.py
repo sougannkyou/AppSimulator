@@ -19,7 +19,6 @@ STATUS_RPC_TIMEOUT = 'rpc_timeout'
 STATUS_UNKOWN = 'unkown'
 
 STATUS_WAIT = 'wait'  # wait
-STATUS_SCRIPT_SUSPEND = 'script_suspend'  # task interrupt
 
 STATUS_DOCKER_RUN = 'docker_run'  # docker running(create and run) ...
 STATUS_DOCKER_RUN_OK = 'docker_run_ok'
@@ -28,6 +27,7 @@ STATUS_DOCKER_RUN_NG = 'docker_run_ng'
 STATUS_SCRIPT_START = 'script_start'  # script running ...
 STATUS_SCRIPT_START_OK = 'script_start_ok'
 STATUS_SCRIPT_START_NG = 'script_start_ng'
+STATUS_SCRIPT_SUSPEND = 'script_suspend'  # task interrupt
 
 # ---------------------- rpc -----------------------------
 RPC_SERVER_TIMEOUT = 5
