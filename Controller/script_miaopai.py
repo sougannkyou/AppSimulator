@@ -27,7 +27,7 @@ class MySelenium(NoxConSelenium):
                         if ret:
                             ret, x, y = self.find_element(comment='copylink', timeout=10)
                             if ret:
-                                ret = self.click_xy(x, y, timeout=1)
+                                ret = self.click_xy(x, y, timeout=1, time_recoder=True)
                             else:  # upgrade?
                                 # ret = self.check_upgrade(timeout=2)
                                 # if ret:

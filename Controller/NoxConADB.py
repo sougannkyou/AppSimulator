@@ -1,10 +1,12 @@
 # coding:utf-8
 import time
+from datetime import datetime
 import re
 import random
 import subprocess
 
 CONSOLE_BINARY_PATH = 'C:\\Nox\\bin\\NoxConsole.exe'
+TIMER = [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
 
 
 class NoxConADB(object):
@@ -95,11 +97,14 @@ class NoxConADB(object):
         cmd_str = self._console_binary + ' adb -name:' + self._docker_name + ' -command:"' + cmd + '"'
         return cmd_str
 
-    def adb_cmd(self, cmd):
+    def adb_cmd(self, cmd, timer_no=0):
         self._clean()
         try:
             cmdline = self._make_command(cmd)
             self._log('[adb_cmd]<<info>>', cmdline)
+            if timer_no:
+                time.sleep(30 + TIMER[timer_no] - datetime.now().second % 30)
+
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()
             (stdout, stderr) = process.communicate()
@@ -110,9 +115,9 @@ class NoxConADB(object):
 
         return
 
-    def adb_shell(self, cmd):
+    def adb_shell(self, cmd, timer_no=0):
         self._clean()
-        self.adb_cmd('shell ' + cmd)
+        self.adb_cmd('shell ' + cmd, timer_no)
         return self._stdout
 
     def get_adb_version(self):

@@ -1,6 +1,6 @@
 # coding:utf-8
 import os
-import time,datetime
+import time
 import cv2
 import aircv as ac
 import ftplib
@@ -122,10 +122,9 @@ class NoxConSelenium(object):
         cv2.destroyAllWindows()
         cv2.waitKey(100)
 
-    def click_xy(self, x, y, timeout):
+    def click_xy(self, x, y, timeout, timer_no=0):
         self._debug(x, y, timeout=2)
-        self._adb.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)))
-        print(datetime.datetime.now())
+        self._adb.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)), timer_no)
         time.sleep(timeout)
         return True
 
@@ -139,7 +138,6 @@ class NoxConSelenium(object):
         self._log('<<info>> input_cn', text)
         # adb shell am broadcast -a ADB_INPUT_TEXT --es msg '输入汉字'
         self._adb.adb_shell("am broadcast -a ADB_INPUT_TEXT --es msg '" + text + "'")
-        time.sleep(timeout)
         return True
 
     def check_upgrade(self, timeout):
