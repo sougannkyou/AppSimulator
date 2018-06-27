@@ -9,7 +9,7 @@ from bson.objectid import ObjectId
 import requests
 from urllib.parse import urlparse, urlunparse
 
-from .setting import *
+from AppSimulator.setting import *
 
 
 class RedisDriver(object):
@@ -52,7 +52,7 @@ class RedisDriver(object):
                 'ip': ip,
                 'cnt': int(str(self._conn.scard("devices:" + app_name + ":" + ip + '_org'))),
                 'dedup_cnt': 0,
-                'status': DEVICE_STATUS_UNKOWN
+                'status': STATUS_UNKOWN
             })
 
         return ret
@@ -92,7 +92,7 @@ class MongoDriver(object):
         ips = RedisDriver().get_devices_ip_list(app_name)
         print("get_devices_status ips")
         for ip in ips:
-            status = {'deviceId': ip, 'ip': ip, 'cnt': 0, 'dedup_cnt': 0, 'status': DEVICE_STATUS_UNKOWN}
+            status = {'deviceId': ip, 'ip': ip, 'cnt': 0, 'dedup_cnt': 0, 'status': STATUS_UNKOWN}
             l = []
             statistics = self.deviceStatisticsInfo.find({'deviceId': ip})
             for s in statistics:
@@ -102,9 +102,9 @@ class MongoDriver(object):
             if (len(l) > 0 and l[-1] > 0):
                 status['cnt'] = l[-1]
                 if (l[0] == l[-1]):
-                    status['status'] = DEVICE_STATUS_SUSPEND
+                    status['status'] = STATUS_SCRIPT_SUSPEND
                 else:
-                    status['status'] = DEVICE_STATUS_RUNNING
+                    status['status'] = STATUS_DOCKER_RUN
 
             devices_status.append(status)
 

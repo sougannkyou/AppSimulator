@@ -7,7 +7,7 @@ from AppSimulator.DBLib import MongoDriver
 # ------------------------ web server task manager ----------------------
 class Manager(object):
     def __init__(self):
-        self._db = MongoDriver()
+        self._mdb = MongoDriver()
         self._DEBUG = False
 
     def _log(self, prefix, msg):
@@ -16,13 +16,14 @@ class Manager(object):
 
     def start_tasks(self):
         while True:
-            task = self._db.get_one_wait_task()
+            task = self._mdb.get_one_wait_task()
             if task:
-                servers = self._db.get_rpc_servers(task['app_name'])
+                servers = self._mdb.get_rpc_servers(task['app_name'])
                 for server in servers:
                     ret = rpc_get_free_mem(server['ip'], server['port'])
                     if ret > 1.0:  # free memory > 1GB
-                        self._db.set_task_server_ip(taskId=task['taskId'], ip=server['ip'])
+                        # set timer number
+                        self._mdb.set_task_server_ip(taskId=task['taskId'], ip=server['ip'])
                         break
             else:
                 time.sleep(1 * 60)

@@ -8,7 +8,6 @@ from Controller.NoxConADB import NoxConADB
 
 class NoxConDocker(object):
     def __init__(self, app_name, docker_name, taskId):
-        self.DOCKERS_MAX_CNT = 10
         self._DEBUG = True
         self._ip = os.getenv('APPSIMULATOR_IP')
         self._app_name = app_name
@@ -55,9 +54,9 @@ class NoxConDocker(object):
             self._log('_check error:', msg)
             return False, msg
 
-        running_dockers = self.ps(docker_status=STATUS_DOCKER_RUNNING)
-        if len(running_dockers) >= self.DOCKERS_MAX_CNT:
-            msg = 'The number of starts can not be greater than ' + str(self.DOCKERS_MAX_CNT)
+        running_dockers = self.ps(docker_status=STATUS_DOCKER_RUN)
+        if len(running_dockers) >= len(TIMER):
+            msg = 'The number of starts can not be greater than timer counter ' + str(len(TIMER))
             self._log('_check error:', msg)
             return False, msg
         else:
@@ -95,7 +94,7 @@ class NoxConDocker(object):
             return _stdout
 
     def _cmd_kill_task(self, docker_name):
-        dockers = self.ps(docker_name=docker_name, docker_status=STATUS_DOCKER_RUNNING)
+        dockers = self.ps(docker_name=docker_name, docker_status=STATUS_DOCKER_RUN)
         for d in dockers:
             cmd = 'TASKKILL /F /T /PID ' + str(d['pid'])  # 不能强杀，会造成 ERR：1037
             self._log('_cmd_kill_task', cmd)
@@ -152,7 +151,7 @@ class NoxConDocker(object):
             # 虚拟机名称，标题，顶层窗口句柄，工具栏窗口句柄，绑定窗口句柄，进程PID
             for s in ret.split('\r\n'):
                 if s.startswith('nox') or s.startswith('Nox'):
-                    status = STATUS_WAIT if s.split(',')[-1] == '-1' else STATUS_DOCKER_RUNNING
+                    status = STATUS_WAIT if s.split(',')[-1] == '-1' else STATUS_DOCKER_RUN
                     name = s.split(',')[1]
                     id = s.split(',')[0]
                     pid = s.split(',')[-1]
@@ -206,7 +205,7 @@ class NoxConDocker(object):
             return False, msg
 
         if len(dockers) == 1:
-            if dockers[0]['status'] == STATUS_DOCKER_RUNNING:
+            if dockers[0]['status'] == STATUS_DOCKER_RUN:
                 self.stop(wait_time=5)
 
             ret = self.remove()

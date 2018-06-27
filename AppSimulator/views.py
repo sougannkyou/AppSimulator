@@ -1,9 +1,5 @@
 # coding=utf-8
 from django.views.generic import TemplateView
-from AppSimulator.DBLib import MongoDriver
-
-MDB = MongoDriver()
-
 
 # [数据面板]
 class DashBoardView(TemplateView):

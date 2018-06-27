@@ -46,14 +46,14 @@ class MongoDriver(object):
         self.rpcServer.update({'ip': controller_info['ip']}, {"$set": controller_info}, upsert=True)
 
     def task_get_one_for_run(self):
-        if self.tasks.find({'status': STATUS_DOCKER_RUNNING, 'rpc_server_ip': LOCAL_IP}).count() > 0:
+        if self.tasks.find({'status': STATUS_DOCKER_RUN, 'rpc_server_ip': LOCAL_IP}).count() > 0:
             return None
         else:
             return self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': LOCAL_IP})
 
     def task_get_my_prepare_tasks_cnt(self):
         return self.tasks.find(
-            {'status': {'$in': [STATUS_WAIT, STATUS_DOCKER_RUNNING]}, 'rpc_server_ip': LOCAL_IP}).count()
+            {'status': {'$in': [STATUS_WAIT, STATUS_DOCKER_RUN]}, 'rpc_server_ip': LOCAL_IP}).count()
 
     def task_change_status(self, task):
         self._log('task_change_status', task['status'])
@@ -68,7 +68,7 @@ class MongoDriver(object):
             'docker_name': 'nox-' + str(task['taskId']),
             'ip': LOCAL_IP,
             'port': 0,
-            'status': STATUS_DOCKER_RUNNING,
+            'status': STATUS_DOCKER_RUN,
             'start_time': int(datetime.now().timestamp()),
             'end_time': 0
         })

@@ -18,14 +18,14 @@ STATUS_UNKOWN = 'unkown'
 
 STATUS_WAIT = 'wait'
 
-STATUS_DOCKER_RUNNING = 'docker_running'  # docker running(create and run) ...
+STATUS_DOCKER_RUN = 'docker_run'  # docker running(create and run) ...
 STATUS_DOCKER_RUN_OK = 'docker_run_ok'
 STATUS_DOCKER_RUN_NG = 'docker_run_ng'
 
-STATUS_SCRIPT_RUNNING = 'script_running'  # script running ...
-STATUS_SCRIPT_RUN_OK = 'script_run_ok'
-STATUS_SCRIPT_RUN_NG = 'script_run_ng'
-STATUS_SCRIPT_RUN_SUSPEND = 'script_run_suspend'  # task interrupt
+STATUS_SCRIPT_START = 'script_start'  # script running ...
+STATUS_SCRIPT_START_OK = 'script_start_ok'
+STATUS_SCRIPT_START_NG = 'script_start_ng'
+STATUS_SCRIPT_SUSPEND = 'script_suspend'  # task interrupt
 
 # ---------------------- task -----------------------------
 TASK_TYPE_ONCE = 'once'

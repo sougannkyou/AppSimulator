@@ -13,8 +13,8 @@ from Controller.NoxConSelenium import NoxConSelenium
 # ------------------------ docker task manager ----------------------
 class Manager(object):
     def __init__(self):
-        self.db = MongoDriver()
-        self.db._DEBUG = True
+        self._mdb = MongoDriver()
+        self._mdb._DEBUG = False
         self._DEBUG = False
         self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
 
@@ -144,14 +144,14 @@ class Manager(object):
     def start_tasks(self):
         # 1)docker running -> 2)docker run ok(ng) -> 3)script running -> 4)script run ok(ng)
         while True:
-            task = self.db.task_get_one_for_run()
+            task = self._mdb.task_get_one_for_run()
             if task:
                 docker_name = 'nox-' + str(task['taskId'])
                 app_name = task['app_name']
 
                 # 1)docker running
-                task['status'] = STATUS_DOCKER_RUNNING
-                self.db.task_change_status(task)
+                task['status'] = STATUS_DOCKER_RUN
+                self._mdb.task_change_status(task)
                 docker = NoxConDocker(app_name=task['app_name'], docker_name=docker_name, taskId=task['taskId'])
                 ret = docker.run(force=True)  # docker run: create and start
                 if ret:
@@ -168,18 +168,18 @@ class Manager(object):
 
                 # 2)docker run ok(ng)
                 docker_info = {'_id': self.db.docker_create(task), 'status': status}
-                self.db.docker_change_status(docker_info)
+                self._mdb.docker_change_status(docker_info)
                 task['status'] = status
-                self.db.task_change_status(task)
+                self._mdb.task_change_status(task)
 
                 if ret:
-                    self.db.task_set_docker(task, docker_info)  # bind docker to task
+                    self._mdb.task_set_docker(task, docker_info)  # bind docker to task
                     # 3)script running
                     ret = self.run_script(task=task, docker_name=docker_name)
-                    task['status'] = STATUS_SCRIPT_RUN_OK if ret else STATUS_SCRIPT_RUN_NG
+                    task['status'] = STATUS_SCRIPT_START_OK if ret else STATUS_SCRIPT_START_NG
 
                     # 4)script run ok(ng)
-                    self.db.task_change_status(task)
+                    self._mdb.task_change_status(task)
 
                 # break
             else:

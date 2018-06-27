@@ -89,6 +89,7 @@ class MongoDriver(object):
             "rpc_server_ip": '',
             "start_time": int(datetime.now().timestamp()),
             "end_time": 0,
+            "timer_no": 0,
             "dockerId": ''
         })
         return taskId
@@ -108,6 +109,9 @@ class MongoDriver(object):
 
     def set_task_server_ip(self, taskId, ip):
         self.tasks.update({'taskId': taskId}, {'$set': {'rpc_server_ip': ip}})
+
+    def get_(self):
+        pass
 
     def get_config_info(self, deviceId):
         info = self.deviceConfig.find_one({'deviceId': deviceId})

@@ -91,7 +91,7 @@
     <script type="text/javascript" src="{% static 'AppSimulator/js/csrf.js' %}"></script>
     <script type="text/javascript">
         const STATUS_UNKOWN = 'unkown';
-        const STATUS_RUNNING = 'running';
+        const STATUS_RUN = 'running';
         const STATUS_SUSPEND = 'suspend';
 
         function addTask(obj) {
@@ -147,21 +147,21 @@
                     port: '62001',
                     script: 'script_douyin.py',
                     app_name: 'douyin',
-                    status: STATUS_RUNNING,
+                    status: STATUS_RUN,
                 }, {
                     taskId: 2,
                     ip: '192.168.31.228',
                     port: '62003',
                     script: 'script_miaopai.py',
                     app_name: 'miaopai',
-                    status: STATUS_RUNNING,
+                    status: STATUS_RUN,
                 }, {
                     taskId: 3,
                     ip: '192.168.31.229',
                     port: '62005',
                     script: 'script_dianping.py',
                     app_name: 'dianping',
-                    status: STATUS_RUNNING,
+                    status: STATUS_RUN,
                 }];
             },
             watch: {},
