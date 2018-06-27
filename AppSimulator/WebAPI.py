@@ -1,18 +1,12 @@
 # coding=utf-8
-import datetime, time
 import os, sys
 import psutil
-
-import json
-import copy
 from io import StringIO
 import bson.binary
 import traceback
 import requests
 import re
 from urllib.parse import urljoin
-import subprocess
-from pprint import pprint
 from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
 # from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -32,7 +26,6 @@ RDB = RedisDriver()
 def getRpcServerStatus(deviceId):
     info = MDB.get_config_info(deviceId)
     # print('get_config_info', deviceId, info['ip'])
-
 
     output = JsonResponse({
         'ret': ret,
@@ -64,7 +57,6 @@ def setDeviceGPSAPI(request):
     latitude = request.POST.get('latitude')  # 经度
     longitude = request.POST.get('longitude')  # 纬度
 
-
     output = JsonResponse({
         'ret': ret,
     })
@@ -73,8 +65,6 @@ def setDeviceGPSAPI(request):
 
 def restartDeviceAPI(request):
     deviceId = request.GET.get('deviceId')  # 设备ID
-
-
 
     output = JsonResponse({
         'ret': ret,
@@ -212,18 +202,6 @@ def runTasks():
         'ret': ret
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
-
-
-def test():
-    tasks = MDB.get_tasks(status=STATUS_WAIT)
-    for task in tasks:
-        rpcServers = MDB.get_rpc_server(app_name=task['app_name'])
-        for server in rpcServers:
-            rpcServer = "http://" + server['ip'] + ":" + str(server['port'])
-            with xmlrpc.client.ServerProxy(rpcServer) as proxy:
-                # ret = proxy.runTasks(app_name, tasks_cnt)
-                free_mem = proxy.get_free_mem()
-                print(free_mem)
 
 
 if __name__ == "__main__":

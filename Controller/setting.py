@@ -3,11 +3,17 @@ import os
 
 LOCAL_IP = os.getenv('APPSIMULATOR_IP')
 
+SCOPE_TIMES = 1 * 60
+
+GB = 1024 * 1024 * 1024
+
+# ---------------------- db -----------------------------
 MONGODB_SERVER_IP = os.environ["MONGODB_SERVER_IP"]
 MONGODB_SERVER_PORT = int(os.environ["MONGODB_SERVER_PORT"])
 
 REDIS_SERVER = 'redis://' + os.environ["REDIS_SERVER_IP"] + '/11'
 
+# ---------------------- status -----------------------------
 STATUS_RPC_TIMEOUT = 'rpc_timeout'
 
 STATUS_UNKOWN = 'unkown'
@@ -23,9 +29,12 @@ STATUS_SCRIPT_RUN_OK = 'script_run_ok'
 STATUS_SCRIPT_RUN_NG = 'script_run_ng'
 STATUS_SCRIPT_RUN_SUSPEND = 'script_run_suspend'  # task interrupt
 
-SCOPE_TIMES = 1 * 60
-
-RPC_PORT = 8003
-GB = 1024 * 1024 * 1024
-
+# ---------------------- rpc -----------------------------
 RPC_SERVER_TIMEOUT = 5
+RPC_PORT = 8003
+
+# ---------------------- adb -----------------------------
+ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
+CONSOLE_BINARY_PATH = 'C:\\Nox\\bin\\NoxConsole.exe'
+
+TIMER = [2, 5, 8, 11, 14, 17, 20, 23, 26, 29]

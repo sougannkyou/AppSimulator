@@ -35,14 +35,14 @@ class MySelenium(NoxConSelenium):
         # ret, x, y = self.find_element(comment='web打开APP', timeout=10)
         # if ret: ret = self.click_xy(x, y, timeout=2)
         if ret: ret, x, y = self.find_element(comment='APP图标', timeout=10)
-        if ret: ret = self.click_xy(x, y, timeout=2)
+        if ret: ret = self.click_xy(x, y, wait_time=2)
         if ret: ret, x, y = self.find_element(comment='附近热搜', timeout=5)
-        if ret: ret = self.click_xy(x, y, timeout=1)
+        if ret: ret = self.click_xy(x, y, wait_time=1)
         time.sleep(3)
         if ret: ret = self.input_cn(keywords[0], timeout=1)
         time.sleep(5)
         if ret: ret, x, y = self.find_element(comment='搜索', timeout=5)
-        if ret: ret = self.click_xy(x, y + 30, timeout=1)
+        if ret: ret = self.click_xy(x, y + 30, wait_time=1)
 
         ret, x, y = self.find_element(comment='APP打开结果OK', timeout=60)
         find = False
@@ -51,38 +51,38 @@ class MySelenium(NoxConSelenium):
             ret, x, y = self.find_element(comment='全部网友点评', timeout=5)
             if ret:
                 find = True
-                ret = self.click_xy(x, y, timeout=1)
+                ret = self.click_xy(x, y, wait_time=1)
                 break
             else:
-                ret = self.next_page(timeout=1)
+                ret = self.next_page(wait_time=1)
 
         while find and ret:
             if ret:
                 ret, pos_list = self.find_elements(comment='打分', timeout=10)
                 if not ret:
-                    ret = self.next_page(timeout=1)
+                    ret = self.next_page(wait_time=1)
                     print('next_page:', page_cnt)
 
             for pos in pos_list:
                 (x, y) = pos
-                if ret: ret = self.click_xy(x, y, timeout=1)
+                if ret: ret = self.click_xy(x, y, wait_time=1)
                 if ret:
                     ret, x, y = self.find_element(comment='分享', timeout=10)
                 else:
                     (x, y) = pos
-                    if ret: ret = self.click_xy(x, y, timeout=1)
+                    if ret: ret = self.click_xy(x, y, wait_time=1)
                     if ret: ret, x, y = self.find_element(comment='分享', timeout=10)
 
-                if ret: ret = self.click_xy(x, y, timeout=1)
+                if ret: ret = self.click_xy(x, y, wait_time=1)
                 if ret: ret, x, y = self.find_element(comment='复制链接', timeout=10)
-                if ret: ret = self.click_xy(x, y, timeout=1)
-                if ret: ret = self.back(timeout=1)
+                if ret: ret = self.click_xy(x, y, wait_time=1)
+                if ret: ret = self.back(wait_time=1)
 
-            if ret: ret = self.next_page(timeout=1)
+            if ret: ret = self.next_page(wait_time=1)
 
 
 ##################################################################################
-def run(docker_name):
+def main(docker_name):
     start = datetime.now()
     print("[Script " + docker_name + "] run start.", start)
     try:
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     tasks_cnt = 1
     docker = NoxConDocker('toutiao', 'nox-99')
     for i in range(1, 1 + tasks_cnt):
-        docker.build(force=True)
+        docker.main(force=True)
 
     time.sleep(10)
 

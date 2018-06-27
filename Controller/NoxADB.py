@@ -1,14 +1,8 @@
 # coding:utf-8
-try:
-    import sys
-    import re
-    import random
-    import subprocess
-except ImportError as e:
-    print("[MyADB] error:", e.args[0])
-    sys.exit(-1)
-
-ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
+import re
+import random
+import subprocess
+from Controller.setting import ADB_BINARY_PATH
 
 
 class NoxADB(object):
@@ -32,7 +26,7 @@ class NoxADB(object):
         self._stdout = None
         self._stderr = None
 
-    def _get_phoneNumber(self):
+    def _get_phone_number(self):
         num = '186'
         for i in range(8):
             num += str(random.randrange(0, 9))

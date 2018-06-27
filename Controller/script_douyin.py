@@ -7,27 +7,27 @@ from Controller.NoxConSelenium import NoxConSelenium
 class MySelenium(NoxConSelenium):
     def script(self):
         ret, x, y = self.find_element(comment=u'APP图标', timeout=10)  # unlock ok
-        if ret: ret = self.click_xy(x, y, timeout=2)
+        if ret: ret = self.click_xy(x, y, wait_time=2)
         while ret:  # 更新 -> 分享 -> 复制链接
             if ret: ret, x, y = self.find_element(comment=u'更新', timeout=10)
-            if ret: ret = self.click_xy(x, y, timeout=1)
+            if ret: ret = self.click_xy(x, y, wait_time=1)
 
             if ret: ret, x, y = self.find_element(comment=u'分享', timeout=10)
-            if ret: ret = self.click_xy(x, y, timeout=1)
+            if ret: ret = self.click_xy(x, y, wait_time=1)
 
             if ret:
                 ret, x, y = self.find_element(comment=u'复制链接', timeout=10)
                 if ret:
-                    ret = self.click_xy(x, y, timeout=1)
+                    ret = self.click_xy(x, y, wait_time=1)
                 else:  # upgrade?
                     # ret = self.check_upgrade(timeout=2)
                     # if ret:
                     print(u"重试 click 分享 按钮 ...")
                     ret, x, y = self.find_element(comment=u'分享', timeout=10)
-                    if ret: ret = self.click_xy(x, y, timeout=1)
+                    if ret: ret = self.click_xy(x, y, wait_time=1)
 
                     if ret: ret, x, y = self.find_element(comment=u'复制链接', timeout=10)
-                    if ret: ret = self.click_xy(x, y, timeout=1)
+                    if ret: ret = self.click_xy(x, y, wait_time=1)
 
 
 ##################################################################################

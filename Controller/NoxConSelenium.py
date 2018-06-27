@@ -33,10 +33,10 @@ class NoxConSelenium(object):
     def wait_online(self, timeout=10):
         return self._adb.wait_for_device(timeout=timeout)
 
-    def get(self, url, timeout=5):
+    def get(self, url, wait_time=5):
         # start android web browser
         self._adb.start_web(url)
-        time.sleep(timeout)
+        time.sleep(wait_time)
         return True
 
     def set_gps(self, latitude, longitude):
@@ -96,20 +96,20 @@ class NoxConSelenium(object):
 
         return len(ret) > 0, ret
 
-    def next_page(self, timeout):
+    def next_page(self, wait_time):
         self._log('<<info>> next_page', 'scroll')
         self._adb.adb_shell("input swipe 10 400 10 10")
-        time.sleep(timeout)
+        time.sleep(wait_time)
         return True
 
-    def next_page_browser(self, timeout):
+    def next_page_browser(self, wait_time):
         self._log('<<info>> next_page_browser', 'web browser scroll')
         # KEYCODE_PAGE_UP = 92
         self._adb.adb_shell("input keyevent 93")  # KEYCODE_PAGE_DOWN = 93
-        time.sleep(timeout)
+        time.sleep(wait_time)
         return True
 
-    def _debug(self, x, y, timeout):
+    def _debug(self, x, y, wait_time):
         if not self._DEBUG:
             return
 
@@ -118,20 +118,20 @@ class NoxConSelenium(object):
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(0, 0, 255), thickness=1)
         cv2.startWindowThread()
         cv2.imshow('Debugger', self._img_capture)
-        cv2.waitKey(timeout * 1000)
+        cv2.waitKey(wait_time * 1000)
         cv2.destroyAllWindows()
         cv2.waitKey(100)
 
-    def click_xy(self, x, y, timeout, timer_no=0):
-        self._debug(x, y, timeout=2)
+    def click_xy(self, x, y, wait_time, timer_no=0):
+        self._debug(x, y, wait_time=2)
         self._adb.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)), timer_no)
-        time.sleep(timeout)
+        time.sleep(wait_time)
         return True
 
-    def input(self, text, timeout):
+    def input(self, text, wait_time):
         self._log('<<info>> input', text)
         self._adb.adb_shell('input text ' + text)
-        time.sleep(timeout)
+        time.sleep(wait_time)
         return True
 
     def input_cn(self, text, timeout):
@@ -144,35 +144,35 @@ class NoxConSelenium(object):
         ret, x, y = self.find_element("ignore_upgrade", timeout)
         if ret:
             self._log('<<info>> check_upgrade', 'ignore the upgrade.')
-            self.click_xy(x, y, 2)
+            self.click_xy(x, y, wait_time=2)
 
         return ret
 
-    def reboot(self, timeout):
+    def reboot(self, wait_time):
         self._adb.adb_cmd('reboot')
-        time.sleep(timeout)
+        time.sleep(wait_time)
 
-    def back(self, timeout):
+    def back(self, wait_time):
         self._log('back', '')
         self._adb.adb_shell('input keyevent 4')  # KEYCODE_BACK
-        time.sleep(timeout)
+        time.sleep(wait_time)
         return True
 
-    def app_quit(self, timeout):
+    def app_quit(self, wait_time):
         for i in range(4):
             self._log('app_quit', '')
             self._adb.adb_shell('input keyevent 4')  # KEYCODE_BACK
-            time.sleep(timeout)
+            time.sleep(wait_time)
         return True
 
-    def unlock(self, timeout):
+    def unlock(self, wait_time):
         self._adb.adb_shell('rm /data/system/*.key')  # rm /data/system/*.key
-        time.sleep(timeout)
+        time.sleep(wait_time)
         return True
 
-    def get_new_phone(self, timeout=1):
+    def get_new_phone(self, wait_time=1):
         ret = self._adb.get_new_phone()
-        time.sleep(timeout)
+        time.sleep(wait_time)
         return ret
 
     def ftp_upload(self, local_file, remote_dir, remote_file):
@@ -210,10 +210,10 @@ class NoxConSelenium(object):
         pass  # overwrite
 
     def run(self, is_app_restart):
-        ret = self.unlock(timeout=1)
-        self.get_new_phone(timeout=1)
+        ret = self.unlock(wait_time=1)
+        self.get_new_phone(wait_time=1)
         if ret and is_app_restart:
-            ret = self.app_quit(timeout=1)
+            ret = self.app_quit(wait_time=1)
 
         if ret:
             self.script()

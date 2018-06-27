@@ -2,12 +2,10 @@ import socket
 import xmlrpc.client
 from AppSimulator.setting import *
 
-_DEBUG = True
-
 
 # ------------------------ server rpc lib ----------------------
 def _log(prefix, msg):
-    if _DEBUG or prefix.find('error') > 0:
+    if RPC_DEBUG or prefix.find('error') > 0:
         print('[web server rpc]', prefix, msg)
 
 

@@ -4,9 +4,7 @@ from datetime import datetime
 import re
 import random
 import subprocess
-
-CONSOLE_BINARY_PATH = 'C:\\Nox\\bin\\NoxConsole.exe'
-TIMER = [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
+from Controller.setting import CONSOLE_BINARY_PATH, TIMER
 
 
 class NoxConADB(object):
@@ -102,8 +100,15 @@ class NoxConADB(object):
         try:
             cmdline = self._make_command(cmd)
             self._log('[adb_cmd]<<info>>', cmdline)
-            if timer_no:
-                time.sleep(30 + TIMER[timer_no] - datetime.now().second % 30)
+            if timer_no > 0:
+                cycle = 3 * len(TIMER)
+                now = datetime.now().second % cycle
+                if now > TIMER[timer_no]:
+                    wait_time = cycle + TIMER[timer_no] - now
+                else:
+                    wait_time = TIMER[timer_no] - now
+
+                time.sleep(wait_time)
 
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()

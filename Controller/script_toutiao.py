@@ -24,29 +24,29 @@ comments = [
 
 class MySelenium(NoxConSelenium):
     def script(self):
-        self.get(url=urls[0], timeout=5)
+        self.get(url=urls[0], wait_time=5)
         self.next_page_browser(3)
         ret, x, y = self.find_element(comment='jump2app', timeout=5)
         if ret:
-            ret = self.click_xy(x, y, timeout=2)
+            ret = self.click_xy(x, y, wait_time=2)
         else:
             # ret = self.next_page(timeout=1)
             ret = self.next_page_browser(1)
             ret, x, y = self.find_element(comment='jump2app', timeout=10)
             if ret:
-                ret = self.click_xy(x, y, timeout=2)
+                ret = self.click_xy(x, y, wait_time=2)
             else:
                 # ret = self.next_page(timeout=1)
                 ret = self.next_page_browser(1)
                 ret, x, y = self.find_element(comment='jump2app', timeout=10)
-                if ret: ret = self.click_xy(x, y, timeout=2)
+                if ret: ret = self.click_xy(x, y, wait_time=2)
 
         ret, x, y = self.find_element(comment='writeComment', timeout=5)
-        if ret: ret = self.click_xy(x, y, timeout=2)
+        if ret: ret = self.click_xy(x, y, wait_time=2)
         if ret: ret = self.input_cn(comments[0], timeout=1)
         time.sleep(5)
         if ret: ret, x, y = self.find_element(comment='publish', timeout=5)
-        if ret: ret = self.click_xy(x, y, timeout=1)
+        if ret: ret = self.click_xy(x, y, wait_time=1)
         # self.task_trace()
 
 

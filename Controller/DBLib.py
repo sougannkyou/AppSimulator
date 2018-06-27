@@ -42,24 +42,6 @@ class MongoDriver(object):
         if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
             print('[Controller DB]', prefix, msg)
 
-    # def task_trace(self, task_id, app_name, docker_name, action):  # after docker start success
-    #     self.tasksTrace.insert({
-    #         'task_id': task_id,
-    #         'app_name': app_name,
-    #         'docker_name': docker_name,
-    #         'time': int(datetime.now().timestamp()),
-    #         'action': action,  # sharelink, start, stop, publish
-    #     })
-    #
-    # def set_docker_info(self, docker_name, ip, port, task_id, app_name):
-    #     self.dockerConfig.insert({
-    #         'docker_name': docker_name,
-    #         'ip': ip,
-    #         'port': port,
-    #         'task_id': task_id,
-    #         'app_name': app_name,
-    #     })
-
     def rpc_registor_service(self, controller_info):
         self.rpcServer.update({'ip': controller_info['ip']}, {"$set": controller_info}, upsert=True)
 

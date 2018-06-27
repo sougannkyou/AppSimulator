@@ -1,8 +1,6 @@
 # coding:utf-8
-import os
 import time
 import psutil
-import win32gui
 import subprocess
 from Controller.setting import *
 from Controller.NoxConADB import NoxConADB
@@ -86,7 +84,7 @@ class NoxConDocker(object):
         except Exception as e:
             self._log('_exec_nox_cmd error:', e)
         finally:
-            os.chdir(self._org_path)
+            os.chdir(self._org_path)  # 恢复路径
 
         self._log('stdout:\n', _stdout)
         if _stderr:
@@ -104,6 +102,7 @@ class NoxConDocker(object):
             os.system(cmd)
 
     def kill_task(self):
+        # <<cmd>> taskkill /f /t /fi "WINDOWTITLE eq task-99"
         cmd = 'TASKKILL /F /T /FI "WINDOWTITLE eq task-' + str(self._taskId) + '"'
         self._log('<<info>> kill_task', cmd)
         os.system(cmd)
@@ -253,7 +252,7 @@ def test(app_name, docker_name):
 if __name__ == "__main__":
     # tasks_cnt = 3
     complete_cnt = 0
-    os.chdir('c:\\Nox\\bin')
+    # os.chdir('c:\\Nox\\bin')
     # pool = multiprocessing.Pool(processes=4)
     # for docker_name in ['nox-3', 'nox-4', 'nox-5']:  # range(tasks_cnt):
     # # for docker_name in ['nox-3']:  # range(tasks_cnt):

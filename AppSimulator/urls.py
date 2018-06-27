@@ -7,7 +7,7 @@ from AppSimulator.views import (
     DashBoardView, TasksView
 )
 
-from AppSimulator.webAPI import (
+from AppSimulator.WebAPI import (
     addTaskAPI,
     getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI,
     setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,

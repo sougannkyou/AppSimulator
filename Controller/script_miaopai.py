@@ -16,29 +16,29 @@ class MySelenium(NoxConSelenium):
         try:
             ret, x, y = self.find_element(comment='app_icon', timeout=10)  # unlock ok
             if ret:
-                ret = self.click_xy(x, y, timeout=2)
+                ret = self.click_xy(x, y, wait_time=2)
 
             while ret:
                 ret, pos_list = self.find_elements(comment='share', timeout=10)
                 if ret:
                     for pos in pos_list:
                         (x, y) = pos
-                        ret = self.click_xy(x, y, timeout=2)
+                        ret = self.click_xy(x, y, wait_time=2)
                         if ret:
                             ret, x, y = self.find_element(comment='copylink', timeout=10)
                             if ret:
-                                ret = self.click_xy(x, y, timeout=1, time_recoder=True)
+                                ret = self.click_xy(x, y, wait_time=1, timer_no=2)
                             else:  # upgrade?
                                 # ret = self.check_upgrade(timeout=2)
                                 # if ret:
                                 # print(u"重试 click 分享 按钮 ...")
                                 ret, x, y = self.find_element(comment='share', timeout=10)
-                                if ret: ret = self.click_xy(x, y, timeout=1)
+                                if ret: ret = self.click_xy(x, y, wait_time=1)
 
                                 if ret: ret, x, y = self.find_element(comment='copylink', timeout=10)
-                                if ret: ret = self.click_xy(x, y, timeout=1)
+                                if ret: ret = self.click_xy(x, y, wait_time=1)
 
-                self.next_page(timeout=5)
+                self.next_page(wait_time=5)
 
         except Exception as e:
             self._log('error:', e)
