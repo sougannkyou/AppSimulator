@@ -1,10 +1,11 @@
 # coding:utf-8
+import os
 import time
 from datetime import datetime
 import re
 import random
 import subprocess
-from Controller.setting import CONSOLE_BINARY_PATH, TIMER
+from Controller.setting import CONSOLE_BINARY_PATH
 
 
 class NoxConADB(object):
@@ -14,14 +15,18 @@ class NoxConADB(object):
     DEFAULT_TCP_HOST = "localhost"
     DEFAULT_TCP_PORT = 62001  # 5555
 
-    def __init__(self, docker_name):
+    def __init__(self, task_info):
         self._DEBUG = False
         self._stdout = None
         self._stderr = None
         self._devices = None
         self.__target = None
+        self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
         self._console_binary = CONSOLE_BINARY_PATH
-        self._docker_name = docker_name
+        self._app_name = task_info['app_name']
+        self._docker_name = 'nox-' + str(task_info['taskId'])
+        self._timer_no = task_info['timer_no']
+        self._taskId = task_info['taskId']
 
     def _log(self, prefix, msg):
         if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
@@ -59,6 +64,7 @@ class NoxConADB(object):
         # "adb shell setprop persist.nox.modem.imsi 460000000000000"
         self.adb_shell("setprop persist.nox.modem.phonumber " + phone_number)
         # "adb shell setprop persist.nox.modem.serial 89860000000000000000"
+        time.sleep(1)
         return True
 
     def get_android_version(self):
@@ -71,7 +77,7 @@ class NoxConADB(object):
         self.adb_shell("setprop persist.nox.gps.longitude " + str(longitude))
         return True
 
-    def start_web(self, url):
+    def adb_start_web(self, url):
         # adb shell am start -a android.intent.action.VIEW -d http://testerhome.com
         self.adb_shell("am start -a android.intent.action.VIEW -d " + url)
         return True
@@ -95,21 +101,15 @@ class NoxConADB(object):
         cmd_str = self._console_binary + ' adb -name:' + self._docker_name + ' -command:"' + cmd + '"'
         return cmd_str
 
-    def adb_cmd(self, cmd, timer_no=0):
+    def adb_cmd_before(self):
+        pass
+
+    def adb_cmd(self, cmd):
         self._clean()
         try:
             cmdline = self._make_command(cmd)
             self._log('[adb_cmd]<<info>>', cmdline)
-            if timer_no > 0:
-                cycle = 3 * len(TIMER)
-                now = datetime.now().second % cycle
-                if now > TIMER[timer_no]:
-                    wait_time = cycle + TIMER[timer_no] - now
-                else:
-                    wait_time = TIMER[timer_no] - now
-
-                time.sleep(wait_time)
-
+            self.adb_cmd_before()
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()
             (stdout, stderr) = process.communicate()
@@ -120,9 +120,9 @@ class NoxConADB(object):
 
         return
 
-    def adb_shell(self, cmd, timer_no=0):
+    def adb_shell(self, cmd):
         self._clean()
-        self.adb_cmd('shell ' + cmd, timer_no)
+        self.adb_cmd('shell ' + cmd)
         return self._stdout
 
     def get_adb_version(self):
@@ -446,9 +446,14 @@ class NoxConADB(object):
 
 
 if __name__ == "__main__":
-    my = NoxConADB('nox-1')
-    my._DEBUG = True
+    task_info = {
+        'app_name': 'miaopai',
+        'docker_name': 'nox-2',
+        'timer_no': 2
+    }
+    me = NoxConADB(task_info)
+    me._DEBUG = True
 
-    print(my.get_adb_version())
-    print(my.get_serialno())
-    print(my.adb_shell('input keyevent 4'))
+    # print(my.get_adb_version())
+    # print(my.get_serialno())
+    # print(my.adb_shell('input keyevent 4'))

@@ -3,18 +3,16 @@ import time
 import psutil
 import subprocess
 from Controller.setting import *
-from Controller.NoxConADB import NoxConADB
 
 
 class NoxConDocker(object):
-    def __init__(self, app_name, docker_name, taskId):
+    def __init__(self, task_info):
         self._DEBUG = True
-        self._ip = os.getenv('APPSIMULATOR_IP')
-        self._app_name = app_name
-        self._docker_name = docker_name
-        self._taskId = taskId
-        self._adb = NoxConADB(docker_name=docker_name)
+        self._local_ip = os.getenv('APPSIMULATOR_IP')
         self._org_path = os.getcwd()
+        self._app_name = task_info['app_name']
+        self._docker_name = 'nox-' + str(task_info['taskId'])
+        self._taskId = task_info['taskId']
 
     # def __del__(self):
     #     print('call NoxConDocker.__del__')
@@ -26,7 +24,7 @@ class NoxConDocker(object):
 
     def _check(self):
         msg = ''
-        if not self._ip:
+        if not self._local_ip:
             msg = 'Must be set APPSIMULATOR_IP'
             self._log('_check error:', msg)
             return False, msg
@@ -109,24 +107,10 @@ class NoxConDocker(object):
     def get_name(self):
         return self._docker_name
 
-    def get_port(self):
-        self._log('get_port', 'Get the adb port')
-        ret = self._exec_nox_cmd(self._make_cmd(
-            'adb -name:' + self._docker_name + ' -command:"get-serialno"'
-        ))
-        return ret.replace('\r', '').replace('\n', '').replace('127.0.0.1:', '')
-
     def shake(self, cnt):
         self._log('<<info>> shake', 'Remind ' + str(cnt) + ' times')
         for _ in range(cnt):
             self._exec_nox_cmd(self._make_cmd("action -name:" + self._docker_name + " -key:call.shake -value:null"))
-        return True
-
-    def set_docker_name(self):
-        self._log('set_docker_name', 'Set docker name:' + self._docker_name)
-        self._exec_nox_cmd(self._make_cmd(
-            'adb -name:' + self._docker_name + ' -command:" shell setprop persist.nox.docker_name ' + self._docker_name + '"'
-        ))
         return True
 
     def stop(self, wait_time=2):
@@ -241,30 +225,21 @@ class NoxConDocker(object):
         return ret
 
 
-def test(app_name, docker_name):
-    docker = NoxConDocker(app_name=app_name, docker_name=docker_name)
+def main(task_info):
+    docker = NoxConDocker(task_info=task_info)
     docker._DEBUG = True
     return docker.run(force=True)
-    # docker.stop_all()
 
 
 if __name__ == "__main__":
-    # tasks_cnt = 3
-    complete_cnt = 0
-    # os.chdir('c:\\Nox\\bin')
-    # pool = multiprocessing.Pool(processes=4)
-    # for docker_name in ['nox-3', 'nox-4', 'nox-5']:  # range(tasks_cnt):
-    # # for docker_name in ['nox-3']:  # range(tasks_cnt):
-    #     pool.apply_async(run, (docker_name,))
-    # pool.close()
-    # pool.join()
-
-    # for docker_name in ['nox-11', 'nox-12', 'nox-13', 'nox-14', 'nox-15']:
-    for docker_name in ['nox-21', 'nox-22', 'nox-23', 'nox-24', 'nox-25', 'nox-26', 'nox-27']:
-        # for docker_name in ['nox-31', 'nox-32', 'nox-33']:
-        # for docker_name in ['nox-41', 'nox-42', 'nox-43']:
-        # for docker_name in ['nox-11']:
-        if test('toutiao', docker_name):  # run = create and start
-            complete_cnt += 1
-
-    print("start success:", str(complete_cnt))
+    # docker_name = sys.argv[1]
+    docker_name = 'nox-2'
+    task_info = {
+        'task_id': 2,
+        'app_name': 'miaopai',
+        'docker_name': docker_name,
+        'timer_no': 2
+    }
+    main(task_info)
+    print("Close after 60 seconds.")
+    time.sleep(60)

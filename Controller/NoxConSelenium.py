@@ -1,24 +1,21 @@
 # coding:utf-8
-import os
 import time
+from datetime import datetime
 import cv2
 import aircv as ac
 import ftplib
+from Controller.setting import TIMER
 from Controller.NoxConADB import NoxConADB
 
 
-class NoxConSelenium(object):
-    def __init__(self, app_name, docker_name):
+class NoxConSelenium(NoxConADB):
+    def __init__(self, task_info):
+        super().__init__(task_info)
         self._DEBUG = False
         self._FTP_TRANSMISSION = False
         self._PIC_PATH = {}  # overwrite
-        self._img_capture = None
-        self._docker_name = docker_name
-        self._app_name = app_name
-        self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
-        self._ip = os.getenv('APPSIMULATOR_IP')
-        self._adb = NoxConADB(docker_name=docker_name)
-        self._adb_port = None
+        self._capture_obj = None
+        self._timer_flg = False
 
     def _log(self, prefix, msg):
         if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
@@ -31,27 +28,24 @@ class NoxConSelenium(object):
             self._log('set_comment_to_pic error:', 'must be set a dictionary')
 
     def wait_online(self, timeout=10):
-        return self._adb.wait_for_device(timeout=timeout)
+        return self.wait_for_device(timeout=timeout)
 
     def get(self, url, wait_time=5):
         # start android web browser
-        self._adb.start_web(url)
+        self.adb_start_web(url)
         time.sleep(wait_time)
         return True
 
-    def set_gps(self, latitude, longitude):
-        return self._adb.set_gps(latitude, longitude)
-
     def open_settings(self):
         # adb shell am start -n com.android.settings/.Settings
-        self._adb.adb_shell("am start -n com.android.settings/.Settings")
+        self.adb_shell("am start -n com.android.settings/.Settings")
         return True
 
     def get_capture(self, capture_name):
-        self._adb.adb_shell("screencap -p /sdcard/" + capture_name)
-        self._adb.adb_cmd("pull /sdcard/" + capture_name)
-        print(os.getcwd())
-        self._img_capture = ac.imread(capture_name)
+        self.adb_shell("screencap -p /sdcard/" + capture_name)
+        self.adb_cmd("pull /sdcard/" + capture_name)
+        # print(os.getcwd())
+        self._capture_obj = ac.imread(capture_name)
         # self.ftp_upload(local_file=capture_name, remote_dir='172.16.253.36', remote_file=capture_name)
 
     def find_element(self, comment, timeout):
@@ -60,7 +54,7 @@ class NoxConSelenium(object):
         img_obj = ac.imread(self._PIC_PATH[comment])
         while timeout > 0:
             self.get_capture(capture_name)
-            pos = ac.find_template(self._img_capture, img_obj)
+            pos = ac.find_template(self._capture_obj, img_obj)
             if pos and pos['confidence'] > 0.9:
                 self._log('<<info>> matched:', comment + ' ' + str(timeout) + 's')
                 x, y = pos['result']
@@ -79,7 +73,7 @@ class NoxConSelenium(object):
         self.get_capture(capture_name)
 
         while timeout > 0:
-            pos_list = ac.find_all_template(self._img_capture, img_obj)
+            pos_list = ac.find_all_template(self._capture_obj, img_obj)
             for pos in pos_list:
                 if pos['confidence'] > 0.9:
                     (x, y) = pos['result']
@@ -98,14 +92,14 @@ class NoxConSelenium(object):
 
     def next_page(self, wait_time):
         self._log('<<info>> next_page', 'scroll')
-        self._adb.adb_shell("input swipe 10 400 10 10")
+        self.adb_shell("input swipe 10 400 10 10")
         time.sleep(wait_time)
         return True
 
     def next_page_browser(self, wait_time):
         self._log('<<info>> next_page_browser', 'web browser scroll')
         # KEYCODE_PAGE_UP = 92
-        self._adb.adb_shell("input keyevent 93")  # KEYCODE_PAGE_DOWN = 93
+        self.adb_shell("input keyevent 93")  # KEYCODE_PAGE_DOWN = 93
         time.sleep(wait_time)
         return True
 
@@ -113,31 +107,57 @@ class NoxConSelenium(object):
         if not self._DEBUG:
             return
 
-        cv2.circle(img=self._img_capture, center=(int(x), int(y)), radius=30, color=(0, 0, 255), thickness=1)
-        cv2.putText(img=self._img_capture, text='click', org=(int(x) - 40, int(y) + 10),
+        cv2.circle(img=self._capture_obj, center=(int(x), int(y)), radius=30, color=(0, 0, 255), thickness=1)
+        cv2.putText(img=self._capture_obj, text='click', org=(int(x) - 40, int(y) + 10),
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(0, 0, 255), thickness=1)
         cv2.startWindowThread()
-        cv2.imshow('Debugger', self._img_capture)
+        cv2.imshow('Debugger', self._capture_obj)
         cv2.waitKey(wait_time * 1000)
         cv2.destroyAllWindows()
         cv2.waitKey(100)
 
-    def click_xy(self, x, y, wait_time, timer_no=0):
+    def _set_AppShareClip(self):
+        f = open(self._work_path + '\\Controller\\timerNo.conf', 'w')
+        f.write('task-' + str(self._taskId))
+        f.close()
+
+    def adb_cmd_before(self):
+        # overwrite NoxConADB adb_cmd_before
+        if self._timer_flg and self._timer_no > 0:
+            cycle = 3 * len(TIMER)
+            now = datetime.now().second % cycle
+            if now > TIMER[self._timer_no]:
+                wait_time = cycle + TIMER[self._timer_no] - now
+            else:
+                wait_time = TIMER[self._timer_no] - now
+            self._set_AppShareClip()
+            self._log('<<info>> timer no:' + str(self._timer_no), 'sleep ' + str(wait_time) + 's')
+            time.sleep(wait_time)
+
+    def click_xy(self, x, y, wait_time):
         self._debug(x, y, wait_time=2)
-        self._adb.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)), timer_no)
+        self.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)))
+        time.sleep(wait_time)
+        return True
+
+    def click_xy_timer(self, x, y, wait_time):
+        self._debug(x, y, wait_time=2)
+        self._timer_flg = True  # NoxConADB adb_cmd_before() on
+        self.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)))
+        self._timer_flg = False  # NoxConADB adb_cmd_before() off
         time.sleep(wait_time)
         return True
 
     def input(self, text, wait_time):
         self._log('<<info>> input', text)
-        self._adb.adb_shell('input text ' + text)
+        self.adb_shell('input text ' + text)
         time.sleep(wait_time)
         return True
 
     def input_cn(self, text, timeout):
         self._log('<<info>> input_cn', text)
         # adb shell am broadcast -a ADB_INPUT_TEXT --es msg '输入汉字'
-        self._adb.adb_shell("am broadcast -a ADB_INPUT_TEXT --es msg '" + text + "'")
+        self.adb_shell("am broadcast -a ADB_INPUT_TEXT --es msg '" + text + "'")
         return True
 
     def check_upgrade(self, timeout):
@@ -149,31 +169,26 @@ class NoxConSelenium(object):
         return ret
 
     def reboot(self, wait_time):
-        self._adb.adb_cmd('reboot')
+        self.adb_cmd('reboot')
         time.sleep(wait_time)
 
     def back(self, wait_time):
         self._log('back', '')
-        self._adb.adb_shell('input keyevent 4')  # KEYCODE_BACK
+        self.adb_shell('input keyevent 4')  # KEYCODE_BACK
         time.sleep(wait_time)
         return True
 
     def app_quit(self, wait_time):
         for i in range(4):
             self._log('app_quit', '')
-            self._adb.adb_shell('input keyevent 4')  # KEYCODE_BACK
+            self.adb_shell('input keyevent 4')  # KEYCODE_BACK
             time.sleep(wait_time)
         return True
 
     def unlock(self, wait_time):
-        self._adb.adb_shell('rm /data/system/*.key')  # rm /data/system/*.key
+        self.adb_shell('rm /data/system/*.key')  # rm /data/system/*.key
         time.sleep(wait_time)
         return True
-
-    def get_new_phone(self, wait_time=1):
-        ret = self._adb.get_new_phone()
-        time.sleep(wait_time)
-        return ret
 
     def ftp_upload(self, local_file, remote_dir, remote_file):
         if not self._FTP_TRANSMISSION: return
@@ -211,7 +226,7 @@ class NoxConSelenium(object):
 
     def run(self, is_app_restart):
         ret = self.unlock(wait_time=1)
-        self.get_new_phone(wait_time=1)
+        self.get_new_phone()
         if ret and is_app_restart:
             ret = self.app_quit(wait_time=1)
 

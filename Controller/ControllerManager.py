@@ -28,11 +28,13 @@ class Manager(object):
             self._log('_check error', msg)
             return False, msg
 
-    def run_script1(self, task, docker_name):
+    def run_script1(self, task_info):
         _stdout = ''
         _stderr = ''
         try:
-            cmdline = 'python ' + task['script'] + ' ' + docker_name
+            docker_name = 'nox-' + str(task_info['taskId'])
+            # cmdline = 'START "task-' + str(task_info['taskId']) + '" '
+            cmdline = 'python ' + self._work_path + '\Controller\\' + task_info['script']  # + ' ' + docker_name
             self._log('run_task', cmdline)
             time.sleep(1)
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -64,10 +66,12 @@ class Manager(object):
             self._log('run_script error:', e)
             return False
 
-    def run_script(self, task, docker_name):
+    def run_script(self, task_info):
         try:
-            cmd = 'START "task-' + str(task['taskId']) + '" '
-            cmd += 'python ' + self._work_path + '\Controller\\' + task['script'] + ' ' + docker_name
+            docker_name = 'nox-' + str(task_info['taskId'])
+            # cmd = 'python --version'
+            cmd = 'START "task-' + str(task_info['taskId']) + '" '
+            cmd += 'python ' + self._work_path + '\Controller\\' + task_info['script'] + ' ' + docker_name
             # cmd += ' >>' + self._work_path + '\Controller\log\\task-' + str(task['taskId']) + '.log 2>&1'
             self._log('<<info>> run_script cmd:\n', cmd)
             os.system(cmd)
@@ -79,7 +83,7 @@ class Manager(object):
 
     def docker_run_success(self, docker):
         self._log('<<info>> docker_run_success', docker.get_name())
-        time.sleep(5)
+        time.sleep(2)
         docker.shake(1)
         # docker.set_docker_name()
         # port = docker.get_port()
@@ -101,18 +105,18 @@ class Manager(object):
 
         return False
 
-    def check_docker_run(self, app_name, docker_name, timeout=60):
-        driver = NoxConSelenium(app_name=app_name, docker_name=docker_name)
+    def check_docker_run(self, task_info, timeout=60):
+        driver = NoxConSelenium(task_info=task_info)
         driver.set_comment_to_pic({
-            "APP图标": self._work_path + '\\Controller\\images\\' + app_name + '\\app_icon.png',
+            "APP图标": self._work_path + '\\Controller\\images\\' + task_info['app_name'] + '\\app_icon.png',
             "很抱歉": self._work_path + '\\Controller\\images\\im_sorry.png',
         })
-
+        docker_name = 'nox-' + str(task_info['taskId'])
         ret = driver.wait_online(timeout=timeout)
         if ret:
             ret, x, y = driver.find_element(comment='很抱歉', timeout=10)  # 匹配到“很抱歉”字样
             if ret:
-                self._log('<<info>> check_docker_run', docker_name + ' 匹配到“很抱歉”.')
+                self._log('<<info>> check_docker_run', task_info['docker_name'] + ' 匹配到“很抱歉”.')
                 return False
             else:
                 ret, x, y = driver.find_element(comment='APP图标', timeout=10)  # 可匹配到app图标
@@ -146,28 +150,25 @@ class Manager(object):
         while True:
             task = self._mdb.task_get_one_for_run()
             if task:
-                docker_name = 'nox-' + str(task['taskId'])
-                app_name = task['app_name']
-
                 # 1)docker running
                 task['status'] = STATUS_DOCKER_RUN
                 self._mdb.task_change_status(task)
-                docker = NoxConDocker(app_name=task['app_name'], docker_name=docker_name, taskId=task['taskId'])
+                docker = NoxConDocker(task_info=task)
                 ret = docker.run(force=True)  # docker run: create and start
                 if ret:
-                    ret = self.check_docker_run(app_name=app_name, docker_name=docker_name, timeout=60)
+                    ret = self.check_docker_run(task_info=task, timeout=60)
                     if ret:
                         ret = self.docker_run_success(docker=docker)
                     else:
                         ret = self.docker_run_error(docker=docker, retry_cnt=2)
 
                 # call NoxConDocker.__del__
-                docker = None
+                # docker = None
 
                 status = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
 
                 # 2)docker run ok(ng)
-                docker_info = {'_id': self.db.docker_create(task), 'status': status}
+                docker_info = {'_id': self._mdb.docker_create(task), 'status': status}
                 self._mdb.docker_change_status(docker_info)
                 task['status'] = status
                 self._mdb.task_change_status(task)
@@ -175,7 +176,7 @@ class Manager(object):
                 if ret:
                     self._mdb.task_set_docker(task, docker_info)  # bind docker to task
                     # 3)script running
-                    ret = self.run_script(task=task, docker_name=docker_name)
+                    ret = self.run_script(task_info=task)
                     task['status'] = STATUS_SCRIPT_START_OK if ret else STATUS_SCRIPT_START_NG
 
                     # 4)script run ok(ng)
@@ -190,4 +191,12 @@ class Manager(object):
 if __name__ == '__main__':
     manager = Manager()
     manager._DEBUG = True
+    task = {
+        'taskId': 2,
+        'app_name': 'miaopai',
+        'docker_name': 'nox-2',
+        'timer_no': 2,
+        'script': 'script_miaopai.py'
+    }
+    # manager.run_script(task_info=task)
     manager.start_tasks()

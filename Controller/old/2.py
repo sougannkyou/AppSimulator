@@ -49,8 +49,31 @@ import importlib.machinery
 #     print(e)
 import subprocess
 
-work_path = os.getenv('APPSIMULATOR_WORK_PATH')
-cmd = "start /b start python " + work_path + "\Controller\script_toutiao_NoxCon.py"
-print(cmd)
-# subprocess.check_output(cmd)
-os.system(cmd)
+
+#
+# work_path = os.getenv('APPSIMULATOR_WORK_PATH')
+# cmd = "start /b start python " + work_path + "\Controller\script_toutiao_NoxCon.py"
+# print(cmd)
+# # subprocess.check_output(cmd)
+# os.system(cmd)
+
+# import win32gui
+# hwnd = win32gui.FindWindow(None, 'NiceClip a0.0.1')
+# print(hwnd)
+
+class A(object):
+    def __init__(self, app_name, docker_name):
+        self.app_name = app_name
+        self.docker_name = docker_name
+        print('class a', self.app_name, self.docker_name)
+
+
+class B(A):
+    def __init__(self, app_name, docker_name):
+        super().__init__(app_name, docker_name)
+        # self.app_name = app_name
+        # self.docker_name = docker_name
+        # print('class b', self.app_name, self.docker_name)
+
+
+b = B(app_name='b-app', docker_name='b-docker')
