@@ -6,10 +6,7 @@ from Controller.NoxConSelenium import NoxConSelenium
 from Controller.NoxConDocker import NoxConDocker
 
 urls = [
-    "http://www.dianping.com/shop/24981944",  # 936
-    "http://www.dianping.com/shop/18385524",  #
-    "http://www.dianping.com/shop/98535009",  # 深夜食堂
-    "http://www.dianping.com/shop/72459852",  # 1061
+    "http://www.dianping.com/shop/93643555",
 ]
 
 keywords = [
@@ -32,9 +29,9 @@ class MySelenium(NoxConSelenium):
         x = -1
         y = -1
         page_cnt = 0
-        # self.get(urls[0], 3)
-        # ret, x, y = self.find_element(comment='web打开APP', timeout=10)
-        # if ret: ret = self.click_xy(x, y, timeout=2)
+        self.get(urls[0], 3)
+        ret, x, y = self.find_element(comment='web打开APP', timeout=10)
+        if ret: ret = self.click_xy(x, y, wait_time=2)
         if ret: ret, x, y = self.find_element(comment='APP图标', timeout=10)
         if ret: ret = self.click_xy(x, y, wait_time=2)
         if ret: ret, x, y = self.find_element(comment='附近热搜', timeout=5)
@@ -83,13 +80,13 @@ class MySelenium(NoxConSelenium):
 
 
 ##################################################################################
-def main(docker_name):
+def main(task):
     start = datetime.now()
-    print("[Script " + docker_name + "] run start.", start)
+    print("[Script " + task['docker_name'] + "] run start.", start)
     try:
-        me = MySelenium(app_name='dianping', docker_name=docker_name)
-        me._PIC_PATH = {
-            # "web打开APP": 'images/dianping/webOpenApp.png',
+        me = MySelenium(task_info=task)
+        me.set_comment_to_pic({
+            "web打开APP": 'images/dianping/webOpenApp.png',
             "APP打开结果OK": 'images/dianping/search_ready.png',
             "APP图标": 'images/dianping/app_icon.png',
             '附近热搜': 'images/dianping/search.png',
@@ -99,29 +96,26 @@ def main(docker_name):
             "分享": 'images/dianping/share.png',
             "复制链接": 'images/dianping/copy_link.png',
             "打分": 'images/dianping/dafen.png',
-        }
-        me._DEBUG = True
-        # me._adb._DEBUG = True
-        # if not ret: self.send2web('images/offline.jpeg')
+        })
         me.set_gps(39.984727, 116.310050)  # 中关村
         me.run(is_app_restart=False)
 
         end = datetime.now()
-        print("[Script " + docker_name + "] run success. ", (end - start).seconds, "s")
+        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s")
         return True
     except Exception as e:
         end = datetime.now()
-        print("[Script " + docker_name + "] ERROR:", (end - start).seconds, e)
+        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s\nerror:", e)
         return False
 
 
 #################################################################################
 if __name__ == "__main__":
     # taskId = sys.argv[1]
-    taskId = 2
+    taskId = 1
     task = {
         'taskId': taskId,
-        'app_name': 'miaopai',
+        'app_name': 'dianping',
         'docker_name': 'nox-' + str(taskId),
         'timer_no': 2
     }

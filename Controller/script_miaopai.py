@@ -61,17 +61,17 @@ def main(task):
         # me._DEBUG = True
         me.run(is_app_restart=True)
         end = datetime.now()
-        print("[Script " + task['docker_name'] + "] total times:", (end - start).seconds, "s")
+        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s")
         return True
     except Exception as e:
         end = datetime.now()
-        print("[Script " + task['docker_name'] + "] total times:", (end - start).seconds, "s error:", e)
+        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s\nerror:", e)
         return False
 
 
 if __name__ == "__main__":
     # taskId = sys.argv[1]
-    taskId = 2
+    taskId = 1
     task = {
         'taskId': taskId,
         'app_name': 'miaopai',

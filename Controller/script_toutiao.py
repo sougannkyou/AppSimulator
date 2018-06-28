@@ -67,11 +67,11 @@ def main(task):
         me.run(is_app_restart=False)
 
         end = datetime.now()
-        print("[Script " + task['docker_name'] + "] total times:", (end - start).seconds, "s")
+        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s")
         return True
     except Exception as e:
         end = datetime.now()
-        print("[Script " + task['docker_name'] + "] total times:", (end - start).seconds, "s\n error:", e)
+        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s\nerror:", e)
         return False
 
 
