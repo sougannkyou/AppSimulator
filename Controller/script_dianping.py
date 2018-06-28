@@ -3,7 +3,6 @@ import sys
 import time
 from datetime import datetime
 from Controller.NoxConSelenium import NoxConSelenium
-from Controller.NoxConDocker import NoxConDocker
 
 urls = [
     "http://www.dianping.com/shop/93643555",
