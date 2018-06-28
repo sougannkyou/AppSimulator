@@ -10,34 +10,40 @@ class MySelenium(NoxConSelenium):
         super().__init__(task_info=task_info)
 
     def script(self):
-        ret, x, y = self.find_element(comment=u'APP图标', timeout=10)  # unlock ok
-        if ret: ret = self.click_xy(x, y, wait_time=2)
-        while ret:  # 更新 -> 分享 -> 复制链接
-            if ret: ret, x, y = self.find_element(comment=u'更新', timeout=10)
-            if ret: ret = self.click_xy(x, y, wait_time=1)
+        try:
+            ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
+            if ret: ret = self.click_xy(x, y, wait_time=2)
 
-            if ret: ret, x, y = self.find_element(comment=u'分享', timeout=10)
-            if ret: ret = self.click_xy(x, y, wait_time=1)
-
-            if ret:
-                ret, x, y = self.find_element(comment=u'复制链接', timeout=10)
+            while ret:  # 更新 -> 分享 -> 复制链接
+                ret, x, y = self.find_element(comment='分享', timeout=10)
                 if ret:
-                    ret = self.click_xy_timer(x, y, wait_time=1)
-                else:  # upgrade?
-                    # ret = self.check_upgrade(timeout=2)
-                    # if ret:
-                    print(u"重试 click 分享 按钮 ...")
-                    ret, x, y = self.find_element(comment=u'分享', timeout=10)
-                    if ret: ret = self.click_xy(x, y, wait_time=1)
+                    ret = self.click_xy(x, y, wait_time=1)
+                    if ret:
+                        ret, x, y = self.find_element(comment='复制链接', timeout=10)
+                        if ret:
+                            ret = self.click_xy(x, y, wait_time=1)
+                        else:  # upgrade?
+                            # ret = self.check_upgrade(timeout=2)
+                            # if ret:
+                            print("重试 click 分享 按钮 ...")
+                            ret, x, y = self.find_element(comment='分享', timeout=10)
+                            if ret:
+                                ret = self.click_xy(x, y, wait_time=1)
+                                if ret:
+                                    ret, x, y = self.find_element(comment='复制链接', timeout=10)
+                                    if ret:
+                                        ret = self.click_xy(x, y, wait_time=1)
 
-                    if ret: ret, x, y = self.find_element(comment=u'复制链接', timeout=10)
-                    if ret: ret = self.click_xy(x, y, wait_time=1)
+                self.next_page(wait_time=5)
+
+        except Exception as e:
+            self._log('error:', e)
 
 
 ##################################################################################
 def main(task):
     start = datetime.now()
-    print("[Script " + docker_name + "] start at ", start, '\n', task)
+    print("[Script " + task['docker_name']  + "] start at ", start, '\n', task)
     try:
         me = MySelenium(task_info=task)
         me.set_comment_to_pic({
@@ -54,22 +60,23 @@ def main(task):
         me.run(is_app_restart=True)
         # me._DEBUG = True
         end = datetime.now()
-        print("[Script " + docker_name + "] total times:", (end - start).seconds, "s")
+        print("[Script " + task['docker_name']  + "] total times:", str((end - start).seconds) + "s")
         return True
     except Exception as e:
         end = datetime.now()
-        print("[Script " + docker_name + "] total times:", (end - start).seconds, "s error:", e)
+        print("[Script " + task['docker_name']  + "] total times:", str((end - start).seconds) + "s\nerror:", e)
         return False
 
 
 if __name__ == "__main__":
-    docker_name = sys.argv[1]
-    # docker_name = 'nox-3'
-    main({
-        'taskId': 3,
+    # taskId = sys.argv[1]
+    taskId = 1
+    task = {
+        'taskId': taskId,
         'app_name': 'douyin',
-        'docker_name': docker_name,
-        'timer_no': 3
-    })
+        'docker_name': 'nox-' + str(taskId),
+        'timer_no': 1
+    }
+    main(task)
     print("Close after 60 seconds.")
     time.sleep(60)

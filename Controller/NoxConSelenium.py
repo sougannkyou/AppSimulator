@@ -1,4 +1,5 @@
 # coding:utf-8
+import os
 import time
 from datetime import datetime
 import cv2
@@ -14,6 +15,7 @@ class NoxConSelenium(NoxConADB):
         self._DEBUG = False
         self._FTP_TRANSMISSION = False
         self._PIC_PATH = {}  # overwrite
+        self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
         self._capture_obj = None
         self._timer_flg = False
 
@@ -43,9 +45,8 @@ class NoxConSelenium(NoxConADB):
 
     def get_capture(self, capture_name):
         self.adb_shell("screencap -p /sdcard/" + capture_name)
-        self.adb_cmd("pull /sdcard/" + capture_name)
-        # print(os.getcwd())
-        self._capture_obj = ac.imread(capture_name)
+        self.adb_cmd("pull /sdcard/" + capture_name + " " + self._work_path + '\\Controller\\images\\temp')
+        self._capture_obj = ac.imread(self._work_path + '\\Controller\\images\\temp\\' + capture_name)
         # self.ftp_upload(local_file=capture_name, remote_dir='172.16.253.36', remote_file=capture_name)
 
     def find_element(self, comment, timeout):

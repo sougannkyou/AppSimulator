@@ -52,11 +52,11 @@ class MySelenium(NoxConSelenium):
 
 
 ##################################################################################
-def main(docker_name):
+def main(task):
     start = datetime.now()
-    print("[Script " + docker_name + "] start at ", start)
+    print("[Script " + task['docker_name'] + "] start at ", start)
     try:
-        me = MySelenium(docker_name=docker_name, app_name='toutiao')
+        me = MySelenium(task_info=task)
         me.set_comment_to_pic({
             "jump2app": 'images/toutiao/jump2app.png',
             "writeComment": 'images/toutiao/writeComment.png',
@@ -67,19 +67,26 @@ def main(docker_name):
         me.run(is_app_restart=False)
 
         end = datetime.now()
-        print("[Script " + docker_name + "] total times:", (end - start).seconds, "s")
+        print("[Script " + task['docker_name'] + "] total times:", (end - start).seconds, "s")
         return True
     except Exception as e:
         end = datetime.now()
-        print("[Script " + docker_name + "] total times:", (end - start).seconds, "s\n error:", e)
+        print("[Script " + task['docker_name'] + "] total times:", (end - start).seconds, "s\n error:", e)
         return False
 
 
 #################################################################################
 if __name__ == "__main__":
     # docker_name = sys.argv[1]
-    docker_name = 'nox-1'
-    main(docker_name)
+    # taskId = sys.argv[1]
+    taskId = 2
+    task = {
+        'taskId': taskId,
+        'app_name': 'miaopai',
+        'docker_name': 'nox-' + str(taskId),
+        'timer_no': 2
+    }
+    main(task)
     print("Close after 60 seconds.")
     time.sleep(60)
 

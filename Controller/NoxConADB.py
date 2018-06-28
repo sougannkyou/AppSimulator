@@ -21,6 +21,7 @@ class NoxConADB(object):
         self._stderr = None
         self._devices = None
         self.__target = None
+        self._org_path = os.getcwd()
         self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
         self._console_binary = CONSOLE_BINARY_PATH
         self._app_name = task_info['app_name']
@@ -110,6 +111,7 @@ class NoxConADB(object):
             cmdline = self._make_command(cmd)
             self._log('[adb_cmd]<<info>>', cmdline)
             self.adb_cmd_before()
+            os.chdir('c:\\Nox\\bin')  # 防止 BignoxVMS 写入.py本地
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()
             (stdout, stderr) = process.communicate()
@@ -117,6 +119,8 @@ class NoxConADB(object):
             self._stderr = stderr.decode('utf8').replace('\r', '').replace('\n', '')
         except Exception as e:
             self._log('[adb_cmd] error:', e)
+        finally:
+            os.chdir(self._org_path)  # 恢复路径
 
         return
 

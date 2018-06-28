@@ -117,17 +117,14 @@ def main(docker_name):
 
 #################################################################################
 if __name__ == "__main__":
-    # tasks_cnt = int(sys.argv[1])
-    tasks_cnt = 1
-    docker = NoxConDocker('toutiao', 'nox-99')
-    for i in range(1, 1 + tasks_cnt):
-        docker.main(force=True)
-
-    time.sleep(10)
-
-    # pool = multiprocessing.Pool(processes=4)
-    # for idx in range(tasks_cnt):
-    #     pool.apply_async(run, ('nox-99',))
-    # pool.close()
-    # pool.join()
-    print("process done.")
+    # taskId = sys.argv[1]
+    taskId = 2
+    task = {
+        'taskId': taskId,
+        'app_name': 'miaopai',
+        'docker_name': 'nox-' + str(taskId),
+        'timer_no': 2
+    }
+    main(task)
+    print("Close after 60 seconds.")
+    time.sleep(60)
