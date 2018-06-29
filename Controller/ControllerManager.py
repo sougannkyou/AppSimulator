@@ -81,6 +81,17 @@ class Manager(object):
             self._log('run_script error:', e)
             return False
 
+    def docker_run(self, task, docker, retry_cnt):
+        ret = docker.run(force=True)  # docker run: create and start
+        if ret:
+            ret = self.docker_run_check(task_info=task, timeout=60)
+            if ret:
+                ret = self.docker_run_success(docker=docker)
+            else:
+                ret = self.docker_run_error(task=task, docker=docker, retry_cnt=retry_cnt)
+
+        return ret
+
     def docker_run_success(self, docker):
         self._log('<<info>> docker_run_success', docker.get_name())
         time.sleep(2)
@@ -89,23 +100,18 @@ class Manager(object):
         # port = docker.get_port()
         return True
 
-    def docker_run_error(self, docker, retry_cnt=0):
-        self._log('<<info>> docker_run_error:', docker.get_name() + ' retry:' + str(retry_cnt))
-        while retry_cnt > 0:
-            ret, msg = docker.create(force=True)
-            if ret:
-                ret = docker.start(timeout=2)
-                if ret:  # start success
-                    return True
-            else:
-                retry_cnt -= 1
-        else:
-            docker.stop()
-            self.check_docker_stop(docker, retry=True, wait_time=30)
+    def docker_run_error(self, task, docker, retry_cnt):
+        self._log('<<info>> docker_run_error:', docker.get_name() + ' retry: ' + str(retry_cnt))
+        retry_cnt -= 1
+        docker.stop()
+        self.check_docker_stop(docker, retry=True, wait_time=30)
+
+        if retry_cnt >= 0:
+            return self.docker_run(task, docker, retry_cnt)
 
         return False
 
-    def check_docker_run(self, task_info, timeout=60):
+    def docker_run_check(self, task_info, timeout=60):
         driver = NoxConSelenium(task_info=task_info)
         driver.set_comment_to_pic({
             "APP图标": self._work_path + '\\Controller\\images\\' + task_info['app_name'] + '\\app_icon.png',
@@ -154,14 +160,7 @@ class Manager(object):
                 task['status'] = STATUS_DOCKER_RUN
                 self._mdb.task_change_status(task)
                 docker = NoxConDocker(task_info=task)
-                ret = docker.run(force=True)  # docker run: create and start
-                if ret:
-                    ret = self.check_docker_run(task_info=task, timeout=60)
-                    if ret:
-                        ret = self.docker_run_success(docker=docker)
-                    else:
-                        ret = self.docker_run_error(docker=docker, retry_cnt=2)
-
+                ret = self.docker_run(task=task, docker=docker, retry_cnt=2)
                 # call NoxConDocker.__del__
                 # docker = None
 

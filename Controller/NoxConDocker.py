@@ -2,6 +2,7 @@
 import time
 import psutil
 import subprocess
+from pprint import pprint
 from Controller.setting import *
 
 
@@ -184,6 +185,7 @@ class NoxConDocker(object):
 
         dockers = self.ps(docker_name=self._docker_name)
         if len(dockers) > 1:
+            pprint(dockers)
             msg = 'The number of docker found is more than 1.'
             self._log('create', msg)
             return False, msg
