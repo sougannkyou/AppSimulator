@@ -8,14 +8,15 @@ import shutil
 from xmlrpc.server import SimpleXMLRPCServer
 from Controller.setting import *
 from Controller.DBLib import MongoDriver
+from Controller.NoxConDocker import NoxConDocker
 
-_DEBUG = True
+RPC_SERVER_DEBUG = True
 MDB = MongoDriver()
 
 
 # ------------------------ docker rpc server ----------------------
 def _log(prefix, msg):
-    if _DEBUG or prefix.find('error') > 0:
+    if RPC_SERVER_DEBUG or prefix.find('error') > 0:
         print('[RpcServer]', prefix, msg)
 
 
@@ -92,13 +93,35 @@ def setDeviceGPS(deviceId, latitude, longitude):
     return True
 
 
-def get_free_mem():
-    _log('get_free_mem', 'start')
+def _get_free_mem():
+    _log('_get_free_mem', 'start')
     mem = psutil.virtual_memory()
     # STATUS_WAIT or STATUS_BUILDING
-    mem_free = MDB.task_get_my_prepare_tasks_cnt() * GB + mem.free
+    mem_free = mem.free - MDB.task_get_my_prepare_tasks_cnt() * GB
     ret = '%.1f' % (mem_free / GB)
-    _log('get_free_mem', 'end:' + ret)
+    _log('_get_free_mem ret: ',  ret + " GB")
+    return float(ret)
+
+
+def _get_running_docker_cnt():
+    _log('_get_running_docker_cnt', 'start')
+    docker = NoxConDocker({'taskId': 0, 'app_name': 'miaopai', 'docker_name': '', 'timer_no': 0})
+    dockers = docker.ps(docker_name=None, docker_status=STATUS_DOCKER_RUN_OK)
+    ret = len(dockers)
+    _log('_get_running_docker_cnt ret: ', str(ret))
+    return ret
+
+
+def can_add_task():
+    _log('can_add_task', 'start')
+    ret = 'yes'
+    if _get_free_mem() < 1.0:
+        ret = '剩余内存小于1GB'
+
+    if _get_running_docker_cnt() >= len(TIMER):
+        ret = '启动docker不能大于10个'
+
+    _log('can_add_task ret: ', ret)
     return ret
 
 
@@ -118,8 +141,8 @@ def _backup_app_list():
     return l
 
 
-def _registor():
-    _log('_registor', 'start')
+def _register_service():
+    _log('_register', 'start')
     mem = psutil.virtual_memory()
     info = {
         'ip': os.getenv('APPSIMULATOR_IP'),
@@ -127,9 +150,10 @@ def _registor():
         'app_name': _backup_app_list(),
         'mem_free': '%.1f' % (mem.free / GB),
         'mem_total': '%.1f' % (mem.total / GB),
+        'timer_max_cnt': len(TIMER)
     }
-    MDB.rpc_registor_service(info)
-    _log('_registor', 'end')
+    MDB.rpc_register_service(info)
+    _log('_register', 'end')
     return
 
 
@@ -143,8 +167,8 @@ def start_rpc_server():
     server.register_function(stopScript, "stopScript")
     server.register_function(getRpcServerStatus, "getRpcServerStatus")
     server.register_function(simulatorStatus, "simulatorStatus")
-    server.register_function(get_free_mem, "get_free_mem")
-    _registor()
+    server.register_function(can_add_task, "can_add_task")
+    _register_service()
     _log("start", "...")
     server.serve_forever()  # never stop
     _log("end", "")
@@ -152,4 +176,6 @@ def start_rpc_server():
 
 ######################################################################
 if __name__ == "__main__":
+    RPC_SERVER_DEBUG = True
+    # can_add_task()
     start_rpc_server()

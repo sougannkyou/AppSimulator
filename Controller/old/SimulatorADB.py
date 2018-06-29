@@ -38,8 +38,8 @@ class Simulator(object):
             else:
                 print('[Simulator] error: cannot get any port.')
 
-    def task_trace(self, task_id, app_name, action):
-        self._manager.task_trace(task_id, app_name, self._docker_name, action)
+    def task_trace(self, taskId, app_name, action):
+        self._manager.task_trace(taskId, app_name, self._docker_name, action)
 
     def start_web(self, url, timeout):
         self._adb.start_web(url)

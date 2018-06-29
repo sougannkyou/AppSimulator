@@ -76,7 +76,7 @@ if __name__ == "__main__":
         'taskId': taskId,
         'app_name': 'miaopai',
         'docker_name': 'nox-' + str(taskId),
-        'timer_no': 2
+        'timer_no': 1
     }
     main(task)
     print("Close after 60 seconds.")

@@ -42,18 +42,24 @@ class MongoDriver(object):
         if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
             print('[Controller DB]', prefix, msg)
 
-    def rpc_registor_service(self, controller_info):
+    def rpc_register_service(self, controller_info):
         self.rpcServer.update({'ip': controller_info['ip']}, {"$set": controller_info}, upsert=True)
 
     def task_get_one_for_run(self):
-        if self.tasks.find({'status': STATUS_DOCKER_RUN, 'rpc_server_ip': LOCAL_IP}).count() > 0:
-            return None
-        else:
-            return self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': LOCAL_IP})
+        cnt = self.tasks.find({'status': STATUS_DOCKER_RUN, 'rpc_server_ip': LOCAL_IP}).count()
+        if cnt > 0:
+            return None, '有' + str(cnt) + '个docker正在启动 ...'
+
+        cnt = self.tasks.find({'status': STATUS_DOCKER_RUN, 'rpc_server_ip': LOCAL_IP}).count()
+        if cnt > len(TIMER):
+            return None, ''
+
+        task = self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': LOCAL_IP})
+        return task, 'ok'
 
     def task_get_my_prepare_tasks_cnt(self):
         return self.tasks.find(
-            {'status': {'$in': [STATUS_WAIT, STATUS_DOCKER_RUN]}, 'rpc_server_ip': LOCAL_IP}).count()
+            {'status': {'$in': [STATUS_WAIT]}, 'rpc_server_ip': LOCAL_IP}).count()
 
     def task_change_status(self, task):
         self._log('task_change_status', task['status'])

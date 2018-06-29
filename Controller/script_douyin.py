@@ -21,7 +21,7 @@ class MySelenium(NoxConSelenium):
                     if ret:
                         ret, x, y = self.find_element(comment='复制链接', timeout=10)
                         if ret:
-                            ret = self.click_xy(x, y, wait_time=1)
+                            ret = self.click_xy_timer(x, y, wait_time=1)
                         else:  # upgrade?
                             # ret = self.check_upgrade(timeout=2)
                             # if ret:
@@ -70,12 +70,12 @@ def main(task):
 
 if __name__ == "__main__":
     # taskId = sys.argv[1]
-    taskId = 1
+    taskId = 2
     task = {
         'taskId': taskId,
         'app_name': 'douyin',
         'docker_name': 'nox-' + str(taskId),
-        'timer_no': 1
+        'timer_no': 2
     }
     main(task)
     print("Close after 60 seconds.")

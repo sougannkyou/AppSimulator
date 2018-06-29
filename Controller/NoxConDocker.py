@@ -52,7 +52,7 @@ class NoxConDocker(object):
             self._log('_check error:', msg)
             return False, msg
 
-        running_dockers = self.ps(docker_status=STATUS_DOCKER_RUN)
+        running_dockers = self.ps(docker_status=STATUS_DOCKER_RUN_OK)
         if len(running_dockers) >= len(TIMER):
             msg = 'The number of starts can not be greater than timer counter ' + str(len(TIMER))
             self._log('_check error:', msg)
@@ -92,7 +92,7 @@ class NoxConDocker(object):
             return _stdout
 
     def _cmd_kill_task(self, docker_name):
-        dockers = self.ps(docker_name=docker_name, docker_status=STATUS_DOCKER_RUN)
+        dockers = self.ps(docker_name=docker_name, docker_status=STATUS_DOCKER_RUN_OK)
         for d in dockers:
             cmd = 'TASKKILL /F /T /PID ' + str(d['pid'])  # 不能强杀，会造成 ERR：1037
             self._log('_cmd_kill_task', cmd)
@@ -135,7 +135,7 @@ class NoxConDocker(object):
             # 虚拟机名称，标题，顶层窗口句柄，工具栏窗口句柄，绑定窗口句柄，进程PID
             for s in ret.split('\r\n'):
                 if s.startswith('nox') or s.startswith('Nox'):
-                    status = STATUS_WAIT if s.split(',')[-1] == '-1' else STATUS_DOCKER_RUN
+                    status = STATUS_WAIT if s.split(',')[-1] == '-1' else STATUS_DOCKER_RUN_OK
                     name = s.split(',')[1]
                     id = s.split(',')[0]
                     pid = s.split(',')[-1]
@@ -235,7 +235,7 @@ if __name__ == "__main__":
     # docker_name = sys.argv[1]
     docker_name = 'nox-2'
     task_info = {
-        'task_id': 2,
+        'taskId': 2,
         'app_name': 'miaopai',
         'docker_name': docker_name,
         'timer_no': 2

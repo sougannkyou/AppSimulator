@@ -71,7 +71,7 @@ class MongoDriver(object):
         if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
             print('[Server DB]', prefix, msg)
 
-    def get_task_id(self):
+    def get_taskId(self):
         taskId = 1
         m = self.tasks.aggregate([{"$group": {'_id': '', 'max_id': {"$max": "$taskId"}}}])
         for i in m:
@@ -80,7 +80,7 @@ class MongoDriver(object):
         return taskId
 
     def add_task(self, task):
-        taskId = self.get_task_id()
+        taskId = self.get_taskId()
         self.tasks.insert({
             "taskId": taskId,
             "script": task['script'],

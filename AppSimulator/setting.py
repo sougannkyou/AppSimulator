@@ -34,5 +34,5 @@ TASK_TYPE_NEVER = 'never'
 SCOPE_TIMES = 1 * 60
 
 # ---------------------- rpc -----------------------------
-RPC_SERVER_TIMEOUT = 5
+RPC_SERVER_TIMEOUT = 30
 RPC_DEBUG = False

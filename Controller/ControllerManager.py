@@ -148,7 +148,7 @@ class Manager(object):
     def start_tasks(self):
         # 1)docker running -> 2)docker run ok(ng) -> 3)script running -> 4)script run ok(ng)
         while True:
-            task = self._mdb.task_get_one_for_run()
+            task, msg = self._mdb.task_get_one_for_run()
             if task:
                 # 1)docker running
                 task['status'] = STATUS_DOCKER_RUN
@@ -191,12 +191,12 @@ class Manager(object):
 if __name__ == '__main__':
     manager = Manager()
     manager._DEBUG = True
-    task = {
+    t = {
         'taskId': 2,
         'app_name': 'miaopai',
         'docker_name': 'nox-2',
         'timer_no': 2,
         'script': 'script_miaopai.py'
     }
-    # manager.run_script(task_info=task)
+    # manager.run_script(task_info=t)
     manager.start_tasks()

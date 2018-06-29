@@ -30,7 +30,7 @@ STATUS_SCRIPT_START_NG = 'script_start_ng'
 STATUS_SCRIPT_SUSPEND = 'script_suspend'  # task interrupt
 
 # ---------------------- rpc -----------------------------
-RPC_SERVER_TIMEOUT = 5
+RPC_SERVER_TIMEOUT = 30
 RPC_PORT = 8003
 
 # ---------------------- adb -----------------------------

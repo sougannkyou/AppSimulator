@@ -1,6 +1,6 @@
 # coding:utf-8
 import time
-from AppSimulator.RPCLib import rpc_get_free_mem
+from AppSimulator.RPCLib import can_add_task
 from AppSimulator.DBLib import MongoDriver
 
 
@@ -20,9 +20,9 @@ class Manager(object):
             if task:
                 servers = self._mdb.get_rpc_servers(task['app_name'])
                 for server in servers:
-                    ret = rpc_get_free_mem(server['ip'], server['port'])
-                    if ret > 1.0:  # free memory > 1GB
-                        # set timer number
+                    ret = can_add_task(server['ip'], server['port'])
+                    self._log('<<info>> ' + server['ip'], ret)
+                    if ret.lower() == 'yes':
                         self._mdb.set_task_server_ip(taskId=task['taskId'], ip=server['ip'])
                         break
             else:
