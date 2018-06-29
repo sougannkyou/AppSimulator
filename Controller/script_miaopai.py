@@ -2,6 +2,8 @@
 from pprint import pprint
 import os
 
+# cd _work_path (D:\workspace\pyWork\AppSimulator>)
+# python Controller\script_miaopai.py
 p = os.getcwd()
 import sys
 
