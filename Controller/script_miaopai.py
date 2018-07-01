@@ -1,18 +1,5 @@
 # coding:utf-8
 from pprint import pprint
-import os
-
-# cd _work_path (D:\workspace\pyWork\AppSimulator>)
-# python Controller\script_miaopai.py
-p = os.getcwd()
-import sys
-
-if p not in sys.path:
-    print('append', p)
-    sys.path.append(p)
-
-pprint(sys.path)
-
 import time
 from datetime import datetime
 from Controller.NoxConSelenium import NoxConSelenium
@@ -28,29 +15,30 @@ class MySelenium(NoxConSelenium):
 
     def script(self):
         try:
-            ret, x, y = self.find_element(comment='app_icon', timeout=10)  # unlock ok
+            ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
             if ret:
                 ret = self.click_xy(x, y, wait_time=2)
 
             while ret:
-                ret, pos_list = self.find_elements(comment='share', timeout=10)
+                ret, pos_list = self.find_elements(comment='分享', timeout=10)
+                pprint(pos_list)
                 if ret:
                     for pos in pos_list:
                         (x, y) = pos
-                        ret = self.click_xy(x, y, wait_time=2)
+                        ret = self.click_xy(x, y, wait_time=2)  # click 分享
                         if ret:
-                            ret, x, y = self.find_element(comment='copylink', timeout=10)
+                            ret, x, y = self.find_element(comment='复制链接', timeout=10)
                             if ret:
                                 ret = self.click_xy_timer(x, y, wait_time=1)
                             else:  # upgrade?
                                 # ret = self.check_upgrade(timeout=2)
                                 # if ret:
                                 # print("重试 click 分享 按钮 ...")
-                                ret, x, y = self.find_element(comment='share', timeout=10)
+                                ret, x, y = self.find_element(comment='分享', timeout=10)
                                 if ret: ret = self.click_xy(x, y, wait_time=1)
 
-                                if ret: ret, x, y = self.find_element(comment='copylink', timeout=10)
-                                if ret: ret = self.click_xy(x, y, wait_time=1)
+                                if ret: ret, x, y = self.find_element(comment='复制链接', timeout=10)
+                                if ret: ret = self.click_xy_timer(x, y, wait_time=1)
 
                 self.next_page(wait_time=5)
 
@@ -65,11 +53,11 @@ def main(task):
     try:
         me = MySelenium(task_info=task)
         me.set_comment_to_pic({
-            "app_icon": 'images/miaopai/app_icon.png',
-            "update": 'images/miaopai/update.png',
-            "share": 'images/miaopai/share.png',
-            "copylink": 'images/miaopai/copylink.png',
-            "ignore_upgrade": 'images/miaopai/ignore_upgrade.png',
+            "APP图标": 'images/miaopai/app_icon.png',
+            "更新": 'images/miaopai/update.png',
+            "分享": 'images/miaopai/share.png',
+            "复制链接": 'images/miaopai/copylink.png',
+            "跳过软件升级": 'images/miaopai/ignore_upgrade.png',
         })
         # me._DEBUG = True
         me.run(is_app_restart=True)
@@ -78,7 +66,7 @@ def main(task):
         return True
     except Exception as e:
         end = datetime.now()
-        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s\nerror:", e)
+        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s\n error:", e)
         return False
 
 
@@ -89,7 +77,7 @@ if __name__ == "__main__":
         'taskId': taskId,
         'app_name': 'miaopai',
         'docker_name': 'nox-' + str(taskId),
-        'timer_no': 1
+        'timer_no': 1  # 5s
     }
     main(task)
     print("Close after 60 seconds.")

@@ -1,5 +1,15 @@
 # coding:utf-8
+from pprint import pprint
+import os
+
+p = os.getcwd()
 import sys
+
+if p not in sys.path:
+    print('append', p)
+    sys.path.append(p)
+
+pprint(sys.path)
 import time
 from datetime import datetime
 from Controller.NoxConSelenium import NoxConSelenium
@@ -43,7 +53,7 @@ class MySelenium(NoxConSelenium):
 ##################################################################################
 def main(task):
     start = datetime.now()
-    print("[Script " + task['docker_name']  + "] start at ", start, '\n', task)
+    print("[Script " + task['docker_name'] + "] start at ", start, '\n', task)
     try:
         me = MySelenium(task_info=task)
         me.set_comment_to_pic({
@@ -60,11 +70,11 @@ def main(task):
         me.run(is_app_restart=True)
         # me._DEBUG = True
         end = datetime.now()
-        print("[Script " + task['docker_name']  + "] total times:", str((end - start).seconds) + "s")
+        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s")
         return True
     except Exception as e:
         end = datetime.now()
-        print("[Script " + task['docker_name']  + "] total times:", str((end - start).seconds) + "s\nerror:", e)
+        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s\nerror:", e)
         return False
 
 
@@ -75,7 +85,7 @@ if __name__ == "__main__":
         'taskId': taskId,
         'app_name': 'douyin',
         'docker_name': 'nox-' + str(taskId),
-        'timer_no': 2
+        'timer_no': 2  # 8s
     }
     main(task)
     print("Close after 60 seconds.")

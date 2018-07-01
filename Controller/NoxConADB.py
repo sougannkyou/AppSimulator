@@ -1,6 +1,7 @@
 # coding:utf-8
 import os
 import time
+from datetime import datetime
 import re
 import random
 import subprocess
@@ -108,9 +109,10 @@ class NoxConADB(object):
         self._clean()
         try:
             cmdline = self._make_command(cmd)
-            self._log('[adb_cmd]<<info>>', cmdline)
             self.adb_cmd_before()
             os.chdir('c:\\Nox\\bin')  # 防止 BignoxVMS 写入.py本地
+            self._log('[adb_cmd]<<info>>', cmdline)
+            print(datetime.now())
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()
             (stdout, stderr) = process.communicate()

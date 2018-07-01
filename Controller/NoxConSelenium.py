@@ -57,13 +57,13 @@ class NoxConSelenium(NoxConADB):
             self.get_capture(capture_name)
             pos = ac.find_template(self._capture_obj, img_obj)
             if pos and pos['confidence'] > 0.9:
-                self._log('<<info>> matched:', comment + ' ' + str(timeout) + 's')
+                self._log('<<info>> 匹配到:', comment + ' ' + str(timeout) + 's')
                 x, y = pos['result']
                 return True, x, y
             else:
                 time.sleep(1)
                 timeout -= 1
-                self._log('<<info>> unmatch:', comment + ' ' + str(timeout) + 's')
+                self._log('<<info>> 未匹配:', comment + ' ' + str(timeout) + 's')
 
         return False, -1, -1
 
@@ -81,24 +81,24 @@ class NoxConSelenium(NoxConADB):
                     ret.append((int(x), int(y)))
 
             if len(ret) > 0:
-                self._log('<<info>> matched + ' + comment + ' counter:', str(len(ret)))
+                self._log('<<info>> 匹配到： + ' + comment, str(len(ret)) + '个')
                 break
             else:
                 time.sleep(1)
                 timeout -= 1
                 self.get_capture(capture_name)
-                self._log('<<info>> unmatch:', comment + ' ' + str(timeout) + 's')
+                self._log('<<info>> 未匹配:', comment + ' ' + str(timeout) + 's')
 
         return len(ret) > 0, ret
 
     def next_page(self, wait_time):
-        self._log('<<info>> next_page', 'scroll')
+        self._log('<<info>> next_page', '翻页')
         self.adb_shell("input swipe 10 400 10 10")
         time.sleep(wait_time)
         return True
 
     def next_page_browser(self, wait_time):
-        self._log('<<info>> next_page_browser', 'web browser scroll')
+        self._log('<<info>> next_page_browser', '浏览器翻页')
         # KEYCODE_PAGE_UP = 92
         self.adb_shell("input keyevent 93")  # KEYCODE_PAGE_DOWN = 93
         time.sleep(wait_time)
@@ -132,7 +132,7 @@ class NoxConSelenium(NoxConADB):
             else:
                 wait_time = TIMER[self._timer_no] - now
             self._set_AppShareClip()
-            self._log('<<info>> timer no:' + str(self._timer_no), 'sleep ' + str(wait_time) + 's')
+            self._log('<<info>> timer_no:' + str(self._timer_no), 'sleep ' + str(wait_time) + 's')
             time.sleep(wait_time)
 
     def click_xy(self, x, y, wait_time):

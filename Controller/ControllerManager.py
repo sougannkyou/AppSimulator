@@ -68,6 +68,18 @@ class Manager(object):
 
     def run_script(self, task_info):
         try:
+            from pprint import pprint
+            import os
+            # cd _work_path (D:\workspace\pyWork\AppSimulator>)
+            # python Controller\script_miaopai.py
+            p = os.getcwd()
+            import sys
+
+            if p not in sys.path:
+                print('append', p)
+                sys.path.append(p)
+
+            pprint(sys.path)
             docker_name = 'nox-' + str(task_info['taskId'])
             # cmd = 'python --version'
             cmd = 'START "task-' + str(task_info['taskId']) + '" '
@@ -82,6 +94,8 @@ class Manager(object):
             return False
 
     def docker_run(self, task, docker, retry_cnt):
+        docker.stop()
+        self.check_docker_stop(docker, retry=True, wait_time=30)
         ret = docker.run(force=True)  # docker run: create and start
         if ret:
             ret = self.docker_run_check(task_info=task, timeout=60)
@@ -103,9 +117,6 @@ class Manager(object):
     def docker_run_error(self, task, docker, retry_cnt):
         self._log('<<info>> docker_run_error:', docker.get_name() + ' retry: ' + str(retry_cnt))
         retry_cnt -= 1
-        docker.stop()
-        self.check_docker_stop(docker, retry=True, wait_time=30)
-
         if retry_cnt >= 0:
             return self.docker_run(task, docker, retry_cnt)
 
