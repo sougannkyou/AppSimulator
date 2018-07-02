@@ -5,13 +5,12 @@ import win32gui
 from PIL import ImageGrab
 import cv2
 import aircv as ac
-import shutil
 import pyautogui
 
 
-class Simulator(object):
-    def __init__(self, app_name):
-        self.DEBUG_ENV = False
+class GUISelenium(object):
+    def __init__(self):
+        self._DEBUG = False
         self._UNLOCK_POS = {
             "step1": (133, 496),
             "step2": (132, 705),
@@ -19,18 +18,28 @@ class Simulator(object):
         }
         self._PIC_PATH = {}
         self._CLICK_POS = {}
-        self.is_proxy_active = True
-        self.hwnd = win32gui.FindWindow(None, app_name)
+        self._capture_obj = None
+        self.hwnd = win32gui.FindWindow(None, '夜神模拟器')
+
+    def _log(self, prefix, msg):
+        if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
+            print('[SeleniumCV]', prefix, msg)
+
+    def set_comment_to_pic(self, value):
+        if isinstance(value, dict):
+            self._PIC_PATH = value
+        else:
+            self._log('set_comment_to_pic error:', 'must be set a dictionary')
 
     def check_upgrade(self, img_capture, comment):
         img_obj = ac.imread(self._PIC_PATH[comment])
         pos = ac.find_template(img_capture, img_obj)
         if pos and pos['confidence'] > 0.9:
-            print('版本更新提示', self._PIC_PATH[comment])
-            self.click(u"跳过软件升级", 1)
-            self.click(u"分享", 1)
+            self._log('版本更新提示', self._PIC_PATH[comment])
+            self.click("跳过软件升级", 1)
+            self.click("分享", 1)
 
-    def click(self, comment, timeout):
+    def click(self, comment, wait_times):
         left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
         win32gui.SetForegroundWindow(self.hwnd)
         # print(left, top, right, bottom)
@@ -38,94 +47,69 @@ class Simulator(object):
         (x, y) = self._CLICK_POS[comment]
         x = left + x
         y = top + y
-        self._sleep(timeout)
+        self._debug(x, y, wait_time=2)
+        time.sleep(wait_times)
         win32api.SetCursorPos((x, y))
         win32api.mouse_event(WCON.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
         win32api.mouse_event(WCON.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
-        self._sleep(timeout)
-        print("click", comment)
+        time.sleep(wait_times)
+        self._log("click", comment)
         return True
 
-    def click_xy(self, x, y, timeout):
+    def click_xy(self, x, y, wait_times):
         left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
         win32gui.SetForegroundWindow(self.hwnd)
         # print(left, top, right, bottom)
         # print(right - left, bottom - top)
         _x = left + x
         _y = top + y
-        self._sleep(timeout)
+        self._debug(_x, _y, wait_time=2)
+        time.sleep(wait_times)
         win32api.SetCursorPos((_x, _y))
         win32api.mouse_event(WCON.MOUSEEVENTF_LEFTDOWN, _x, _y, 0, 0)
         win32api.mouse_event(WCON.MOUSEEVENTF_LEFTUP, _x, _y, 0, 0)
-        self._sleep(timeout)
-        print("click", _x, _y)
+        time.sleep(wait_times)
+        self._log("click_xy", str(_x) + ' ' + str(_y))
         return True
 
-    def set_proxy(self):
-        self.is_proxy_active = False
+    def _debug(self, x, y, wait_time):
+        if not self._DEBUG:
+            return
 
-    def proxy_change_status_stop(self):
-        self.is_proxy_active = False
-
-    def proxy_change_status_run(self):
-        self.is_proxy_active = True
-
-    def _sleep(self, times):
-        while (not self.is_proxy_active):
-            print("wait for proxy server active ...")
-            time.sleep(1)
-        else:
-            time.sleep(times)
-
-    def _detect_obj(self, img, circle_center_pos, circle_radius, color, line_width):
-        if self.DEBUG_ENV:
-            cv2.circle(img, circle_center_pos, circle_radius, color, line_width)
-            cv2.imshow('detect_obj', img)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
-
-    def send2web(self, pic_path):
-        # APPSIMULATOR_IMAGES_HOME = os.environ["APPSIMULATOR_IMAGES_HOME"]
-        try:
-            shutil.copyfile('Z:/images/capture.png',
-                            'Z:/images/capture_before.png')
-        except Exception as e:
-            print("send2web error:", e)
-            pass
-
-        shutil.copyfile(pic_path, 'Z:/images/capture.png')
-        return True
+        cv2.circle(img=self._capture_obj, center=(int(x), int(y)), radius=30, color=(0, 0, 255), thickness=1)
+        cv2.putText(img=self._capture_obj, text='click', org=(int(x) - 40, int(y) + 10),
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(0, 0, 255), thickness=1)
+        cv2.startWindowThread()
+        cv2.imshow('Debugger', self._capture_obj)
+        cv2.waitKey(wait_time * 1000)
+        cv2.destroyAllWindows()
+        cv2.waitKey(100)
 
     def find_element(self, comment, timeout):
-        # 匹配element图像
-        # pprint(pos)
         obj_pic_path = self._PIC_PATH[comment]
-        while (timeout > 0):
+        while timeout > 0:
             win32gui.SetForegroundWindow(self.hwnd)
             left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
             app_bg_box = (left, top, right, bottom)
             im = ImageGrab.grab(app_bg_box)
-            im.save('images_yeshen/capture.png')
-            # self.send2web('images/capture.png')
+            im.save('images/temp/capture.png')
 
-            img_capture = ac.imread('images_yeshen/capture.png')
+            img_capture = ac.imread('images/temp/capture.png')
             img_obj = ac.imread(obj_pic_path)
             pos = ac.find_template(img_capture, img_obj)
             if pos and pos['confidence'] > 0.9:
-                print('匹配到', comment, timeout)
+                self._log('<<info>> 匹配到：', comment + ' ' + str(timeout) + 's')
                 x, y = pos['result']
-                self._detect_obj(img=img_capture, circle_center_pos=(int(x), int(y)), circle_radius=40,
-                                 color=(0, 255, 0), line_width=2)
                 return True, int(x), int(y)
             else:
-                print('未匹配到', comment, timeout)
-                self._sleep(1)
+                self._log('<<info>> 未匹配：', comment + ' ' + str(timeout) + 's')
+                time.sleep(1)
                 timeout -= 1
                 # self.check_upgrade(img_capture, comment=u"跳过软件升级")
 
         return False, -1, -1
 
-    def send_key(self, key_value, timeout):
+    def send_key(self, key_value, wait_times):
         win32gui.SetForegroundWindow(self.hwnd)
         # win32api.SetCursorPos([left + 10, top + 10])
         # win32api.mouse_event(WCON.MOUSEEVENTF_LEFTDOWN,0,0,0,0)
@@ -134,22 +118,24 @@ class Simulator(object):
         # win32api.SendMessage(hwnd,WCON.WM_SETTEXT,None,'A')
 
         # 向窗口发送Enter键
-        self._sleep(timeout)
+        time.sleep(wait_times)
         win32api.keybd_event(key_value, 0, 0, 0)
         # self._sleep(0.5)
         win32api.keybd_event(key_value, 0, WCON.KEYEVENTF_KEYUP, 0)
-        print('发送', key_value, '键')
-        self._sleep(timeout)
+        self._log('<<info>> 发送：', key_value + ' 键')
+        time.sleep(wait_times)
         return True
 
-    def app_quit(self):
+    def quit_app(self, wait_times):
+        time.sleep(wait_times)
         self.send_key(WCON.VK_ESCAPE, 1)
         self.send_key(WCON.VK_ESCAPE, 1)
         self.send_key(WCON.VK_ESCAPE, 1)
         self.send_key(WCON.VK_ESCAPE, 1)
+        time.sleep(wait_times)
         return True
 
-    def check_screen_lock(self, timeout):
+    def unlock(self, wait_times):
         ret, x, y = self.find_element(comment='锁屏', timeout=10)
         if not ret:
             return False
@@ -157,7 +143,7 @@ class Simulator(object):
             win32gui.SetForegroundWindow(self.hwnd)
             left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
             top += 20
-            self._sleep(timeout)
+            time.sleep(wait_times)
 
             (x, y) = self._UNLOCK_POS['step1']
             x = left + x
@@ -177,7 +163,7 @@ class Simulator(object):
             # pyautogui.dragTo(x, y, 0.5, button='left')
             pyautogui.moveTo(x, y, 1, pyautogui.easeInBounce)
             pyautogui.mouseUp()
-            self._sleep(timeout)
+            time.sleep(wait_times)
             return True
 
     def _check_screen_lock(self, timeout):
@@ -221,16 +207,16 @@ class Simulator(object):
                 return True
 
     def run(self):
-        ret = None
-        # hwnd = win32gui.FindWindow("Qt5QWindowIcon", None)
         if self.hwnd:
-            ret = self.check_screen_lock(timeout=1)
-            if not ret:
-                ret = self.app_quit()
-            if ret: self.script()
+            ret = self.unlock(wait_times=1)
+            if ret:
+                ret = self.quit_app(wait_times=1)
+
+            if ret:
+                self.script()
 
     def script(self):
-        pass
+        pass  # overwrite
 
 
 if __name__ == "__main__":

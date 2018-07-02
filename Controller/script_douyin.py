@@ -51,11 +51,11 @@ class MySelenium(NoxConSelenium):
 
 
 ##################################################################################
-def main(task):
+def main():
     start = datetime.now()
     print("[Script " + task['docker_name'] + "] start at ", start, '\n', task)
     try:
-        me = MySelenium(task_info=task)
+        me = MySelenium()
         me.set_comment_to_pic({
             "锁屏": 'images/screen_lock.png',
             "锁屏图案": 'images/screen_lock_9point.png',
