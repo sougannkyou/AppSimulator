@@ -6,10 +6,10 @@ p = os.getcwd()
 import sys
 
 if p not in sys.path:
-    print('append', p)
+    # print('append', p)
     sys.path.append(p)
 
-pprint(sys.path)
+# pprint(sys.path)
 import time
 from datetime import datetime
 from Controller.NoxConSelenium import NoxConSelenium
