@@ -201,12 +201,12 @@ class Manager(object):
 if __name__ == '__main__':
     manager = Manager()
     manager._DEBUG = True
-    t = {
-        'taskId': 2,
-        'app_name': 'miaopai',
-        'docker_name': 'nox-2',
-        'timer_no': 2,
-        'script': 'script_miaopai.py'
-    }
+    # t = {
+    #     'taskId': 2,
+    #     'app_name': 'miaopai',
+    #     'docker_name': 'nox-2',
+    #     'timer_no': 2,
+    #     'script': 'script_miaopai.py'
+    # }
     # manager.run_script(task_info=t)
     manager.start_tasks()

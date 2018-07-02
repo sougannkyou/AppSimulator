@@ -5,7 +5,7 @@ from datetime import datetime
 import re
 import random
 import subprocess
-from Controller.setting import CONSOLE_BINARY_PATH
+from Controller.setting import TIMER, CONSOLE_BINARY_PATH
 
 
 class NoxConADB(object):
@@ -28,6 +28,7 @@ class NoxConADB(object):
         self._docker_name = 'nox-' + str(task_info['taskId'])
         self._timer_no = task_info['timer_no']
         self._taskId = task_info['taskId']
+        self._timer_flg = False
 
     def _log(self, prefix, msg):
         if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
@@ -102,17 +103,34 @@ class NoxConADB(object):
         cmd_str = self._console_binary + ' adb -name:' + self._docker_name + ' -command:"' + cmd + '"'
         return cmd_str
 
-    def adb_cmd_before(self):
-        pass
+    def _set_timer_no(self):
+        f = open(self._work_path + '\\Controller\\timerNo.conf', 'w')
+        self._log('<<info>> write timerNo on:', datetime.now().strftime('%H:%M:%S %f'))
+        f.write('task-' + str(self._taskId))
+        f.close()
+
+    def adb_cmd_before(self, cmdline):
+        # overwrite NoxConADB adb_cmd_before
+        if self._timer_flg and self._timer_no > 0:
+            cycle = 3 * len(TIMER)
+            now = datetime.now().second % cycle
+            if now > TIMER[self._timer_no]:
+                wait_time = cycle + TIMER[self._timer_no] - now
+            else:
+                wait_time = TIMER[self._timer_no] - now
+            self._log('<<info>> timer_no:' + str(self._timer_no), 'sleep ' + str(wait_time) + 's')
+            time.sleep(wait_time)
+            self._set_timer_no()
+            self._log('[adb_cmd]<<info>> ' + datetime.now().strftime('%H:%M:%S %f') + '\n', cmdline)
+        else:
+            self._log('[adb_cmd]<<info>>\n', cmdline)
 
     def adb_cmd(self, cmd):
         self._clean()
         try:
-            cmdline = self._make_command(cmd)
-            self.adb_cmd_before()
             os.chdir('c:\\Nox\\bin')  # 防止 BignoxVMS 写入.py本地
-            self._log('[adb_cmd]<<info>>', cmdline)
-            print(datetime.now())
+            cmdline = self._make_command(cmd)
+            self.adb_cmd_before(cmdline)
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()
             (stdout, stderr) = process.communicate()

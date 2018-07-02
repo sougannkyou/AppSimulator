@@ -72,7 +72,7 @@ def main(task):
 
 if __name__ == "__main__":
     # taskId = sys.argv[1]
-    taskId = 1
+    taskId = 3
     task = {
         'taskId': taskId,
         'app_name': 'miaopai',
