@@ -202,8 +202,8 @@ class NoxConSelenium(NoxConADB):
     def run(self, is_app_restart):
         ret = self.unlock(wait_time=1)
         self.get_new_phone()
-        if ret and is_app_restart:
-            ret = self.app_quit(wait_time=1)
+        # if ret and is_app_restart:
+        #     ret = self.app_quit(wait_time=1)
 
         if ret:
             self.script()

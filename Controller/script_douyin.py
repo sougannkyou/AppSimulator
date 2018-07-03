@@ -75,12 +75,12 @@ def main(task_info, mode):
 
 if __name__ == "__main__":
     # taskId = sys.argv[1]
-    taskId = 2
+    taskId = 1
     task = {
         'taskId': taskId,
         'app_name': 'douyin',
         'docker_name': 'nox-' + str(taskId),
-        'timer_no': 2  # 8s
+        'timer_no': 1  # 5s
     }
     main(task, 'single')
     print("Close after 60 seconds.")

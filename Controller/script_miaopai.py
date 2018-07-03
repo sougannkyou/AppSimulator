@@ -72,12 +72,12 @@ def main(task):
 
 if __name__ == "__main__":
     # taskId = sys.argv[1]
-    taskId = 3
+    taskId = 2
     task = {
         'taskId': taskId,
         'app_name': 'miaopai',
         'docker_name': 'nox-' + str(taskId),
-        'timer_no': 1  # 5s
+        'timer_no': 2  # 8s
     }
     main(task)
     print("Close after 60 seconds.")
