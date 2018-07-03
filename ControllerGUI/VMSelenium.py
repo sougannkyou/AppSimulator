@@ -1,3 +1,4 @@
+import os
 import time
 import win32con as WCON
 import win32api
@@ -8,8 +9,8 @@ import aircv as ac
 import pyautogui
 
 
-class GUISelenium(object):
-    def __init__(self):
+class VMSelenium(object):
+    def __init__(self, nox_name):
         self._DEBUG = False
         self._UNLOCK_POS = {
             "step1": (133, 496),
@@ -19,7 +20,8 @@ class GUISelenium(object):
         self._PIC_PATH = {}
         self._CLICK_POS = {}
         self._capture_obj = None
-        self.hwnd = win32gui.FindWindow(None, '夜神模拟器')
+        self.hwnd = win32gui.FindWindow(None, nox_name)
+        self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
 
     def _log(self, prefix, msg):
         if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
@@ -85,18 +87,21 @@ class GUISelenium(object):
         cv2.destroyAllWindows()
         cv2.waitKey(100)
 
-    def find_element(self, comment, timeout):
-        obj_pic_path = self._PIC_PATH[comment]
-        while timeout > 0:
-            win32gui.SetForegroundWindow(self.hwnd)
-            left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
-            app_bg_box = (left, top, right, bottom)
-            im = ImageGrab.grab(app_bg_box)
-            im.save('images/temp/capture.png')
+    def get_capture(self, capture_name):
+        pic = self._work_path + '\\ControllerCV\\images\\temp\\' + capture_name
+        win32gui.SetForegroundWindow(self.hwnd)
+        left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
+        app_bg_box = (left, top, right, bottom)
+        im = ImageGrab.grab(app_bg_box)
+        im.save(pic)
+        self._capture_obj = ac.imread(pic)
 
-            img_capture = ac.imread('images/temp/capture.png')
-            img_obj = ac.imread(obj_pic_path)
-            pos = ac.find_template(img_capture, img_obj)
+    def find_element(self, comment, timeout):
+        capture_name = 'capture.png'
+        img_obj = ac.imread(self._PIC_PATH[comment])
+        while timeout > 0:
+            self.get_capture(capture_name)
+            pos = ac.find_template(self._capture_obj, img_obj)
             if pos and pos['confidence'] > 0.9:
                 self._log('<<info>> 匹配到：', comment + ' ' + str(timeout) + 's')
                 x, y = pos['result']
@@ -169,7 +174,7 @@ class GUISelenium(object):
     def _check_screen_lock(self, timeout):
         win32gui.SetForegroundWindow(self.hwnd)
         left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
-        self._sleep(timeout)
+        time.sleep(timeout)
 
         ret, x, y = self.find_element(comment='锁屏', timeout=10)
         if not ret:
@@ -203,14 +208,15 @@ class GUISelenium(object):
                 # pyautogui.dragTo(x, y, 0.5, button='left')
                 pyautogui.moveTo(_x, _y, 1, pyautogui.easeInBounce)
                 pyautogui.mouseUp()
-                self._sleep(timeout)
+                time.sleep(timeout)
                 return True
 
     def run(self):
         if self.hwnd:
-            ret = self.unlock(wait_times=1)
-            if ret:
-                ret = self.quit_app(wait_times=1)
+            ret = True
+            # ret = self.unlock(wait_times=1)
+            # if ret:
+            #     ret = self.quit_app(wait_times=1)
 
             if ret:
                 self.script()

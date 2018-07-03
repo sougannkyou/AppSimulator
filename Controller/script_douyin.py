@@ -12,12 +12,12 @@ if p not in sys.path:
 # pprint(sys.path)
 import time
 from datetime import datetime
-from Controller.NoxConSelenium import NoxConSelenium
+from Controller.NoxConSelenium import NoxConSelenium as MySelenium
 
 
-class MySelenium(NoxConSelenium):
-    def __init__(self, task_info):
-        super().__init__(task_info=task_info)
+class MySel(MySelenium):
+    def __init__(self, task_info, mode):
+        super().__init__(task_info=task_info, mode=mode)
 
     def script(self):
         try:
@@ -51,11 +51,11 @@ class MySelenium(NoxConSelenium):
 
 
 ##################################################################################
-def main():
+def main(task_info, mode):
     start = datetime.now()
     print("[Script " + task['docker_name'] + "] start at ", start, '\n', task)
     try:
-        me = MySelenium()
+        me = MySel(task_info, mode)
         me.set_comment_to_pic({
             "锁屏": 'images/screen_lock.png',
             "锁屏图案": 'images/screen_lock_9point.png',
@@ -87,6 +87,6 @@ if __name__ == "__main__":
         'docker_name': 'nox-' + str(taskId),
         'timer_no': 2  # 8s
     }
-    main(task)
+    main(task, 'single')
     print("Close after 60 seconds.")
     time.sleep(60)

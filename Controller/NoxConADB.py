@@ -5,7 +5,7 @@ from datetime import datetime
 import re
 import random
 import subprocess
-from Controller.setting import TIMER, CONSOLE_BINARY_PATH
+from Controller.setting import TIMER, CONSOLE_BINARY_PATH, ADB_BINARY_PATH
 
 
 class NoxConADB(object):
@@ -15,7 +15,8 @@ class NoxConADB(object):
     DEFAULT_TCP_HOST = "localhost"
     DEFAULT_TCP_PORT = 62001  # 5555
 
-    def __init__(self, task_info):
+    def __init__(self, task_info, mode):
+        self.mode = mode  # Nox 6.1.0: multi(NoxConsole);  Nox 3.8.1:single
         self._DEBUG = False
         self._stdout = None
         self._stderr = None
@@ -24,6 +25,7 @@ class NoxConADB(object):
         self._org_path = os.getcwd()
         self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
         self._console_binary = CONSOLE_BINARY_PATH
+        self._adb_binary = ADB_BINARY_PATH
         self._app_name = task_info['app_name']
         self._docker_name = 'nox-' + str(task_info['taskId'])
         self._timer_no = task_info['timer_no']
@@ -100,7 +102,10 @@ class NoxConADB(object):
 
     def _make_command(self, cmd):
         # NoxConsole.exe adb -name:nox-22 -command:"version"
-        cmd_str = self._console_binary + ' adb -name:' + self._docker_name + ' -command:"' + cmd + '"'
+        if self.mode == 'multi':  # multi: Nox >6.1.0
+            cmd_str = self._console_binary + ' adb -name:' + self._docker_name + ' -command:"' + cmd + '"'
+        else:  # single: Nox 3.8.1
+            cmd_str = self._adb_binary + ' ' + cmd
         return cmd_str
 
     def _set_timer_no(self):
@@ -166,8 +171,8 @@ class NoxConADB(object):
         """
         ver = None
         while timeout > 0:
-            ver = self.get_adb_version()
-            if ver and ver.startswith('Android Debug Bridge'):
+            ver = self.get_android_version()
+            if ver and ver.startswith('4.4.2'):
                 self._log('<<info>> wait_for_device:', 'ok')
                 break
             else:
@@ -469,12 +474,12 @@ class NoxConADB(object):
 
 
 if __name__ == "__main__":
-    task_info = {
+    task = {
         'app_name': 'miaopai',
         'docker_name': 'nox-2',
         'timer_no': 2
     }
-    me = NoxConADB(task_info)
+    me = NoxConADB(task_info=task, mode='multi')
     me._DEBUG = True
 
     # print(my.get_adb_version())

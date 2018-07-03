@@ -1,43 +1,46 @@
 # coding=utf8
 import os
 from datetime import datetime
-from ControllerCV.GUISelenium import GUISelenium
+from ControllerGUI.VMSelenium import VMSelenium
 
 
-class MySelenium(GUISelenium):
-    def __init__(self):
-        super().__init__()
+class MySelenium(VMSelenium):
+    def __init__(self, nox_name):
+        super().__init__(nox_name)
 
     def script(self):
         try:
-            ret = None
-            if self.hwnd: ret = self.find_element(comment='APP图标', timeout=10)  # unlock ok
-            if ret: ret = self.click(u"APP图标", wait_times=2)
+            ret = False
+            x = -1
+            y = -1
+            if self.hwnd: ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
+            if ret: ret = self.click_xy(x, y, wait_times=2)
             while ret:
-                if ret: ret = self.find_element(comment='更新', timeout=30)
-                if ret: ret = self.click(u"更新", wait_times=1)
+                if ret: ret, x, y = self.find_element(comment='更新', timeout=30)
+                if ret: ret = self.click_xy(x, y, wait_times=1)
 
-                if ret: ret = self.find_element(comment='分享', timeout=10)
-                if ret: ret = self.click(u"分享", wait_times=1)
+                if ret: ret, x, y = self.find_element(comment='分享', timeout=10)
+                if ret: ret = self.click_xy(x, y, wait_times=1)
 
                 if ret:
-                    ret = self.find_element(comment='复制链接', timeout=10)
-                    if not ret:
+                    ret, x, y = self.find_element(comment='复制链接', timeout=10)
+                    if ret:
+                        ret = self.click_xy(x, y, wait_times=1)
+                    else:
                         print("重试 click 分享 按钮 ...")
-                        ret = self.find_element(comment='分享', timeout=10)
-                        if ret: ret = self.click(u"分享", wait_times=1)
-
-                if ret: ret = self.click(u"复制链接", wait_times=1)
+                        ret, x, y = self.find_element(comment='分享', timeout=10)
+                        if ret: ret = self.click_xy(x, y, wait_times=1)
+                        # if ret: ret = self.click("复制链接", wait_times=1)
 
         except Exception as e:
-            self._log('error:', e)
+            self._log('[Script] error:', e)
 
 
-def main():
+def main(nox_name):
     start = datetime.now()
     print("[Script] start at ", start)
     try:
-        me = MySelenium()
+        me = MySelenium(nox_name)
         me.set_comment_to_pic({
             "锁屏": 'images/screen_lock.png',
             "APP图标": 'images/douyin/app_icon.png',
@@ -66,4 +69,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main('nox-1')

@@ -34,7 +34,7 @@ RPC_SERVER_TIMEOUT = 30
 RPC_PORT = 8003
 
 # ---------------------- adb -----------------------------
-ADB_BINARY_PATH = 'C:\\Nox\\bin\\adb.exe'
+ADB_BINARY_PATH = 'C:\\Nox\\bin\\nox_adb.exe'
 CONSOLE_BINARY_PATH = 'C:\\Nox\\bin\\NoxConsole.exe'
 
 TIMER = [2, 5, 8, 11, 14, 17, 20, 23, 26, 29]

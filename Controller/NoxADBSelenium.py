@@ -5,12 +5,12 @@ from datetime import datetime
 import cv2
 import aircv as ac
 import ftplib
-from Controller.NoxConADB import NoxConADB
+from Controller.NoxADB import NoxADB
 
 
-class NoxConSelenium(NoxConADB):
-    def __init__(self, task_info, mode):
-        super().__init__(task_info, mode)
+class NoxADBSelenium(NoxADB):
+    def __init__(self, task_info):
+        super().__init__(task_info)
         self._DEBUG = False
         self._FTP_TRANSMISSION = False
         self._PIC_PATH = {}  # overwrite/sd
@@ -122,7 +122,12 @@ class NoxConSelenium(NoxConADB):
         return True
 
     def click_xy_timer(self, x, y, wait_time):
-        return self.click_xy(x, y, wait_time=wait_time)
+        self._debug(x, y, wait_time=2)
+        self._timer_flg = True  # NoxConADB adb_cmd_before() on
+        self.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)))
+        self._timer_flg = False  # NoxConADB adb_cmd_before() off
+        time.sleep(wait_time)
+        return True
 
     def input(self, text, wait_time):
         self._log('<<info>> input', text)
