@@ -5,7 +5,6 @@ import sys
 
 sys.path.append(os.getcwd())
 
-# pprint(sys.path)
 import time
 from datetime import datetime
 from Controller.NoxConSelenium import NoxConSelenium as MySelenium
