@@ -49,7 +49,7 @@ class NoxConSelenium(NoxConADB):
     def find_element(self, comment, timeout):
         # True(False), x, y
         capture_name = "capture_" + self._docker_name + ".png"
-        img_obj = ac.imread(self._PIC_PATH[comment])
+        img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
         while timeout > 0:
             self.get_capture(capture_name)
             pos = ac.find_template(self._capture_obj, img_obj)
@@ -67,7 +67,7 @@ class NoxConSelenium(NoxConADB):
     def find_elements(self, comment, timeout):
         ret = []
         capture_name = "capture_" + self._docker_name + ".png"
-        img_obj = ac.imread(self._PIC_PATH[comment])
+        img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
         self.get_capture(capture_name)
 
         while timeout > 0:
@@ -200,10 +200,10 @@ class NoxConSelenium(NoxConADB):
         pass  # overwrite
 
     def run(self, is_app_restart):
-        ret = self.unlock(wait_time=1)
-        self.get_new_phone()
+        # ret = self.unlock(wait_time=1)
+        # self.get_new_phone()
         # if ret and is_app_restart:
         #     ret = self.app_quit(wait_time=1)
 
-        if ret:
-            self.script()
+        # if ret:
+        self.script()

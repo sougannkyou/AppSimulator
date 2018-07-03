@@ -35,7 +35,7 @@ class VMSelenium(object):
             self._log('set_comment_to_pic error:', 'must be set a dictionary')
 
     def check_upgrade(self, img_capture, comment):
-        img_obj = ac.imread(self._PIC_PATH[comment])
+        img_obj = ac.imread(self._work_path + '\\ControllerGUI\\' + self._PIC_PATH[comment])
         pos = ac.find_template(img_capture, img_obj)
         if pos and pos['confidence'] > 0.9:
             self._log('版本更新提示', self._PIC_PATH[comment])
@@ -99,7 +99,7 @@ class VMSelenium(object):
 
     def find_element(self, comment, timeout):
         capture_name = 'capture.png'
-        img_obj = ac.imread(self._PIC_PATH[comment])
+        img_obj = ac.imread(self._work_path + '\\ControllerGUI\\' + self._PIC_PATH[comment])
         while timeout > 0:
             self.get_capture(capture_name)
             pos = ac.find_template(self._capture_obj, img_obj)

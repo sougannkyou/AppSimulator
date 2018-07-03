@@ -1,5 +1,4 @@
 # coding:utf-8
-from pprint import pprint
 import os
 import sys
 
@@ -61,7 +60,6 @@ def main(task_info, mode):
             "跳过软件升级": 'images/douyin/ignore_upgrade.png',
         })
 
-        # if not ret: self.send2web('images/offline.jpeg')
         me.run(is_app_restart=True)
         # me._DEBUG = True
         end = datetime.now()

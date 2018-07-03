@@ -51,7 +51,7 @@ class NoxADBSelenium(NoxADB):
     def find_element(self, comment, timeout):
         # True(False), x, y
         capture_name = "capture_" + self._docker_name + ".png"
-        img_obj = ac.imread(self._PIC_PATH[comment])
+        img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
         while timeout > 0:
             self.get_capture(capture_name)
             pos = ac.find_template(self._capture_obj, img_obj)
@@ -69,7 +69,7 @@ class NoxADBSelenium(NoxADB):
     def find_elements(self, comment, timeout):
         ret = []
         capture_name = "capture_" + self._docker_name + ".png"
-        img_obj = ac.imread(self._PIC_PATH[comment])
+        img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
         self.get_capture(capture_name)
 
         while timeout > 0:
