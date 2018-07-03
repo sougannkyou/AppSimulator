@@ -89,7 +89,7 @@ class VMSelenium(object):
         cv2.waitKey(100)
 
     def get_capture(self, capture_name):
-        pic = self._work_path + '\\ControllerCV\\images\\temp\\' + capture_name
+        pic = self._work_path + '\\ControllerGUI\\images\\temp\\' + capture_name
         win32gui.SetForegroundWindow(self.hwnd)
         left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
         app_bg_box = (left, top, right, bottom)
