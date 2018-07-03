@@ -1,13 +1,9 @@
 # coding:utf-8
 from pprint import pprint
 import os
-
-p = os.getcwd()
 import sys
 
-if p not in sys.path:
-    # print('append', p)
-    sys.path.append(p)
+sys.path.append(os.getcwd())
 
 # pprint(sys.path)
 import time
