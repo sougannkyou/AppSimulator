@@ -5,7 +5,7 @@ from datetime import datetime
 import re
 import random
 import subprocess
-from Controller.setting import TIMER, CONSOLE_BINARY_PATH, ADB_BINARY_PATH
+from Controller.setting import TIMER, WORK_PATH, CONSOLE_BINARY_PATH, ADB_BINARY_PATH
 
 
 class NoxConADB(object):
@@ -23,7 +23,7 @@ class NoxConADB(object):
         self._devices = None
         self.__target = None
         self._org_path = os.getcwd()
-        self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
+        self._work_path = WORK_PATH
         self._console_binary = CONSOLE_BINARY_PATH
         self._adb_binary = ADB_BINARY_PATH
         self._app_name = task_info['app_name']

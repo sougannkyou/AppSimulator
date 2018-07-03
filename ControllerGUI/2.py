@@ -51,7 +51,6 @@ import subprocess
 
 
 #
-# work_path = os.getenv('APPSIMULATOR_WORK_PATH')
 # cmd = "start /b start python " + work_path + "\Controller\script_toutiao_NoxCon.py"
 # print(cmd)
 # # subprocess.check_output(cmd)

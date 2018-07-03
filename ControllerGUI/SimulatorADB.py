@@ -8,6 +8,7 @@ from PIL import ImageGrab
 import cv2
 import aircv as ac
 import ftplib
+from Controller.setting import LOCAL_IP
 from Controller.ControllerManager import Manager
 from Controller.NoxADB import NoxADB
 
@@ -21,7 +22,7 @@ class Simulator(object):
         self._img_capture = None
         self._docker_name = None
         self._app_name = app_name
-        self._ip = os.getenv('APPSIMULATOR_IP')
+        self._local_ip = LOCAL_IP
         self._adb = NoxADB(adb_binary_path=adb_path)
         self._adb_port = None
 
@@ -29,7 +30,7 @@ class Simulator(object):
         err_msg, devices = self._adb.get_devices()
         # pprint(devices)
         if not err_msg:
-            running_devices = self._manager.get_devices(status='running', app_name=app_name, ip=self._ip)
+            running_devices = self._manager.get_devices(status='running', app_name=app_name, ip=self._local_ip)
             self._adb_port = devices - running_devices
             if self._adb_port:
                 self._adb.set_target_device('127.0.0.1:' + str(self._adb_port))

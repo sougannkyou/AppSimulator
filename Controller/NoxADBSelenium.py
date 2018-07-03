@@ -5,6 +5,7 @@ from datetime import datetime
 import cv2
 import aircv as ac
 import ftplib
+from Controller.setting import WORK_PATH
 from Controller.NoxADB import NoxADB
 
 
@@ -14,7 +15,7 @@ class NoxADBSelenium(NoxADB):
         self._DEBUG = False
         self._FTP_TRANSMISSION = False
         self._PIC_PATH = {}  # overwrite/sd
-        self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
+        self._work_path = WORK_PATH
         self._capture_obj = None
 
     def _log(self, prefix, msg):

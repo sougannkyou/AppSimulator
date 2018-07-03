@@ -99,7 +99,7 @@ def _get_free_mem():
     # STATUS_WAIT or STATUS_BUILDING
     mem_free = mem.free - MDB.task_get_my_prepare_tasks_cnt() * GB
     ret = '%.1f' % (mem_free / GB)
-    _log('_get_free_mem ret: ',  ret + " GB")
+    _log('_get_free_mem ret: ', ret + " GB")
     return float(ret)
 
 
@@ -145,7 +145,7 @@ def _register_service():
     _log('_register', 'start')
     mem = psutil.virtual_memory()
     info = {
-        'ip': os.getenv('APPSIMULATOR_IP'),
+        'ip': LOCAL_IP,
         'port': RPC_PORT,
         'app_name': _backup_app_list(),
         'mem_free': '%.1f' % (mem.free / GB),

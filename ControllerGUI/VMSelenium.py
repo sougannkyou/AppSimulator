@@ -7,6 +7,7 @@ from PIL import ImageGrab
 import cv2
 import aircv as ac
 import pyautogui
+from ControllerGUI.setting import WORK_PATH
 
 
 class VMSelenium(object):
@@ -21,7 +22,7 @@ class VMSelenium(object):
         self._CLICK_POS = {}
         self._capture_obj = None
         self.hwnd = win32gui.FindWindow(None, nox_name)
-        self._work_path = os.getenv('APPSIMULATOR_WORK_PATH')
+        self._work_path = WORK_PATH
 
     def _log(self, prefix, msg):
         if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:

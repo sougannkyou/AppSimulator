@@ -9,7 +9,7 @@ from Controller.setting import *
 class NoxConDocker(object):
     def __init__(self, task_info):
         self._DEBUG = True
-        self._local_ip = os.getenv('APPSIMULATOR_IP')
+        self._local_ip = LOCAL_IP
         self._org_path = os.getcwd()
         self._app_name = task_info['app_name']
         self._docker_name = 'nox-' + str(task_info['taskId'])
