@@ -6,6 +6,7 @@ timeout 90
 REM tasklist | findstr "Nox.exe"
 cd %APPSIMULATOR_WORK_PATH%
 start "script" /HIGH python ControllerGUI/script_douyin.py
+REM start "script" /HIGH python Controller/script_douyin.py
 timeout 10
 exit
 
