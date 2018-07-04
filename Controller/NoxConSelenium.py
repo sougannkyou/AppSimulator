@@ -161,8 +161,8 @@ class NoxConSelenium(NoxConADB):
         return True
 
     def unlock(self, wait_time):
-        self.adb_shell('rm /data/system/*.key')  # rm /data/system/*.key
-        time.sleep(wait_time)
+        # self.adb_shell('rm /data/system/*.key')  # rm /data/system/*.key
+        # time.sleep(wait_time)
         return True
 
     def ftp_upload(self, local_file, remote_dir, remote_file):
