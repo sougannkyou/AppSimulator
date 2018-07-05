@@ -3,6 +3,8 @@ import time
 import cv2
 import aircv as ac
 import ftplib
+import win32gui
+import pyautogui
 from Controller.setting import WORK_PATH
 from Controller.NoxConADB import NoxConADB
 
@@ -15,6 +17,15 @@ class NoxConSelenium(NoxConADB):
         self._PIC_PATH = {}  # overwrite/sd
         self._work_path = WORK_PATH
         self._capture_obj = None
+        if mode == 'single':
+            self.hwnd = win32gui.FindWindow(None, '夜神模拟器')
+        else:
+            self.hwnd = None
+        self._UNLOCK_POS = {
+            "step1": (133, 496),
+            "step2": (132, 705),
+            "step3": (343, 707)
+        }
 
     def _log(self, prefix, msg):
         if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
@@ -160,10 +171,41 @@ class NoxConSelenium(NoxConADB):
             time.sleep(wait_time)
         return True
 
-    def unlock(self, wait_time):
+    def _unlock(self, wait_time):
         # self.adb_shell('rm /data/system/*.key')  # rm /data/system/*.key
         # time.sleep(wait_time)
         return True
+
+    def unlock(self, wait_times):
+        ret, x, y = self.find_element(comment='锁屏', timeout=10)
+        if not ret:
+            return False
+        else:
+            win32gui.SetForegroundWindow(self.hwnd)
+            left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
+            top += 20
+            time.sleep(wait_times)
+
+            (x, y) = self._UNLOCK_POS['step1']
+            x = left + x
+            y = top + y
+            pyautogui.moveTo(x, y)
+            pyautogui.mouseDown()
+
+            (x, y) = self._UNLOCK_POS['step2']
+            x = left + x
+            y = top + y
+            # pyautogui.dragTo(x, y, 0.5, button='left')
+            pyautogui.moveTo(x, y, 1, pyautogui.easeInQuad)
+
+            (x, y) = self._UNLOCK_POS['step3']
+            x = left + x
+            y = top + y
+            # pyautogui.dragTo(x, y, 0.5, button='left')
+            pyautogui.moveTo(x, y, 1, pyautogui.easeInBounce)
+            pyautogui.mouseUp()
+            time.sleep(wait_times)
+            return True
 
     def ftp_upload(self, local_file, remote_dir, remote_file):
         if not self._FTP_TRANSMISSION: return
@@ -200,7 +242,7 @@ class NoxConSelenium(NoxConADB):
         pass  # overwrite
 
     def run(self, is_app_restart):
-        # ret = self.unlock(wait_time=1)
+        ret = self.unlock(wait_time=1)
         # self.get_new_phone()
         # if ret and is_app_restart:
         #     ret = self.app_quit(wait_time=1)
