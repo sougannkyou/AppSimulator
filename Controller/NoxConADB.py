@@ -108,7 +108,7 @@ class NoxConADB(object):
             cmd_str = self._adb_binary + ' ' + cmd
         return cmd_str
 
-    def _set_timer_no(self):
+    def _set_task_conf(self):
         f = open(self._work_path + '\\cmd\\task.conf', 'w')
         self._log('<<info>> write task.conf:', datetime.now().strftime('%H:%M:%S %f'))
         f.write('task-' + str(self._taskId))
@@ -125,7 +125,7 @@ class NoxConADB(object):
                 wait_time = TIMER[self._timer_no] - now
             self._log('<<info>> timer_no:' + str(self._timer_no), 'sleep ' + str(wait_time) + 's')
             time.sleep(wait_time)
-            self._set_timer_no()
+            self._set_task_conf()
             self._log('[adb_cmd]<<info>> ' + datetime.now().strftime('%H:%M:%S %f') + '\n', cmdline)
         else:
             self._log('[adb_cmd]<<info>>\n', cmdline)
