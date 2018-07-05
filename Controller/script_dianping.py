@@ -1,5 +1,9 @@
 # coding:utf-8
+import os
 import sys
+
+sys.path.append(os.getcwd())
+
 import time
 from datetime import datetime
 from Controller.NoxConSelenium import NoxConSelenium

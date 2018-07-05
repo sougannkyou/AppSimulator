@@ -1,4 +1,9 @@
 # coding:utf-8
+import os
+import sys
+
+sys.path.append(os.getcwd())
+
 from pprint import pprint
 import time
 from datetime import datetime
@@ -47,11 +52,11 @@ class MySel(MySelenium):
 
 
 ##################################################################################
-def main(task, mode):
+def main(task_info, mode):
     start = datetime.now()
-    print("[Script " + task['docker_name'] + "] start at ", start, '\n', task)
+    print("[Script " + task_info['docker_name'] + "] start at ", start, '\n', task_info)
     try:
-        me = MySel(task_info=task, mode=mode)
+        me = MySelenium(task_info=task_info, mode=mode)
         me.set_comment_to_pic({
             "锁屏": 'images/screen_lock.png',
             "APP图标": 'images/miaopai/app_icon.png',
@@ -63,11 +68,11 @@ def main(task, mode):
         # me._DEBUG = True
         me.run(is_app_restart=True)
         end = datetime.now()
-        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s")
+        print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s")
         return True
     except Exception as e:
         end = datetime.now()
-        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s\n error:", e)
+        print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s\n error:", e)
         return False
 
 
@@ -80,6 +85,6 @@ if __name__ == "__main__":
         'docker_name': 'nox-' + str(taskId),
         'timer_no': 2  # 8s
     }
-    main(task, 'single')
+    main(task_info=task, mode='single')
     print("Close after 60 seconds.")
     time.sleep(60)
