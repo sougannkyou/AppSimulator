@@ -12,7 +12,7 @@
         <div class="col-xs-12">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">Tasks</h3>
+                    <h3 class="box-title">VMware</h3>
                     <div class="box-tools">
                         <div class="input-group input-group-sm" style="width: 150px;">
                             <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
@@ -26,19 +26,15 @@
                     <table class="table table-hover">
                         <tbody>
                         <tr>
-                            <th width="5%">TaskId</th>
                             <th width="10%">IP</th>
-                            <th width="5%">Port</th>
                             <th width="20%">Script</th>
                             <th width="20%">APP</th>
+                            <th width="5%">TaskId</th>
                             <th width="20%">Status</th>
-                            <th width="20%">Type</th>
                         </tr>
                         <tr>
-                            <td><input type="text" v-model="task.taskId" placeholder="等待分配" readonly></td>
                             <td><input type="text" v-model="task.ip" placeholder="等待分配" readonly></td>
-                            <td><input type="text" v-model="task.port" placeholder="等待分配" readonly></td>
-                            <td><input type="text" v-model="task.script" placeholder="script"></td>
+                            <td><input type="text" v-model="task.taskId" placeholder="等待分配" readonly></td>
                             <td>
                                 <label v-for="app in appAll">
                                     <img v-bind:class="[task.app_name===app?'app-icon-big':'app-icon']"
@@ -46,22 +42,22 @@
                                          v-bind:src="'/static/AppSimulator/images/' + app + '/app_icon.png'">
                                 </label>
                             </td>
+                            <td><input type="text" v-model="task.app_name" placeholder="APP"></td>
                             <td>
                                 <span v-bind:class="[task.status==='unkown'?'label label-default':
                                 (task.status==='running'?'label label-success':'label label-warring')]">[[ task.status ]]</span>
                             </td>
-                            <td><input type="text" v-model="task.deviceType" placeholder="emulator/vm">
+                            <td>
                                 <button v-on:click="addTask" class="fa fa-2x fa-plus-circle pull-right"
                                         style="color:orange;" title="增加"></button>
                             </td>
                         </tr>
                         <tr v-for="t in tasks">
-                            <td>[[ t.taskId ]]</td>
                             <td>[[ t.ip ]]</td>
-                            <td>[[ t.port ]]</td>
                             <td>[[ t.script ]]</td>
                             <td><img class="app" v-bind:src="'/static/AppSimulator/images/'+t.app_name+'/app_icon.png'">
                             </td>
+                            <td>[[ t.taskId ]]</td>
                             <td><span v-bind:class="[t.status==='unkown'?'label label-default':
                                 (t.status==='running'?'label label-success':'label label-warring')]">[[ t.status ]]</span>
                             </td>
@@ -146,29 +142,26 @@
             },
             created: function () {
                 this.tasks = [{
+                    ip: '192.168.84.144',
+                    docker_name: 'vm1',
                     taskId: 1,
-                    ip: '192.168.31.227',
-                    port: '62001',
                     script: 'script_douyin.py',
                     app_name: 'douyin',
                     status: STATUS_RUN,
-                    deviceType: 'emulator'
                 }, {
+                    ip: '192.168.84.143',
+                    docker_name: 'vm2',
                     taskId: 2,
-                    ip: '192.168.31.228',
-                    port: '62003',
                     script: 'script_miaopai.py',
                     app_name: 'miaopai',
                     status: STATUS_RUN,
-                    deviceType: 'emulator'
                 }, {
+                    ip: '172.16.253.233',
+                    docker_name: 'vm3',
                     taskId: 3,
-                    ip: '192.168.31.229',
-                    port: '62005',
                     script: 'script_dianping.py',
                     app_name: 'dianping',
                     status: STATUS_RUN,
-                    deviceType: 'emulator'
                 }];
             },
             watch: {},
