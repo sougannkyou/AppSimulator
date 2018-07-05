@@ -5,7 +5,7 @@ from datetime import datetime
 import re
 import random
 import subprocess
-from Controller.setting import TIMER, WORK_PATH, CONSOLE_BINARY_PATH, ADB_BINARY_PATH
+from Controller.setting import *
 
 
 class NoxConADB(object):
@@ -133,7 +133,7 @@ class NoxConADB(object):
     def adb_cmd(self, cmd):
         self._clean()
         try:
-            os.chdir('c:\\Nox\\bin')  # 防止 BignoxVMS 写入.py本地
+            os.chdir(NOX_BIN_PATH)  # 防止 BignoxVMS 写入.py本地
             cmdline = self._make_command(cmd)
             self.adb_cmd_before(cmdline)
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

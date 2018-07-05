@@ -7,14 +7,14 @@ sys.path.append(os.getcwd())
 from pprint import pprint
 import time
 from datetime import datetime
-from Controller.NoxConSelenium import NoxConSelenium as MySelenium
+from Controller.NoxConSelenium import NoxConSelenium
 
 urls = [
     "http://www.miaopai.com/show/6NWi1Bp5fx9GV0tdwCUGYWNzaQm9hVJe.htm",  # 936
 ]
 
 
-class MySel(MySelenium):
+class MySelenium(NoxConSelenium):
     def __init__(self, task_info, mode):
         super().__init__(task_info=task_info, mode=mode)
 

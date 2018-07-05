@@ -6,10 +6,10 @@ sys.path.append(os.getcwd())
 
 import time
 from datetime import datetime
-from Controller.NoxConSelenium import NoxConSelenium as MySelenium
+from Controller.NoxConSelenium import NoxConSelenium
 
 
-class MySel(MySelenium):
+class MySelenium(NoxConSelenium):
     def __init__(self, task_info, mode):
         super().__init__(task_info=task_info, mode=mode)
 
@@ -49,7 +49,7 @@ def main(task_info, mode):
     start = datetime.now()
     print("[Script " + task_info['docker_name'] + "] start at ", start, '\n', task_info)
     try:
-        me = MySel(task_info=task_info, mode=mode)
+        me = MySelenium(task_info=task_info, mode=mode)
         me.set_comment_to_pic({
             "锁屏": 'images/screen_lock.png',
             "锁屏图案": 'images/screen_lock_9point.png',
