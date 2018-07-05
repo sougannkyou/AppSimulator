@@ -109,8 +109,8 @@ class NoxConADB(object):
         return cmd_str
 
     def _set_timer_no(self):
-        f = open(self._work_path + '\\Controller\\timerNo.conf', 'w')
-        self._log('<<info>> write timerNo on:', datetime.now().strftime('%H:%M:%S %f'))
+        f = open(self._work_path + '\\cmd\\task.conf', 'w')
+        self._log('<<info>> write task.conf:', datetime.now().strftime('%H:%M:%S %f'))
         f.write('task-' + str(self._taskId))
         f.close()
 
