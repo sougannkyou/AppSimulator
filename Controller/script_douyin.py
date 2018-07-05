@@ -49,7 +49,7 @@ def main(task_info, mode):
     start = datetime.now()
     print("[Script " + task['docker_name'] + "] start at ", start, '\n', task)
     try:
-        me = MySel(task_info, mode)
+        me = MySel(task_info=task, mode=mode)
         me.set_comment_to_pic({
             "锁屏": 'images/screen_lock.png',
             "锁屏图案": 'images/screen_lock_9point.png',
