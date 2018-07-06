@@ -1,7 +1,7 @@
 REM taskkill /t /f /fi "WINDOWTITLE eq script"
-C:\Nox\bin\Nox.exe -quit
-timeout 10
-start /HIGH C:\Nox\bin\Nox.exe
+REM C:\Nox\bin\Nox.exe -quit
+REM timeout 10
+REM start /HIGH C:\Nox\bin\Nox.exe
 timeout 60
 REM tasklist | findstr "Nox.exe"
 cd %APPSIMULATOR_WORK_PATH%
