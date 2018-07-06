@@ -164,9 +164,9 @@ class MongoDriver(object):
                 s.pop('_id')
                 l.append(s['cnt'])
 
-            if (len(l) > 0 and l[-1] > 0):
+            if len(l) > 0 and l[-1] > 0:
                 status['cnt'] = l[-1]
-                if (l[0] == l[-1]):
+                if l[0] == l[-1]:
                     status['status'] = STATUS_SCRIPT_RUN_SUSPEND
                 else:
                     status['status'] = STATUS_SCRIPT_RUNNING

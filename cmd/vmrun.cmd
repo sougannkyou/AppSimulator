@@ -8,12 +8,15 @@ REM echo snapshot vm
 REM vmrun.exe snapshot "c:\VMWare\VM\vm1\Windows 7 x64.vmx" vm1-snapshot
 REM timeout 10
 
-echo revert To Snapshot
-vmrun.exe revertToSnapshot "c:\VMWare\VM\vm1\Windows 7 x64.vmx" snapshot-vm1
-timeout 10
+rem echo revert To Snapshot
+rem vmrun.exe revertToSnapshot "c:\VMWare\VM\vm1\Windows 7 x64.vmx" snapshot-vm1
+rem timeout 10
 
+rem vmrun.exe getGuestIPAddress "C:\VMware\VM\device1\Windows 7 x64.vmx"
+
+rem vmrun.exe  -T ws -gu "zhxg" -gp "zhxg2018" CopyFileFromHostToGuest "c:\VMWare\VM\vm1\Windows 7 x64.vmx"  %APPSIMULATOR_WORK_PATH%"\cmd\task.conf"
 echo start vm
-vmrun.exe start "c:\VMWare\VM\vm1\Windows 7 x64.vmx"
+vmrun.exe reset "c:\VMWare\VM\vm1\Windows 7 x64.vmx"
 timeout 10
 
 rem echo run Program in Guest

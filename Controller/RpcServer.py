@@ -28,6 +28,13 @@ def simulatorStatus():
     return "running"
 
 
+def resetVM(docker_name, app_name):
+    # docker_name: vm1 vm2 vm3
+    os.system('vmrun.exe  -T ws -gu "zhxg" -gp "zhxg2018" CopyFileFromHostToGuest "c:\VMWare\VM\\vm1\Windows 7 x64.vmx"  %APPSIMULATOR_WORK_PATH%"\cmd\\task.conf"')
+    os.system('vmrun.exe reset "c:\VMWare\VM\\' + docker_name + '\Windows 7 x64.vmx"')
+    return True
+
+
 def startScript():
     os.system('taskkill /f /t /fi "WINDOWTITLE eq script"')
     os.system('start /B start "script" cmd.exe @cmd /k python %RPCSERVER_HOME%script_douyin.py')

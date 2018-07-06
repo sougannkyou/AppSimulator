@@ -37,5 +37,10 @@ RPC_PORT = 8003
 NOX_BIN_PATH = 'C:\\Nox\\bin'
 ADB_BINARY_PATH = NOX_BIN_PATH + '\\nox_adb.exe'
 CONSOLE_BINARY_PATH = NOX_BIN_PATH + '\\NoxConsole.exe'
-
 TIMER = [2, 5, 8, 11, 14, 17, 20, 23, 26, 29]
+
+# ---------------------- VMware -----------------------------
+VMRUN_BINARY_PATH = 'C:\\VMware\\Workstation\\vmrun.exe'
+VM_IMAGES_PATH = 'C:\\VMware\\VM'
+VMX_NAME = 'Windows 7 x64.vmx'
+VM_MAX = 5

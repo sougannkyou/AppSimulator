@@ -73,7 +73,7 @@ class NoxConDocker(object):
         try:
             self._log('<<nox_cmd>> ', cmdline)
             time.sleep(1)
-            os.chdir('c:\\Nox\\bin')  # 防止 BignoxVMS 写入.py本地
+            os.chdir(NOX_BIN_PATH)  # 防止 BignoxVMS 写入.py本地
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             # process.wait()
             (stdout, stderr) = process.communicate()
