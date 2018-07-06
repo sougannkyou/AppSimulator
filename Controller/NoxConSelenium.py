@@ -176,15 +176,15 @@ class NoxConSelenium(NoxConADB):
         # time.sleep(wait_time)
         return True
 
-    def unlock(self, wait_times):
-        ret, x, y = self.find_element(comment='锁屏', timeout=10)
+    def unlock(self, timeout):
+        ret, x, y = self.find_element(comment='锁屏', timeout=timeout)
         if not ret:
             return False
         else:
             win32gui.SetForegroundWindow(self.hwnd)
             left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
             top += 20
-            time.sleep(wait_times)
+            time.sleep(1)
 
             (x, y) = self._UNLOCK_POS['step1']
             x = left + x
@@ -204,7 +204,7 @@ class NoxConSelenium(NoxConADB):
             # pyautogui.dragTo(x, y, 0.5, button='left')
             pyautogui.moveTo(x, y, 1, pyautogui.easeInBounce)
             pyautogui.mouseUp()
-            time.sleep(wait_times)
+            time.sleep(1)
             return True
 
     def ftp_upload(self, local_file, remote_dir, remote_file):
@@ -241,8 +241,8 @@ class NoxConSelenium(NoxConADB):
     def script(self):
         pass  # overwrite
 
-    def run(self, is_app_restart):
-        self.unlock(wait_times=1)
+    def run(self):
+        self.unlock(timeout=10)
         # self.get_new_phone()
         # if ret and is_app_restart:
         #     ret = self.app_quit(wait_time=1)

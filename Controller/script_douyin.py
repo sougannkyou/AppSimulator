@@ -60,7 +60,7 @@ def main(task_info, mode):
             "跳过软件升级": 'images/douyin/ignore_upgrade.png',
         })
 
-        me.run(is_app_restart=True)
+        me.run()
         # me._DEBUG = True
         end = datetime.now()
         print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s")

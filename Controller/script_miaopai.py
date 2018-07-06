@@ -4,7 +4,6 @@ import sys
 
 sys.path.append(os.getcwd())
 
-from pprint import pprint
 import time
 from datetime import datetime
 from Controller.NoxConSelenium import NoxConSelenium
@@ -19,6 +18,7 @@ class MySelenium(NoxConSelenium):
         super().__init__(task_info=task_info, mode=mode)
 
     def script(self):
+        print('script')
         try:
             ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
             if ret:
@@ -26,7 +26,6 @@ class MySelenium(NoxConSelenium):
 
             while ret:
                 ret, pos_list = self.find_elements(comment='分享', timeout=10)
-                pprint(pos_list)
                 if ret:
                     for pos in pos_list:
                         (x, y) = pos
@@ -66,7 +65,7 @@ def main(task_info, mode):
             "跳过软件升级": 'images/miaopai/ignore_upgrade.png',
         })
         # me._DEBUG = True
-        me.run(is_app_restart=True)
+        me.run()
         end = datetime.now()
         print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s")
         return True

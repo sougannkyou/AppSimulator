@@ -1,5 +1,9 @@
 # coding:utf-8
+import os
 import sys
+
+sys.path.append(os.getcwd())
+
 import time
 from datetime import datetime
 from Controller.NoxConSelenium import NoxConSelenium
@@ -24,6 +28,9 @@ comments = [
 
 
 class MySelenium(NoxConSelenium):
+    def __init__(self, task_info, mode):
+        super().__init__(task_info=task_info, mode=mode)
+
     def script(self):
         self.get(url=urls[0], wait_time=5)
         self.next_page_browser(3)
@@ -52,11 +59,11 @@ class MySelenium(NoxConSelenium):
 
 
 ##################################################################################
-def main(task):
+def main(task_info, mode):
     start = datetime.now()
     print("[Script " + task['docker_name'] + "] start at ", start)
     try:
-        me = MySelenium(task_info=task)
+        me = MySelenium(task_info=task_info, mode=mode)
         me.set_comment_to_pic({
             "jump2app": 'images/toutiao/jump2app.png',
             "writeComment": 'images/toutiao/writeComment.png',
@@ -64,14 +71,14 @@ def main(task):
         })
         me._DEBUG = True
         # me.set_gps(39.984727, 116.310050)  # 中关村
-        me.run(is_app_restart=False)
+        me.run()
 
         end = datetime.now()
-        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s")
+        print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s")
         return True
     except Exception as e:
         end = datetime.now()
-        print("[Script " + task['docker_name'] + "] total times:", str((end - start).seconds) + "s\nerror:", e)
+        print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s\nerror:", e)
         return False
 
 
@@ -86,7 +93,6 @@ if __name__ == "__main__":
         'docker_name': 'nox-' + str(taskId),
         'timer_no': 2
     }
-    main(task)
+    main(task_info=task, mode='single')
     print("Close after 60 seconds.")
     time.sleep(60)
-
