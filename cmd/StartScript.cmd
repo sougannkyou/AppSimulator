@@ -1,8 +1,8 @@
 @ECHO ON
 timeout 10
-C:\Nox\bin\Nox.exe -quit
+start C:\Nox\bin\Nox.exe -quit
 timeout 10
-C:\Nox\bin\Nox.exe
+start C:\Nox\bin\Nox.exe
 timeout 10
 cd %APPSIMULATOR_WORK_PATH%
 set /P taskConf= 0<cmd\task.conf
