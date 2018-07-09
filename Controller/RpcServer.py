@@ -29,7 +29,7 @@ def simulatorStatus():
 
 
 def sendTaskToVM(docker_name, app_name):
-
+    os.system('VMReset.cmd ' + docker_name)
     return True
 
 
