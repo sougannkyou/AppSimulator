@@ -52,16 +52,17 @@
                                         style="color:orange;" title="增加"></button>
                             </td>
                         </tr>
-                        <tr v-for="t in tasks">
-                            <td>[[ t.ip ]]</td>
-                            <td>[[ t.script ]]</td>
-                            <td><img class="app" v-bind:src="'/static/AppSimulator/images/'+t.app_name+'/app_icon.png'">
+                        <tr v-for="device in devices">
+                            <td>[[ device.ip ]]</td>
+                            <td>[[ device.script ]]</td>
+                            <td><img class="app"
+                                     v-bind:src="'/static/AppSimulator/images/'+device.app_name+'/app_icon.png'">
                             </td>
-                            <td>[[ t.taskId ]]</td>
-                            <td><span v-bind:class="[t.status==='unkown'?'label label-default':
-                                (t.status==='running'?'label label-success':'label label-warring')]">[[ t.status ]]</span>
+                            <td>[[ device.taskId ]]</td>
+                            <td><span v-bind:class="[device.status==='unkown'?'label label-default':
+                                (device.status==='running'?'label label-success':'label label-warring')]">[[ device.status ]]</span>
                             </td>
-                            <td>[[ t.deviceType ]]</td>
+                            <td>[[ device.deviceType ]]</td>
                         </tr>
                         </tbody>
                     </table>
@@ -120,9 +121,10 @@
         let mainVue = new Vue({
             el: "#main",
             data: {
+                docker_type: 'vm', // nox or vm
                 appAll: ['douyin', 'miaopai', 'dianping', 'toutiao'],
                 task: {taskId: '等待分配', ip: '等待分配', port: '等待分配', script: '', app_name: '', status: STATUS_UNKOWN},
-                tasks: [],
+                devices: [],
                 msg: ""
             },
             methods: {
@@ -141,13 +143,16 @@
                 }
             },
             created: function () {
-                this.tasks = [{
+                this.devices = [{
                     ip: '192.168.84.144',
                     docker_name: 'vm1',
                     taskId: 1,
                     script: 'script_douyin.py',
                     app_name: 'douyin',
                     status: STATUS_RUN,
+                    disable: false,
+                    start_time: 0,
+                    end_time: 0
                 }, {
                     ip: '192.168.84.143',
                     docker_name: 'vm2',
@@ -155,6 +160,9 @@
                     script: 'script_miaopai.py',
                     app_name: 'miaopai',
                     status: STATUS_RUN,
+                    disable: false,
+                    start_time: 0,
+                    end_time: 0
                 }, {
                     ip: '172.16.253.233',
                     docker_name: 'vm3',
@@ -162,6 +170,9 @@
                     script: 'script_dianping.py',
                     app_name: 'dianping',
                     status: STATUS_RUN,
+                    disable: false,
+                    start_time: 0,
+                    end_time: 0
                 }];
             },
             watch: {},

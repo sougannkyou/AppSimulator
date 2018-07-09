@@ -1,7 +1,8 @@
-REM @ECHO OFF
+@ECHO OFF
 SET vmrun=C:\VMware\Workstation\vmrun.exe
 SET workspace=d:\VM
 SET vmx=Windows 7 x64.vmx
+REM parameter vm1
 SET vm=%1
 
 IF NOT DEFINED vm (
