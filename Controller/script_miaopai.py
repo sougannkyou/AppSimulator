@@ -1,6 +1,6 @@
 # coding:utf-8
 import os
-import systype
+import sys
 
 sys.path.append(os.getcwd())
 
