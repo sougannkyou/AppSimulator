@@ -25,17 +25,22 @@ class RedisDriver(object):
         print("get_devices_ip_list:", l)
         return l
 
+    def get_vmware_crwal_cnt(self, wm):
+        key = 'devices:' + wm['ip'] + ':' + wm['app_name']
+        return self._conn.scard(key)
+
 
 # ------------------------ docker db lib ----------------------
 class MongoDriver(object):
     def __init__(self):
         self._client = pymongo.MongoClient(host=MONGODB_SERVER_IP, port=MONGODB_SERVER_PORT)
         self._db = self._client.AppSimulator
-        self.deviceStatisticsInfo = self._db.deviceStatisticsInfo
+        self.activeInfo = self._db.activeInfo
         self.deviceConfig = self._db.deviceConfig
         self.rpcServer = self._db.rpcServer
         self.tasks = self._db.tasks
         self.dockers = self._db.dockers
+        self.vmwares = self._db.vmwares
         self._DEBUG = False
 
     def _log(self, prefix, msg):
@@ -84,27 +89,38 @@ class MongoDriver(object):
         self._log('docker_change_status', docker['status'])
         self.dockers.update({'_id': docker['_id']}, {"$set": {'status': docker['status']}})
 
-    def update_device_statistics_info(self, info, scope_times):  # 时间窗式记录采集量
+    def vm_find_vm_by_host(self, host_ip):
+        ret = []
+        vmwares = self.vmwares.find({'host_ip': host_ip, '$ne': {'status': 'disable'}})
+        for vm in vmwares:
+            vm.pop('_id')
+            ret.append(vm)
+        return ret
+
+    def vm_update_active(self, vm, scope_times):  # 时间窗式记录采集量
         self._log("update_device_statistics_info start", info)
         old_time = int((datetime.now() - timedelta(seconds=scope_times)).timestamp())
-        self.deviceStatisticsInfo.remove({'time': {'$lt': old_time}})
-        now = int(datetime.now().timestamp())
-        # ips = RedisDriver().get_devices_ip_list()
-        # print("update_device_statistics_info ips:", ips)
-        for m in info['statusList']:
-            m['time'] = now
-            # print("update_device_statistics_info:", m)
-            self.deviceStatisticsInfo.insert(m)
-            m.pop('_id')
+        self.activeInfo.remove({'time': {'$lt': old_time}})
+        vm['time'] = int(datetime.now().timestamp())
+        self.activeInfo.insert(vm)
+
+    def vm_active_cnt_in_time_scope(self, ip):
+        ret = []
+        vmwares = self.activeInfo.find({'ip': ip}).sort([("time", 1)])
+        for vm in vmwares:
+            vm.pop('_id')
+            ret.append(vm['cnt'])
+
+        return ret
 
     def get_devices_status(self, app_name):  # 时间窗
         devices_status = []
         ips = RedisDriver().get_devices_ip_list(app_name)
-        print("get_devices_status ips")
+        self._log('get_devices_status', '')
         for ip in ips:
             status = {'deviceId': ip, 'ip': ip, 'cnt': 0, 'dedup_cnt': 0, 'status': STATUS_UNKOWN}
             l = []
-            statistics = self.deviceStatisticsInfo.find({'deviceId': ip})
+            statistics = self.activeInfo.find({'deviceId': ip})
             for s in statistics:
                 s.pop('_id')
                 l.append(s['cnt'])

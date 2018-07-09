@@ -5,7 +5,7 @@ import importlib
 import importlib.util
 import win32gui
 from Controller.setting import *
-from Controller.DBLib import MongoDriver
+from Controller.DBLib import MongoDriver, RedisDriver
 from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
 
@@ -13,6 +13,7 @@ from Controller.NoxConSelenium import NoxConSelenium
 # ------------------------ docker task manager ----------------------
 class Manager(object):
     def __init__(self):
+        self._rds = RedisDriver()
         self._mdb = MongoDriver()
         self._mdb._DEBUG = False
         self._DEBUG = False
@@ -197,6 +198,46 @@ class Manager(object):
                 self._log('<<info>> start_tasks', 'not found waiting task, retry after 60s.')
                 time.sleep(1 * 60)
 
+    def vm_active(self):
+        host_ip = '172.16.253.37'
+        while True:
+            vmwares = self._mdb.vm_find_vm_by_host(host_ip)
+            for vm in vmwares:
+                cnt = self._rds.get_vmware_crwal_cnt(vm)
+                vm['cnt'] = cnt
+                vm['dedup_cnt'] = cnt
+                self._mdb.vm_update_active(vm, 60)
+
+            time.sleep(60)
+
+    def vm_reset(self, vm_name):
+        try:
+            work_path = os.getenv('APPSIMULATOR_WORK_PATH')
+            cmd = work_path + '\cmd\VMReset.cmd ' + vm_name
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process.wait()
+            (stdout, stderr) = process.communicate()
+            _stdout = stdout.decode('utf8').replace('\r', '').replace('\n', '')
+            _stderr = stderr.decode('utf8').replace('\r', '').replace('\n', '')
+            print('stdout:', _stdout)
+            print('stderr:', _stderr)
+            return True
+        except Exception as e:
+            self._log('vm_reset:', e)
+            return False
+
+    def vm_check_active(self):
+        host_ip = '172.16.253.37'
+        while True:
+            vmwares = self._mdb.vm_find_vm_by_host(host_ip)
+            for vm in vmwares:
+                l = self._mdb.vm_active_cnt_in_time_scope(vm['ip'])
+                if len(l) > 0 and l[-1] > 0:
+                    if l[0] == l[-1]:  # 记录无增长
+                        self.vm_reset(vm['name'])
+
+            time.sleep(10 * 60)
+
 
 if __name__ == '__main__':
     manager = Manager()
@@ -209,4 +250,5 @@ if __name__ == '__main__':
     #     'script': 'script_miaopai.py'
     # }
     # manager.run_script(task_info=t)
-    manager.start_tasks()
+    # manager.start_tasks()
+    manager.start_vm_tasks()

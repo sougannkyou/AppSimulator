@@ -12,11 +12,11 @@ IF NOT DEFINED vm (
 
 ECHO [%DATE% %TIME%] stop %vm%
 %vmrun% stop "%workspace%\%vm%\%vmx%"
-
 timeout 10
 
 ECHO [%DATE% %TIME%] start %vm%
 %vmrun% start "%workspace%\%vm%\%vmx%"
+timeout 10
 
 :END
 @ECHO ON
