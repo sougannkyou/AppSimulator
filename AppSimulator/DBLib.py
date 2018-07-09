@@ -139,44 +139,6 @@ class MongoDriver(object):
         self._log('get_one_wait_task', task)
         return task
 
-    def update_device_statistics_info(self, info, scope_times):  # 时间窗式记录采集量
-        print("update_device_statistics_info start", info)
-        old_time = int((datetime.now() - timedelta(seconds=scope_times)).timestamp())
-        self.deviceStatisticsInfo.remove({'time': {'$lt': old_time}})
-        now = int(datetime.now().timestamp())
-        # ips = RedisDriver().get_devices_ip_list()
-        # print("update_device_statistics_info ips:", ips)
-        for m in info['statusList']:
-            m['time'] = now
-            # print("update_device_statistics_info:", m)
-            self.deviceStatisticsInfo.insert(m)
-            m.pop('_id')
-
-    def get_devices_status(self, app_name):  # 时间窗
-        devices_status = []
-        ips = RedisDriver().get_devices_ip_list(app_name)
-        print("get_devices_status ips")
-        for ip in ips:
-            status = {'deviceId': ip, 'ip': ip, 'cnt': 0, 'dedup_cnt': 0, 'status': STATUS_UNKOWN}
-            l = []
-            statistics = self.deviceStatisticsInfo.find({'deviceId': ip})
-            for s in statistics:
-                s.pop('_id')
-                l.append(s['cnt'])
-
-            if len(l) > 0 and l[-1] > 0:
-                status['cnt'] = l[-1]
-                if l[0] == l[-1]:
-                    status['status'] = STATUS_SCRIPT_RUN_SUSPEND
-                else:
-                    status['status'] = STATUS_SCRIPT_RUNNING
-
-            devices_status.append(status)
-
-        # {deviceId: '172.16.251.27', ip: '172.16.251.27', cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN}
-        # {deviceId: '172.16.251.28', ip: '172.16.251.28', cnt: 0, dedup_cnt: 0, status: DEVICE_STATUS_UNKOWN}
-        return devices_status  # {'172.16.250.247':'running','172.16.250.252':'unkown'}
-
 
 # ------------------------ server db lib ----------------------
 if __name__ == '__main__':

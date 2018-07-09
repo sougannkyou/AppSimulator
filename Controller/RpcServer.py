@@ -28,8 +28,8 @@ def simulatorStatus():
     return "running"
 
 
-def sendTaskToVM(docker_name, app_name):
-    os.system('VMReset.cmd ' + docker_name)
+def resetVM(docker_name):
+    os.system('%APPSIMULATOR_WORK_PATH%\cmd\VMReset.cmd ' + docker_name)
     return True
 
 
@@ -181,6 +181,7 @@ def start_rpc_server():
     server.register_function(getRpcServerStatus, "getRpcServerStatus")
     server.register_function(simulatorStatus, "simulatorStatus")
     server.register_function(can_add_task, "can_add_task")
+    server.register_function(resetVM, "resetVM")
     _register_service()
     _log("start", "...")
     server.serve_forever()  # never stop
