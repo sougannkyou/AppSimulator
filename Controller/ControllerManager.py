@@ -277,30 +277,6 @@ def check(host_ip):
     _log('check', 'end.')
 
 
-def main():
-    _log('main', 'start ...')
-    host_ip = os.getenv('APPSIMULATOR_IP')
-    if not host_ip:
-        _log('main', 'Undefined APPSIMULATOR_IP')
-    else:
-        numList = []
-        p1 = multiprocessing.Process(target=draw_cardiogram, args=(host_ip,))
-        numList.append(p1)
-        p1.start()
-
-        p2 = multiprocessing.Process(target=check, args=(host_ip,))
-        numList.append(p2)
-        p2.start()
-
-        p1.join()
-        _log('main', 'draw_cardiogram end.')
-        p2.join()
-        _log('main', 'check end.')
-
-    _log('main', 'all end.')
-    return
-
-
 def test():
     manager = Manager()
     manager._DEBUG = True
@@ -321,7 +297,31 @@ def test():
     return
 
 
+def main():
+    host_ip = os.getenv('APPSIMULATOR_IP')
+    if not host_ip:
+        _log('main', 'Undefined APPSIMULATOR_IP')
+    else:
+        _log('main', host_ip + ' start ...')
+        numList = []
+        p1 = multiprocessing.Process(target=draw_cardiogram, args=(host_ip,))
+        numList.append(p1)
+        p1.start()
+
+        p2 = multiprocessing.Process(target=check, args=(host_ip,))
+        numList.append(p2)
+        p2.start()
+
+        p1.join()
+        _log('main', 'draw_cardiogram end.')
+        p2.join()
+        _log('main', 'check end.')
+
+    _log('main', host_ip + ' all end.')
+    return
+
+
 # ------------------------------------------------------------------------------------------
 if __name__ == '__main__':
-    # main()
-    test()
+    main()
+    # test()
