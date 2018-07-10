@@ -225,14 +225,8 @@ class Manager(object):
             self._log('vm_reset start:', vm_name)
             work_path = os.getenv('APPSIMULATOR_WORK_PATH')
             cmd = work_path + '\cmd\VMReset.cmd ' + vm_name
-            print('vm_reset', cmd)
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            # process.wait()
-            (stdout, stderr) = process.communicate()
-            _stdout = stdout.decode('utf8')
-            _stderr = stderr.decode('utf8')
-            print('stdout:', _stdout)
-            print('stderr:', _stderr)
+            self._log('vm_reset <<cmd>>', vm_name)
+            os.system('start ' + cmd)
             self._log('vm_reset end:', vm_name)
             return True
         except Exception as e:
@@ -308,8 +302,9 @@ def main():
 
 
 def test():
-    # manager = Manager()
-    # manager._DEBUG = True
+    manager = Manager()
+    manager._DEBUG = True
+    manager._mdb._DEBUG = True
     # t = {
     #     'taskId': 2,
     #     'app_name': 'miaopai',
@@ -322,9 +317,11 @@ def test():
     # manager.vm_draw_cardiogram()
     # manager.vm_reset(vm_name='vm4')
     # host_ip = '172.16.253.37'
+    manager.vm_reset('vm4')
     return
 
 
 # ------------------------------------------------------------------------------------------
 if __name__ == '__main__':
-    main()
+    # main()
+    test()

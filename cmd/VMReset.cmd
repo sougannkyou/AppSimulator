@@ -20,3 +20,4 @@ timeout 10
 
 :END
 @ECHO ON
+EXIT 0
