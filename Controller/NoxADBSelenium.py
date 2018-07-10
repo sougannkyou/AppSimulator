@@ -1,7 +1,5 @@
 # coding:utf-8
-import os
 import time
-from datetime import datetime
 import cv2
 import aircv as ac
 import ftplib
@@ -28,12 +26,12 @@ class NoxADBSelenium(NoxADB):
         else:
             self._log('set_comment_to_pic error:', 'must be set a dictionary')
 
-    def wait_online(self, timeout=10):
-        return self.wait_for_device(timeout=timeout)
+    def wait_online(self):
+        return self.wait_for_device()
 
     def get(self, url, wait_time=5):
         # start android web browser
-        self.adb_start_web(url)
+        self.start_web(url)
         time.sleep(wait_time)
         return True
 

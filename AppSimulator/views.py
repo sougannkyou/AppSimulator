@@ -12,6 +12,6 @@ class TasksView(TemplateView):
     template_name = 'AppSimulator/tasks.html'
 
 
-class VMConfView(TemplateView):
+class VMwareView(TemplateView):
     queryset = []
-    template_name = 'AppSimulator/vm_conf.html'
+    template_name = 'AppSimulator/vmware.html'
