@@ -6,6 +6,7 @@ import cv2
 import aircv as ac
 import ftplib
 from Controller.setting import WORK_PATH
+from Controller.Common import common_log
 from Controller.NoxADB import NoxADB
 
 
@@ -19,8 +20,7 @@ class NoxADBSelenium(NoxADB):
         self._capture_obj = None
 
     def _log(self, prefix, msg):
-        if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-            print('[NoxConSelenium ' + self._docker_name + ']', prefix, msg)
+        common_log(self._DEBUG, '[NoxConSelenium ' + self._docker_name + ']', prefix, msg)
 
     def set_comment_to_pic(self, value):
         if isinstance(value, dict):

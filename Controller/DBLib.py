@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import pymongo
 import redis
 from Controller.setting import *
+from Controller.Common import common_log
 
 
 # ------------------------ docker db lib ----------------------
@@ -44,8 +45,7 @@ class MongoDriver(object):
         self._DEBUG = False
 
     def _log(self, prefix, msg):
-        if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-            print('[' + datetime.now().strftime('%H:%M:%S') + ' Controller DB]', prefix, msg)
+        common_log(self._DEBUG, '[Controller DB]', prefix, msg)
 
     def rpc_register_service(self, controller_info):
         self.rpcServer.update({'ip': controller_info['ip']}, {"$set": controller_info}, upsert=True)

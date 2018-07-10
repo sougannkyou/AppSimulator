@@ -9,6 +9,7 @@ import importlib
 import importlib.util
 import win32gui
 from Controller.setting import *
+from Controller.Common import common_log
 from Controller.DBLib import MongoDriver, RedisDriver
 from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
@@ -26,8 +27,7 @@ class Manager(object):
         self._work_path = WORK_PATH
 
     def _log(self, prefix, msg):
-        if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-            print('[' + datetime.now().strftime('%H:%M:%S') + ' Controller Manager]', prefix, msg)
+        common_log(self._DEBUG, '[Controller Manager]', prefix, msg)
 
     def _check(self):
         if not self._work_path:

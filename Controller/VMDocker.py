@@ -3,6 +3,7 @@ import time
 import psutil
 import subprocess
 from Controller.setting import *
+from Controller.Common import common_log
 
 
 class VMDocker(object):
@@ -14,8 +15,7 @@ class VMDocker(object):
         self._taskId = task_info['taskId']
 
     def _log(self, prefix, msg):
-        if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-            print('[VM] ', prefix, msg)
+        common_log(self._DEBUG, '[VM ' + self._vm_name + ']', prefix, msg)
 
     def run_check(self):
         msg = ''

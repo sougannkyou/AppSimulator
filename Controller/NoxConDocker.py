@@ -4,6 +4,7 @@ import psutil
 import subprocess
 from pprint import pprint
 from Controller.setting import *
+from Controller.Common import common_log
 
 
 class NoxConDocker(object):
@@ -20,8 +21,7 @@ class NoxConDocker(object):
     #     os.chdir(self._org_path)
 
     def _log(self, prefix, msg):
-        if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-            print('[NoxDocker] ', prefix, msg)
+        common_log(self._DEBUG, '[NoxDocker ' + self._docker_name + ']', prefix, msg)
 
     def _check(self):
         msg = ''

@@ -3,6 +3,7 @@ import re
 import random
 import subprocess
 from Controller.setting import ADB_BINARY_PATH
+from Controller.Common import common_log
 
 
 class NoxADB(object):
@@ -58,8 +59,7 @@ class NoxADB(object):
         return True
 
     def _log(self, prefix, msg):
-        if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-            print(prefix, msg)
+        common_log(self._DEBUG, '[NoxADB]', prefix, msg)
 
     def get_android_version(self):
         self.__clean__()

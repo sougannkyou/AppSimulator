@@ -72,11 +72,12 @@ def main(task, mode):
         # me._DEBUG = True
         me.run()
         end = datetime.now()
-        common_log(_DEBUG, 'Script ' + task['docker_name'], 'total times:', str((end - start).seconds) + 's')
+        common_log(_DEBUG, 'Script ' + task['docker_name'], 'total times:' + str((end - start).seconds) + 's', '')
         return True
     except Exception as e:
         end = datetime.now()
-        common_log(_DEBUG, 'Script ' + task['docker_name'], 'total times:' + str((end - start).seconds) + 's\n', e)
+        common_log(_DEBUG, 'Script ' + task['docker_name'],
+                   '<<error>> total times:' + str((end - start).seconds) + 's\n', e)
         return False
 
 

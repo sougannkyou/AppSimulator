@@ -6,6 +6,7 @@ import re
 import random
 import subprocess
 from Controller.setting import *
+from Controller.Common import common_log
 
 
 class NoxConADB(object):
@@ -33,8 +34,7 @@ class NoxConADB(object):
         self._timer_flg = False
 
     def _log(self, prefix, msg):
-        if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-            print('[NoxConADB]', prefix, msg)
+        common_log(self._DEBUG, '[NoxConADB ' + self._docker_name + ']', prefix, msg)
 
     def _clean(self):
         self._stdout = None
