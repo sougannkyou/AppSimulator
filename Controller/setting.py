@@ -44,3 +44,6 @@ VMRUN_BINARY_PATH = 'C:\\VMware\\Workstation\\vmrun.exe'
 VM_IMAGES_PATH = 'C:\\VMware\\VM'
 VMX_NAME = 'Windows 7 x64.vmx'
 VM_MAX = 5
+
+# ---------------------- ControllerManager -----------------------------
+CHECK_TIMES = 10  # min

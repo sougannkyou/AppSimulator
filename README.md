@@ -24,11 +24,11 @@
 win7_64/zhxg2018
 
 3)环境变量
-APPSIMULATOR_IP
+APPSIMULATOR_IP = 172.16.253.232
 APPSIMULATOR_WORK_PATH = c:\workspace\pyWorks\AppSimulator
-MONGODB_SERVER_IP = 127.0.0.1
+MONGODB_SERVER_IP = 172.16.253.37
 MONGODB_SERVER_PORT = 27017
-REDIS_SERVER_IP = 127.0.0.1
+REDIS_SERVER_IP = 172.16.253.37
 
 4）pip install
 pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt

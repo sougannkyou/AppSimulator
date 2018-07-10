@@ -1,6 +1,10 @@
 # coding:utf-8
+import os
 import time
 import subprocess
+import multiprocessing
+from pprint import pprint
+from datetime import datetime
 import importlib
 import importlib.util
 import win32gui
@@ -9,8 +13,10 @@ from Controller.DBLib import MongoDriver, RedisDriver
 from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
 
+_DEBUG = True
 
-# ------------------------ docker task manager ----------------------
+
+# ------------------------ task manager ----------------------
 class Manager(object):
     def __init__(self):
         self._rds = RedisDriver()
@@ -21,7 +27,7 @@ class Manager(object):
 
     def _log(self, prefix, msg):
         if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-            print('[Controller Manager]', prefix, msg)
+            print('[' + datetime.now().strftime('%H:%M:%S') + ' Controller Manager]', prefix, msg)
 
     def _check(self):
         if not self._work_path:
@@ -198,50 +204,112 @@ class Manager(object):
                 self._log('<<info>> start_tasks', 'not found waiting task, retry after 60s.')
                 time.sleep(1 * 60)
 
-    def vm_active(self):
-        host_ip = '172.16.253.37'
+    def vm_draw_cardiogram(self, host_ip):
         while True:
             vmwares = self._mdb.vm_find_vm_by_host(host_ip)
             for vm in vmwares:
                 cnt = self._rds.get_vmware_crwal_cnt(vm)
                 vm['cnt'] = cnt
                 vm['dedup_cnt'] = cnt
-                self._mdb.vm_update_active(vm, 60)
+                self._mdb.vm_record_share_cnt(vm_info=vm, scope_times=10 * 60)
 
-            time.sleep(60)
+            if vmwares:
+                self._log('vm_draw_cardiogram', 'vmware:' + str(len(vmwares)))
+                time.sleep(60)
+            else:
+                self._log('vm_draw_cardiogram:', 'not found vmware.')
+                break
 
     def vm_reset(self, vm_name):
         try:
+            self._log('vm_reset start:', vm_name)
             work_path = os.getenv('APPSIMULATOR_WORK_PATH')
             cmd = work_path + '\cmd\VMReset.cmd ' + vm_name
+            print('vm_reset', cmd)
             process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            process.wait()
+            # process.wait()
             (stdout, stderr) = process.communicate()
-            _stdout = stdout.decode('utf8').replace('\r', '').replace('\n', '')
-            _stderr = stderr.decode('utf8').replace('\r', '').replace('\n', '')
+            _stdout = stdout.decode('utf8')
+            _stderr = stderr.decode('utf8')
             print('stdout:', _stdout)
             print('stderr:', _stderr)
+            self._log('vm_reset end:', vm_name)
             return True
         except Exception as e:
-            self._log('vm_reset:', e)
+            self._log('vm_reset error:', e)
             return False
 
-    def vm_check_active(self):
-        host_ip = '172.16.253.37'
+    def vm_check_active(self, host_ip):
         while True:
             vmwares = self._mdb.vm_find_vm_by_host(host_ip)
             for vm in vmwares:
-                l = self._mdb.vm_active_cnt_in_time_scope(vm['ip'])
-                if len(l) > 0 and l[-1] > 0:
-                    if l[0] == l[-1]:  # 记录无增长
+                crwal_cnt_list = self._mdb.vm_get_crwal_cnt(vm['ip'])
+                if len(crwal_cnt_list) >= CHECK_TIMES and crwal_cnt_list[-1] > 0:
+                    self._log('vm_check_active ' + vm['ip'], crwal_cnt_list)
+                    if crwal_cnt_list[0] == crwal_cnt_list[-1]:  # 无增长记录
+                        self._log('vm_check_active', vm['ip'] + ': suspend tobe reset')
                         self.vm_reset(vm['name'])
+                    else:
+                        self._log('vm_check_active', vm['ip'] + ': running')
 
-            time.sleep(10 * 60)
+            time.sleep(CHECK_TIMES * 60)
 
 
-if __name__ == '__main__':
+# ------------------------------------------------------------------------------------------
+def _log(prefix, msg):
+    if _DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
+        print('[' + datetime.now().strftime('%H:%M:%S') + ' Controller Process]', prefix, msg)
+
+
+def start_tasks():
+    pass
+
+
+def draw_cardiogram(host_ip):
+    _log('draw_cardiogram', 'start ...')
     manager = Manager()
     manager._DEBUG = True
+    manager._mdb._DEBUG = True
+    manager.vm_draw_cardiogram(host_ip)
+    _log('draw_cardiogram', 'end.')
+
+
+def check(host_ip):
+    _log('check', 'start ...')
+    manager = Manager()
+    manager._DEBUG = True
+    manager._mdb._DEBUG = True
+    manager.vm_check_active(host_ip)
+    _log('check', 'end.')
+
+
+def main():
+    _log('main', 'start ...')
+    host_ip = os.getenv('APPSIMULATOR_IP')
+    if not host_ip:
+        _log('main', 'Undefined APPSIMULATOR_IP')
+    else:
+        numList = []
+        p1 = multiprocessing.Process(target=draw_cardiogram, args=(host_ip,))
+        numList.append(p1)
+        p1.start()
+
+        p2 = multiprocessing.Process(target=check, args=(host_ip,))
+        numList.append(p2)
+        p2.start()
+
+        p1.join()
+        _log('main', 'draw_cardiogram end.')
+        p2.join()
+        _log('main', 'check end.')
+
+    _log('main', 'all end.')
+    return
+
+
+def test():
+    # manager = Manager()
+    # manager._DEBUG = True
     # t = {
     #     'taskId': 2,
     #     'app_name': 'miaopai',
@@ -251,4 +319,12 @@ if __name__ == '__main__':
     # }
     # manager.run_script(task_info=t)
     # manager.start_tasks()
-    manager.start_vm_tasks()
+    # manager.vm_draw_cardiogram()
+    # manager.vm_reset(vm_name='vm4')
+    # host_ip = '172.16.253.37'
+    return
+
+
+# ------------------------------------------------------------------------------------------
+if __name__ == '__main__':
+    main()

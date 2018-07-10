@@ -45,7 +45,7 @@ class MongoDriver(object):
 
     def _log(self, prefix, msg):
         if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-            print('[Controller DB]', prefix, msg)
+            print('[' + datetime.now().strftime('%H:%M:%S') + ' Controller DB]', prefix, msg)
 
     def rpc_register_service(self, controller_info):
         self.rpcServer.update({'ip': controller_info['ip']}, {"$set": controller_info}, upsert=True)
@@ -91,20 +91,20 @@ class MongoDriver(object):
 
     def vm_find_vm_by_host(self, host_ip):
         ret = []
-        vmwares = self.vmwares.find({'host_ip': host_ip, '$ne': {'status': 'disable'}})
+        vmwares = self.vmwares.find({'host_ip': host_ip, 'status': {'$ne': 'disable'}})
         for vm in vmwares:
             vm.pop('_id')
             ret.append(vm)
         return ret
 
-    def vm_update_active(self, vm, scope_times):  # 时间窗式记录采集量
-        self._log("update_device_statistics_info start", info)
+    def vm_record_share_cnt(self, vm_info, scope_times):  # 时间窗式记录采集量
+        self._log("vm_record_share_cnt\t", vm_info['ip'] + ':\t' + str(vm_info['cnt']))
         old_time = int((datetime.now() - timedelta(seconds=scope_times)).timestamp())
-        self.activeInfo.remove({'time': {'$lt': old_time}})
-        vm['time'] = int(datetime.now().timestamp())
-        self.activeInfo.insert(vm)
+        self.activeInfo.remove({'time': {'$lte': old_time}})
+        vm_info['time'] = int(datetime.now().timestamp())
+        self.activeInfo.insert(vm_info)
 
-    def vm_active_cnt_in_time_scope(self, ip):
+    def vm_get_crwal_cnt(self, ip):
         ret = []
         vmwares = self.activeInfo.find({'ip': ip}).sort([("time", 1)])
         for vm in vmwares:
@@ -142,7 +142,10 @@ class MongoDriver(object):
 # ------------------------ docker db lib ----------------------
 if __name__ == '__main__':
     # from .setting import
+    host_ip = '172.16.253.37'
     info = {'device1': 10, 'device2': 20, 'device3': 30, 'device4': 40}
     db = MongoDriver()
+    db._DEBUG = True
+    pprint(db.vm_find_vm_by_host(host_ip))
     # db.update_device_statistics_info(info, SCOPE_TIMES)
     # pprint(db.get_devices_status())
