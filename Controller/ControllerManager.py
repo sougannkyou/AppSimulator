@@ -86,7 +86,7 @@ class Manager(object):
                 print('append', p)
                 sys.path.append(p)
 
-            pprint(sys.path)
+            # pprint(sys.path)
             docker_name = 'nox-' + str(task_info['taskId'])
             # cmd = 'python --version'
             cmd = 'START "task-' + str(task_info['taskId']) + '" '
@@ -208,7 +208,7 @@ class Manager(object):
         while True:
             vmwares = self._mdb.vm_find_vm_by_host(host_ip)
             for vm in vmwares:
-                cnt = self._rds.get_vmware_crwal_cnt(vm)
+                cnt = self._rds.get_vmware_shareLink_cnt(vm['ip'], vm['app_name'])
                 vm['cnt'] = cnt
                 vm['dedup_cnt'] = cnt
                 self._mdb.vm_record_share_cnt(vm_info=vm, scope_times=10 * 60)
@@ -225,7 +225,7 @@ class Manager(object):
             self._log('vm_reset start:', vm_name)
             work_path = os.getenv('APPSIMULATOR_WORK_PATH')
             cmd = work_path + '\cmd\VMReset.cmd ' + vm_name
-            self._log('vm_reset <<cmd>>', vm_name)
+            self._log('vm_reset <<cmd>>', cmd)
             os.system('start ' + cmd)
             self._log('vm_reset end:', vm_name)
             return True
@@ -237,10 +237,10 @@ class Manager(object):
         while True:
             vmwares = self._mdb.vm_find_vm_by_host(host_ip)
             for vm in vmwares:
-                crwal_cnt_list = self._mdb.vm_get_crwal_cnt(vm['ip'])
-                if len(crwal_cnt_list) >= CHECK_TIMES and crwal_cnt_list[-1] > 0:
-                    self._log('vm_check_active ' + vm['ip'], crwal_cnt_list)
-                    if crwal_cnt_list[0] == crwal_cnt_list[-1]:  # 无增长记录
+                shareLink_cnt_list = self._mdb.vm_get_shareLink_cnt(vm['ip'])
+                if len(shareLink_cnt_list) >= CHECK_TIMES and shareLink_cnt_list[-1] > 0:
+                    self._log('vm_check_active ' + vm['ip'], shareLink_cnt_list)
+                    if shareLink_cnt_list[0] == shareLink_cnt_list[-1]:  # 无增长记录
                         self._log('vm_check_active', vm['ip'] + ': suspend tobe reset')
                         self.vm_reset(vm['name'])
                     else:

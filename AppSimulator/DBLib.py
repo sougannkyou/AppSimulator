@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import pymongo
 import redis
 from AppSimulator.setting import *
+from AppSimulator.Common import common_log
 
 
 # ------------------------ web server db lib ----------------------
@@ -55,6 +56,14 @@ class RedisDriver(object):
     def get_device_history(self, device_id):
         return self._conn.scard(device_id)
 
+    def get_vmware_shareLink_cnt(self, ip, app_name):
+        key = 'devices:' + ip + ':' + app_name
+        return self._conn.scard(key)
+
+    def get_vmware_lastTime(self, ip, app_name):
+        key = 'devices:' + ip + '_lastTime:' + app_name
+        return self._conn.scard(key)
+
 
 # ------------------------ web server db lib ----------------------
 class MongoDriver(object):
@@ -65,11 +74,11 @@ class MongoDriver(object):
         self.deviceConfig = self._db.deviceConfig
         self.rpcServer = self._db.rpcServer
         self.tasks = self._db.tasks
+        self.vmwares = self._db.vmwares
         self._DEBUG = False
 
     def _log(self, prefix, msg):
-        if self._DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-            print('[Server DB]', prefix, msg)
+        common_log(self._DEBUG, 'Server DB', prefix, msg)
 
     def get_taskId(self):
         taskId = 1
@@ -110,9 +119,6 @@ class MongoDriver(object):
     def set_task_server_ip(self, taskId, ip):
         self.tasks.update({'taskId': taskId}, {'$set': {'rpc_server_ip': ip}})
 
-    def get_(self):
-        pass
-
     def get_config_info(self, deviceId):
         info = self.deviceConfig.find_one({'deviceId': deviceId})
         if info:
@@ -138,6 +144,21 @@ class MongoDriver(object):
 
         self._log('get_one_wait_task', task)
         return task
+
+    def vm_find_by_host(self, host_ip=None):
+        ret = []
+        if host_ip:
+            cond = {'host_ip': host_ip, 'status': {'$ne': 'disable'}}
+        else:
+            cond = {'status': {'$ne': 'disable'}}
+
+        vmwares = self.vmwares.find(cond)
+        for vm in vmwares:
+            vm.pop('_id')
+            vm['cnt'] = RedisDriver().get_vmware_shareLink_cnt(vm['ip'], vm['app_name'])
+            vm['lastTime'] = RedisDriver().get_vmware_shareLink_cnt(vm['ip'], vm['app_name'])
+            ret.append(vm)
+        return ret
 
 
 # ------------------------ server db lib ----------------------

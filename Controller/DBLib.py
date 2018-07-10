@@ -25,8 +25,8 @@ class RedisDriver(object):
         print("get_devices_ip_list:", l)
         return l
 
-    def get_vmware_crwal_cnt(self, wm):
-        key = 'devices:' + wm['ip'] + ':' + wm['app_name']
+    def get_vmware_shareLink_cnt(self, ip, app_name):
+        key = 'devices:' + ip + ':' + app_name
         return self._conn.scard(key)
 
 
@@ -89,9 +89,14 @@ class MongoDriver(object):
         self._log('docker_change_status', docker['status'])
         self.dockers.update({'_id': docker['_id']}, {"$set": {'status': docker['status']}})
 
-    def vm_find_vm_by_host(self, host_ip):
+    def vm_find_vm_by_host(self, host_ip=None):
         ret = []
-        vmwares = self.vmwares.find({'host_ip': host_ip, 'status': {'$ne': 'disable'}})
+        if host_ip:
+            cond = {'host_ip': host_ip, 'status': {'$ne': 'disable'}}
+        else:
+            cond = {'status': {'$ne': 'disable'}}
+
+        vmwares = self.vmwares.find(cond)
         for vm in vmwares:
             vm.pop('_id')
             ret.append(vm)
@@ -104,7 +109,7 @@ class MongoDriver(object):
         vm_info['time'] = int(datetime.now().timestamp())
         self.activeInfo.insert(vm_info)
 
-    def vm_get_crwal_cnt(self, ip):
+    def vm_get_shareLink_cnt(self, ip):
         ret = []
         vmwares = self.activeInfo.find({'ip': ip}).sort([("time", 1)])
         for vm in vmwares:

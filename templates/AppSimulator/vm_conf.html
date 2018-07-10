@@ -26,13 +26,17 @@
                     <table class="table table-hover">
                         <tbody>
                         <tr>
+                            <th width="10%">Name</th>
                             <th width="10%">IP</th>
-                            <th width="20%">Script</th>
+                            <th width="10%">Host</th>
                             <th width="20%">APP</th>
                             <th width="5%">TaskId</th>
                             <th width="20%">Status</th>
+                            <th width="10%">ShareLink</th>
+                            <th width="10%">LastTime</th>
                         </tr>
                         <tr>
+                            <td><input type="text" v-model="task.name" placeholder="等待分配" readonly></td>
                             <td><input type="text" v-model="task.ip" placeholder="等待分配" readonly></td>
                             <td><input type="text" v-model="task.taskId" placeholder="等待分配" readonly></td>
                             <td>
@@ -42,7 +46,7 @@
                                          v-bind:src="'/static/AppSimulator/images/' + app + '/app_icon.png'">
                                 </label>
                             </td>
-                            <td><input type="text" v-model="task.app_name" placeholder="APP"></td>
+                            <td><input type="text" v-model="task.app_name" placeholder="等待分配"></td>
                             <td>
                                 <span v-bind:class="[task.status==='unkown'?'label label-default':
                                 (task.status==='running'?'label label-success':'label label-warring')]">[[ task.status ]]</span>
@@ -52,17 +56,19 @@
                                         style="color:orange;" title="增加"></button>
                             </td>
                         </tr>
-                        <tr v-for="device in devices">
-                            <td>[[ device.ip ]]</td>
-                            <td>[[ device.script ]]</td>
+                        <tr v-for="vm in vmwares">
+                            <td>[[ vm.name ]]</td>
+                            <td>[[ vm.ip ]]</td>
+                            <td>[[ vm.host_ip ]]</td>
                             <td><img class="app"
-                                     v-bind:src="'/static/AppSimulator/images/'+device.app_name+'/app_icon.png'">
+                                     v-bind:src="'/static/AppSimulator/images/'+vm.app_name+'/app_icon.png'">
                             </td>
-                            <td>[[ device.taskId ]]</td>
-                            <td><span v-bind:class="[device.status==='unkown'?'label label-default':
-                                (device.status==='running'?'label label-success':'label label-warring')]">[[ device.status ]]</span>
+                            <td>[[ vm.taskId ]]</td>
+                            <td><span v-bind:class="[vm.status==='unkown'?'label label-default':
+                                (vm.status==='running'?'label label-success':'label label-warring')]">[[ vm.status ]]</span>
                             </td>
-                            <td>[[ device.deviceType ]]</td>
+                            <td>[[ vm.cnt ]]</td>
+                            <td>[[ vm.last_time ]]</td>
                         </tr>
                         </tbody>
                     </table>
@@ -106,10 +112,30 @@
                 dataType: "json",
                 error: function (xhr, err) {
                     obj.msg = "failure";
-                    console.error("[tasks] addTaskAPI", err);
+                    console.error("[vmconf] addTaskAPI", err);
                 },
                 success: function (data, status) {
                     obj.msg = "success";
+                }
+            };
+            $.ajax(opt);
+        }
+
+        function getVMwares(obj) {
+            let opt = {
+                url: '/AppSimulator/getVMwaresAPI/',
+                type: 'GET',
+                data: {
+                    host_ip: obj.host_ip
+                },
+                dataType: "json",
+                error: function (xhr, err) {
+                    obj.msg = "failure";
+                    console.error("[vmconf] getVMwaresAPI", err);
+                },
+                success: function (data, status) {
+                    obj.msg = "success";
+                    obj.vmwares = data['ret'];
                 }
             };
             $.ajax(opt);
@@ -123,8 +149,18 @@
             data: {
                 docker_type: 'vm', // nox or vm
                 appAll: ['douyin', 'miaopai', 'dianping', 'toutiao'],
-                task: {taskId: '等待分配', ip: '等待分配', port: '等待分配', script: '', app_name: '', status: STATUS_UNKOWN},
-                devices: [],
+                task: {
+                    taskId: '请指定',
+                    ip: '请指定',
+                    host_ip: '请指定',
+                    port: '请指定',
+                    script: '',
+                    app_name: '',
+                    status: STATUS_UNKOWN
+                },
+                {#host_ip: '172.16.253.37',#}
+                host_ip: '',
+                vmwares: [],
                 msg: ""
             },
             methods: {
@@ -143,11 +179,13 @@
                 }
             },
             created: function () {
-                this.devices = [{
+                getVMwares(this);
+                /*
+                this.vmwares = [{
                     ip: '192.168.84.144',
-                    docker_name: 'vm1',
+                    host_ip: '192.168.84.144',
+                    name: 'vm1',
                     taskId: 1,
-                    script: 'script_douyin.py',
                     app_name: 'douyin',
                     status: STATUS_RUN,
                     disable: false,
@@ -155,9 +193,9 @@
                     end_time: 0
                 }, {
                     ip: '192.168.84.143',
-                    docker_name: 'vm2',
+                    host_ip: '192.168.84.144',
+                    name: 'vm2',
                     taskId: 2,
-                    script: 'script_miaopai.py',
                     app_name: 'miaopai',
                     status: STATUS_RUN,
                     disable: false,
@@ -165,15 +203,16 @@
                     end_time: 0
                 }, {
                     ip: '172.16.253.233',
-                    docker_name: 'vm3',
+                    host_ip: '192.168.84.144',
+                    name: 'vm3',
                     taskId: 3,
-                    script: 'script_dianping.py',
                     app_name: 'dianping',
                     status: STATUS_RUN,
                     disable: false,
                     start_time: 0,
                     end_time: 0
                 }];
+                //*/
             },
             watch: {},
             computed: {}

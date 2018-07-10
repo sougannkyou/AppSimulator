@@ -6,11 +6,15 @@ sys.path.append(os.getcwd())
 
 import time
 from datetime import datetime
+from Controller.DBLib import MongoDriver
 from Controller.NoxConSelenium import NoxConSelenium
+from Controller.Common import common_log
 
 urls = [
     "http://www.miaopai.com/show/6NWi1Bp5fx9GV0tdwCUGYWNzaQm9hVJe.htm",  # 936
 ]
+
+_DEBUG = False
 
 
 class MySelenium(NoxConSelenium):
@@ -18,7 +22,6 @@ class MySelenium(NoxConSelenium):
         super().__init__(task_info=task_info, mode=mode)
 
     def script(self):
-        print('script')
         try:
             ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
             if ret:
@@ -51,11 +54,13 @@ class MySelenium(NoxConSelenium):
 
 
 ##################################################################################
-def main(task_info, mode):
+def main(task, mode):
+    MDB = MongoDriver()
     start = datetime.now()
-    print("[Script " + task_info['docker_name'] + "] start at ", start, '\n', task_info)
+    common_log(_DEBUG, 'Script ' + task['docker_name'], 'start', task)
+
     try:
-        me = MySelenium(task_info=task_info, mode=mode)
+        me = MySelenium(task_info=task, mode=mode)
         me.set_comment_to_pic({
             "锁屏": 'images/screen_lock.png',
             "APP图标": 'images/miaopai/app_icon.png',
@@ -67,15 +72,16 @@ def main(task_info, mode):
         # me._DEBUG = True
         me.run()
         end = datetime.now()
-        print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s")
+        common_log(_DEBUG, 'Script ' + task['docker_name'], 'total times:', str((end - start).seconds) + 's')
         return True
     except Exception as e:
         end = datetime.now()
-        print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s\n error:", e)
+        common_log(_DEBUG, 'Script ' + task['docker_name'], 'total times:' + str((end - start).seconds) + 's\n', e)
         return False
 
 
 if __name__ == "__main__":
+    _DEBUG = True
     # taskId = sys.argv[1]
     taskId = 2
     task = {
@@ -84,6 +90,6 @@ if __name__ == "__main__":
         'docker_name': 'nox-' + str(taskId),
         'timer_no': 2  # 8s
     }
-    main(task_info=task, mode='single')
+    main(task=task, mode='single')
     print("Close after 60 seconds.")
     time.sleep(60)

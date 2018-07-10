@@ -1,6 +1,8 @@
 # coding=utf-8
-import os, sys
+import os
+import sys
 import psutil
+from pprint import pprint
 from io import StringIO
 import bson.binary
 import traceback
@@ -199,7 +201,16 @@ def addTaskAPI(request):
 def runTasks():
     tasks = MDB.get_tasks(status=STATUS_WAIT)
     output = JsonResponse({
-        'ret': ret
+        'ret': tasks
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
+def getVMwaresAPI(request):
+    host_ip = request.GET.get('host_ip')
+    ret = MDB.vm_find_by_host(host_ip)
+    output = JsonResponse({
+        'ret': ret,
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 

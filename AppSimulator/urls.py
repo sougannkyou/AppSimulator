@@ -13,6 +13,7 @@ from AppSimulator.WebAPI import (
     setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,
     getDeviceCaptureAPI, getProxyServerInfoAPI,
     runTasksAPI,
+    getVMwaresAPI,
 )
 
 cache_time_out = 60 * 3
@@ -37,4 +38,6 @@ urlpatterns = patterns('',
 
                        url(r'^getDeviceCaptureAPI/$', getDeviceCaptureAPI, name='getDeviceCaptureAPI'),
                        url(r'^getProxyServerInfoAPI/$', getProxyServerInfoAPI, name='getProxyServerInfoAPI'),
+                       # vm api
+                       url(r'^getVMwaresAPI/$', getVMwaresAPI, name='getVMwaresAPI'),
                        )
