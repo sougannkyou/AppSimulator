@@ -76,6 +76,20 @@ class NoxConADB(object):
         self.adb_shell("getprop ro.build.version.release")
         return self._stdout.decode('utf8')
 
+    def clear_cache(self):
+        packages = {
+            'miaopai': 'com.yixia.videoeditor',
+            'dianping': 'com.dianping.v1',
+            'douyin': 'com.ss.android.ugc.aweme',
+            'huoshan': 'com.ss.android.ugc.live'
+        }
+        if self._app_name not in packages:
+            return False
+        else:
+            self.adb_shell("pm clear " + packages[self._app_name])
+            # Success
+        return True
+
     def set_gps(self, latitude, longitude):
         self.adb_shell("setprop persist.nox.gps.latitude " + str(latitude))
         self.adb_shell("setprop persist.nox.gps.longitude " + str(longitude))
