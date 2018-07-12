@@ -27,7 +27,7 @@ class Manager(object):
         self._work_path = WORK_PATH
 
     def _log(self, prefix, msg):
-        common_log(self._DEBUG, '[Controller Manager]', prefix, msg)
+        common_log(self._DEBUG, 'Controller Manager', prefix, msg)
 
     def _check(self):
         if not self._work_path:
