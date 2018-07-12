@@ -55,7 +55,7 @@ class MySelenium(NoxConSelenium):
 
 ##################################################################################
 def main(task, mode):
-    MDB = MongoDriver()
+    # MDB = MongoDriver()
     start = datetime.now()
     common_log(_DEBUG, 'Script ' + task['docker_name'], 'start', task)
 
@@ -69,7 +69,7 @@ def main(task, mode):
             "复制链接": 'images/miaopai/copylink.png',
             "跳过软件升级": 'images/miaopai/ignore_upgrade.png',
         })
-        # me._DEBUG = True
+        me._DEBUG = True
         me.run()
         end = datetime.now()
         common_log(_DEBUG, 'Script ' + task['docker_name'], 'total times:' + str((end - start).seconds) + 's', '')

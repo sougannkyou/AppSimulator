@@ -61,7 +61,7 @@ def main(task_info, mode):
         })
 
         me.run()
-        # me._DEBUG = True
+        me._DEBUG = True
         end = datetime.now()
         print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s")
         return True
