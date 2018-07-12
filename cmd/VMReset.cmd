@@ -1,6 +1,6 @@
 @ECHO OFF
 SET vmrun=C:\VMware\Workstation\vmrun.exe
-SET workspace=C:\VMware\VM
+SET workspace=D:\VMware\VM
 SET vmx=Windows 7 x64.vmx
 REM parameter vm1
 SET vm=%1
