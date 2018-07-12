@@ -34,7 +34,7 @@ class NoxConADB(object):
         self._timer_flg = False
 
     def _log(self, prefix, msg):
-        common_log(self._DEBUG, '[NoxConADB ' + self._docker_name + ']', prefix, msg)
+        common_log(self._DEBUG, 'NoxConADB ' + self._docker_name, prefix, msg)
 
     def _clean(self):
         self._stdout = None
@@ -142,7 +142,7 @@ class NoxConADB(object):
             self._set_task_conf()
             self._log('[adb_cmd]<<info>> ' + datetime.now().strftime('%H:%M:%S %f') + '\n', cmdline)
         else:
-            self._log('[adb_cmd]<<info>>\n', cmdline)
+            self._log('[adb_cmd]<<info>>\n\t\t', cmdline)
 
     def adb_cmd(self, cmd):
         self._clean()

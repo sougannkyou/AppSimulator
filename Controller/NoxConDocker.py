@@ -21,7 +21,7 @@ class NoxConDocker(object):
     #     os.chdir(self._org_path)
 
     def _log(self, prefix, msg):
-        common_log(self._DEBUG, '[NoxDocker ' + self._docker_name + ']', prefix, msg)
+        common_log(self._DEBUG, 'NoxDocker ' + self._docker_name, prefix, msg)
 
     def _check(self):
         msg = ''
