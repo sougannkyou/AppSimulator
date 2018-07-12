@@ -6,7 +6,6 @@ sys.path.append(os.getcwd())
 
 import time
 from datetime import datetime
-from Controller.DBLib import MongoDriver
 from Controller.NoxConSelenium import NoxConSelenium
 from Controller.Common import common_log
 
@@ -55,14 +54,12 @@ class MySelenium(NoxConSelenium):
 
 ##################################################################################
 def main(task, mode):
-    # MDB = MongoDriver()
     start = datetime.now()
     common_log(_DEBUG, 'Script ' + task['docker_name'], 'start', task)
 
     try:
         me = MySelenium(task_info=task, mode=mode)
         me.set_comment_to_pic({
-            "锁屏": 'images/screen_lock.png',
             "APP图标": 'images/miaopai/app_icon.png',
             "更新": 'images/miaopai/update.png',
             "分享": 'images/miaopai/share.png',

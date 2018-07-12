@@ -83,7 +83,7 @@ class NoxConADB(object):
             'douyin': 'com.ss.android.ugc.aweme',
             'huoshan': 'com.ss.android.ugc.live'
         }
-        if self._app_name not in packages:
+        if self._app_name not in packages.keys():
             return False
         else:
             self.adb_shell("pm clear " + packages[self._app_name])

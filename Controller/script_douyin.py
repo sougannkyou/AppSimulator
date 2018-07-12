@@ -51,8 +51,6 @@ def main(task_info, mode):
     try:
         me = MySelenium(task_info=task_info, mode=mode)
         me.set_comment_to_pic({
-            "锁屏": 'images/screen_lock.png',
-            "锁屏图案": 'images/screen_lock_9point.png',
             "APP图标": 'images/douyin/app_icon.png',
             "更新": 'images/douyin/update.png',
             "分享": 'images/douyin/share.png',

@@ -6,7 +6,6 @@ sys.path.append(os.getcwd())
 
 import time
 from datetime import datetime
-from Controller.DBLib import MongoDriver
 from Controller.NoxConSelenium import NoxConSelenium
 from Controller.Common import common_log
 
@@ -59,7 +58,6 @@ def main(task, mode):
     try:
         me = MySelenium(task_info=task, mode=mode)
         me.set_comment_to_pic({
-            "锁屏": 'images/screen_lock.png',
             "选择一个视频": 'images/huoshan/clickone.png',
             "APP图标": 'images/huoshan/app_icon.png',
             "更新": 'images/huoshan/update.png',

@@ -15,7 +15,10 @@ class NoxConSelenium(NoxConADB):
         super().__init__(task_info, mode)
         self._DEBUG = False
         self._FTP_TRANSMISSION = False
-        self._PIC_PATH = {}  # overwrite/sd
+        self._PIC_PATH = {  # set_comment_to_pic()
+            "锁屏": 'images/screen_lock.png',
+            "锁屏图案": 'images/screen_lock_9point.png',
+        }
         self._work_path = WORK_PATH
         self._capture_obj = None
         if mode == 'single':
@@ -33,7 +36,7 @@ class NoxConSelenium(NoxConADB):
 
     def set_comment_to_pic(self, value):
         if isinstance(value, dict):
-            self._PIC_PATH = value
+            self._PIC_PATH.update(value)
         else:
             self._log('set_comment_to_pic error:', 'must be set a dictionary')
 
