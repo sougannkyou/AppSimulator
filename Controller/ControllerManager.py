@@ -1,10 +1,6 @@
 # coding:utf-8
-import os
 import time
 import subprocess
-import multiprocessing
-from pprint import pprint
-from datetime import datetime
 import importlib
 import importlib.util
 import win32gui
@@ -27,15 +23,16 @@ class Manager(object):
         self._work_path = WORK_PATH
 
     def _log(self, prefix, msg):
-        common_log(self._DEBUG, 'Controller Manager', prefix, msg)
+        common_log(self._DEBUG, 'Manager', prefix, msg)
 
-    def _check(self):
+    # ----------------------------------------------------------------------------------------------
+    def _nox_check(self):
         if not self._work_path:
             msg = '请设置: APPSIMULATOR_WORK_PATH'
             self._log('_check error', msg)
             return False, msg
 
-    def run_script1(self, task_info):
+    def nox_run_script1(self, task_info):
         _stdout = ''
         _stderr = ''
         try:
@@ -60,7 +57,7 @@ class Manager(object):
             time.sleep(1)
             return True
 
-    def run_script2(self, task, docker_name):
+    def nox_run_script2(self, task, docker_name):
         try:
             script = 'Controller.' + task['script'][:-3]
             importlib.invalidate_caches()
@@ -73,7 +70,7 @@ class Manager(object):
             self._log('run_script error:', e)
             return False
 
-    def run_script(self, task_info):
+    def nox_run_script(self, task_info):
         try:
             from pprint import pprint
             import os
@@ -83,7 +80,7 @@ class Manager(object):
             import sys
 
             if p not in sys.path:
-                print('append', p)
+                # print('append', p)
                 sys.path.append(p)
 
             # pprint(sys.path)
@@ -100,20 +97,20 @@ class Manager(object):
             self._log('run_script error:', e)
             return False
 
-    def docker_run(self, task, docker, retry_cnt):
+    def nox_run(self, task, docker, retry_cnt):
         docker.stop()
-        self.check_docker_stop(docker, retry=True, wait_time=30)
+        self.nox_check_stop(docker, retry=True, wait_time=30)
         ret = docker.run(force=True)  # docker run: create and start
         if ret:
-            ret = self.docker_run_check(task_info=task, timeout=60)
+            ret = self.nox_run_check(task_info=task, timeout=60)
             if ret:
-                ret = self.docker_run_success(docker=docker)
+                ret = self.nox_run_success(docker=docker)
             else:
-                ret = self.docker_run_error(task=task, docker=docker, retry_cnt=retry_cnt)
+                ret = self.nox_run_error(task=task, docker=docker, retry_cnt=retry_cnt)
 
         return ret
 
-    def docker_run_success(self, docker):
+    def nox_run_success(self, docker):
         self._log('<<info>> docker_run_success', docker.get_name())
         time.sleep(2)
         docker.shake(1)
@@ -121,15 +118,15 @@ class Manager(object):
         # port = docker.get_port()
         return True
 
-    def docker_run_error(self, task, docker, retry_cnt):
+    def nox_run_error(self, task, docker, retry_cnt):
         self._log('<<info>> docker_run_error:', docker.get_name() + ' retry: ' + str(retry_cnt))
         retry_cnt -= 1
         if retry_cnt >= 0:
-            return self.docker_run(task, docker, retry_cnt)
+            return self.nox_run(task, docker, retry_cnt)
 
         return False
 
-    def docker_run_check(self, task_info, timeout=60):
+    def nox_run_check(self, task_info, timeout=60):
         driver = NoxConSelenium(task_info=task_info)
         driver.set_comment_to_pic({
             "APP图标": self._work_path + '\\Controller\\images\\' + task_info['app_name'] + '\\app_icon.png',
@@ -151,7 +148,7 @@ class Manager(object):
 
                 return ret
 
-    def check_docker_stop(self, docker, retry=False, wait_time=30):
+    def nox_check_stop(self, docker, retry=False, wait_time=30):
         while wait_time > 0:
             hwnd = win32gui.FindWindow(None, docker.get_name())
             if hwnd:  # hwnd is 0 if not found
@@ -169,7 +166,7 @@ class Manager(object):
         time.sleep(10)
         return True
 
-    def start_tasks(self):
+    def nox_tasks(self):
         # 1)docker running -> 2)docker run ok(ng) -> 3)script running -> 4)script run ok(ng)
         while True:
             task, msg = self._mdb.task_get_one_for_run()
@@ -178,7 +175,7 @@ class Manager(object):
                 task['status'] = STATUS_DOCKER_RUN
                 self._mdb.task_change_status(task)
                 docker = NoxConDocker(task_info=task)
-                ret = self.docker_run(task=task, docker=docker, retry_cnt=2)
+                ret = self.nox_run(task=task, docker=docker, retry_cnt=2)
                 # call NoxConDocker.__del__
                 # docker = None
 
@@ -193,7 +190,7 @@ class Manager(object):
                 if ret:
                     self._mdb.task_set_docker(task, docker_info)  # bind docker to task
                     # 3)script running
-                    ret = self.run_script(task_info=task)
+                    ret = self.nox_run_script(task_info=task)
                     task['status'] = STATUS_SCRIPT_START_OK if ret else STATUS_SCRIPT_START_NG
 
                     # 4)script run ok(ng)
@@ -204,6 +201,7 @@ class Manager(object):
                 self._log('<<info>> start_tasks', 'not found waiting task, retry after 60s.')
                 time.sleep(1 * 60)
 
+    # ----------------------------------------------------------------------------------------------
     def vm_draw_cardiogram(self, host_ip):
         while True:
             vmwares = self._mdb.vm_find_vm_by_host(host_ip)
@@ -247,81 +245,3 @@ class Manager(object):
                         self._log('vm_check_active', vm['ip'] + ': running')
 
             time.sleep(CHECK_TIMES * 60)
-
-
-# ------------------------------------------------------------------------------------------
-def _log(prefix, msg):
-    if _DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-        print('[' + datetime.now().strftime('%H:%M:%S') + ' Controller Process]', prefix, msg)
-
-
-def start_tasks():
-    pass
-
-
-def draw_cardiogram(host_ip):
-    _log('draw_cardiogram', 'start ...')
-    manager = Manager()
-    manager._DEBUG = True
-    manager._mdb._DEBUG = True
-    manager.vm_draw_cardiogram(host_ip)
-    _log('draw_cardiogram', 'end.')
-
-
-def check(host_ip):
-    _log('check', 'start ...')
-    manager = Manager()
-    manager._DEBUG = True
-    manager._mdb._DEBUG = True
-    manager.vm_check_active(host_ip)
-    _log('check', 'end.')
-
-
-def test():
-    manager = Manager()
-    manager._DEBUG = True
-    manager._mdb._DEBUG = True
-    # t = {
-    #     'taskId': 2,
-    #     'app_name': 'miaopai',
-    #     'docker_name': 'nox-2',
-    #     'timer_no': 2,
-    #     'script': 'script_miaopai.py'
-    # }
-    # manager.run_script(task_info=t)
-    # manager.start_tasks()
-    # manager.vm_draw_cardiogram()
-    # manager.vm_reset(vm_name='vm4')
-    # host_ip = '172.16.253.37'
-    manager.vm_reset('vm4')
-    return
-
-
-def main():
-    host_ip = os.getenv('APPSIMULATOR_IP')
-    if not host_ip:
-        _log('main', 'Undefined APPSIMULATOR_IP')
-    else:
-        _log('main', host_ip + ' start ...')
-        numList = []
-        p1 = multiprocessing.Process(target=draw_cardiogram, args=(host_ip,))
-        numList.append(p1)
-        p1.start()
-
-        p2 = multiprocessing.Process(target=check, args=(host_ip,))
-        numList.append(p2)
-        p2.start()
-
-        p1.join()
-        _log('main', 'draw_cardiogram end.')
-        p2.join()
-        _log('main', 'check end.')
-
-    _log('main', host_ip + ' all end.')
-    return
-
-
-# ------------------------------------------------------------------------------------------
-if __name__ == '__main__':
-    main()
-    # test()

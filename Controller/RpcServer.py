@@ -16,24 +16,16 @@ MDB = MongoDriver()
 
 
 # ------------------------ docker rpc server ----------------------
-def rpc_log(prefix, msg):
+def _rpc_log(prefix, msg):
     common_log(RPC_SERVER_DEBUG, '[RpcServer]', prefix, msg)
 
 
-def getRpcServerStatus():
-    return "running"
-
-
-def simulatorStatus():
-    return "running"
-
-
-def resetVM(docker_name):
+def reset_vm(docker_name):
     os.system('%APPSIMULATOR_WORK_PATH%\cmd\VMReset.cmd ' + docker_name)
     return True
 
 
-def sendTaskToVM(docker_name, app_name):
+def set_app_name_to_vm(docker_name, app_name):
     # docker_name: vm1 vm2 vm3
     os.system(
         'vmrun.exe  -T ws -gu "zhxg" -gp "zhxg2018" CopyFileFromHostToGuest "c:\VMWare\VM\\vm1\Windows 7 x64.vmx"  %APPSIMULATOR_WORK_PATH%"\cmd\\app.conf"')
@@ -41,19 +33,19 @@ def sendTaskToVM(docker_name, app_name):
     return True
 
 
-def startScript():
+def start_script():
     os.system('taskkill /f /t /fi "WINDOWTITLE eq script"')
     os.system('start /B start "script" cmd.exe @cmd /k python %RPCSERVER_HOME%script_douyin.py')
     return True
 
 
-def startTask(app_name):
+def start_task(app_name):
     os.system('taskkill /f /t /fi "WINDOWTITLE eq script"')
     os.system('start /B start "script" cmd.exe @cmd /k python %RPCSERVER_HOME%script_douyin.py')
     return True
 
 
-def stopScript():
+def stop_script():
     os.system('taskkill /f /t /fi "WINDOWTITLE eq script"')
     return True
 
@@ -89,14 +81,14 @@ def capture(app_name):
         send2web('images/offline.jpeg')
 
 
-def restartDevice(deviceId):
+def restart_device(deviceId):
     print("[rpc_server] restartDevice")
     # print("Nox.exe -quit :", p.read())
 
     return True
 
 
-def setDeviceGPS(deviceId, latitude, longitude):
+def set_device_gps(deviceId, latitude, longitude):
     print(deviceId, latitude, longitude)  # 39.6099202570, 118.1799316404
     p = os.popen("[rpc_server] adb shell setprop persist.nox.gps.latitude " + latitude)
     print(p.read())
@@ -107,34 +99,34 @@ def setDeviceGPS(deviceId, latitude, longitude):
 
 
 def _get_free_mem():
-    rpc_log('_get_free_mem', 'start')
+    _rpc_log('_get_free_mem', 'start')
     mem = psutil.virtual_memory()
     # STATUS_WAIT or STATUS_BUILDING
     mem_free = mem.free - MDB.task_get_my_prepare_tasks_cnt() * GB
     ret = '%.1f' % (mem_free / GB)
-    rpc_log('_get_free_mem ret: ', ret + " GB")
+    _rpc_log('_get_free_mem ret: ', ret + " GB")
     return float(ret)
 
 
 def _get_running_docker_cnt():
-    rpc_log('_get_running_docker_cnt', 'start')
+    _rpc_log('_get_running_docker_cnt', 'start')
     docker = NoxConDocker({'taskId': 0, 'app_name': 'miaopai', 'docker_name': '', 'timer_no': 0})
     dockers = docker.ps(docker_name=None, docker_status=STATUS_DOCKER_RUN_OK)
     ret = len(dockers)
-    rpc_log('_get_running_docker_cnt ret: ', str(ret))
+    _rpc_log('_get_running_docker_cnt ret: ', str(ret))
     return ret
 
 
 def can_add_task():
-    rpc_log('can_add_task', 'start')
+    _rpc_log('can_add_task', 'start')
     ret = 'yes'
     if _get_free_mem() < 1.0:
         ret = '剩余内存小于1GB'
 
     if _get_running_docker_cnt() >= len(TIMER):
-        ret = '启动docker不能大于10个'
+        ret = '启动docker不能大于' + str(len(TIMER)) + '个'
 
-    rpc_log('can_add_task ret: ', ret)
+    _rpc_log('can_add_task ret: ', ret)
     return ret
 
 
@@ -143,7 +135,7 @@ def _clean():
     time.sleep(10)
 
 
-def _backup_app_list():
+def nox_backup_app_list():
     l = []
     for root, dirs, files in os.walk('C:\\Nox\\backup'):
         for file in files:
@@ -155,18 +147,18 @@ def _backup_app_list():
 
 
 def _register_service():
-    rpc_log('_register', 'start')
+    _rpc_log('_register', 'start')
     mem = psutil.virtual_memory()
     info = {
         'ip': LOCAL_IP,
         'port': RPC_PORT,
-        'app_name': _backup_app_list(),
+        'app_name': nox_backup_app_list(),
         'mem_free': '%.1f' % (mem.free / GB),
         'mem_total': '%.1f' % (mem.total / GB),
         'timer_max_cnt': len(TIMER)
     }
     MDB.rpc_register_service(info)
-    rpc_log('_register', 'end')
+    _rpc_log('_register', 'end')
     return
 
 
@@ -174,18 +166,16 @@ def start_rpc_server():
     # netstat -ano | findstr "8003"
     _clean()
     server = SimpleXMLRPCServer(("0.0.0.0", RPC_PORT))
-    server.register_function(restartDevice, "restartDevice")
-    server.register_function(setDeviceGPS, 'setDeviceGPS')
-    server.register_function(startScript, "startScript")
-    server.register_function(stopScript, "stopScript")
-    server.register_function(getRpcServerStatus, "getRpcServerStatus")
-    server.register_function(simulatorStatus, "simulatorStatus")
+    server.register_function(restart_device, "restart_device")
+    server.register_function(set_device_gps, 'set_device_gps')
+    server.register_function(start_script, "start_script")
+    server.register_function(stop_script, "stop_script")
     server.register_function(can_add_task, "can_add_task")
-    server.register_function(resetVM, "resetVM")
+    server.register_function(reset_vm, "reset_vm")
     _register_service()
-    rpc_log("start", "...")
+    _rpc_log("start", "...")
     server.serve_forever()  # never stop
-    rpc_log("end", "")
+    _rpc_log("end", "")
 
 
 ######################################################################
