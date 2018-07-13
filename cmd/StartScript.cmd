@@ -3,7 +3,7 @@ cd %APPSIMULATOR_WORK_PATH%
 
 timeout 5
 set /P NoxResetCounter= 0<cmd\NoxResetCounter.conf
-echo %NoxResetCounter%
+echo NoxResetCounter is %NoxResetCounter%
 
 if %NoxResetCounter% EQU 0 goto END
 

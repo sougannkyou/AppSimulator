@@ -1,4 +1,4 @@
-@ECHO OFF
+@ECHO ON
 SET log=%APPSIMULATOR_WORK_PATH%\cmd\vmreset.log
 SET vmrun=C:\VMware\Workstation\vmrun.exe
 SET workspace=D:\VMware\VM
@@ -12,7 +12,7 @@ IF NOT DEFINED vm(
 
 %vmrun% -T ws -gu win7_64 -gp zhxg2018 copyFileFromGuestToHost "%workspace%\%vm%\%vmx%" "C:\workspace\pyWorks\AppSimulator\cmd\NoxResetCounter.conf" "%workspace%\%vm%\NoxResetCounter.conf"
 
-set /P NoxResetCounter= 0<%workspace%\%vm%\NoxResetCounter.conf
+set /P NoxResetCounter= 0<%APPSIMULATOR_WORK_PATH%\cmd\NoxResetCounter.conf
 echo NoxResetCounter is %NoxResetCounter%
 
 IF %NoxResetCounter% NEQ 0 GOTO END
