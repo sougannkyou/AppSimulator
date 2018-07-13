@@ -1,11 +1,11 @@
 @ECHO OFF
+SET log=%APPSIMULATOR_WORK_PATH%\cmd\vmreset.log
 SET vmrun=C:\VMware\Workstation\vmrun.exe
 SET workspace=D:\VMware\VM
 SET vmx=Windows 7 x64.vmx
-REM parameter vm1
 SET vm=%1
 
-IF NOT DEFINED vm (
+IF NOT DEFINED vm(
     ECHO [error] please input vm name
     GOTO END
 )
@@ -17,6 +17,7 @@ echo NoxResetCounter is %NoxResetCounter%
 
 IF %NoxResetCounter% NEQ 0 GOTO END
 
+ECHO [%DATE% %TIME%] %vm%>>%log%
 ECHO [%DATE% %TIME%] stop %vm%
 %vmrun% stop "%workspace%\%vm%\%vmx%"
 timeout 10
