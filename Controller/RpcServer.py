@@ -36,7 +36,7 @@ def resetVM(docker_name):
 def sendTaskToVM(docker_name, app_name):
     # docker_name: vm1 vm2 vm3
     os.system(
-        'vmrun.exe  -T ws -gu "zhxg" -gp "zhxg2018" CopyFileFromHostToGuest "c:\VMWare\VM\\vm1\Windows 7 x64.vmx"  %APPSIMULATOR_WORK_PATH%"\cmd\\task.conf"')
+        'vmrun.exe  -T ws -gu "zhxg" -gp "zhxg2018" CopyFileFromHostToGuest "c:\VMWare\VM\\vm1\Windows 7 x64.vmx"  %APPSIMULATOR_WORK_PATH%"\cmd\\app.conf"')
     os.system('vmrun.exe reset "c:\VMWare\VM\\' + docker_name + '\Windows 7 x64.vmx"')
     return True
 

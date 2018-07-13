@@ -7,8 +7,7 @@ sys.path.append(os.getcwd())
 import time
 from datetime import datetime
 from Controller.NoxConSelenium import NoxConSelenium
-from Controller.Common import common_log
-
+from Controller.Common import common_log, common_runscript_countdown
 
 _DEBUG = False
 
@@ -52,6 +51,8 @@ class MySelenium(NoxConSelenium):
 
 ##################################################################################
 def main(task, mode):
+    msg = ''
+    error = ''
     start = datetime.now()
     common_log(_DEBUG, 'Script ' + task['docker_name'], 'start', task)
 
@@ -66,14 +67,15 @@ def main(task, mode):
         })
         # me._DEBUG = True
         me.run()
-        end = datetime.now()
-        common_log(_DEBUG, 'Script ' + task['docker_name'], 'total times:' + str((end - start).seconds) + 's', '')
-        return True
     except Exception as e:
+        msg = '<<error>>'
+        error = e
+    finally:
         end = datetime.now()
-        common_log(_DEBUG, 'Script ' + task['docker_name'],
-                   '<<error>> total times:' + str((end - start).seconds) + 's\n', e)
-        return False
+        common_log(_DEBUG, 'Script ' + task['docker_name'] + 'end.',
+                   msg + 'total times:' + str((end - start).seconds) + 's', error)
+        common_runscript_countdown()
+        return
 
 
 if __name__ == "__main__":
@@ -87,5 +89,5 @@ if __name__ == "__main__":
         'timer_no': 3  # 11s
     }
     main(task=task, mode='single')
-    print("Close after 60 seconds.")
-    time.sleep(60)
+    print("Close after 30 seconds.")
+    time.sleep(30)

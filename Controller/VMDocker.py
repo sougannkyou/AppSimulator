@@ -84,7 +84,7 @@ class VMDocker(object):
 
     def set_run_app(self, app_name):
         try:
-            f = open(WORK_PATH + '\cmd\\task.conf', 'w')
+            f = open(WORK_PATH + '\cmd\\app.conf', 'w')
             f.write(app_name)
             f.close()
             self._log('<<info>> set run app:', app_name)
@@ -92,8 +92,8 @@ class VMDocker(object):
             self._log('set run app error:', e)
             return False
 
-        guest_path = '"' + WORK_PATH + '\cmd\\task.conf"'
-        host_path = '"C:\workspace\pyWorks\AppSimulator\cmd\\task.conf"'
+        guest_path = '"' + WORK_PATH + '\cmd\\app.conf"'
+        host_path = '"C:\workspace\pyWorks\AppSimulator\cmd\\app.conf"'
         time.sleep(1)
         ret = self._exec_vmrun_cmd(self._make_cmd_login(
             'CopyFileFromHostToGuest ' + self.get_vm_image_path(self._vm_name) + ' ' + guest_path + ' ' + host_path

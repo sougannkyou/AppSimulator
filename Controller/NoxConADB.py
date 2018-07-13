@@ -10,6 +10,9 @@ from Controller.Common import common_log
 
 
 class NoxConADB(object):
+    '''
+    可以使用Timer进行时分同步
+    '''
     REBOOT_RECOVERY = 1
     REBOOT_BOOTLOADER = 2
 
@@ -123,8 +126,8 @@ class NoxConADB(object):
         return cmd_str
 
     def _set_task_conf(self):
-        f = open(self._work_path + '\\cmd\\task.conf', 'w')
-        self._log('<<info>> write task.conf:', datetime.now().strftime('%H:%M:%S %f'))
+        f = open(self._work_path + '\\cmd\\app.conf', 'w')
+        self._log('<<info>> write app.conf:', datetime.now().strftime('%H:%M:%S %f'))
         f.write('task-' + str(self._taskId))
         f.close()
 

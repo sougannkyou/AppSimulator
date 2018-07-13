@@ -1,17 +1,26 @@
 @ECHO ON
+cd %APPSIMULATOR_WORK_PATH%
+
 timeout 5
+set /P NoxResetCounter= 0<cmd\NoxResetCounter.conf
+echo %NoxResetCounter%
+
+if NoxResetCounter EQ 0 goto END
+
 start C:\Nox\bin\Nox.exe -quit
 
 timeout 20
 start C:\Nox\bin\Nox.exe
 
 timeout 10
-cd %APPSIMULATOR_WORK_PATH%
-set /P taskConf= 0<cmd\task.conf
-echo %taskConf%
+set /P appName= 0<cmd\app.conf
+echo %appName%
 
 timeout 60
-start "script" /HIGH python Controller/script_%taskConf%.py
+start "script" /HIGH python Controller/script_%appName%.py
+
+:END
+echo 脚本执行完毕，10秒后关闭。
 timeout 10
 @ECHO ON
 exit

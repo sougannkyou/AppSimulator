@@ -14,7 +14,7 @@ rem timeout 10
 
 rem vmrun.exe getGuestIPAddress "C:\VMware\VM\device1\Windows 7 x64.vmx"
 
-rem vmrun.exe  -T ws -gu "zhxg" -gp "zhxg2018" CopyFileFromHostToGuest "c:\VMWare\VM\vm1\Windows 7 x64.vmx"  %APPSIMULATOR_WORK_PATH%"\cmd\task.conf"
+rem vmrun.exe  -T ws -gu "zhxg" -gp "zhxg2018" CopyFileFromHostToGuest "c:\VMWare\VM\vm1\Windows 7 x64.vmx"  %APPSIMULATOR_WORK_PATH%"\cmd\app.conf"
 echo start vm
 vmrun.exe reset "c:\VMWare\VM\vm1\Windows 7 x64.vmx"
 timeout 10

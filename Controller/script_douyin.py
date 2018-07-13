@@ -7,6 +7,9 @@ sys.path.append(os.getcwd())
 import time
 from datetime import datetime
 from Controller.NoxConSelenium import NoxConSelenium
+from Controller.Common import common_log, common_runscript_countdown
+
+_DEBUG = False
 
 
 class MySelenium(NoxConSelenium):
@@ -46,6 +49,8 @@ class MySelenium(NoxConSelenium):
 
 ##################################################################################
 def main(task_info, mode):
+    msg = ''
+    error = ''
     start = datetime.now()
     print("[Script " + task_info['docker_name'] + "] start at ", start, '\n', task_info)
     try:
@@ -57,19 +62,21 @@ def main(task_info, mode):
             "复制链接": 'images/douyin/copylink.png',
             "跳过软件升级": 'images/douyin/ignore_upgrade.png',
         })
-
+        # me._DEBUG = True
         me.run()
-        me._DEBUG = True
-        end = datetime.now()
-        print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s")
-        return True
     except Exception as e:
+        msg = '<<error>>'
+        error = e
+    finally:
         end = datetime.now()
-        print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s\nerror:", e)
-        return False
+        common_log(_DEBUG, 'Script ' + task['docker_name'] + 'end.',
+                   msg + 'total times:' + str((end - start).seconds) + 's', error)
+        common_runscript_countdown()
+        return
 
 
 if __name__ == "__main__":
+    _DEBUG = True
     # taskId = sys.argv[1]
     taskId = 1
     task = {
@@ -79,5 +86,5 @@ if __name__ == "__main__":
         'timer_no': 1  # 5s
     }
     main(task_info=task, mode='single')
-    print("Close after 60 seconds.")
-    time.sleep(60)
+    print("Close after 30 seconds.")
+    time.sleep(30)

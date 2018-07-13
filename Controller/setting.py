@@ -33,8 +33,8 @@ STATUS_SCRIPT_SUSPEND = 'script_suspend'  # task interrupt
 RPC_SERVER_TIMEOUT = 30
 RPC_PORT = 8003
 
-# ---------------------- adb ---------------------------C--
-NOX_BIN_PATH = 'D:\\Nox\\bin'
+# ---------------------- adb -----------------------------
+NOX_BIN_PATH = 'C:\\Nox\\bin'
 ADB_BINARY_PATH = NOX_BIN_PATH + '\\nox_adb.exe'
 CONSOLE_BINARY_PATH = NOX_BIN_PATH + '\\NoxConsole.exe'
 TIMER = [2, 5, 8, 11, 14, 17, 20, 23, 26, 29]
