@@ -22,6 +22,6 @@ start "script" /HIGH python Controller/script_%appName%.py
 :END
 timeout 10
 @ECHO ON
-exit
+EXIT 0
 
 

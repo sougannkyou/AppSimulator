@@ -13,7 +13,7 @@ IF NOT DEFINED vm (
 %vmrun% -T ws -gu win7_64 -gp zhxg2018 copyFileFromGuestToHost "%workspace%\%vm%\%vmx%" "C:\workspace\pyWorks\AppSimulator\cmd\NoxResetCounter.conf" "%workspace%\%vm%\NoxResetCounter.conf"
 
 set /P NoxResetCounter= 0<%workspace%\%vm%\NoxResetCounter.conf
-echo %NoxResetCounter%
+echo NoxResetCounter is %NoxResetCounter%
 
 IF %NoxResetCounter% NEQ 0 GOTO END
 
