@@ -5,7 +5,7 @@ SET workspace=D:\VMware\VM
 SET vmx=Windows 7 x64.vmx
 SET vm=%1
 
-IF NOT DEFINED vm(
+IF NOT DEFINED vm (
     ECHO [error] please input vm name
     GOTO END
 )
@@ -28,4 +28,5 @@ timeout 10
 
 :END
 @ECHO ON
+timeout 20
 EXIT 0
