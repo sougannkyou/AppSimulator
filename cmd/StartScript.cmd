@@ -5,7 +5,7 @@ timeout 5
 set /P NoxResetCounter= 0<cmd\NoxResetCounter.conf
 echo NoxResetCounter is %NoxResetCounter%
 
-if %NoxResetCounter% EQU 0 goto END
+REM if %NoxResetCounter% EQU 0 goto END
 
 start C:\Nox\bin\Nox.exe -quit
 

@@ -76,7 +76,7 @@ def main(task, mode):
         end = datetime.now()
         common_log(_DEBUG, 'Script ' + task['docker_name'] + 'end.',
                    msg + 'total times:' + str((end - start).seconds) + 's', error)
-        common_runscript_countdown()
+        # common_runscript_countdown()
         return
 
 
