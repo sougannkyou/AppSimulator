@@ -20,30 +20,23 @@ class MySelenium(NoxConSelenium):
         try:
             ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
             if ret: ret = self.click_xy(x, y, wait_time=2)
-            ret, x, y = self.find_element(comment='选择一个视频', timeout=10)
-            if ret: ret = self.click_xy(x, y, wait_time=2)
+            # ret, x, y = self.find_element(comment='选择一个视频', timeout=10)
+            if ret: ret = self.click_xy(200, 200, wait_time=2)
 
             while ret:
-                ret, pos_list = self.find_elements(comment='分享', timeout=10)
+                ret, x, y = self.find_element(comment='分享', timeout=10)
                 if ret:
-                    for pos in pos_list:
-                        (x, y) = pos
-                        ret = self.click_xy(x, y, wait_time=2)  # click 分享
+                    self.click_xy(x, y, wait_time=2)  # click 分享
+                    if ret:
+                        ret, x, y = self.find_element(comment='复制链接', timeout=10)
                         if ret:
-                            ret, x, y = self.find_element(comment='复制链接', timeout=10)
-                            if ret:
-                                ret = self.click_xy_timer(x, y, wait_time=1)
-                            else:  # upgrade?
-                                # ret = self.check_upgrade(timeout=2)
-                                # if ret:
-                                # print("重试 click 分享 按钮 ...")
-                                ret, x, y = self.find_element(comment='分享', timeout=10)
-                                if ret: ret = self.click_xy(x, y, wait_time=1)
+                            self.click_xy(x, y, wait_time=1)
+                else:
+                    ret = self.find_element(comment='广告', timeout=10)
+                    if ret:
+                        ret = self.next_page_700(wait_time=5)
 
-                                if ret: ret, x, y = self.find_element(comment='复制链接', timeout=10)
-                                if ret: ret = self.click_xy_timer(x, y, wait_time=1)
-
-                self.next_page(wait_time=5)
+                self.next_page_700(wait_time=5)
 
         except Exception as e:
             self._log('error:', e)
@@ -62,6 +55,7 @@ def main(task, mode):
             "选择一个视频": 'images/huoshan/clickone.png',
             "APP图标": 'images/huoshan/app_icon.png',
             "更新": 'images/huoshan/update.png',
+            "广告": 'images/huoshan/ad.png',
             "分享": 'images/huoshan/share.png',
             "复制链接": 'images/huoshan/copylink.png',
         })
