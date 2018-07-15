@@ -70,7 +70,7 @@ class NoxConSelenium(NoxConADB):
         while timeout > 0:
             self.get_capture(capture_name)
             pos = ac.find_template(self._capture_obj, img_obj)
-            if pos and pos['confidence'] > 0.9:
+            if pos and pos['confidence'] > 0.7:
                 self._log('<<info>> 匹配到：', comment + ' ' + str(timeout) + 's')
                 x, y = pos['result']
                 return True, x, y
@@ -257,7 +257,7 @@ class NoxConSelenium(NoxConADB):
         pass  # overwrite
 
     def run(self):
-        self.unlock(timeout=10)
+        # self.unlock(timeout=10)
         # self.get_new_phone()
         # if ret and is_app_restart:
         #     ret = self.app_quit(wait_time=1)
