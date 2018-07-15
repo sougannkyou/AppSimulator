@@ -17,34 +17,23 @@ class MySelenium(NoxConSelenium):
         super().__init__(task_info=task_info, mode=mode)
 
     def script(self):
-        try:
-            ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
-            if ret: ret = self.click_xy(x, y, wait_time=2)
+        ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
+        if ret: ret = self.click_xy(x, y, wait_time=2)
 
-            while ret:  # 更新 -> 分享 -> 复制链接
-                ret, x, y = self.find_element(comment='分享', timeout=10)
+        while ret:  # 更新 -> 分享 -> 复制链接
+            ret, x, y = self.find_element(comment='分享', timeout=10)
+            if ret:
+                self.click_xy(x, y, wait_time=1)
+                ret, x, y = self.find_element(comment='复制链接', timeout=10)
                 if ret:
-                    ret = self.click_xy(x, y, wait_time=1)
-                    if ret:
-                        ret, x, y = self.find_element(comment='复制链接', timeout=10)
-                        if ret:
-                            ret = self.click_xy_timer(x, y, wait_time=1)
-                        else:  # upgrade?
-                            # ret = self.check_upgrade(timeout=2)
-                            # if ret:
-                            print("重试 click 分享 按钮 ...")
-                            ret, x, y = self.find_element(comment='分享', timeout=10)
-                            if ret:
-                                ret = self.click_xy(x, y, wait_time=1)
-                                if ret:
-                                    ret, x, y = self.find_element(comment='复制链接', timeout=10)
-                                    if ret:
-                                        ret = self.click_xy(x, y, wait_time=1)
+                    self.click_xy_timer(x, y, wait_time=1)
+            else:
+                ret, x, y = self.find_element(comment='跳过软件升级', timeout=10)
+                if ret:
+                    self.click_xy(x, y, wait_time=1)
+                    self.next_page(wait_time=5)
 
-                self.next_page(wait_time=5)
-
-        except Exception as e:
-            self._log('error:', e)
+            self.next_page(wait_time=5)
 
 
 ##################################################################################
