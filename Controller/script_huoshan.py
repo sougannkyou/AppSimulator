@@ -19,9 +19,13 @@ class MySelenium(NoxConSelenium):
     def script(self):
         try:
             ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
-            if ret: ret = self.click_xy(x, y, wait_time=2)
-            # ret, x, y = self.find_element(comment='选择一个视频', timeout=10)
-            if ret: ret = self.click_xy(200, 200, wait_time=2)
+            if ret:
+                self.click_xy(x, y, wait_time=20)
+            ret, x, y = self.find_element(comment='忽略升级', timeout=10)
+            if ret:
+                self.click_xy(x, y, wait_time=2)
+
+            self.click_xy(200, 200, wait_time=10)  # 选择一个视频
 
             while ret:
                 ret, x, y = self.find_element(comment='分享', timeout=10)
@@ -54,7 +58,7 @@ def main(task, mode):
         me.set_comment_to_pic({
             "选择一个视频": 'images/huoshan/clickone.png',
             "APP图标": 'images/huoshan/app_icon.png',
-            "更新": 'images/huoshan/update.png',
+            "忽略升级": 'images/huoshan/ignore_upgrade.png',
             "广告": 'images/huoshan/ad.png',
             "分享": 'images/huoshan/share.png',
             "复制链接": 'images/huoshan/copylink.png',
