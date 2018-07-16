@@ -53,13 +53,14 @@ class MongoDriver(object):
     def task_get_one_for_run(self):
         cnt = self.tasks.find({'status': STATUS_DOCKER_RUN, 'rpc_server_ip': LOCAL_IP}).count()
         if cnt > 0:
-            return None, '有' + str(cnt) + '个docker正在启动 ...'
+            return None, '宿主机当前有' + str(cnt) + '个模拟器正在启动 ...'
 
         cnt = self.tasks.find({'status': STATUS_DOCKER_RUN, 'rpc_server_ip': LOCAL_IP}).count()
         if cnt > len(TIMER):
             return None, ''
 
-        task = self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': LOCAL_IP})
+        task = self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': ''})
+        self.tasks.update({'_id': task['_id']}, {'$set': {'rpc_server_ip': LOCAL_IP}})
         return task, 'ok'
 
     def task_get_my_prepare_tasks_cnt(self):
@@ -95,15 +96,6 @@ class MongoDriver(object):
             'end_time': 0
         })
         return id
-
-    def docker_get_destroy(self):
-        d = []
-        dockers = self.dockers.find({
-            'status': {'$in': [STATUS_SCRIPT_START_OK, STATUS_SCRIPT_START_NG]},
-            'rpc_server_ip': LOCAL_IP
-        })
-
-        return docker_name
 
     def docker_change_status(self, docker):
         self._log('docker_change_status', docker['status'])

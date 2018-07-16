@@ -64,7 +64,7 @@ class NoxConDocker(object):
         return True, msg
 
     def _make_cmd(self, cmd):
-        os.chdir('c:\\Nox\\bin')
+        os.chdir(NOX_BIN_PATH)
         return 'NoxConsole ' + cmd
 
     def _exec_nox_cmd(self, cmdline):
@@ -163,7 +163,7 @@ class NoxConDocker(object):
         self._log('pull', self._docker_name + ' ' + app_name)
         time.sleep(1)
         ret = self._exec_nox_cmd(self._make_cmd(
-            'restore -name:' + self._docker_name + ' -file:"c:\\Nox\\backup\\nox-' + app_name + '.npbk"'
+            'restore -name:' + self._docker_name + ' -file:"' + NOX_BACKUP_PATH + '\\nox-' + app_name + '.npbk"'
         ))
         if ret.find('failed') > 0:
             return False
