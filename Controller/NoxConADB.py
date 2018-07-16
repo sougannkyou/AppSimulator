@@ -31,7 +31,8 @@ class NoxConADB(object):
         self._console_binary = CONSOLE_BINARY_PATH
         self._adb_binary = ADB_BINARY_PATH
         self._app_name = task_info['app_name']
-        self._docker_name = 'nox-' + str(task_info['taskId'])
+        self._docker_name = str(task_info['taskId']) if str(task_info['taskId']).startswith('nox') \
+            else 'nox-' + str(task_info['taskId'])
         self._timer_no = task_info['timer_no']
         self._taskId = task_info['taskId']
         self._timer_flg = False
@@ -77,7 +78,8 @@ class NoxConADB(object):
     def get_android_version(self):
         self._clean()
         self.adb_shell("getprop ro.build.version.release")
-        return self._stdout.decode('utf8')
+        # return self._stdout.decode('utf8')
+        return self._stdout
 
     def clear_cache(self):
         packages = {
@@ -145,7 +147,7 @@ class NoxConADB(object):
             self._set_task_conf()
             self._log('[adb_cmd]<<info>> ' + datetime.now().strftime('%H:%M:%S %f') + '\n', cmdline)
         else:
-            self._log('[adb_cmd]<<info>>\n\t\t', cmdline)
+            self._log('[adb_cmd]<<info>>\n\t', cmdline)
 
     def adb_cmd(self, cmd):
         self._clean()

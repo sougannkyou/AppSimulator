@@ -6,6 +6,7 @@ sys.path.append(os.getcwd())
 
 import time
 from datetime import datetime
+from Controller.setting import APPSIMULATOR_MODE
 from Controller.NoxConSelenium import NoxConSelenium
 from Controller.Common import common_log, common_runscript_countdown
 
@@ -78,14 +79,20 @@ def main(task, mode):
 
 if __name__ == "__main__":
     _DEBUG = True
-    # taskId = sys.argv[1]
-    taskId = 3
+
+    if APPSIMULATOR_MODE == 'vmware':
+        taskId = 3
+        mode = 'single'
+    else:
+        taskId = sys.argv[1]
+        mode = 'multi'
+
     task = {
         'taskId': taskId,
         'app_name': 'huoshan',
         'docker_name': 'nox-' + str(taskId),
         'timer_no': 3  # 11s
     }
-    main(task=task, mode='single')
+    main(task=task, mode=mode)
     print("Close after 30 seconds.")
     time.sleep(30)

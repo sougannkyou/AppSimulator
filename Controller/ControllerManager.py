@@ -76,14 +76,16 @@ class Manager(object):
             import os
             # cd _work_path (D:\workspace\pyWork\AppSimulator>)
             # python Controller\script_miaopai.py
-            p = os.getcwd()
-            import sys
-
-            if p not in sys.path:
-                # print('append', p)
-                sys.path.append(p)
+            # p = os.getcwd()
+            # import sys
+            #
+            # if p not in sys.path:
+            #     # print('append', p)
+            #     sys.path.append(p)
 
             # pprint(sys.path)
+            org_path = os.getcwd()
+            os.chdir(self._work_path)
             docker_name = 'nox-' + str(task_info['taskId'])
             # cmd = 'python --version'
             cmd = 'START "task-' + str(task_info['taskId']) + '" '
@@ -91,26 +93,27 @@ class Manager(object):
             # cmd += ' >>' + self._work_path + '\Controller\log\\task-' + str(task['taskId']) + '.log 2>&1'
             self._log('<<info>> run_script cmd:\n', cmd)
             os.system(cmd)
+            os.chdir(org_path)
             # print(os.popen(cmd).read())
             return True
         except Exception as e:
             self._log('run_script error:', e)
             return False
 
-    def nox_run(self, task, docker, retry_cnt):
+    def nox_start(self, task, docker, retry_cnt):
         docker.stop()
         self.nox_check_stop(docker, retry=True, wait_time=30)
         ret = docker.run(force=True)  # docker run: create and start
         if ret:
-            ret = self.nox_run_check(task_info=task, timeout=60)
+            ret = self.nox_start_check(task_info=task, timeout=60)
             if ret:
-                ret = self.nox_run_success(docker=docker)
+                ret = self.nox_start_success(docker=docker)
             else:
-                ret = self.nox_run_error(task=task, docker=docker, retry_cnt=retry_cnt)
+                ret = self.nox_start_error(task=task, docker=docker, retry_cnt=retry_cnt)
 
         return ret
 
-    def nox_run_success(self, docker):
+    def nox_start_success(self, docker):
         self._log('<<info>> docker_run_success', docker.get_name())
         time.sleep(2)
         docker.shake(1)
@@ -118,19 +121,18 @@ class Manager(object):
         # port = docker.get_port()
         return True
 
-    def nox_run_error(self, task, docker, retry_cnt):
+    def nox_start_error(self, task, docker, retry_cnt):
         self._log('<<info>> docker_run_error:', docker.get_name() + ' retry: ' + str(retry_cnt))
         retry_cnt -= 1
         if retry_cnt >= 0:
-            return self.nox_run(task, docker, retry_cnt)
+            return self.nox_start(task, docker, retry_cnt)
 
         return False
 
-    def nox_run_check(self, task_info, timeout=60):
-        driver = NoxConSelenium(task_info=task_info)
+    def nox_start_check(self, task_info, timeout=60):
+        driver = NoxConSelenium(task_info=task_info, mode='multi')
         driver.set_comment_to_pic({
-            "APP图标": self._work_path + '\\Controller\\images\\' + task_info['app_name'] + '\\app_icon.png',
-            "很抱歉": self._work_path + '\\Controller\\images\\im_sorry.png',
+            "APP图标": 'images/' + task_info['app_name'] + '/app_icon.png',
         })
         docker_name = 'nox-' + str(task_info['taskId'])
         ret = driver.wait_online(timeout=timeout)
@@ -166,7 +168,7 @@ class Manager(object):
         time.sleep(10)
         return True
 
-    def nox_tasks(self):
+    def nox_run_tasks(self):
         # 1)docker running -> 2)docker run ok(ng) -> 3)script running -> 4)script run ok(ng)
         while True:
             task, msg = self._mdb.task_get_one_for_run()
@@ -175,7 +177,7 @@ class Manager(object):
                 task['status'] = STATUS_DOCKER_RUN
                 self._mdb.task_change_status(task)
                 docker = NoxConDocker(task_info=task)
-                ret = self.nox_run(task=task, docker=docker, retry_cnt=2)
+                ret = self.nox_start(task=task, docker=docker, retry_cnt=2)
                 # call NoxConDocker.__del__
                 # docker = None
 

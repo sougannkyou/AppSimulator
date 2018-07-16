@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 
+APPSIMULATOR_MODE = os.getenv('APPSIMULATOR_MODE')
 LOCAL_IP = os.getenv('APPSIMULATOR_IP')
 WORK_PATH = os.getenv('APPSIMULATOR_WORK_PATH')
 SCOPE_TIMES = 1 * 60
