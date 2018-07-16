@@ -5,10 +5,10 @@ import sys
 sys.path.append(os.getcwd())
 
 import time
-from datetime import datetime
 from Controller.setting import APPSIMULATOR_MODE
+from Controller.Common import *
+from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
-from Controller.Common import common_log, common_runscript_countdown
 
 _DEBUG = False
 
@@ -73,7 +73,9 @@ def main(task, mode):
         end = datetime.now()
         common_log(_DEBUG, 'Script ' + task['docker_name'] + 'end.',
                    msg + 'total times:' + str((end - start).seconds) + 's', error)
-        # common_runscript_countdown()
+        docker = NoxConDocker(task)
+        docker.destroy()
+        docker.remove()
         return
 
 
@@ -91,7 +93,7 @@ if __name__ == "__main__":
         'taskId': taskId,
         'app_name': 'huoshan',
         'docker_name': 'nox-' + str(taskId),
-        'timer_no': 3  # 11s
+        'timer_no': 2  # 5s
     }
     main(task=task, mode=mode)
     print("Close after 30 seconds.")

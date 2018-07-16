@@ -36,6 +36,7 @@ RPC_PORT = 8003
 
 # ---------------------- adb -----------------------------
 NOX_BIN_PATH = 'C:\\Nox\\bin'
+NOX_BACKUP_PATH = 'C:\\Nox\\backup'
 ADB_BINARY_PATH = NOX_BIN_PATH + '\\nox_adb.exe'
 CONSOLE_BINARY_PATH = NOX_BIN_PATH + '\\NoxConsole.exe'
 TIMER = [2, 5, 8, 11, 14, 17, 20, 23, 26, 29]

@@ -1,4 +1,5 @@
 # coding:utf-8
+import os
 import time
 import subprocess
 import importlib
@@ -72,29 +73,14 @@ class Manager(object):
 
     def nox_run_script(self, task_info):
         try:
-            from pprint import pprint
-            import os
-            # cd _work_path (D:\workspace\pyWork\AppSimulator>)
-            # python Controller\script_miaopai.py
-            # p = os.getcwd()
-            # import sys
-            #
-            # if p not in sys.path:
-            #     # print('append', p)
-            #     sys.path.append(p)
-
-            # pprint(sys.path)
             org_path = os.getcwd()
             os.chdir(self._work_path)
-            docker_name = 'nox-' + str(task_info['taskId'])
-            # cmd = 'python --version'
             cmd = 'START "task-' + str(task_info['taskId']) + '" '
-            cmd += 'python ' + self._work_path + '\Controller\\' + task_info['script'] + ' ' + docker_name
+            cmd += 'python ' + self._work_path + '\Controller\\' + task_info['script'] + ' ' + str(task_info['taskId'])
             # cmd += ' >>' + self._work_path + '\Controller\log\\task-' + str(task['taskId']) + '.log 2>&1'
             self._log('<<info>> run_script cmd:\n', cmd)
             os.system(cmd)
             os.chdir(org_path)
-            # print(os.popen(cmd).read())
             return True
         except Exception as e:
             self._log('run_script error:', e)
@@ -169,36 +155,30 @@ class Manager(object):
         return True
 
     def nox_run_tasks(self):
-        # 1)docker running -> 2)docker run ok(ng) -> 3)script running -> 4)script run ok(ng)
+        # 1)docker running -> 2)docker run ok(ng) -> 3)script run ok(ng)
         while True:
             task, msg = self._mdb.task_get_one_for_run()
             if task:
-                # 1)docker running
+                # 1)docker run
                 task['status'] = STATUS_DOCKER_RUN
                 self._mdb.task_change_status(task)
                 docker = NoxConDocker(task_info=task)
                 ret = self.nox_start(task=task, docker=docker, retry_cnt=2)
-                # call NoxConDocker.__del__
-                # docker = None
-
-                status = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
 
                 # 2)docker run ok(ng)
+                status = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
                 docker_info = {'_id': self._mdb.docker_create(task), 'status': status}
                 self._mdb.docker_change_status(docker_info)
                 task['status'] = status
                 self._mdb.task_change_status(task)
 
-                if ret:
+                if ret:  # docker run ok
+                    # 3)script run ok(ng)
                     self._mdb.task_set_docker(task, docker_info)  # bind docker to task
-                    # 3)script running
                     ret = self.nox_run_script(task_info=task)
                     task['status'] = STATUS_SCRIPT_START_OK if ret else STATUS_SCRIPT_START_NG
-
-                    # 4)script run ok(ng)
                     self._mdb.task_change_status(task)
 
-                # break
             else:
                 self._log('<<info>> start_tasks', 'not found waiting task, retry after 60s.')
                 time.sleep(1 * 60)

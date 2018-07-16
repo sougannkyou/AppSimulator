@@ -85,6 +85,26 @@ class MongoDriver(object):
         })
         return id
 
+    def docker_end(self, task):
+        id = self.dockers.update({
+            'docker_name': 'nox-' + str(task['taskId']),
+            'ip': LOCAL_IP,
+            'port': 0,
+            'status': STATUS_DOCKER_RUN,
+            'start_time': int(datetime.now().timestamp()),
+            'end_time': 0
+        })
+        return id
+
+    def docker_get_destroy(self):
+        d = []
+        dockers = self.dockers.find({
+            'status': {'$in': [STATUS_SCRIPT_START_OK, STATUS_SCRIPT_START_NG]},
+            'rpc_server_ip': LOCAL_IP
+        })
+
+        return docker_name
+
     def docker_change_status(self, docker):
         self._log('docker_change_status', docker['status'])
         self.dockers.update({'_id': docker['_id']}, {"$set": {'status': docker['status']}})

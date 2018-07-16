@@ -14,13 +14,14 @@ class NoxConSelenium(NoxConADB):
     '''
     可以使用Timer进行时分同步
     '''
+
     def __init__(self, task_info, mode):
         super().__init__(task_info, mode)
         self._DEBUG = False
         self._FTP_TRANSMISSION = False
         self._PIC_PATH = {  # set_comment_to_pic()
             "锁屏": 'images\\screen_lock.png',
-            "很抱歉":  'images\\im_sorry.png',
+            "很抱歉": 'images\\im_sorry.png',
             "锁屏图案": 'images\\screen_lock_9point.png',
         }
         self._work_path = WORK_PATH
@@ -70,7 +71,11 @@ class NoxConSelenium(NoxConADB):
         img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
         while timeout > 0:
             self.get_capture(capture_name)
+            from datetime import datetime
+            # start = datetime.now()
             pos = ac.find_template(self._capture_obj, img_obj)
+            # end = datetime.now()
+            # print('find_template', (end - start).microseconds)
             if pos and pos['confidence'] > 0.7:
                 self._log('<<info>> 匹配到：', comment + ' ' + str(timeout) + 's')
                 x, y = pos['result']

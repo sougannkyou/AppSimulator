@@ -5,10 +5,10 @@ import sys
 sys.path.append(os.getcwd())
 
 import time
-from datetime import datetime
+from Controller.Common import *
 from Controller.setting import APPSIMULATOR_MODE
+from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
-from Controller.Common import common_log, common_runscript_countdown
 
 _DEBUG = False
 
@@ -61,12 +61,15 @@ def main(task_info, mode):
         end = datetime.now()
         common_log(_DEBUG, 'Script ' + task['docker_name'] + 'end.',
                    msg + 'total times:' + str((end - start).seconds) + 's', error)
-        # common_runscript_countdown()
+        docker = NoxConDocker(task)
+        docker.destroy()
+        docker.remove()
         return
 
 
 if __name__ == "__main__":
     _DEBUG = True
+
     if APPSIMULATOR_MODE == 'vmware':
         taskId = 1
         mode = 'single'

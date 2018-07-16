@@ -43,7 +43,7 @@ class NoxConDocker(object):
         else:
             self._log('_check', 'Memory: %.1f' % (mem.free / GB) + ' GB')
 
-        if not os.access('c:\\Nox\\backup\\nox-' + self._app_name + '.npbk', os.R_OK):
+        if not os.access(NOX_BACKUP_PATH + '\\nox-' + self._app_name + '.npbk', os.R_OK):
             msg = 'Not found nox-' + self._app_name + '.npbk'
             self._log('_check error', msg)
             return False, msg
@@ -114,12 +114,17 @@ class NoxConDocker(object):
             self._exec_nox_cmd(self._make_cmd("action -name:" + self._docker_name + " -key:call.shake -value:null"))
         return True
 
-    def stop(self, wait_time=2):
-        self.kill_task()
-        self._log('<<info>> stop', 'wait: ' + str(wait_time) + 's')
+    def destroy(self, wait_time=2):
+        self._log('<<info>> destroy', 'wait: ' + str(wait_time) + 's')
         time.sleep(wait_time)
         self._exec_nox_cmd(self._make_cmd("quit -name:" + self._docker_name))
         time.sleep(wait_time)
+        return True
+
+    def stop(self, wait_time=2):
+        self._log('<<info>> stop', 'wait: ' + str(wait_time) + 's')
+        self.kill_task()
+        self.destroy(wait_time=wait_time)
         return True
 
     def stop_all(self):
