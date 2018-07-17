@@ -73,10 +73,10 @@ def main(task, mode):
         end = datetime.now()
         common_log(_DEBUG, 'Script ' + task['docker_name'] + 'end.',
                    msg + 'total times:' + str((end - start).seconds) + 's', error)
-
-        docker = NoxConDocker(task)
-        docker.destroy()
-        docker.remove()
+        if APPSIMULATOR_MODE != 'vmware':
+            docker = NoxConDocker(task)
+            docker.destroy()
+            docker.remove()
         return
 
 

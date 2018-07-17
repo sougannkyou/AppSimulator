@@ -26,7 +26,7 @@ class MySelenium(NoxConSelenium):
             if ret:
                 self.click_xy(x, y, wait_time=2)
 
-            self.click_xy(200, 200, wait_time=10)  # 选择一个视频
+            ret = self.click_xy(200, 200, wait_time=10)  # 选择一个视频
 
             while ret:
                 ret, x, y = self.find_element(comment='分享', timeout=10)
@@ -73,9 +73,10 @@ def main(task, mode):
         end = datetime.now()
         common_log(_DEBUG, 'Script ' + task['docker_name'] + 'end.',
                    msg + 'total times:' + str((end - start).seconds) + 's', error)
-        docker = NoxConDocker(task)
-        docker.destroy()
-        docker.remove()
+        if APPSIMULATOR_MODE != 'vmware':
+            docker = NoxConDocker(task)
+            docker.destroy()
+            docker.remove()
         return
 
 
