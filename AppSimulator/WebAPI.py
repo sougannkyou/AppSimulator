@@ -191,7 +191,8 @@ def getResultSampleAPI(request):
 def addTaskAPI(request):
     app_name = request.POST.get('app_name')
     script = request.POST.get('script')
-    ret = MDB.add_task({'script': script, 'app_name': app_name})
+    live_cycle = request.POST.get('live_cycle')
+    ret = MDB.add_task({'script': script, 'app_name': app_name, 'live_cycle': live_cycle})
     output = JsonResponse({
         'ret': ret
     })

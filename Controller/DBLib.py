@@ -47,6 +47,14 @@ class MongoDriver(object):
     def _log(self, prefix, msg):
         common_log(self._DEBUG, '[Controller DB]', prefix, msg)
 
+    def get_taskId(self):
+        taskId = 1
+        m = self.tasks.aggregate([{"$group": {'_id': '', 'max_id': {"$max": "$taskId"}}}])
+        for i in m:
+            taskId = i['max_id'] + 1  # taskId自增
+
+        return taskId
+
     def rpc_register_service(self, controller_info):
         self.rpcServer.update({'ip': controller_info['ip']}, {"$set": controller_info}, upsert=True)
 
@@ -60,16 +68,40 @@ class MongoDriver(object):
             return None, ''
 
         task = self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': ''})
-        self.tasks.update({'_id': task['_id']}, {'$set': {'rpc_server_ip': LOCAL_IP}})
-        return task, 'ok'
+        if task:
+            self.tasks.update({'_id': task['_id']}, {'$set': {'rpc_server_ip': LOCAL_IP}})
+            return task, 'ok'
+
+        return None, ''
 
     def task_get_my_prepare_tasks_cnt(self):
         return self.tasks.find(
             {'status': {'$in': [STATUS_WAIT]}, 'rpc_server_ip': LOCAL_IP}).count()
 
+    def task_find_by_taskId(self, taskId):
+        return self.tasks.find_one({'taskId': taskId})
+
+    def task_clone(self, task):
+        taskId = self.get_taskId()
+        self.tasks.insert({
+            "taskId": taskId,
+            "orgTaskId": task['orgTaskId'] if task['orgTaskId'] != 0 else task['taskId'],  # 初始taskId
+            "script": task['script'],
+            "app_name": task['app_name'],
+            "status": STATUS_WAIT,
+            "live_cycle": task['live_cycle'],
+            "rpc_server_ip": task['rpc_server_ip'],
+            "start_time": int(datetime.now().timestamp()),
+            "up_time": 0,
+            "timer_no": 0,
+            "dockerId": ''
+        })
+        return taskId
+
     def task_change_status(self, task):
         self._log('task_change_status', task['status'])
-        self.tasks.update({'_id': task['_id']}, {"$set": {'status': task['status']}})
+        self.tasks.update({'_id': task['_id']},
+                          {"$set": {'status': task['status'], 'up_time': int(datetime.now().timestamp())}})
 
     def task_set_docker(self, task, docker):
         self._log('task_set_docker', task)
@@ -82,7 +114,7 @@ class MongoDriver(object):
             'port': 0,
             'status': STATUS_DOCKER_RUN,
             'start_time': int(datetime.now().timestamp()),
-            'end_time': 0
+            'up_time': 0
         })
         return id
 
@@ -93,7 +125,7 @@ class MongoDriver(object):
             'port': 0,
             'status': STATUS_DOCKER_RUN,
             'start_time': int(datetime.now().timestamp()),
-            'end_time': 0
+            'up_time': 0
         })
         return id
 
@@ -163,6 +195,7 @@ if __name__ == '__main__':
     info = {'device1': 10, 'device2': 20, 'device3': 30, 'device4': 40}
     db = MongoDriver()
     db._DEBUG = True
-    pprint(db.vm_find_vm_by_host(host_ip))
+    # pprint(db.vm_find_vm_by_host(host_ip))
+    pprint(db.task_find_by_taskId(10))
     # db.update_device_statistics_info(info, SCOPE_TIMES)
     # pprint(db.get_devices_status())

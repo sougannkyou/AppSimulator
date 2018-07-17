@@ -9,6 +9,7 @@ from Controller.setting import APPSIMULATOR_MODE
 from Controller.Common import *
 from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
+from Controller.ControllerManager import Manager
 
 _DEBUG = False
 
@@ -71,12 +72,17 @@ def main(task, mode):
         error = e
     finally:
         end = datetime.now()
-        common_log(_DEBUG, 'Script ' + task['docker_name'] + 'end.',
-                   msg + 'total times:' + str((end - start).seconds) + 's', error)
-        if APPSIMULATOR_MODE != 'vmware':
+        if APPSIMULATOR_MODE != 'vmware':  # multi nox console
+            common_log(_DEBUG, 'Script ' + task['docker_name'], 'multi nox console mode.', '')
             docker = NoxConDocker(task)
             docker.destroy()
             docker.remove()
+            m = Manager()
+            m.nox_run_task_complete(task['taskId'])
+            time.sleep(10)
+
+        common_log(_DEBUG, 'Script ' + task['docker_name'] + 'end.',
+                   msg + 'total times:' + str((end - start).seconds) + 's', error)
         return
 
 

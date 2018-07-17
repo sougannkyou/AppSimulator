@@ -110,8 +110,9 @@
                 url: '/AppSimulator/addTaskAPI/',
                 type: 'POST',
                 data: {
-                    script: obj.task.script,
-                    app_name: obj.task.app_name,
+                    script: obj.vmware.script,
+                    app_name: obj.vmware.app_name,
+                    live_cycle: obj.vmware.live_cycle
                 },
                 dataType: "json",
                 error: function (xhr, err) {

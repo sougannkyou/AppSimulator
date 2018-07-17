@@ -92,12 +92,14 @@ class MongoDriver(object):
         taskId = self.get_taskId()
         self.tasks.insert({
             "taskId": taskId,
+            "orgTaskId": 0,
             "script": task['script'],
             "app_name": task['app_name'],
             "status": STATUS_WAIT,
+            "live_cycle": task['live_cycle'],
             "rpc_server_ip": '',
             "start_time": int(datetime.now().timestamp()),
-            "end_time": 0,
+            "up_time": 0,
             "timer_no": 0,
             "dockerId": ''
         })

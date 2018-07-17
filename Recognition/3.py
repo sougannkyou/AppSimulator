@@ -5,7 +5,8 @@ import aircv as ac
 # img_bg = ac.imread("douyin/bg5.jpg")
 
 img_obj = ac.imread("huoshan/share.png")
-img_bg = ac.imread("huoshan/bg6.jpg")
+img_bg = ac.imread("huoshan/bg2.png")
+
 
 def debug(x, y):
     cv2.circle(img=img_bg, center=(int(x), int(y)), radius=30, color=(0, 0, 255), thickness=1)

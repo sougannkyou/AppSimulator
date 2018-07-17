@@ -154,6 +154,15 @@ class Manager(object):
         time.sleep(10)
         return True
 
+    def nox_run_task_complete(self, taskId):
+        task = self._mdb.task_find_by_taskId(int(taskId))
+        print('task', taskId, task)
+        task['status'] = STATUS_SCRIPT_COMPLETE
+        self._mdb.task_change_status(task)
+        if task['live_cycle'] == LIVE_CYCLE_NEVER:
+            self._log('<<info>> nox_run_task_complete', 'clone')
+            self._mdb.task_clone(task)
+
     def nox_run_tasks(self):
         # 1)docker running -> 2)docker run ok(ng) -> 3)script run ok(ng)
         while True:

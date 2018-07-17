@@ -30,15 +30,17 @@
                             <th width="10%">IP</th>
                             <th width="5%">Port</th>
                             <th width="20%">Script</th>
+                            <th width="10%">Live</th>
                             <th width="20%">APP</th>
-                            <th width="20%">Status</th>
-                            <th width="20%">Type</th>
+                            <th width="10%">Status</th>
+                            <th width="10%">Type</th>
                         </tr>
                         <tr>
                             <td><input type="text" v-model="task.taskId" placeholder="等待分配" readonly></td>
                             <td><input type="text" v-model="task.ip" placeholder="等待分配" readonly></td>
                             <td><input type="text" v-model="task.port" placeholder="等待分配" readonly></td>
                             <td><input type="text" v-model="task.script" placeholder="script"></td>
+                            <td><input type="text" v-model="task.live_cycle" placeholder="never"></td>
                             <td>
                                 <label v-for="app in appAll">
                                     <img v-bind:class="[task.app_name===app?'app-icon-big':'app-icon']"
@@ -60,6 +62,7 @@
                             <td>[[ t.ip ]]</td>
                             <td>[[ t.port ]]</td>
                             <td>[[ t.script ]]</td>
+                            <td>[[ t.live_cycle ]]</td>
                             <td><img class="app" v-bind:src="'/static/AppSimulator/images/'+t.app_name+'/app_icon.png'">
                             </td>
                             <td><span v-bind:class="[t.status==='unkown'?'label label-default':
@@ -105,6 +108,7 @@
                 data: {
                     script: obj.task.script,
                     app_name: obj.task.app_name,
+                    live_cycle: obj.task.live_cycle,
                 },
                 dataType: "json",
                 error: function (xhr, err) {
@@ -125,7 +129,15 @@
             el: "#main",
             data: {
                 appAll: ['douyin', 'miaopai', 'kuaishou', 'huoshan'],
-                task: {taskId: '等待分配', ip: '等待分配', port: '等待分配', script: '', app_name: '', status: STATUS_UNKOWN},
+                task: {
+                    taskId: '等待分配',
+                    ip: '等待分配',
+                    port: '等待分配',
+                    script: '',
+                    live_cycle: 'never',
+                    app_name: '',
+                    status: STATUS_UNKOWN
+                },
                 tasks: [],
                 msg: ""
             },
@@ -150,6 +162,7 @@
                     ip: '192.168.31.227',
                     port: '62001',
                     script: 'script_douyin.py',
+                    live_cycle: 'never',
                     app_name: 'douyin',
                     status: STATUS_RUN,
                     deviceType: 'emulator'
@@ -158,6 +171,7 @@
                     ip: '192.168.31.228',
                     port: '62003',
                     script: 'script_miaopai.py',
+                    live_cycle: 'never',
                     app_name: 'miaopai',
                     status: STATUS_RUN,
                     deviceType: 'emulator'
@@ -166,6 +180,7 @@
                     ip: '192.168.31.229',
                     port: '62005',
                     script: 'script_dianping.py',
+                    live_cycle: 'never',
                     app_name: 'dianping',
                     status: STATUS_RUN,
                     deviceType: 'emulator'

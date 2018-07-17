@@ -9,6 +9,7 @@ from Controller.setting import APPSIMULATOR_MODE
 from Controller.Common import *
 from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
+from Controller.ControllerManager import Manager
 
 _DEBUG = False
 
@@ -20,8 +21,7 @@ class MySelenium(NoxConSelenium):
     def script(self):
         try:
             ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
-            if ret:
-                self.click_xy(x, y, wait_time=20)
+            if ret: self.click_xy(x, y, wait_time=20)
             ret, x, y = self.find_element(comment='忽略升级', timeout=10)
             if ret:
                 self.click_xy(x, y, wait_time=2)
@@ -36,6 +36,14 @@ class MySelenium(NoxConSelenium):
                         ret, x, y = self.find_element(comment='复制链接', timeout=10)
                         if ret:
                             self.click_xy(x, y, wait_time=1)
+                        else:  # retry once
+                            ret, x, y = self.find_element(comment='分享', timeout=10)
+                            if ret:
+                                self.click_xy(x, y, wait_time=2)  # click 分享
+                                if ret:
+                                    ret, x, y = self.find_element(comment='复制链接', timeout=10)
+                                    if ret:
+                                        self.click_xy(x, y, wait_time=1)
                 else:
                     ret = self.find_element(comment='广告', timeout=10)
                     if ret:
@@ -71,12 +79,17 @@ def main(task, mode):
         error = e
     finally:
         end = datetime.now()
-        common_log(_DEBUG, 'Script ' + task['docker_name'] + 'end.',
-                   msg + 'total times:' + str((end - start).seconds) + 's', error)
-        if APPSIMULATOR_MODE != 'vmware':
+        if APPSIMULATOR_MODE != 'vmware':  # multi nox console
+            common_log(_DEBUG, 'Script ' + task['docker_name'], 'multi nox console mode.', '')
             docker = NoxConDocker(task)
             docker.destroy()
             docker.remove()
+            m = Manager()
+            m.nox_run_task_complete(task['taskId'])
+            time.sleep(10)
+
+        common_log(_DEBUG, 'Script ' + task['docker_name'] + 'end.',
+                   msg + 'total times:' + str((end - start).seconds) + 's', error)
         return
 
 

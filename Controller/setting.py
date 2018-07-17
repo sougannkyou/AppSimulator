@@ -29,7 +29,10 @@ STATUS_SCRIPT_START = 'script_start'  # script running ...
 STATUS_SCRIPT_START_OK = 'script_start_ok'
 STATUS_SCRIPT_START_NG = 'script_start_ng'
 STATUS_SCRIPT_SUSPEND = 'script_suspend'  # task interrupt
+STATUS_SCRIPT_COMPLETE = 'script_run_complete'  # task complete
 
+LIVE_CYCLE_NEVER = 'never'
+LIVE_CYCLE_ONCE = 'once'
 # ---------------------- rpc -----------------------------
 RPC_SERVER_TIMEOUT = 30
 RPC_PORT = 8003
