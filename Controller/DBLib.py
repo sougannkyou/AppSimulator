@@ -4,7 +4,9 @@ from datetime import datetime, timedelta
 import pymongo
 import redis
 from Controller.setting import *
-from Controller.Common import common_log
+
+
+# from Controller.Common import common_log
 
 
 # ------------------------ docker db lib ----------------------
@@ -40,18 +42,29 @@ class MongoDriver(object):
         self.deviceConfig = self._db.deviceConfig
         self.rpcServer = self._db.rpcServer
         self.tasks = self._db.tasks
+        self.logger = self._db.logger
         self.dockers = self._db.dockers
         self.vmwares = self._db.vmwares
         self._DEBUG = False
 
-    def _log(self, prefix, msg):
-        common_log(self._DEBUG, '[Controller DB]', prefix, msg)
+    # def _log(self, prefix, msg):
+    #     common_log(self._DEBUG, '[Controller DB]', prefix, msg)
+
+    def log(self, taskId, func, prefix, msg):
+        self.logger.insert({
+            'time': int(datetime.now().timestamp()),
+            'ip': LOCAL_IP,
+            'taskId': int(taskId),
+            'func': func,
+            'prefix': prefix,
+            'msg': msg
+        })
 
     def get_taskId(self):
         taskId = 1
         m = self.tasks.aggregate([{"$group": {'_id': '', 'max_id': {"$max": "$taskId"}}}])
         for i in m:
-            taskId = i['max_id'] + 1  # taskId自增
+            taskId = int(i['max_id']) + 1  # taskId自增
 
         return taskId
 
@@ -99,12 +112,10 @@ class MongoDriver(object):
         return taskId
 
     def task_change_status(self, task):
-        self._log('task_change_status', task['status'])
         self.tasks.update({'_id': task['_id']},
                           {"$set": {'status': task['status'], 'up_time': int(datetime.now().timestamp())}})
 
     def task_set_docker(self, task, docker):
-        self._log('task_set_docker', task)
         self.tasks.update({'_id': task['_id']}, {"$set": {'dockerId': docker['_id']}})
 
     def docker_create(self, task):

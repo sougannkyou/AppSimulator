@@ -38,7 +38,7 @@ class NoxConADB(object):
         self._timer_flg = False
 
     def _log(self, prefix, msg):
-        common_log(self._DEBUG, 'NoxConADB ' + self._docker_name, prefix, msg)
+        common_log(self._DEBUG, self._taskId, 'NoxConADB ' + self._docker_name, prefix, msg)
 
     def _clean(self):
         self._stdout = None

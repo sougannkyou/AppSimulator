@@ -48,7 +48,7 @@ def main(task, mode):
     msg = ''
     error = ''
     start = datetime.now()
-    common_log(_DEBUG, 'Script ' + task['docker_name'], 'start', task)
+    common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
     try:
         me = MySelenium(task_info=task, mode=mode)
         me.set_comment_to_pic({
@@ -66,7 +66,7 @@ def main(task, mode):
     finally:
         end = datetime.now()
         if APPSIMULATOR_MODE != 'vmware':  # multi nox console
-            common_log(_DEBUG, 'Script ' + task['docker_name'], 'multi nox console mode.', '')
+            common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'multi nox console mode.', '')
             docker = NoxConDocker(task)
             docker.destroy()
             docker.remove()
@@ -74,7 +74,7 @@ def main(task, mode):
             m.nox_run_task_complete(task['taskId'])
             time.sleep(10)
 
-        common_log(_DEBUG, 'Script ' + task['docker_name'] + 'end.',
+        common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'] + 'end.',
                    msg + 'total times:' + str((end - start).seconds) + 's', error)
         return
 

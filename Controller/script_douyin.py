@@ -61,7 +61,7 @@ def main(task_info, mode):
     finally:
         end = datetime.now()
         if APPSIMULATOR_MODE != 'vmware':  # multi nox console
-            common_log(_DEBUG, 'Script ' + task['docker_name'], 'multi nox console mode.', '')
+            common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'multi nox console mode.', '')
             docker = NoxConDocker(task)
             docker.destroy()
             docker.remove()
@@ -69,7 +69,7 @@ def main(task_info, mode):
             m.nox_run_task_complete(task['taskId'])
             time.sleep(10)
 
-        common_log(_DEBUG, 'Script ' + task['docker_name'] + 'end.',
+        common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'] + 'end.',
                    msg + 'total times:' + str((end - start).seconds) + 's', error)
         return
 

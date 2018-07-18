@@ -13,15 +13,19 @@ class NoxADB(object):
     DEFAULT_TCP_HOST = "localhost"
     DEFAULT_TCP_PORT = 62001  # 5555
 
-    def __init__(self, adb_binary_path=ADB_BINARY_PATH):
+    def __init__(self, task_info):
         self._DEBUG = True
+        self._taskId = task_info['taskId']
         self._adb_binary_path = None
         self._stdout = None
         self._stderr = None
         self._devices = None
         self.__target = None
         self._docker_name = None
-        self._adb_binary_path = adb_binary_path
+        self._adb_binary_path = ADB_BINARY_PATH
+
+    def _log(self, prefix, msg):
+        common_log(self._DEBUG, self._taskId, '[NoxADB]', prefix, msg)
 
     def __clean__(self):
         self._stdout = None
@@ -57,9 +61,6 @@ class NoxADB(object):
         self.adb_shell("setprop persist.nox.modem.phonumber " + phone_number)
         # "adb shell setprop persist.nox.modem.serial 89860000000000000000"
         return True
-
-    def _log(self, prefix, msg):
-        common_log(self._DEBUG, '[NoxADB]', prefix, msg)
 
     def get_android_version(self):
         self.__clean__()

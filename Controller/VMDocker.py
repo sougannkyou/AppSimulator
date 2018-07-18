@@ -15,7 +15,7 @@ class VMDocker(object):
         self._taskId = task_info['taskId']
 
     def _log(self, prefix, msg):
-        common_log(self._DEBUG, '[VM ' + self._vm_name + ']', prefix, msg)
+        common_log(self._DEBUG, self._taskId, '[VM ' + self._vm_name + ']', prefix, msg)
 
     def run_check(self):
         msg = ''
@@ -33,7 +33,7 @@ class VMDocker(object):
         else:
             self._log('_check', 'Memory: %.1f' % (mem.free / GB) + ' GB')
 
-        running_dockers = self.ps(docker_status=STATUS_DOCKER_RUN_OK)
+        running_dockers = self.ps()
         if len(running_dockers) >= VM_MAX:
             msg = 'The number of starts can not be greater ' + str(VM_MAX)
             self._log('_check error:', msg)

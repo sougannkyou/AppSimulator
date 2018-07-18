@@ -2,9 +2,13 @@ import os
 # import logging
 from datetime import datetime
 from Controller.setting import WORK_PATH
+from Controller.DBLib import MongoDriver
+
+MDB = MongoDriver()
 
 
-def common_log(_DEBUG, func, prefix, msg):
+def common_log(_DEBUG, taskId, func, prefix, msg):
+    MDB.log(taskId, func, prefix, msg)
     if _DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
         print(datetime.now().strftime('%H:%M:%S') + ' [' + func + ']', prefix, msg)
 

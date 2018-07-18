@@ -74,11 +74,9 @@ class MongoDriver(object):
         self.deviceConfig = self._db.deviceConfig
         self.rpcServer = self._db.rpcServer
         self.tasks = self._db.tasks
+        self.logger = self._db.logger
         self.vmwares = self._db.vmwares
         self._DEBUG = False
-
-    def _log(self, prefix, msg):
-        common_log(self._DEBUG, 'Server DB', prefix, msg)
 
     def get_taskId(self):
         taskId = 1
@@ -144,8 +142,19 @@ class MongoDriver(object):
         if task:
             task.pop('_id')
 
-        self._log('get_one_wait_task', task)
         return task
+
+    def log_find_by_ip(self, ip=None):
+        ret = []
+        cond = {}
+        if ip:
+            cond = {'ip': ip}
+
+        log_list = self.logger.find(cond)
+        for log in log_list:
+            log.pop('_id')
+            ret.append(log)
+        return ret
 
     def vm_find_by_host(self, host_ip=None):
         ret = []

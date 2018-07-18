@@ -37,7 +37,7 @@ class NoxConSelenium(NoxConADB):
         }
 
     def _log(self, prefix, msg):
-        common_log(self._DEBUG, 'NoxConSelenium ' + self._docker_name, prefix, msg)
+        common_log(self._DEBUG, self._taskId, 'NoxConSelenium ' + self._docker_name, prefix, msg)
 
     def set_comment_to_pic(self, value):
         if isinstance(value, dict):

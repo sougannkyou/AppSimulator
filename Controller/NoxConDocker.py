@@ -10,6 +10,7 @@ from Controller.Common import common_log
 class NoxConDocker(object):
     def __init__(self, task_info):
         self._DEBUG = True
+        self._taskId = task_info['taskId']
         self._local_ip = LOCAL_IP
         self._org_path = os.getcwd()
         self._app_name = task_info['app_name']
@@ -21,7 +22,7 @@ class NoxConDocker(object):
     #     os.chdir(self._org_path)
 
     def _log(self, prefix, msg):
-        common_log(self._DEBUG, 'NoxDocker ' + self._docker_name, prefix, msg)
+        common_log(self._DEBUG, self._taskId, 'NoxDocker ' + self._docker_name, prefix, msg)
 
     def _check(self):
         msg = ''

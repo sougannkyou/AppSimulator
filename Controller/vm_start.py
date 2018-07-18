@@ -1,4 +1,9 @@
 # coding:utf-8
+import os
+import sys
+
+sys.path.append(os.getcwd())
+
 import multiprocessing
 from Controller.setting import *
 from Controller.Common import common_log
@@ -9,7 +14,7 @@ _DEBUG = True
 
 # ------------------------------------------------------------------------------------------
 def _log(prefix, msg):
-    common_log(_DEBUG, 'VM start', prefix, msg)
+    common_log(_DEBUG, '', 'VM start', prefix, msg)
 
 
 def vm_draw_cardiogram(host_ip):

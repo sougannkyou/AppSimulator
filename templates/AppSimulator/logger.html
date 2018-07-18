@@ -1,0 +1,117 @@
+{% extends 'base_backend_frameless.html' %}
+{% load static %}
+
+{% block header_tail %}
+    {#    <meta http-equiv="refresh" content="5">#}
+    <link rel="stylesheet" href="{% static 'AppSimulator/css/tasks.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
+{% endblock header_tail %}
+
+{% block section_content %}
+    <div id="main" v-cloak>
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Tasks</h3>
+                    <div class="box-tools">
+                        <div class="input-group input-group-sm" style="width: 150px;">
+                            <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
+                            <div class="input-group-btn">
+                                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover">
+                        <tbody>
+                        <tr>
+                            <th width="5%">Time</th>
+                            <th width="5%">TaskId</th>
+                            <th width="10%">IP</th>
+                            <th width="20%">func</th>
+                            <th width="20%">Prefix</th>
+                            <th width="30%">MSG</th>
+                        </tr>
+                        </tr>
+                        <tr v-for="log in logList">
+                            <td>[[ log.time ]]</td>
+                            <td>[[ log.taskId ]]</td>
+                            <td>[[ log.ip ]]</td>
+                            <td>[[ log.func ]]</td>
+                            <td>[[ log.prefix ]]</td>
+                            <td>[[ log.msg ]]</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock section_content %}
+
+{% block jquery_js %}
+
+{% endblock jquery_js %}
+
+{% block body_tail %}
+    <!-- page script -->
+    <script type="text/javascript"
+            src="{% static 'plugins/echarts/extension/dataTool.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/echarts/echarts-all-3.js' %}"></script>
+    <script type="text/javascript" src="{% static 'dist/js/demo.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/dark.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/infographic.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/macarons.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/roma.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/shine.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/theme/vintage.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/vue1/vue.js' %}"></script>
+    <script type="text/javascript" src="{% static 'AppSimulator/js/csrf.js' %}"></script>
+    <script type="text/javascript">
+
+        function getLogList(obj) {
+            let opt = {
+                url: '/AppSimulator/getLoggerAPI/',
+                type: 'GET',
+                data: {
+                    ip: obj.ip,
+                },
+                dataType: "json",
+                error: function (xhr, err) {
+                    obj.msg = "failure";
+                    console.error("[tasks] getLoggerAPI", err);
+                },
+                success: function (data, status) {
+                    for (let i = 0; i < 1000; i++) {
+                        obj.logList.shift();
+                    }
+                    for (let i = 0; i <; i++) {
+                        obj.logList.push(logList)
+                    }
+                    obj.msg = "success";
+                }
+            };
+            $.ajax(opt);
+        }
+
+        //----------------------------------------------------------------------------
+        Vue.config.delimiters = ['[[', ']]'];
+        //----------------------------------------------------------------------------
+        let mainVue = new Vue({
+            el: "#main",
+            data: {
+                logList: [],
+                msg: ""
+            },
+            methods: {},
+            created: function () {
+            },
+            watch: {},
+            computed: {}
+        });
+    </script>
+{% endblock body_tail %}
+
+
+

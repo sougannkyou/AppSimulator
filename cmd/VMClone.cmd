@@ -4,19 +4,19 @@ SET VMRUN_EXE=C:\VMware\Workstation\vmrun.exe
 SET workspace=D:\VMware\VM
 SET VMX_FILE=Windows 7 x64.vmx
 ::---- main vm1 vm2 vm3 vm4 vm5  -------------------
-FOR /L %%vm in (1 1 5) do CALL :STOP_VM %%vm
+FOR /L %%i in (1 1 5) do CALL :STOP_VM %%i
 
 CALL :KILL_VM
 
-FOR /L %%vm in (1 1 5) do CALL :CLONE_VM %%vm
+FOR /L %%i in (1 1 5) do CALL :CLONE_VM %%i
 
-FOR /L %%vm in (1 1 5) do CALL :START_VM %%vm
+FOR /L %%i in (1 1 5) do CALL :START_VM %%i
 
 GOTO :EOF
 ::--------------------------------------------------
 :KILL_VM
 TASKKILL /F /IM "VMware.exe"
-ECHO [%DATE% %TIME%] TASKKILL %ERRORLEVEL%
+ECHO [%DATE% %TIME%] TASKKILL : %ERRORLEVEL%
 GOTO :EOF
 ::--------------------------------------------------
 :STOP_VM
@@ -49,9 +49,9 @@ IF NOT DEFINED vmName (
     ECHO [ERROR] please input vm name
     GOTO END
 )
-ECHO [%DATE% %TIME%] DELETE %vmName%
+ECHO [%DATE% %TIME%] DELETE %vmName% : %ERRORLEVEL%
 DEL /F /Q /S %workspace%\%vmName%
-ECHO [%DATE% %TIME%] XCOPY %vmName%
+ECHO [%DATE% %TIME%] XCOPY %vmName% : %ERRORLEVEL%
 XCOPY /Y %workspace%\%vmName%-org %workspace%\%vmName%
 ECHO [%DATE% %TIME%] CLONE_VM %vmName% : %ERRORLEVEL%
 GOTO :EOF

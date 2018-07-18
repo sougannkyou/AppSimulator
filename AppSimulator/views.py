@@ -15,3 +15,8 @@ class TasksView(TemplateView):
 class VMwareView(TemplateView):
     queryset = []
     template_name = 'AppSimulator/vmware.html'
+
+
+class LoggerView(TemplateView):
+    queryset = []
+    template_name = 'AppSimulator/logger.html'

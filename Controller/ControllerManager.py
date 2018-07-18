@@ -24,7 +24,7 @@ class Manager(object):
         self._work_path = WORK_PATH
 
     def _log(self, prefix, msg):
-        common_log(self._DEBUG, 'Manager', prefix, msg)
+        common_log(self._DEBUG, '', 'Manager', prefix, msg)
 
     # ----------------------------------------------------------------------------------------------
     def _nox_check(self):

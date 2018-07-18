@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
 
 from AppSimulator.views import (
-    DashBoardView, TasksView, VMwareView
+    DashBoardView, TasksView, VMwareView, LoggerView
 )
 
 from AppSimulator.WebAPI import (
@@ -13,7 +13,7 @@ from AppSimulator.WebAPI import (
     setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,
     getDeviceCaptureAPI, getProxyServerInfoAPI,
     runTasksAPI,
-    getVMwaresAPI,
+    getVMwaresAPI,getLoggerAPI
 )
 
 cache_time_out = 60 * 3
@@ -22,6 +22,7 @@ urlpatterns = patterns('',
                        url(r'^dashboard/$', DashBoardView.as_view(), name='dashboard'),
                        url(r'^tasks/$', TasksView.as_view(), name='tasks'),
                        url(r'^vmware/$', VMwareView.as_view(), name='vmware'),
+                       url(r'^logger/$', LoggerView.as_view(), name='logger'),
                        url(r'^addTaskAPI/$', addTaskAPI, name='addTaskAPI'),
 
                        url(r'^getDeviceCrawlCntAPI/$', getDeviceCrawlCntAPI, name='getDeviceCrawlCntAPI'),
@@ -38,6 +39,8 @@ urlpatterns = patterns('',
 
                        url(r'^getDeviceCaptureAPI/$', getDeviceCaptureAPI, name='getDeviceCaptureAPI'),
                        url(r'^getProxyServerInfoAPI/$', getProxyServerInfoAPI, name='getProxyServerInfoAPI'),
-                       # vm api
+                       # vmware
                        url(r'^getVMwaresAPI/$', getVMwaresAPI, name='getVMwaresAPI'),
+                       # logger
+                       url(r'^getLoggerAPI/$', getLoggerAPI, name='getLoggerAPI'),
                        )

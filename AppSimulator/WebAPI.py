@@ -216,5 +216,14 @@ def getVMwaresAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
+def getLoggerAPI(request):
+    ip = request.GET.get('ip')
+    ret = MDB.log_find_by_ip(ip)
+    output = JsonResponse({
+        'ret': ret,
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
 if __name__ == "__main__":
     test()
