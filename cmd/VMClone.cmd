@@ -21,39 +21,39 @@ GOTO :EOF
 ::--------------------------------------------------
 :STOP_VM
 
-SET vm=%1
-IF NOT DEFINED vm (
+SET vmName=%1
+IF NOT DEFINED vmName (
     ECHO [ERROR] please input vm name
     GOTO END
 )
 
-%VMRUN_EXE% stop "%workspace%\%vm%\%VMX_FILE%"
-ECHO [%DATE% %TIME%] STOP_VM %vm% : %ERRORLEVEL%
+%VMRUN_EXE% stop "%workspace%\%vmName%\%VMX_FILE%"
+ECHO [%DATE% %TIME%] STOP_VM %vmName% : %ERRORLEVEL%
 GOTO :EOF
 ::--------------------------------------------------
 :START_VM
 
-SET vm=%1
-IF NOT DEFINED vm (
+SET vmName=%1
+IF NOT DEFINED vmName (
     ECHO [ERROR] please input vm name
     GOTO END
 )
-%VMRUN_EXE% start "%workspace%\%vm%\%VMX_FILE%"
-ECHO [%DATE% %TIME%] START_VM %vm% : %ERRORLEVEL%
+%VMRUN_EXE% start "%workspace%\%vmName%\%VMX_FILE%"
+ECHO [%DATE% %TIME%] START_VM %vmName% : %ERRORLEVEL%
 GOTO :EOF
 ::--------------------------------------------------
 :CLONE_VM
-SET vm=%1
+SET vmName=%1
 
-IF NOT DEFINED vm (
+IF NOT DEFINED vmName (
     ECHO [ERROR] please input vm name
     GOTO END
 )
-ECHO [%DATE% %TIME%] DELETE %vm%
-DEL /F /Q /S %workspace%\%vm%
-ECHO [%DATE% %TIME%] XCOPY %vm%
-XCOPY /Y %workspace%\%vm%-org %workspace%\%vm%
-ECHO [%DATE% %TIME%] CLONE_VM %vm% : %ERRORLEVEL%
+ECHO [%DATE% %TIME%] DELETE %vmName%
+DEL /F /Q /S %workspace%\%vmName%
+ECHO [%DATE% %TIME%] XCOPY %vmName%
+XCOPY /Y %workspace%\%vmName%-org %workspace%\%vmName%
+ECHO [%DATE% %TIME%] CLONE_VM %vmName% : %ERRORLEVEL%
 GOTO :EOF
 ::--------------------------------------------------
 
