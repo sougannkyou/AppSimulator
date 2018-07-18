@@ -20,7 +20,12 @@ class NoxConADB(object):
     DEFAULT_TCP_PORT = 62001  # 5555
 
     def __init__(self, task_info, mode):
-        self.mode = mode  # Nox 6.1.0: multi(NoxConsole);  Nox 3.8.1:single
+        '''
+        mode:
+          multi(例：NoxConsole.exe adb -name:nox-1 -command:"version"): > Nox 6.0.0:
+          single(例：nox_adb.exe version): VMware + Nox 3.8.1 or  > Nox 6.0.0
+        '''
+        self.mode = mode
         self._DEBUG = False
         self._stdout = None
         self._stderr = None
@@ -135,7 +140,7 @@ class NoxConADB(object):
 
     def adb_cmd_before(self, cmdline):
         # overwrite NoxConADB adb_cmd_before
-        if self._timer_flg and self._timer_no > 0:
+        if self.mode == 'multi' and self._timer_flg and self._timer_no > 0:
             cycle = 3 * len(TIMER)
             now = datetime.now().second % cycle
             if now > TIMER[self._timer_no]:
@@ -202,9 +207,6 @@ class NoxConADB(object):
         return True if ver else False
 
     def check_path(self):
-        """
-        Intuitive way to verify the ADB path
-        """
         if self.get_adb_version() is None:
             return False
         return True
@@ -263,7 +265,7 @@ class NoxConADB(object):
 
     def get_serialno(self):
         """
-        Get serialno from target device
+        Get serialno from target device  port like 62001
         adb get-serialno
         """
         self._clean()
@@ -449,7 +451,6 @@ class NoxConADB(object):
         -r -> reinstall the app, keeping its data
         -s -> install on sdcard instead of internal storage
         """
-
         self._clean()
         if pkgapp is None:
             return self._stdout

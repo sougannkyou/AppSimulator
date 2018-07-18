@@ -153,7 +153,12 @@ class NoxConSelenium(NoxConADB):
         return True
 
     def click_xy_timer(self, x, y, wait_time):
-        return self.click_xy(x, y, wait_time=wait_time)
+        self._debug(x, y, wait_time=2)
+        self._timer_flg = True  # NoxConADB adb_cmd_before() on
+        self.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)))
+        self._timer_flg = False  # NoxConADB adb_cmd_before() off
+        time.sleep(wait_time)
+        return True
 
     def input(self, text, wait_time):
         self._log('<<info>> input', text)
@@ -192,7 +197,7 @@ class NoxConSelenium(NoxConADB):
             time.sleep(wait_time)
         return True
 
-    def _unlock(self, wait_time):
+    def __unlock(self, wait_time):
         # self.adb_shell('rm /data/system/*.key')  # rm /data/system/*.key
         # time.sleep(wait_time)
         return True

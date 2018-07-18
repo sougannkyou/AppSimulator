@@ -121,14 +121,6 @@ class NoxADBSelenium(NoxADB):
         time.sleep(wait_time)
         return True
 
-    def click_xy_timer(self, x, y, wait_time):
-        self._debug(x, y, wait_time=2)
-        self._timer_flg = True  # NoxConADB adb_cmd_before() on
-        self.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)))
-        self._timer_flg = False  # NoxConADB adb_cmd_before() off
-        time.sleep(wait_time)
-        return True
-
     def input(self, text, wait_time):
         self._log('<<info>> input', text)
         self.adb_shell('input text ' + text)
