@@ -2,7 +2,7 @@
 SET vmrun=C:\VMware\Workstation\vmrun.exe
 SET workspace=d:\VMware\VM
 SET vmx=Windows 7 x64.vmx
-REM parameter vm1
+:: parameter vm1
 SET vm=%1
 
 IF NOT DEFINED vm (
@@ -16,8 +16,8 @@ ECHO [%DATE% %TIME%] stop %vm%
 ECHO [%DATE% %TIME%] delete %vm%
 DEL /F /Q /S %workspace%\%vm%
 
-ECHO [%DATE% %TIME%] copy %vm%
-XCOPY /Y %workspace%\%vm%-org %workspace%\%vm%
+::ECHO [%DATE% %TIME%] copy %vm%
+::XCOPY /Y %workspace%\%vm%-org %workspace%\%vm%
 
 ECHO [%DATE% %TIME%] start %vm%
 %vmrun% start "%workspace%\%vm%\%vmx%"

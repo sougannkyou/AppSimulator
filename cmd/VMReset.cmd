@@ -10,7 +10,7 @@ IF NOT DEFINED vm (
     GOTO END
 )
 
-REM %vmrun% -T ws -gu win7_64 -gp zhxg2018 copyFileFromGuestToHost "%workspace%\%vm%\%vmx%" "C:\workspace\pyWorks\AppSimulator\cmd\NoxResetCounter.conf" "%workspace%\%vm%\NoxResetCounter.conf"
+:: %vmrun% -T ws -gu win7_64 -gp zhxg2018 copyFileFromGuestToHost "%workspace%\%vm%\%vmx%" "C:\workspace\pyWorks\AppSimulator\cmd\NoxResetCounter.conf" "%workspace%\%vm%\NoxResetCounter.conf"
 
 set /P NoxResetCounter= 0<%APPSIMULATOR_WORK_PATH%\cmd\NoxResetCounter.conf
 echo NoxResetCounter is %NoxResetCounter%
@@ -29,4 +29,4 @@ timeout 10
 :END
 @ECHO ON
 timeout 20
-EXIT 0
+EXIT /B %ERRORLEVEL%

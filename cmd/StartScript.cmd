@@ -1,11 +1,11 @@
-@ECHO ON
+@ECHO OFF
 cd %APPSIMULATOR_WORK_PATH%
 
 timeout 5
 set /P NoxResetCounter= 0<cmd\NoxResetCounter.conf
 echo NoxResetCounter is %NoxResetCounter%
 
-REM if %NoxResetCounter% EQU 0 goto END
+:: if %NoxResetCounter% EQU 0 goto END
 
 start C:\Nox\bin\Nox.exe -quit
 
@@ -21,7 +21,7 @@ start "script" /HIGH python Controller/script_%appName%.py
 
 :END
 timeout 10
-@ECHO ON
-EXIT 0
+ECHO ON
+EXIT /B %ERRORLEVEL%
 
 
