@@ -144,7 +144,7 @@ class Manager(object):
                 self._log('<<info>> check_docker_stop', '正在等待 ' + docker.get_name() + ' 停止，剩余：' + str(wait_time) + 's')
                 wait_time -= 1
             else:  # not found the window
-                self._log('<<info>> check_docker_stop', '已停止：' + str(wait_time) + 's')
+                self._log('<<info>> check_docker_stop', docker.get_name() + '已停止 ' + str(wait_time) + 's')
                 break
 
         if retry and wait_time == 0:  # retry

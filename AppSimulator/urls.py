@@ -8,12 +8,12 @@ from AppSimulator.views import (
 )
 
 from AppSimulator.WebAPI import (
-    addTaskAPI,
+    addTaskAPI, getTasksAPI,
     getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI,
     setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,
     getDeviceCaptureAPI, getProxyServerInfoAPI,
     runTasksAPI,
-    getVMwaresAPI,getLoggerAPI
+    getVMwaresAPI, getLoggerAPI
 )
 
 cache_time_out = 60 * 3
@@ -24,6 +24,7 @@ urlpatterns = patterns('',
                        url(r'^vmware/$', VMwareView.as_view(), name='vmware'),
                        url(r'^logger/$', LoggerView.as_view(), name='logger'),
                        url(r'^addTaskAPI/$', addTaskAPI, name='addTaskAPI'),
+                       url(r'^getTasksAPI/$', getTasksAPI, name='getTasksAPI'),
 
                        url(r'^getDeviceCrawlCntAPI/$', getDeviceCrawlCntAPI, name='getDeviceCrawlCntAPI'),
                        url(r'^getDevicesStatusAPI/$', getDevicesStatusAPI, name='getDevicesStatusAPI'),

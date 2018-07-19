@@ -1,6 +1,7 @@
 # coding=utf-8
 from pprint import pprint
 from datetime import datetime, timedelta
+from bson.objectid import ObjectId
 import pymongo
 import redis
 from Controller.setting import *
@@ -54,7 +55,7 @@ class MongoDriver(object):
         self.logger.insert({
             'time': int(datetime.now().timestamp()),
             'ip': LOCAL_IP,
-            'taskId': int(taskId),
+            'taskId': int(taskId) if taskId and isinstance(taskId, str) else taskId,
             'func': func,
             'prefix': prefix,
             'msg': msg
@@ -80,7 +81,10 @@ class MongoDriver(object):
         if cnt > len(TIMER):
             return None, ''
 
-        task = self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': ''})
+        task = self.tasks.find_one({
+            'status': STATUS_WAIT,
+            '$or': [{'rpc_server_ip': ''}, {'rpc_server_ip': LOCAL_IP, 'orgTaskId': {'$ne': 0}}]
+        })
         if task:
             self.tasks.update({'_id': task['_id']}, {'$set': {'rpc_server_ip': LOCAL_IP}})
             return task, 'ok'
@@ -106,42 +110,50 @@ class MongoDriver(object):
             "rpc_server_ip": task['rpc_server_ip'],
             "start_time": int(datetime.now().timestamp()),
             "up_time": 0,
+            "end_time": 0,
             "timer_no": 0,
             "dockerId": ''
         })
         return taskId
 
     def task_change_status(self, task):
-        self.tasks.update({'_id': task['_id']},
-                          {"$set": {'status': task['status'], 'up_time': int(datetime.now().timestamp())}})
+        now = int(datetime.now().timestamp())
+        if task['status'] == STATUS_SCRIPT_COMPLETE:
+            self.tasks.update({'_id': task['_id']},
+                              {"$set": {'status': task['status'], 'up_time': now, 'end_time': now}})
+        else:
+            self.tasks.update({'_id': task['_id']},
+                              {"$set": {'status': task['status'], 'up_time': now}})
 
     def task_set_docker(self, task, docker):
         self.tasks.update({'_id': task['_id']}, {"$set": {'dockerId': docker['_id']}})
 
     def docker_create(self, task):
-        id = self.dockers.insert({
+        return self.dockers.insert({  # ObjectId('5b5031baf930a530c47275d2')
             'docker_name': 'nox-' + str(task['taskId']),
             'ip': LOCAL_IP,
             'port': 0,
             'status': STATUS_DOCKER_RUN,
             'start_time': int(datetime.now().timestamp()),
-            'up_time': 0
+            'up_time': 0,
+            'end_time': 0
         })
-        return id
 
-    def docker_end(self, task):
-        id = self.dockers.update({
-            'docker_name': 'nox-' + str(task['taskId']),
-            'ip': LOCAL_IP,
-            'port': 0,
-            'status': STATUS_DOCKER_RUN,
-            'start_time': int(datetime.now().timestamp()),
-            'up_time': 0
-        })
-        return id
+    def docker_end(self, taskId):
+        t = self.tasks.find_one({'taskId': taskId})
+        if t:
+            now = int(datetime.now().timestamp())
+            ret = self.dockers.update(
+                {'_id': t['dockerId']},
+                {"$set": {
+                    'up_time': now,
+                    'end_time': now
+                }})
+            return ret['nModified'] == 1
+
+        return False
 
     def docker_change_status(self, docker):
-        self._log('docker_change_status', docker['status'])
         self.dockers.update({'_id': docker['_id']}, {"$set": {'status': docker['status']}})
 
     def vm_find_vm_by_host(self, host_ip=None):
@@ -158,7 +170,7 @@ class MongoDriver(object):
         return ret
 
     def vm_record_share_cnt(self, vm_info, scope_times):  # 时间窗式记录采集量
-        self._log("vm_record_share_cnt\t", vm_info['ip'] + ':\t' + str(vm_info['cnt']))
+        # self._log("vm_record_share_cnt\t", vm_info['ip'] + ':\t' + str(vm_info['cnt']))
         old_time = int((datetime.now() - timedelta(seconds=scope_times)).timestamp())
         self.activeInfo.remove({'time': {'$lte': old_time}})
         vm_info['time'] = int(datetime.now().timestamp())
@@ -176,7 +188,7 @@ class MongoDriver(object):
     def get_devices_status(self, app_name):  # 时间窗
         devices_status = []
         ips = RedisDriver().get_devices_ip_list(app_name)
-        self._log('get_devices_status', '')
+        # self._log('get_devices_status', '')
         for ip in ips:
             status = {'deviceId': ip, 'ip': ip, 'cnt': 0, 'dedup_cnt': 0, 'status': STATUS_UNKOWN}
             l = []

@@ -63,7 +63,7 @@ def main(task_info, mode):
         if APPSIMULATOR_MODE != 'vmware':  # multi nox console
             common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'multi nox console mode.', '')
             docker = NoxConDocker(task)
-            docker.destroy()
+            docker.quit()
             docker.remove()
             m = Manager()
             m.nox_run_task_complete(task['taskId'])

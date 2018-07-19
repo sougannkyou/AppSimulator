@@ -188,11 +188,22 @@ def getResultSampleAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
+# ------- tasks ----------------------------------------------------------------
 def addTaskAPI(request):
     app_name = request.POST.get('app_name')
     script = request.POST.get('script')
     live_cycle = request.POST.get('live_cycle')
     ret = MDB.add_task({'script': script, 'app_name': app_name, 'live_cycle': live_cycle})
+    output = JsonResponse({
+        'ret': ret
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
+def getTasksAPI(request):
+    # status = request.POST.get('status')
+    # ret = MDB.get_tasks({'status': status})
+    ret = MDB.get_tasks()
     output = JsonResponse({
         'ret': ret
     })

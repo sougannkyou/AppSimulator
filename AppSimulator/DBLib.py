@@ -1,6 +1,6 @@
 # coding=utf-8
 from pprint import pprint
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import pymongo
 import redis
 from AppSimulator.setting import *
@@ -106,12 +106,17 @@ class MongoDriver(object):
     def get_tasks(self, status=None):
         ret = []
         if status:
-            l = self.tasks.find({'status': status})
+            l = self.tasks.find({'status': status}).sort([('_id', pymongo.DESCENDING)])
         else:
             l = self.tasks.find()
 
         for r in l:
             r.pop('_id')
+            r.pop('dockerId')
+            r['start_time'] = datetime.fromtimestamp(r['start_time']).strftime("%Y-%m-%d %H:%M:%S") \
+                if r['start_time'] else ''
+            r['end_time'] = datetime.fromtimestamp(r['end_time']).strftime("%Y-%m-%d %H:%M:%S") \
+                if r['end_time'] else ''
             ret.append(r)
 
         return ret

@@ -5,6 +5,7 @@ import subprocess
 from pprint import pprint
 from Controller.setting import *
 from Controller.Common import common_log
+from Controller.DBLib import MongoDriver
 
 
 class NoxConDocker(object):
@@ -16,6 +17,7 @@ class NoxConDocker(object):
         self._app_name = task_info['app_name']
         self._docker_name = 'nox-' + str(task_info['taskId'])
         self._taskId = task_info['taskId']
+        self._mdb = MongoDriver()
 
     # def __del__(self):
     #     print('call NoxConDocker.__del__')
@@ -78,8 +80,8 @@ class NoxConDocker(object):
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             # process.wait()
             (stdout, stderr) = process.communicate()
-            _stdout = stdout.decode('utf8')
-            _stderr = stderr.decode('utf8')
+            _stdout = stdout.decode('gbk')
+            _stderr = stderr.decode('gbk')
         except Exception as e:
             self._log('_exec_nox_cmd error:', e)
         finally:
@@ -115,7 +117,7 @@ class NoxConDocker(object):
             self._exec_nox_cmd(self._make_cmd("action -name:" + self._docker_name + " -key:call.shake -value:null"))
         return True
 
-    def destroy(self, wait_time=2):
+    def quit(self, wait_time=2):
         self._log('<<info>> destroy', 'wait: ' + str(wait_time) + 's')
         time.sleep(wait_time)
         self._exec_nox_cmd(self._make_cmd("quit -name:" + self._docker_name))
@@ -125,7 +127,7 @@ class NoxConDocker(object):
     def stop(self, wait_time=2):
         self._log('<<info>> stop', 'wait: ' + str(wait_time) + 's')
         self.kill_task()
-        self.destroy(wait_time=wait_time)
+        self.quit(wait_time=wait_time)
         return True
 
     def stop_all(self):
@@ -158,7 +160,7 @@ class NoxConDocker(object):
         time.sleep(2)
         self._exec_nox_cmd(self._make_cmd("remove -name:" + self._docker_name))
         time.sleep(2)
-        return True
+        return self._mdb.docker_end(self._taskId)
 
     def pull(self, app_name):  # restore
         self._log('pull', self._docker_name + ' ' + app_name)
@@ -233,6 +235,7 @@ class NoxConDocker(object):
         return ret
 
 
+# -------------------------------------------------------------------------------
 def main(task_info):
     docker = NoxConDocker(task_info=task_info)
     docker._DEBUG = True
