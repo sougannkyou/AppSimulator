@@ -29,8 +29,7 @@
                             <th width="10%">Name</th>
                             <th width="10%">IP</th>
                             <th width="10%">Host-IP</th>
-                            <th width="20%">APP</th>
-                            <th width="10%">TaskId</th>
+                            <th width="20%">APP Increase ( 10 minutes )</th>
                             <th width="10%">Status</th>
                             <th width="10%">LastTime</th>
                         </tr>
@@ -41,38 +40,17 @@
                             <td>
                                 <img height="30" style="margin-top:10px;"
                                      v-bind:src="'/static/AppSimulator/images/'+vm.app_name+'/app_icon.png'">
-                                <span class="badge bg-aqua" style="margin:-15px 0 0 -5px;"
+                                <span class="badge bg-aqua" style="margin:-10px 0 0 -5px;"
                                       title="分享链接数">[[vm.cnt]]</span>
+                                <span style="margin:50px 0 -10px 20px;width:200px;height:50px;" class="inlinebar">1,2,3,4,5,6,7,8,9,10</span>
                             </td>
-                            <td>[[ vm.taskId ]]</td>
                             <td>
-                                <span v-bind:class="[vm.status==='unkown'?'label label-default':
-                                (vm.status==='running'?'label label-success':'label label-warring')]">[[ vm.status ]]</span>
+                                <span v-bind:class="[vm.status==='wait'?'label label-default':
+                                (vm.status==='running'?'label label-success':'label label-warring')]">[[ vm.status ]]
+                                </span>
                             </td>
                             <td>[[ vm.cnt ]]</td>
                             <td>[[ vm.last_time ]]</td>
-                        </tr>
-                        <tr style="border:0px solid dodgerblue;">
-                            <td><input type="text" v-model="vmware.name" placeholder="等待分配" readonly></td>
-                            <td><input type="text" v-model="vmware.ip" placeholder="等待分配" readonly></td>
-                            <td><input type="text" v-model="vmware.host_ip" placeholder="等待分配" readonly></td>
-                            <td>
-                                <label v-for="app in appAll">
-                                    <img v-bind:class="[vmware.app_name===app?'app-icon-big':'app-icon']"
-                                         v-on:click="setAppName(app)"
-                                         v-bind:src="'/static/AppSimulator/images/' + app + '/app_icon.png'">
-                                </label>
-                            </td>
-                            <td><input type="text" v-model="vmware.taskId" placeholder="等待分配" readonly></td>
-                            <td>
-                                <span v-bind:class="[vmware.status==='unkown'?'label label-default':
-                                (vmware.status==='running'?'label label-success':'label label-warring')]">[[ vmware.status ]]</span>
-                            </td>
-                            <td>[[ vmware.cnt ]]</td>
-                            <td>
-                                <button v-on:click="addTask" class="fa fa-2x fa-plus-circle pull-right"
-                                        style="color:orange;" title="增加"></button>
-                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -98,12 +76,22 @@
     <script type="text/javascript" src="{% static 'backend/js/theme/roma.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/theme/shine.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/theme/vintage.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/sparkline/jquery.sparkline.js' %}"></script>
     <script type="text/javascript" src="{% static 'plugins/vue1/vue.js' %}"></script>
     <script type="text/javascript" src="{% static 'AppSimulator/js/csrf.js' %}"></script>
     <script type="text/javascript">
         const STATUS_UNKOWN = 'unkown';
         const STATUS_RUN = 'running';
         const STATUS_SUSPEND = 'suspend';
+
+        setInterval(function () {
+            getVMwares(mainVue);
+        }, 5000);
+
+        setInterval(function () {
+            $('.inlinebar').sparkline('html', {type: 'bar', barColor: 'red'});
+            //$('.inlinesparkline').sparkline([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        }, 5200);
 
         function addTask(obj) {
             let opt = {
@@ -169,6 +157,12 @@
                 vmwares: [],
                 msg: ""
             },
+            created: function () {
+                getVMwares(this);
+            },
+            ready: function () {
+                //alert(this.vmwares.length);
+            },
             methods: {
                 setAppName: function (app_name) {
                     if (this.vmware.app_name !== app_name) {
@@ -183,9 +177,6 @@
                     this.tasks.push(this.task);
                     addTask(this);
                 }
-            },
-            created: function () {
-                getVMwares(this);
             },
             watch: {},
             computed: {}

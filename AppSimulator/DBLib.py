@@ -76,6 +76,7 @@ class MongoDriver(object):
         self.tasks = self._db.tasks
         self.logger = self._db.logger
         self.vmwares = self._db.vmwares
+        self.activeInfo = self._db.activeInfo
         self._DEBUG = False
 
     def get_taskId(self):
@@ -173,7 +174,39 @@ class MongoDriver(object):
             vm.pop('_id')
             vm['cnt'] = RedisDriver().get_vmware_shareLink_cnt(vm['ip'], vm['app_name'])
             vm['lastTime'] = RedisDriver().get_vmware_shareLink_cnt(vm['ip'], vm['app_name'])
+            # vm[]
             ret.append(vm)
+        return ret
+
+    def vm_get_cardiogram_by_host(self, host_ip=None):
+        ret = []
+        if host_ip:
+            cond = {'host_ip': host_ip, 'status': {'$ne': 'disable'}}
+        else:
+            cond = {'status': {'$ne': 'disable'}}
+
+        vmwares = self.vmwares.find(cond)
+        for vm in vmwares:
+            vm.pop('_id')
+            vm['lastTime'] = RedisDriver().get_vmware_shareLink_cnt(vm['ip'], vm['app_name'])
+            ret.append(vm)
+        return ret
+
+    def vm_actioveInfo_by_host(self, host_ip=None):
+        ret = {
+            'interval': [],
+            'cntList': []
+        }
+        if host_ip:
+            cond = {'host_ip': host_ip, 'status': {'$ne': 'disable'}}
+        else:
+            cond = {'status': {'$ne': 'disable'}}
+
+        info_list = self.activeInfo.find(cond)
+        for info in info_list:
+            t = datetime.fromtimestamp(info['time']).strftime("%Y-%m-%d %H:%M:%S") if info['time'] else ''
+            ret['interval'].append(t)
+            ret['cntList'].append(info['cnt'])
         return ret
 
 

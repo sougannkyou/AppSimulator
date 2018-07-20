@@ -5,7 +5,8 @@ import os
 PAGE_SIZE = 20
 
 # ---------------------- db -----------------------------
-REDIS_SERVER = 'redis://' + os.environ["REDIS_SERVER_IP"] + '/11'
+# REDIS_SERVER = 'redis://' + os.environ["REDIS_SERVER_IP"] + '/11'
+REDIS_SERVER = 'redis://172.16.253.232/11'
 REDIS_SERVER_RESULT = 'redis://' + os.environ["REDIS_SERVER_IP"] + '/10'
 
 MONGODB_SERVER_IP = os.environ["MONGODB_SERVER_IP"]

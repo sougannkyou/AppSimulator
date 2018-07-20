@@ -218,6 +218,7 @@ def runTasks():
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
+# ------- vmware ----------------------------------------------------------------
 def getVMwaresAPI(request):
     host_ip = request.GET.get('host_ip')
     ret = MDB.vm_find_by_host(host_ip)
@@ -227,6 +228,17 @@ def getVMwaresAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
+def getVMwareActiveInfoAPI(request):
+    host_ip = request.GET.get('host_ip')
+    ret = MDB.vm_actioveInfo_by_host(host_ip)
+    output = JsonResponse({
+        'interval': ret['interval'],
+        'cntList': ret['cntList'],
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
+# ------- vmware ----------------------------------------------------------------
 def getLoggerAPI(request):
     ip = request.GET.get('ip')
     ret = MDB.log_find_by_ip(ip)
