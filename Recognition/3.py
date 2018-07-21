@@ -4,8 +4,8 @@ import aircv as ac
 # img_obj = ac.imread("douyin/share.png")
 # img_bg = ac.imread("douyin/bg5.jpg")
 
-img_obj = ac.imread("huoshan/share.png")
-img_bg = ac.imread("huoshan/bg2.png")
+img_obj = ac.imread("images/huoshan/share.png")
+img_bg = ac.imread("images/huoshan/bg2.png")
 
 
 def debug(x, y):

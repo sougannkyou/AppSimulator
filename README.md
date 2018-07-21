@@ -33,6 +33,7 @@ nox-1
 
 2) VM-win7设置登录免密（netplwiz 命令）
 win7_64/zhxg2018
+vmrun -T ws -gu win7_64 -gp zhxg2018 captureScreen "c:\VMware\VM\vm1\Windows 7 x64.vmx" c:\vmware\vm\1.png
 
 3)环境变量
 APPSIMULATOR_IP = 172.16.253.232
