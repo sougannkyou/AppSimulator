@@ -45,8 +45,8 @@ class Manager(object):
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             # process.wait()
             (stdout, stderr) = process.communicate()
-            _stdout = stdout.decode('utf8')
-            _stderr = stderr.decode('utf8')
+            _stdout = stdout.decode('gbk')
+            _stderr = stderr.decode('gbk')
         except Exception as e:
             self._log('<<error>> run_script:', e)
 
@@ -215,7 +215,7 @@ class Manager(object):
             work_path = os.getenv('APPSIMULATOR_WORK_PATH')
             cmd = work_path + '\cmd\VMReset.cmd ' + vm_name
             self._log('vm_reset <<cmd>>', cmd)
-            os.system('start ' + cmd)
+            os.system('start "VMReset" ' + cmd)
             self._log('vm_reset end:', vm_name)
             return True
         except Exception as e:

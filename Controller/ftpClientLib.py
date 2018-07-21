@@ -5,11 +5,12 @@ DEBUG_ENV = False
 
 
 def ftp_upload(local_file, remote_dir, remote_file):
-    host = '172.16.1.1'
-    username = 'admin'
-    password = 'zhxg@2018'
+    host = '127.0.0.1'
+    username = 'ControllerManager'
+    password = 'zhxg2018'
 
     f = ftplib.FTP(host)
+    f.port = 14147
     f.login(username, password)
     pwd_path = f.pwd()
     print("FTP当前路径:", pwd_path)
@@ -31,6 +32,6 @@ def ftp_upload(local_file, remote_dir, remote_file):
 
 if __name__ == "__main__":
     local_file = 'images/miaopai/app_icon.png'
-    remote_dir = '172.16.3.2'
+    remote_dir = '127.0.0.1'
     remote_file = 'app_ready.png'
     ftp_upload(local_file, remote_dir, remote_file)

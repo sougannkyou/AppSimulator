@@ -26,6 +26,7 @@ ECHO [%DATE% %TIME%] start %vm%
 %vmrun% start "%workspace%\%vm%\%vmx%"
 timeout 10
 
+
 :END
 @ECHO ON
 timeout 20
