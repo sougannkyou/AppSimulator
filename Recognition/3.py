@@ -29,3 +29,4 @@ if __name__ == '__main__':
     ret = test()
     (x, y) = ret['result']
     debug(x, y)
+    print(cv2.getBuildInformation())
