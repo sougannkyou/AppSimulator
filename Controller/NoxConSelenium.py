@@ -268,7 +268,7 @@ class NoxConSelenium(NoxConADB):
         pass  # overwrite
 
     def run(self):
-        # self.unlock(timeout=10)
+        self.unlock(timeout=10)
         # self.get_new_phone()
         # if ret and is_app_restart:
         #     ret = self.app_quit(wait_time=1)

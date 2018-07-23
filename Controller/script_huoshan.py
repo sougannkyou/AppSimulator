@@ -72,7 +72,7 @@ def main(task, mode):
             "分享": 'images/huoshan/share.png',
             "复制链接": 'images/huoshan/copylink.png',
         })
-        # me._DEBUG = True
+        me._DEBUG = True
         me.run()
     except Exception as e:
         msg = '<<error>>'
