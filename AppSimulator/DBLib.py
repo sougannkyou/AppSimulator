@@ -156,9 +156,10 @@ class MongoDriver(object):
         if ip:
             cond = {'ip': ip}
 
-        log_list = self.logger.find(cond)
+        log_list = self.logger.find(cond).sort('found_time', pymongo.DESCENDING).skip(0).limit(200)
         for log in log_list:
             log.pop('_id')
+            log['msg'] = log['msg'].decode('gbk') if isinstance(log['msg'], bytes) else log['msg']
             ret.append(log)
         return ret
 

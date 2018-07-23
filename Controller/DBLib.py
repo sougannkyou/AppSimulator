@@ -58,7 +58,7 @@ class MongoDriver(object):
             'taskId': int(taskId) if taskId and isinstance(taskId, str) else taskId,
             'func': func,
             'prefix': prefix,
-            'msg': msg
+            'msg': msg.decode('gbk') if isinstance(msg, bytes) else msg
         })
 
     def get_taskId(self):

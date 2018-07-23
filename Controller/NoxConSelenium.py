@@ -63,7 +63,7 @@ class NoxConSelenium(NoxConADB):
         self.adb_shell("screencap -p /sdcard/" + capture_name)
         self.adb_cmd("pull /sdcard/" + capture_name + " " + self._work_path + '\\Controller\\images\\temp')
         self._capture_obj = ac.imread(self._work_path + '\\Controller\\images\\temp\\' + capture_name)
-        # self.ftp_upload(local_file=capture_name, remote_dir='172.16.253.36', remote_file=capture_name)
+        self.ftp_upload(local_file=capture_name, remote_dir='172.16.253.36', remote_file=capture_name)
 
     def find_element(self, comment, timeout):
         # True(False), x, y
