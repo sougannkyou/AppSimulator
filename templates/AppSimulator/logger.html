@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block header_tail %}
-    {#    <meta http-equiv="refresh" content="5">#}
+    {#<meta http-equiv="refresh" content="5">#}
     <link rel="stylesheet" href="{% static 'AppSimulator/css/tasks.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
 {% endblock header_tail %}
@@ -26,7 +26,7 @@
                     <table class="table table-hover">
                         <tbody>
                         <tr>
-                            <th width="5%">Time</th>
+                            <th width="10%">Time</th>
                             <th width="5%">TaskId</th>
                             <th width="10%">IP</th>
                             <th width="10%">func</th>
@@ -101,8 +101,8 @@
         let mainVue = new Vue({
             el: "#main",
             data: {
+                ip: '172.16.253.232',
                 {#ip: '172.16.253.37',#}
-                ip: '172.16.253.37',
                 logList: [],
                 msg: ""
             },
