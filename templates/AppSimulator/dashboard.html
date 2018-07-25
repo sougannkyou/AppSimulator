@@ -105,54 +105,99 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <section v-for="server in rpcServer" class="col-md-12 connectedSortable"><!-- rpc server -->
-                <div class="box box-info">
-                    <div class="box-header with-border"><!-- server info-->
-                        <h1 class="box-title label bg-gray">[[ server.ip ]]</h1>
-                        <small class="badge bg-green">[[ server.memory_free ]] / [[ server.memory_total ]] GB</small>
-                        <small v-for="app in server.app">
-                            <img id="app_icon" height="30" style="border-radius:3px;"
-                                 src="/static/AppSimulator/images/[[app]]/app_icon.png">
-                        </small>
-                        <span class="badge">[[ server.cnt ]]</span>
-                        <div class="box-tools pull-left">
-                            <button v-on:click="runTasks" class="btn btn-xs btn-info">重启服务</button>
-                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                                <i class="fa fa-minus"></i>
-                            </button>
-                            <button type="button" class="btn btn-box-tool" data-widget="remove">
-                                <i class="fa fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="box-body">
-                        <div class="docker col-md-3" v-for="docker in server.dockers"><!-- dockers info -->
-                            <small>
-                                <img id="current" height="30" style="border-radius:3px;"
-                                     src="/static/AppSimulator/images/[[docker.app]]/app_icon.png">
-                            </small>
-                            <label class="badge bg-gray">[[ docker.name ]]</label>
-                            <span v-bind:class="[docker.status==='unkown'?'badge bg-gray':
+        <div class="row nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#nox" data-toggle="tab" aria-expanded="true">模拟器</a></li>
+                <li class=""><a href="#vmware" data-toggle="tab" aria-expanded="false">VMware</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="nox"><!-- nox -->
+                    <section v-for="server in rpcServer" class="col-md-12 connectedSortable"><!-- rpc server -->
+                        <div class="box box-info">
+                            <div class="box-header with-border"><!-- server info-->
+                                <h1 class="box-title label bg-gray">[[ server.ip ]]</h1>
+                                <small class="badge bg-green">[[ server.memory_free ]] / [[ server.memory_total ]] GB
+                                </small>
+                                <small v-for="app in server.app">
+                                    <img id="app_icon" height="30" style="border-radius:3px;"
+                                         src="/static/AppSimulator/images/[[app]]/app_icon.png">
+                                </small>
+                                <span class="badge">[[ server.cnt ]]</span>
+                                <div class="box-tools pull-left">
+                                    <button v-on:click="runTasks" class="btn btn-xs btn-info">重启服务</button>
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div class="docker col-md-3" v-for="docker in server.dockers"><!-- dockers info -->
+                                    <small>
+                                        <img id="current" height="30" style="border-radius:3px;"
+                                             src="/static/AppSimulator/images/[[docker.app]]/app_icon.png">
+                                    </small>
+                                    <label class="badge bg-gray">[[ docker.name ]]</label>
+                                    <span v-bind:class="[docker.status==='unkown'?'badge bg-gray':
                                 (docker.status==='running'?'badge bg-green':'badge bg-yellow')]">[[ docker.status ]]
                                 </span>
-                            <div class="docker-capture">
-                                <img id="current" height="240" class="capture"
-                                     src="/static/AppSimulator/images/capture.png">
-                                <img id="before" height="240" class="capture"
-                                     src="/static/AppSimulator/images/capture_before.png">
+                                    <div class="docker-capture">
+                                        <img id="current" height="240" class="capture"
+                                             src="/static/AppSimulator/images/capture.png">
+                                        <img id="before" height="240" class="capture"
+                                             src="/static/AppSimulator/images/capture_before.png">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-footer">
+                                {#                        <input type="text" placeholder="latitude" v-model="latitude" style="width:35%;">#}
+                                {#                        <input type="text" placeholder="longitude" v-model="longitude" style="width:35%;">#}
+                                {#                        <button v-on:click="setDeviceGPS" class="btn btn-xs btn-info">位置设定</button>#}
+                                {#                        <button v-on:click="restartDevice" class="btn btn-xs btn-info">重启</button>#}
+                                {#                        <button v-on:click="stopScript" class="btn btn-xs btn-info">停止脚本</button>#}
                             </div>
                         </div>
-                    </div>
-                    <div class="box-footer">
-                        {#                        <input type="text" placeholder="latitude" v-model="latitude" style="width:35%;">#}
-                        {#                        <input type="text" placeholder="longitude" v-model="longitude" style="width:35%;">#}
-                        {#                        <button v-on:click="setDeviceGPS" class="btn btn-xs btn-info">位置设定</button>#}
-                        {#                        <button v-on:click="restartDevice" class="btn btn-xs btn-info">重启</button>#}
-                        {#                        <button v-on:click="stopScript" class="btn btn-xs btn-info">停止脚本</button>#}
-                    </div>
+                    </section>
                 </div>
-            </section>
+                <div class="tab-pane active" id="vmware"><!-- vmware -->
+                    <section v-for="vm in vmwares" class="col-md-12 connectedSortable">
+                        <div class="box box-info">
+                            <div class="box-header with-border">
+                                <h1 class="box-title label bg-gray">[[ vm.ip ]]</h1>
+                                <small class="badge bg-green">[[ vm.memory_free ]] / [[ vm.memory_total ]] GB
+                                </small>
+                                <small>
+                                    <img id="app_icon" height="30" style="border-radius:3px;"
+                                         src="/static/AppSimulator/images/VM/capture_[[vm.app_name]].png">
+                                </small>
+                                <span class="badge">[[ server.cnt ]]</span>
+                                <div class="box-tools pull-left">
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div class="docker col-md-3" v-for="docker in server.dockers">
+                                    <small>
+                                        <img id="current" height="30" style="border-radius:3px;"
+                                             src="/static/AppSimulator/images/[[docker.app]]/app_icon.png">
+                                    </small>
+                                    <label class="badge bg-gray">[[ docker.name ]]</label>
+                                    <span v-bind:class="[docker.status==='unkown'?'badge bg-gray':
+                                (docker.status==='running'?'badge bg-green':'badge bg-yellow')]">[[ docker.status ]]
+                                </span>
+                                    <div class="docker-capture">
+                                        <img id="current" height="240" class="capture"
+                                             src="/static/AppSimulator/images/capture.png">
+                                        <img id="before" height="240" class="capture"
+                                             src="/static/AppSimulator/images/capture_before.png">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock section_content %}
@@ -328,6 +373,29 @@
             $.ajax(opt);
         }
 
+        function getVMwares(obj) {
+            let opt = {
+                url: '/AppSimulator/getVMwaresAPI/',
+                type: 'GET',
+                data: {},
+                dataType: "json",
+                error: function (xhr, err) {
+                    obj.msg = "Failure";
+                    console.error("[dashboard] getVMwaresAPI", err);
+                },
+                success: function (data, status) {
+                    obj.msg = "OK";
+                    for (let i = 0; i < 1000; i++) {
+                        obj.vmwares.shift();
+                    }
+                    for (let i = 0; i < data['ret'].length; i++) {
+                        obj.vmwares.push(data['ret'][i])
+                    }
+                }
+            };
+            $.ajax(opt);
+        }
+
         //----------------------------------------------------------------------------
         Vue.config.delimiters = ['[[', ']]'];
         //----------------------------------------------------------------------------
@@ -344,6 +412,7 @@
                 dockerName: 'nox-1',
                 dockersCnt: 0,
                 appAll: [],
+                vmwares: [],
                 rpcServer: [
                     {
                         ip: '192.168.31.227',
@@ -468,6 +537,7 @@
                 }
             },
             created: function () {
+                getVMwares(this);
             },
             watch: {},
             computed: {

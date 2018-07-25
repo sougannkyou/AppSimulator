@@ -38,7 +38,7 @@ vmrun -T ws -gu win7_64 -gp zhxg2018 captureScreen "c:\VMware\VM\vm1\Windows 7 x
 3)环境变量
 APPSIMULATOR_IP = 172.16.253.232
 APPSIMULATOR_MODE = nox
-APPSIMULATOR_WORK_PATH = c:\workspace\pyWorks\AppSimulator
+APPSIMULATOR_WORK_PATH = C:\workspace\pyWorks\AppSimulator
 MONGODB_SERVER_IP = 172.16.253.37
 MONGODB_SERVER_PORT = 27017
 REDIS_SERVER_IP = 172.16.253.37
