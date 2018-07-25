@@ -48,7 +48,6 @@ class MongoDriver(object):
         self.vmwares = self._db.vmwares
         self._DEBUG = False
 
-
     # def _log(self, prefix, msg):
     #     common_log(self._DEBUG, '[Controller DB]', prefix, msg)
 

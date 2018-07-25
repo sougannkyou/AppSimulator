@@ -13,29 +13,28 @@ from Controller.ControllerManager import Manager
 
 _DEBUG = False
 
+# comments
+url = "https://www.iesdouyin.com/share/video/6578652904150797581/?region=CN&mid=6576897816944184072&titleType=title&utm_source=copy_link&utm_campaign=client_share&utm_medium=android&app=aweme&iid=38787387499&timestamp=1532499011"
+
 
 class MySelenium(NoxConSelenium):
     def __init__(self, task_info, mode):
         super().__init__(task_info=task_info, mode=mode)
 
     def script(self):
-        ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
+        ret = self.get(url, wait_time=2)  # unlock ok
+
+        ret, x, y = self.find_element(comment='跳转APP', timeout=10)  # unlock ok
         if ret: ret = self.click_xy(x, y, wait_time=2)
 
-        while ret:  # 更新 -> 分享 -> 复制链接
-            ret, x, y = self.find_element(comment='分享', timeout=10)
-            if ret:
-                self.click_xy(x, y, wait_time=1)
-                ret, x, y = self.find_element(comment='复制链接', timeout=10)
-                if ret:
-                    self.click_xy_timer(x, y, wait_time=1)
-            else:
-                ret, x, y = self.find_element(comment='跳过软件升级', timeout=10)
-                if ret:
-                    self.click_xy(x, y, wait_time=1)
-                    self.next_page(wait_time=5)
+        ret, x, y = self.find_element(comment='评论', timeout=10)  # unlock ok
+        if ret: ret = self.click_xy(x, y, wait_time=2)
 
-            self.next_page(wait_time=5)
+        page_cnt = 0
+        while ret:  # 更新 -> 分享 -> 复制链接
+            print('page_cnt', page_cnt)
+            self.next_page_comments(wait_time=5)
+            page_cnt += 1
 
 
 ##################################################################################
@@ -47,13 +46,15 @@ def main(task_info, mode):
     try:
         me = MySelenium(task_info=task_info, mode=mode)
         me.set_comment_to_pic({
+            "跳转APP": 'images/douyin/jump2app.png',
             "APP图标": 'images/douyin/app_icon.png',
+            "评论": 'images/douyin/comments.png',
             "更新": 'images/douyin/update.png',
             "分享": 'images/douyin/share.png',
             "复制链接": 'images/douyin/copylink.png',
             "跳过软件升级": 'images/douyin/ignore_upgrade.png',
         })
-        # me._DEBUG = True
+        me._DEBUG = True
         me.run()
     except Exception as e:
         msg = '<<error>>'

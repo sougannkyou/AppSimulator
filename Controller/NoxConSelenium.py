@@ -119,6 +119,13 @@ class NoxConSelenium(NoxConADB):
 
         return len(ret) > 0, ret
 
+    def next_page_comments(self, wait_time):
+        self._log('<<info>> next_page_comments', '翻页')
+        # self .clear_cache()
+        self.adb_shell("input swipe 300 750 300 350")
+        time.sleep(wait_time)
+        return True
+
     def next_page(self, wait_time):
         self._log('<<info>> next_page', '翻页')
         # self .clear_cache()
