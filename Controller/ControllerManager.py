@@ -2,6 +2,7 @@
 import os
 import time
 import subprocess
+import psutil
 import importlib
 import importlib.util
 import win32gui
@@ -14,7 +15,7 @@ from Controller.NoxConSelenium import NoxConSelenium
 _DEBUG = True
 
 
-# ------------------------ task manager ----------------------
+# ------------------------ manager ----------------------
 class Manager(object):
     def __init__(self):
         self._rds = RedisDriver()
@@ -26,7 +27,31 @@ class Manager(object):
     def _log(self, prefix, msg):
         common_log(self._DEBUG, '', 'Manager', prefix, msg)
 
-    # ----------------------------------------------------------------------------------------------
+    # ----------------------- hosts ------------------------------------------------------
+    def host_support_app_list(self):
+        app_list = []
+        for root, dirs, files in os.walk(NOX_BACKUP_PATH):
+            for file in files:
+                if os.path.splitext(file)[1] == '.npbk':
+                    p = os.path.splitext(file)[0]  # nox-dianping.npbk
+                    app_list.append(p[4:])
+
+        return app_list
+
+    def host_register_service(self, host_type='emulator'):
+        mem = psutil.virtual_memory()
+        info = {
+            'ip': LOCAL_IP,
+            'host_type': host_type,  # 'emulator' or 'vmware'
+            'support_app_list': self.host_support_app_list(),
+            'mem_free': '%.1f' % (mem.free / GB),
+            'mem_total': '%.1f' % (mem.total / GB),
+            'timer_max_cnt': len(TIMER)
+        }
+        self._mdb.host_register_service(info)
+        return
+
+    # ---------------------- nox -------------------------------------------------------------
     def _nox_check(self):
         if not self._work_path:
             msg = '请设置: APPSIMULATOR_WORK_PATH'
@@ -192,7 +217,7 @@ class Manager(object):
                 self._log('<<info>> start_tasks', 'not found waiting task, retry after 60s.')
                 time.sleep(1 * 60)
 
-    # ----------------------------------------------------------------------------------------------
+    # --------------------------- vmwares --------------------------------------------------------
     def vm_draw_cardiogram(self, host_ip):
         while True:
             vmwares = self._mdb.vm_find_vm_by_host(host_ip)

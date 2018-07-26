@@ -152,12 +152,12 @@ def _register_service():
     info = {
         'ip': LOCAL_IP,
         'port': RPC_PORT,
-        'app_name': nox_backup_app_list(),
+        'support_app_list': nox_backup_app_list(),
         'mem_free': '%.1f' % (mem.free / GB),
         'mem_total': '%.1f' % (mem.total / GB),
         'timer_max_cnt': len(TIMER)
     }
-    MDB.rpc_register_service(info)
+    MDB.host_register_service(info)
     _rpc_log('_register', 'end')
     return
 

@@ -41,7 +41,7 @@ class MongoDriver(object):
         self._db = self._client.AppSimulator
         self.activeInfo = self._db.activeInfo
         self.deviceConfig = self._db.deviceConfig
-        self.rpcServer = self._db.rpcServer
+        self.hosts = self._db.hosts
         self.tasks = self._db.tasks
         self.logger = self._db.logger
         self.dockers = self._db.dockers
@@ -69,31 +69,31 @@ class MongoDriver(object):
 
         return taskId
 
-    def rpc_register_service(self, controller_info):
-        self.rpcServer.update({'ip': controller_info['ip']}, {"$set": controller_info}, upsert=True)
+    def host_register_service(self, controller_info):
+        self.hosts.update({'ip': controller_info['ip']}, {"$set": controller_info}, upsert=True)
 
     def task_get_one_for_run(self):
-        cnt = self.tasks.find({'status': STATUS_DOCKER_RUN, 'rpc_server_ip': LOCAL_IP}).count()
+        cnt = self.tasks.find({'status': STATUS_DOCKER_RUN, 'host_ip': LOCAL_IP}).count()
         if cnt > 0:
             return None, '宿主机当前有' + str(cnt) + '个模拟器正在启动 ...'
 
-        cnt = self.tasks.find({'status': STATUS_DOCKER_RUN, 'rpc_server_ip': LOCAL_IP}).count()
+        cnt = self.tasks.find({'status': STATUS_DOCKER_RUN, 'host_ip': LOCAL_IP}).count()
         if cnt > len(TIMER):
             return None, ''
 
         task = self.tasks.find_one({
             'status': STATUS_WAIT,
-            '$or': [{'rpc_server_ip': ''}, {'rpc_server_ip': LOCAL_IP, 'orgTaskId': {'$ne': 0}}]
+            '$or': [{'host_ip': ''}, {'host_ip': LOCAL_IP, 'orgTaskId': {'$ne': 0}}]
         })
         if task:
-            self.tasks.update({'_id': task['_id']}, {'$set': {'rpc_server_ip': LOCAL_IP}})
+            self.tasks.update({'_id': task['_id']}, {'$set': {'host_ip': LOCAL_IP}})
             return task, 'ok'
 
         return None, ''
 
     def task_get_my_prepare_tasks_cnt(self):
         return self.tasks.find(
-            {'status': {'$in': [STATUS_WAIT]}, 'rpc_server_ip': LOCAL_IP}).count()
+            {'status': {'$in': [STATUS_WAIT]}, 'host_ip': LOCAL_IP}).count()
 
     def task_find_by_taskId(self, taskId):
         return self.tasks.find_one({'taskId': taskId})
@@ -107,7 +107,7 @@ class MongoDriver(object):
             "app_name": task['app_name'],
             "status": STATUS_WAIT,
             "live_cycle": task['live_cycle'],
-            "rpc_server_ip": task['rpc_server_ip'],
+            "host_ip": task['host_ip'],
             "start_time": int(datetime.now().timestamp()),
             "up_time": 0,
             "end_time": 0,

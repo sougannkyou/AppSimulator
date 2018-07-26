@@ -17,7 +17,7 @@
                         <h3>[[ proxyServerInfo.memory_rate ]]%</h3>
                     </div>
                     <div class="icon">
-                        <img class="top-icon" src="{% static 'AppSimulator/images/memory.png' %}">
+                        <img class="top-icon" src="{% static 'AppSimulator/images/page/memory.png' %}">
                     </div>
                     <a href="/AppSimulator/dashboard/" class="small-box-footer">
                         详情&nbsp;
@@ -33,7 +33,7 @@
                         <h3>[[ proxyServerInfo.cpu_percent ]]%</h3>
                     </div>
                     <div class="icon">
-                        <img class="top-icon" src="{% static 'AppSimulator/images/cpu.png' %}">
+                        <img class="top-icon" src="{% static 'AppSimulator/images/page/cpu.png' %}">
                     </div>
                     <a href="/AppSimulator/dashboard/" class="small-box-footer">
                         详情&nbsp;
@@ -48,7 +48,7 @@
                         <h3>[[ proxyServerInfo.hd_percent ]]%</h3>
                     </div>
                     <div class="icon">
-                        <img class="top-icon" src="{% static 'AppSimulator/images/hd.png' %}">
+                        <img class="top-icon" src="{% static 'AppSimulator/images/page/hd.png' %}">
                     </div>
                     <a href="/AppSimulator/dashboard/" class="small-box-footer">
                         详情&nbsp;
@@ -80,7 +80,7 @@
                         <h3>[[ rpcServer | count ]] / [[ dockersCnt ]]</h3>
                     </div>
                     <div class="icon">
-                        <img class="top-icon" src="{% static 'AppSimulator/images/emulator.png' %}">
+                        <img class="top-icon" src="{% static 'AppSimulator/images/page/emulator.png' %}">
                     </div>
                     <a href="/AppSimulator/dashboard/" class="small-box-footer">
                         详情&nbsp;
@@ -92,10 +92,10 @@
                 <div class="small-box bg-gray">
                     <div class="inner">
                         <p>Support App</p>
-                        <label v-for="app in appAll">
+                        <label v-for="app in app_list">
                             <img height="40" v-bind:class="[app_name===app?'app-icon-big':'app-icon']"
                                  v-on:click="setAppName(app)"
-                                 src="/static/AppSimulator/images/[[app]]/app_icon.png">
+                                 src="/static/AppSimulator/images/app/[[app]]/app_icon.png">
                         </label>
                     </div>
                     <a href="/AppSimulator/dashboard/" class="small-box-footer">
@@ -112,17 +112,17 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="nox"><!-- nox -->
-                    <section v-for="server in rpcServer" class="col-md-12 connectedSortable"><!-- rpc server -->
+                    <section v-for="host in hostList" class="col-md-12 connectedSortable"><!-- host list -->
                         <div class="box box-info">
-                            <div class="box-header with-border"><!-- server info-->
-                                <h1 class="box-title label bg-gray">[[ server.ip ]]</h1>
-                                <small class="badge bg-green">[[ server.memory_free ]] / [[ server.memory_total ]] GB
+                            <div class="box-header with-border"><!-- host info-->
+                                <h1 class="box-title label bg-gray">[[ emulator.ip ]]</h1>
+                                <small class="badge bg-green">[[ host.memory_free ]] / [[ host.memory_total ]] GB
                                 </small>
-                                <small v-for="app in server.app">
+                                <small v-for="app in host.app_list">
                                     <img id="app_icon" height="30" style="border-radius:3px;"
-                                         src="/static/AppSimulator/images/[[app]]/app_icon.png">
+                                         src="/static/AppSimulator/images/app/[[app]]/app_icon.png">
                                 </small>
-                                <span class="badge">[[ server.cnt ]]</span>
+                                <span class="badge">[[ host.cnt ]]</span>
                                 <div class="box-tools pull-left">
                                     <button v-on:click="runTasks" class="btn btn-xs btn-info">重启服务</button>
                                     <button type="button" class="btn btn-box-tool" data-widget="collapse">
@@ -134,20 +134,20 @@
                                 </div>
                             </div>
                             <div class="box-body">
-                                <div class="docker col-md-3" v-for="docker in server.dockers"><!-- dockers info -->
+                                <div class="docker col-md-3" v-for="emulator in host.emulators"><!-- dockers info -->
                                     <small>
                                         <img id="current" height="30" style="border-radius:3px;"
-                                             src="/static/AppSimulator/images/[[docker.app]]/app_icon.png">
+                                             src="http://[[emulator.ip]]:8000/static/AppSimulator/images/app/[[emulator.app]]/app_icon.png">
                                     </small>
-                                    <label class="badge bg-gray">[[ docker.name ]]</label>
-                                    <span v-bind:class="[docker.status==='unkown'?'badge bg-gray':
-                                (docker.status==='running'?'badge bg-green':'badge bg-yellow')]">[[ docker.status ]]
+                                    <label class="badge bg-gray">[[ emulator.name ]]</label>
+                                    <span v-bind:class="[emulator.status==='unkown'?'badge bg-gray':
+                                (emulator.status==='running'?'badge bg-green':'badge bg-yellow')]">[[ emulator.status ]]
                                 </span>
                                     <div class="docker-capture">
                                         <img id="current" height="240" class="capture"
-                                             src="/static/AppSimulator/images/capture.png">
+                                             src="http://[[emulator.ip]]:8000/static/AppSimulator/images/temp/mnox/capture_[[emulator.name]].png">
                                         <img id="before" height="240" class="capture"
-                                             src="/static/AppSimulator/images/capture_before.png">
+                                             src="http://[[emulator.ip]]:8000/static/AppSimulator/images/mnox/capture_[[emulator.name]]_before.png">
                                     </div>
                                 </div>
                             </div>
@@ -161,7 +161,8 @@
                         </div>
                     </section>
                 </div>
-                <div class="tab-pane active" id="vmware"><!-- vmware -->
+                <!-------------------- vmware -------------------------------->
+                <div class="tab-pane active" id="vmware">
                     <section v-for="vm in vmwares" class="col-md-12 connectedSortable">
                         <div class="box box-info">
                             <div class="box-header with-border">
@@ -170,7 +171,7 @@
                                 </small>
                                 <small>
                                     <img id="app_icon" height="30" style="border-radius:3px;"
-                                         src="/static/AppSimulator/images/VM/capture_[[vm.app_name]].png">
+                                         src="/static/AppSimulator/images/temp/VM/capture_[[vm.app_name]].png">
                                 </small>
                                 <span class="badge">[[ server.cnt ]]</span>
                                 <div class="box-tools pull-left">
@@ -180,7 +181,7 @@
                                 <div class="docker col-md-3" v-for="docker in server.dockers">
                                     <small>
                                         <img id="current" height="30" style="border-radius:3px;"
-                                             src="/static/AppSimulator/images/[[docker.app]]/app_icon.png">
+                                             src="/static/AppSimulator/images/app/[[docker.app]]/app_icon.png">
                                     </small>
                                     <label class="badge bg-gray">[[ docker.name ]]</label>
                                     <span v-bind:class="[docker.status==='unkown'?'badge bg-gray':
@@ -188,9 +189,9 @@
                                 </span>
                                     <div class="docker-capture">
                                         <img id="current" height="240" class="capture"
-                                             src="/static/AppSimulator/images/capture.png">
+                                             src="/static/AppSimulator/images/temp/VM/capture.png">
                                         <img id="before" height="240" class="capture"
-                                             src="/static/AppSimulator/images/capture_before.png">
+                                             src="/static/AppSimulator/images/temp/VM/capture_before.png">
                                     </div>
                                 </div>
                             </div>
@@ -223,7 +224,6 @@
     <script type="text/javascript" src="{% static 'AppSimulator/js/vue_filter.js' %}"></script>
     <script type="text/javascript" src="{% static 'AppSimulator/js/dashboard.js' %}"></script>
     <script type="text/javascript">
-        {#const HOST = "http://172.16.55.155:8000";#}
         {#const HOST = "http://192.168.31.227:8000";#}
         const DEVICE_STATUS_UNKOWN = 'unkown';
         const DEVICE_STATUS_RUN = 'running';
@@ -411,9 +411,9 @@
                 tasksCnt: 4,
                 dockerName: 'nox-1',
                 dockersCnt: 0,
-                appAll: [],
+                app_list: [],
                 vmwares: [],
-                rpcServer: [
+                emulators: [
                     {
                         ip: '192.168.31.227',
                         memory_total: '7.9',
@@ -548,7 +548,7 @@
                     });
                     return cnt;
                 },
-                appAll: function () {
+                app_list: function () {
                     let l = [];
                     this.rpcServer.forEach(server => {
                         server.app.forEach(app => {

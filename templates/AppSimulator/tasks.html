@@ -42,7 +42,7 @@
                                 <label v-for="app in appAll">
                                     <img v-bind:class="[task.app_name===app?'app-icon-big':'app-icon']"
                                          v-on:click="setAppName(app)"
-                                         v-bind:src="'/static/AppSimulator/images/' + app + '/app_icon.png'">
+                                         v-bind:src="'/static/AppSimulator/images/app/' + app + '/app_icon.png'">
                                 </label>
                             </td>
                             <td>等待分配</td>
@@ -68,7 +68,7 @@
                         </tr>
                         <tr v-for="t in tasks">
                             <td>[[ t.taskId ]]</td>
-                            <td><img class="app" v-bind:src="'/static/AppSimulator/images/'+t.app_name+'/app_icon.png'">
+                            <td><img class="app" v-bind:src="'/static/AppSimulator/images/app/'+t.app_name+'/app_icon.png'">
                             <td>[[ t.rpc_server_ip ]]</td>
                             <td>[[ t.script ]]</td>
                             <td>[[ t.live_cycle ]]</td>

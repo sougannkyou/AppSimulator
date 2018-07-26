@@ -174,8 +174,8 @@ class MongoDriver(object):
         vmwares = self.vmwares.find(cond)
         for vm in vmwares:
             vm.pop('_id')
-            vm['capture'] = 'static/AppSimuilator/images/VM/capture' + vm['name'] + '.png'
-            vm['capture_before'] = 'static/AppSimuilator/images/VM/capture' + vm['name'] + '_before.png'
+            vm['capture'] = 'http://' + vm['host_ip'] + ':8000/static/AppSimuilator/images/VM/capture_' + vm['name'] + '.png'
+            vm['capture_before'] = 'http://' + vm['host_ip'] + ':8000/static/AppSimuilator/images/VM/capture_' + vm['name'] + '_before.png'
             vm['cnt'] = RedisDriver().get_vmware_shareLink_cnt(vm['ip'], vm['app_name'])
             vm['lastTime'] = RedisDriver().get_vmware_shareLink_cnt(vm['ip'], vm['app_name'])
             # vm[]

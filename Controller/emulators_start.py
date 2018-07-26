@@ -4,8 +4,6 @@ import sys
 
 sys.path.append(os.getcwd())
 
-import multiprocessing
-from Controller.setting import *
 from Controller.Common import common_log
 from Controller.ControllerManager import Manager
 
@@ -17,7 +15,7 @@ def _log(prefix, msg):
     common_log(_DEBUG, '', 'Multi Nox start', prefix, msg)
 
 
-def mnox_test(vm):
+def emulators_test(vm):
     manager = Manager()
     manager._DEBUG = True
     manager._mdb._DEBUG = True
@@ -36,7 +34,7 @@ def mnox_test(vm):
     return
 
 
-def mnox_main():
+def emulators_main():
     manager = Manager()
     manager._DEBUG = True
     manager.nox_run_tasks()
@@ -45,4 +43,4 @@ def mnox_main():
 # ------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     # mnox_test()
-    mnox_main()
+    emulators_main()
