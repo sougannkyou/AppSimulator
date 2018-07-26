@@ -49,5 +49,6 @@ REDIS_SERVER_IP = 172.16.253.37
     password = 'zhxg2018'
     
 4）python3 pip install
+python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
 pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
-pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple psutil opencv-python Pillow aircv pypiwin32 protobuf grpcio grpcio-tools pyautogui==0.9.36 matplotlib opencv-contrib-python
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple psutil opencv-python==3.4.1.15 Pillow aircv pypiwin32 protobuf grpcio grpcio-tools pyautogui==0.9.36 matplotlib opencv-contrib-python
