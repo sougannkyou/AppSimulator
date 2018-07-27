@@ -101,3 +101,6 @@ pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple psutil opencv-python==3
     "start_time" : 0,
     "end_time" : 0
 }
+
+[mongodb]
+mongodump -h 172.16.253.37:27017 -d AppSimulator -o c:\MongoDB\data
