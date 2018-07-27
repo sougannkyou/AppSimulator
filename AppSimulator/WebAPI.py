@@ -26,8 +26,8 @@ RDB = RedisDriver()
 
 
 def getRpcServerStatus(deviceId):
-    info = MDB.get_config_info(deviceId)
-    # print('get_config_info', deviceId, info['ip'])
+    info = MDB.emulator_get_config_info(deviceId)
+    # print('emulator_get_config_info', deviceId, info['ip'])
 
     output = JsonResponse({
         'ret': ret,
@@ -193,7 +193,7 @@ def addTaskAPI(request):
     app_name = request.POST.get('app_name')
     script = request.POST.get('script')
     live_cycle = request.POST.get('live_cycle')
-    ret = MDB.add_task({'script': script, 'app_name': app_name, 'live_cycle': live_cycle})
+    ret = MDB.emulator_add_task({'script': script, 'app_name': app_name, 'live_cycle': live_cycle})
     output = JsonResponse({
         'ret': ret
     })
@@ -202,8 +202,8 @@ def addTaskAPI(request):
 
 def getTasksAPI(request):
     # status = request.POST.get('status')
-    # ret = MDB.get_tasks({'status': status})
-    ret = MDB.get_tasks()
+    # ret = MDB.emulator_get_tasks({'status': status})
+    ret = MDB.emulator_get_tasks()
     output = JsonResponse({
         'ret': ret
     })
@@ -211,7 +211,7 @@ def getTasksAPI(request):
 
 
 def runTasks():
-    tasks = MDB.get_tasks(status=STATUS_WAIT)
+    tasks = MDB.emulator_get_tasks(status=STATUS_WAIT)
     output = JsonResponse({
         'ret': tasks
     })
@@ -238,7 +238,16 @@ def getVMwareActiveInfoAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
-# ------- vmware ----------------------------------------------------------------
+# ------- hosts ----------------------------------------------------------------
+def getHostsAPI(request):
+    ret = MDB.emulator_get_hosts()
+    output = JsonResponse({
+        'ret': ret,
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
+# ------- logger ----------------------------------------------------------------
 def getLoggerAPI(request):
     ip = request.GET.get('ip')
     ret = MDB.log_find_by_ip(ip)

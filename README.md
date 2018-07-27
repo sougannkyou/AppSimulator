@@ -11,7 +11,6 @@
 00:e0:4c:44:c2:40
 
 [VM]
-
 00:0c:29:79:08:7e
 00:0c:29:04:ca:80
 00:0c:29:f4:b2:63
@@ -49,7 +48,56 @@ REDIS_SERVER_IP = 172.16.253.37
     username = 'ControllerManager'
     password = 'zhxg2018'
     
-4）python3 pip install
+5）python3 pip install
 python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
 pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple psutil opencv-python==3.4.1.15 Pillow aircv pypiwin32 protobuf grpcio grpcio-tools pyautogui==0.9.36 matplotlib opencv-contrib-python
+
+6)数据结构
+[tasks]
+{
+    "taskId" : 222,
+    "orgTaskId":0,
+    "script" : "script_douyin.py",
+    "live_cycle": "once"/"never",
+    "host_ip": "172.16.253.232",
+    "app_name" : "douyin",
+    "status" : "wait",  // unkown, wait, building, build_ok, build_ng, running, run_ok, run_ng
+    "docker_type": "vmware"/"emulator",
+    "timer_no": 0,
+    "dockerId": ObjectId("emulators") or ObjectId("vmwares"),
+    "start_time" : 0,
+    "up_time" : 0,
+    "end_time" : 0,
+}
+
+[hosts]
+{
+    "ip" : "172.16.253.232",
+    "host_type": "vmware" / "emulator",
+    "support_app_list": ["huoshan", "douyin", "miaopai"],
+    "timer_max_cnt": 10,
+    "mem_total": 7.9
+}
+
+[emulators]
+{
+    "name" : "nox-222",
+    "host_ip" : "172.16.253.232",
+    "app_name" : "douyin",
+    "status" : "docker_run_ok",
+    "start_time" : 1529894656,
+    "up_time" : 1529894656,
+    "end_time" : 0
+}
+
+[vmwares]
+{
+    "name" : "vm3",
+    "local_ip" : "172.16.251.13",
+    "host_ip" : "172.16.253.232",
+    "app_name" : "douyin",
+    "status" : "wait",
+    "start_time" : 0,
+    "end_time" : 0
+}

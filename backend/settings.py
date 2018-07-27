@@ -16,7 +16,7 @@ SECRET_KEY = 'sq!f#iw20wk@lsd7p2j9#8hz&uqq8-_358&3=_6@i&$=2pe4ce'
 # DEBUG = True
 DEBUG = False
 
-ALLOWED_HOSTS = ['192.168.16.223', '127.0.0.1', '*']
+ALLOWED_HOSTS = ['127.0.0.1', '*']
 
 # django-celery
 

@@ -1,10 +1,10 @@
-div.docker {
+div.emulator {
     padding: 5px 0 0 5px;
     border-radius: 3px;
     border: 1px solid gray;
 }
 
-div.docker-capture {
+div.emulator-capture {
     margin-top: 5px;
     padding: 0 10px 0 10px;
     width: 100%;

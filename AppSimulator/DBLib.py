@@ -75,11 +75,41 @@ class MongoDriver(object):
         self.rpcServer = self._db.rpcServer
         self.tasks = self._db.tasks
         self.logger = self._db.logger
+        self.hosts = self._db.hosts
         self.vmwares = self._db.vmwares
+        self.emulators = self._db.emulators
         self.activeInfo = self._db.activeInfo
         self._DEBUG = False
 
-    def get_taskId(self):
+    # -------------  emulators ---------------------------------
+    def emulator_get_hosts(self):
+        hosts = []
+        l = self.hosts.find({'host_type': 'emulator'})
+        for h in l:
+            h.pop('_id')
+            host = self.emulator_find_by_host(h['ip'])
+            h['emulators'] = host
+            hosts.append(h)
+        return hosts
+
+    def emulator_find_by_host(self, host_ip=None):
+        ret = []
+        if host_ip:
+            cond = {'host_ip': host_ip, 'status': {'$ne': 'disable'}}
+        else:
+            cond = {'status': {'$ne': 'disable'}}
+
+        emulators = self.emulators.find(cond)
+        for emu in emulators:
+            emu.pop('_id')
+            pre = 'http://' + emu['host_ip'] + ':8000/static/AppSimulator/images/'
+            emu['app_icon'] = pre + 'app/' + emu['app_name'] + '/app_icon.png'
+            emu['capture'] = pre + 'temp/emulators/capture_' + emu['name'] + '.png'
+            emu['capture_before'] = pre + 'temp/emulators/capture_' + emu['name'] + '_before.png'
+            ret.append(emu)
+        return ret
+
+    def emulator_get_taskId(self):
         taskId = 1
         m = self.tasks.aggregate([{"$group": {'_id': '', 'max_id': {"$max": "$taskId"}}}])
         for i in m:
@@ -87,8 +117,8 @@ class MongoDriver(object):
 
         return taskId
 
-    def add_task(self, task):
-        taskId = self.get_taskId()
+    def emulator_add_task(self, task):
+        taskId = self.emulator_get_taskId()
         self.tasks.insert({
             "taskId": taskId,
             "orgTaskId": 0,
@@ -96,7 +126,7 @@ class MongoDriver(object):
             "app_name": task['app_name'],
             "status": STATUS_WAIT,
             "live_cycle": task['live_cycle'],
-            "rpc_server_ip": '',
+            "host_ip": '',
             "start_time": int(datetime.now().timestamp()),
             "up_time": 0,
             "timer_no": 0,
@@ -104,7 +134,14 @@ class MongoDriver(object):
         })
         return taskId
 
-    def get_tasks(self, status=None):
+    def emulator_get_one_wait_task(self):
+        task = self.tasks.find_one({'status': STATUS_WAIT, 'host_ip': ''})
+        if task:
+            task.pop('_id')
+
+        return task
+
+    def emulator_get_tasks(self, status=None):
         ret = []
         if status:
             l = self.tasks.find({'status': status}).sort([('_id', pymongo.DESCENDING)])
@@ -122,10 +159,10 @@ class MongoDriver(object):
 
         return ret
 
-    def set_task_server_ip(self, taskId, ip):
-        self.tasks.update({'taskId': taskId}, {'$set': {'rpc_server_ip': ip}})
+    def emulator_set_task_server_ip(self, taskId, ip):
+        self.tasks.update({'taskId': taskId}, {'$set': {'host_ip': ip}})
 
-    def get_config_info(self, deviceId):
+    def emulator_get_config_info(self, deviceId):
         info = self.deviceConfig.find_one({'deviceId': deviceId})
         if info:
             info.pop('_id')
@@ -143,13 +180,7 @@ class MongoDriver(object):
             ret.append(r)
         return ret
 
-    def get_one_wait_task(self):
-        task = self.tasks.find_one({'status': STATUS_WAIT, 'rpc_server_ip': ''})
-        if task:
-            task.pop('_id')
-
-        return task
-
+    # -------------  logger -----------------------------------------------------------------
     def log_find_by_ip(self, ip=None):
         ret = []
         cond = {}
@@ -164,6 +195,17 @@ class MongoDriver(object):
             ret.append(log)
         return ret
 
+    # ----------------- vmwares -------------------------------------------------------------
+    def vm_get_hosts(self):
+        hosts = []
+        l = self.hosts.find({'host_type': 'vmware'})
+        for h in l:
+            h.pop('_id')
+            host = self.vm_find_by_host(host_ip=h['ip'])
+            h['vmwares'] = host
+            hosts.append(h)
+        return hosts
+
     def vm_find_by_host(self, host_ip=None):
         ret = []
         if host_ip:
@@ -174,10 +216,11 @@ class MongoDriver(object):
         vmwares = self.vmwares.find(cond)
         for vm in vmwares:
             vm.pop('_id')
-            vm['capture'] = 'http://' + vm['host_ip'] + ':8000/static/AppSimuilator/images/VM/capture_' + vm['name'] + '.png'
-            vm['capture_before'] = 'http://' + vm['host_ip'] + ':8000/static/AppSimuilator/images/VM/capture_' + vm['name'] + '_before.png'
-            vm['cnt'] = RedisDriver().get_vmware_shareLink_cnt(vm['ip'], vm['app_name'])
-            vm['lastTime'] = RedisDriver().get_vmware_shareLink_cnt(vm['ip'], vm['app_name'])
+            pre = 'http://' + vm['host_ip'] + ':8000/static/AppSimulator/images/temp/vmwares/'
+            vm['capture'] = pre + 'capture_' + vm['name'] + '.png'
+            vm['capture_before'] = pre + '/capture_' + vm['name'] + '_before.png'
+            # vm['cnt'] = RedisDriver().get_vmware_shareLink_cnt(vm['ip'], vm['app_name'])
+            # vm['lastTime'] = RedisDriver().get_vmware_shareLink_cnt(vm['ip'], vm['app_name'])
             # vm[]
             ret.append(vm)
         return ret

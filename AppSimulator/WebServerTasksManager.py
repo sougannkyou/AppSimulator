@@ -16,14 +16,14 @@ class Manager(object):
 
     def start_tasks(self):
         while True:
-            task = self._mdb.get_one_wait_task()
+            task = self._mdb.emulator_get_one_wait_task()
             if task:
                 servers = self._mdb.get_rpc_servers(task['app_name'])
                 for server in servers:
                     ret = can_add_task(server['ip'], server['port'])
                     self._log('<<info>> ' + server['ip'], ret)
                     if ret.lower() == 'yes':
-                        self._mdb.set_task_server_ip(taskId=task['taskId'], ip=server['ip'])
+                        self._mdb.emulator_set_task_server_ip(taskId=task['taskId'], ip=server['ip'])
                         break
             else:
                 time.sleep(1 * 60)

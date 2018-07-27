@@ -201,8 +201,8 @@ class Manager(object):
 
                 # 2)docker run ok(ng)
                 status = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
-                docker_info = {'_id': self._mdb.docker_create(task), 'status': status}
-                self._mdb.docker_change_status(docker_info)
+                docker_info = {'_id': self._mdb.emulator_create(task), 'status': status}
+                self._mdb.emulator_change_status(docker_info)
                 task['status'] = status
                 self._mdb.task_change_status(task)
 

@@ -92,14 +92,16 @@ if __name__ == "__main__":
     if APPSIMULATOR_MODE == 'vmware':
         taskId = 3
         mode = 'single'
+        docker_name = 'vm1'
     else:
         taskId = sys.argv[1]
         mode = 'multi'
+        docker_name = 'nox-' + str(taskId)
 
     task = {
         'taskId': taskId,
         'app_name': 'miaopai',
-        'docker_name': 'nox-' + str(taskId),
+        'docker_name': docker_name,
         'timer_no': 4  # 14s
     }
 

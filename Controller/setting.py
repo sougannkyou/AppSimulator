@@ -50,5 +50,10 @@ VM_IMAGES_PATH = 'C:\\VMware\\VM'
 VMX_NAME = 'Windows 7 x64.vmx'
 VM_MAX = 5
 
+# ---------------------- FTP -----------------------------
+FTP_SERVER_IP = '172.16.253.37'
+FTP_USER_NAME = 'zhxg'
+FTP_PASSWORD = 'zhxg2018'
+
 # ---------------------- ControllerManager -----------------------------
 CHECK_TIMES = 10  # min

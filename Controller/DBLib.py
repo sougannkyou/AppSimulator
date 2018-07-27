@@ -44,13 +44,14 @@ class MongoDriver(object):
         self.hosts = self._db.hosts
         self.tasks = self._db.tasks
         self.logger = self._db.logger
-        self.dockers = self._db.dockers
+        self.emulators = self._db.emulators
         self.vmwares = self._db.vmwares
         self._DEBUG = False
 
     # def _log(self, prefix, msg):
     #     common_log(self._DEBUG, '[Controller DB]', prefix, msg)
 
+    # ---------- log -----------------------
     def log(self, taskId, func, prefix, msg):
         self.logger.insert({
             'time': int(datetime.now().timestamp()),
@@ -61,6 +62,7 @@ class MongoDriver(object):
             'msg': msg.decode('gbk') if isinstance(msg, bytes) else msg
         })
 
+    # ---------- tasks -----------------------
     def get_taskId(self):
         taskId = 1
         m = self.tasks.aggregate([{"$group": {'_id': '', 'max_id': {"$max": "$taskId"}}}])
@@ -128,22 +130,22 @@ class MongoDriver(object):
     def task_set_docker(self, task, docker):
         self.tasks.update({'_id': task['_id']}, {"$set": {'dockerId': docker['_id']}})
 
-    def docker_create(self, task):
-        return self.dockers.insert({  # ObjectId('5b5031baf930a530c47275d2')
+    # ---------- emulator -----------------------
+    def emulator_create(self, task):
+        return self.emulators.insert({  # ObjectId('5b5031baf930a530c47275d2')
             'docker_name': 'nox-' + str(task['taskId']),
-            'ip': LOCAL_IP,
-            'port': 0,
+            'host_ip': LOCAL_IP,
             'status': STATUS_DOCKER_RUN,
             'start_time': int(datetime.now().timestamp()),
             'up_time': 0,
             'end_time': 0
         })
 
-    def docker_end(self, taskId):
+    def emulator_end(self, taskId):
         t = self.tasks.find_one({'taskId': taskId})
         if t:
             now = int(datetime.now().timestamp())
-            ret = self.dockers.update(
+            ret = self.emulators.update(
                 {'_id': t['dockerId']},
                 {"$set": {
                     'up_time': now,
@@ -153,9 +155,10 @@ class MongoDriver(object):
 
         return False
 
-    def docker_change_status(self, docker):
-        self.dockers.update({'_id': docker['_id']}, {"$set": {'status': docker['status']}})
+    def emulator_change_status(self, docker):
+        self.emulators.update({'_id': docker['_id']}, {"$set": {'status': docker['status']}})
 
+    # ---------- vmware -----------------------
     def vm_find_vm_by_host(self, host_ip=None):
         ret = []
         if host_ip:

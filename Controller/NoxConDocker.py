@@ -160,7 +160,7 @@ class NoxConDocker(object):
         time.sleep(2)
         self._exec_nox_cmd(self._make_cmd("remove -name:" + self._docker_name))
         time.sleep(2)
-        return self._mdb.docker_end(self._taskId)
+        return self._mdb.emulator_end(self._taskId)
 
     def pull(self, app_name):  # restore
         self._log('pull', self._docker_name + ' ' + app_name)

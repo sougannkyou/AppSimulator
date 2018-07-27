@@ -47,7 +47,7 @@ class NoxADB(object):
         return '{}{}'.format(part, -res % 10)
 
     def get_docker_name(self):
-        ret = self.adb_shell("getprop persist.nox.docker_name")
+        ret = self.adb_shell("getprop persist.nox.emulator_name")
         if ret:
             self._docker_name = ret.replace('\r\r\n', '')
 

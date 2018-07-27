@@ -92,7 +92,7 @@
                 <div class="small-box bg-gray">
                     <div class="inner">
                         <p>Support App</p>
-                        <label v-for="app in app_list">
+                        <label v-for="app in support_app_list">
                             <img height="40" v-bind:class="[app_name===app?'app-icon-big':'app-icon']"
                                  v-on:click="setAppName(app)"
                                  src="/static/AppSimulator/images/app/[[app]]/app_icon.png">
@@ -106,98 +106,90 @@
             </div>
         </div>
         <div class="row nav-tabs-custom">
-            <ul class="nav nav-tabs">
-                <li class="active"><a href="#nox" data-toggle="tab" aria-expanded="true">模拟器</a></li>
-                <li class=""><a href="#vmware" data-toggle="tab" aria-expanded="false">VMware</a></li>
-            </ul>
             <div class="tab-content">
-                <div class="tab-pane active" id="nox"><!-- nox -->
-                    <section v-for="host in hostList" class="col-md-12 connectedSortable"><!-- host list -->
-                        <div class="box box-info">
-                            <div class="box-header with-border"><!-- host info-->
-                                <h1 class="box-title label bg-gray">[[ emulator.ip ]]</h1>
-                                <small class="badge bg-green">[[ host.memory_free ]] / [[ host.memory_total ]] GB
-                                </small>
-                                <small v-for="app in host.app_list">
-                                    <img id="app_icon" height="30" style="border-radius:3px;"
-                                         src="/static/AppSimulator/images/app/[[app]]/app_icon.png">
-                                </small>
-                                <span class="badge">[[ host.cnt ]]</span>
-                                <div class="box-tools pull-left">
-                                    <button v-on:click="runTasks" class="btn btn-xs btn-info">重启服务</button>
-                                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-box-tool" data-widget="remove">
-                                        <i class="fa fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="box-body">
-                                <div class="docker col-md-3" v-for="emulator in host.emulators"><!-- dockers info -->
-                                    <small>
-                                        <img id="current" height="30" style="border-radius:3px;"
-                                             src="http://[[emulator.ip]]:8000/static/AppSimulator/images/app/[[emulator.app]]/app_icon.png">
-                                    </small>
-                                    <label class="badge bg-gray">[[ emulator.name ]]</label>
-                                    <span v-bind:class="[emulator.status==='unkown'?'badge bg-gray':
-                                (emulator.status==='running'?'badge bg-green':'badge bg-yellow')]">[[ emulator.status ]]
-                                </span>
-                                    <div class="docker-capture">
-                                        <img id="current" height="240" class="capture"
-                                             src="http://[[emulator.ip]]:8000/static/AppSimulator/images/temp/mnox/capture_[[emulator.name]].png">
-                                        <img id="before" height="240" class="capture"
-                                             src="http://[[emulator.ip]]:8000/static/AppSimulator/images/mnox/capture_[[emulator.name]]_before.png">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="box-footer">
-                                {#                        <input type="text" placeholder="latitude" v-model="latitude" style="width:35%;">#}
-                                {#                        <input type="text" placeholder="longitude" v-model="longitude" style="width:35%;">#}
-                                {#                        <button v-on:click="setDeviceGPS" class="btn btn-xs btn-info">位置设定</button>#}
-                                {#                        <button v-on:click="restartDevice" class="btn btn-xs btn-info">重启</button>#}
-                                {#                        <button v-on:click="stopScript" class="btn btn-xs btn-info">停止脚本</button>#}
+                <!-------------------------- emulators -------------------------------------------------->
+                <section v-for="host in hosts" class="col-md-12 connectedSortable">
+                    <div class="box box-info">
+                        <div class="box-header with-border"><!-- host info-->
+                            <h1 class="box-title label bg-gray">[[ host.ip ]]</h1>
+                            <small class="badge bg-green">[[ host.mem_total ]] GB
+                            </small>
+                            <small v-for="app_name in host.support_app_list">
+                                <img id="app_icon" height="30" style="border-radius:3px;"
+                                     src="/static/AppSimulator/images/app/[[app_name]]/app_icon.png">
+                            </small>
+                            <div class="box-tools pull-left">
+                                <span class="label label-info">多模拟器</span>
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                    <i class="fa fa-times"></i>
+                                </button>
                             </div>
                         </div>
-                    </section>
-                </div>
-                <!-------------------- vmware -------------------------------->
-                <div class="tab-pane active" id="vmware">
-                    <section v-for="vm in vmwares" class="col-md-12 connectedSortable">
-                        <div class="box box-info">
-                            <div class="box-header with-border">
-                                <h1 class="box-title label bg-gray">[[ vm.ip ]]</h1>
-                                <small class="badge bg-green">[[ vm.memory_free ]] / [[ vm.memory_total ]] GB
-                                </small>
+                        <!---------------------------- emulator info -------------------------->
+                        <div class="box-body">
+                            <div class="docker col-md-3" v-for="emulator in host.emulators">
                                 <small>
-                                    <img id="app_icon" height="30" style="border-radius:3px;"
-                                         src="/static/AppSimulator/images/temp/VM/capture_[[vm.app_name]].png">
+                                    <img id="current" height="30" style="border-radius:3px;"
+                                         src="[[emulator.app_icon]]">
                                 </small>
-                                <span class="badge">[[ server.cnt ]]</span>
-                                <div class="box-tools pull-left">
-                                </div>
-                            </div>
-                            <div class="box-body">
-                                <div class="docker col-md-3" v-for="docker in server.dockers">
-                                    <small>
-                                        <img id="current" height="30" style="border-radius:3px;"
-                                             src="/static/AppSimulator/images/app/[[docker.app]]/app_icon.png">
-                                    </small>
-                                    <label class="badge bg-gray">[[ docker.name ]]</label>
-                                    <span v-bind:class="[docker.status==='unkown'?'badge bg-gray':
-                                (docker.status==='running'?'badge bg-green':'badge bg-yellow')]">[[ docker.status ]]
-                                </span>
-                                    <div class="docker-capture">
-                                        <img id="current" height="240" class="capture"
-                                             src="/static/AppSimulator/images/temp/VM/capture.png">
-                                        <img id="before" height="240" class="capture"
-                                             src="/static/AppSimulator/images/temp/VM/capture_before.png">
-                                    </div>
+                                <label class="badge bg-gray">[[ emulator.name ]]</label>
+                                <span v-bind:class="[emulator.status==='unkown'?'badge bg-gray':
+                                        (emulator.status==='running'?'badge bg-green':'badge bg-yellow')]">
+                                        [[ emulator.status ]]
+                                    </span>
+                                <div class="docker-capture">
+                                    <img id="current" height="240" class="capture"
+                                         src="[[emulator.capture]]">
+                                    <img id="before" height="240" class="capture"
+                                         src="[[emulator.capture_before]]">
                                 </div>
                             </div>
                         </div>
-                    </section>
-                </div>
+                        <div class="box-footer">
+                            {#<input type="text" placeholder="latitude" v-model="latitude" style="width:35%;">#}
+                            {#<input type="text" placeholder="longitude" v-model="longitude" style="width:35%;">#}
+                            {#<button v-on:click="setDeviceGPS" class="btn btn-xs btn-info">位置设定</button>#}
+                            {#<button v-on:click="restartDevice" class="btn btn-xs btn-info">重启</button>#}
+                            {#<button v-on:click="stopScript" class="btn btn-xs btn-info">停止脚本</button>#}
+                        </div>
+                    </div>
+                </section>
+                <!--------------------------- vmwares ------------------------------->
+                <section v-for="vm in vmwares" class="col-md-12 connectedSortable">
+                    <div class="box box-warning">
+                        <div class="box-header with-border">
+                            <h1 class="box-title label bg-gray">[[ vm.local_ip ]] @ [[ vm.host_ip ]]</h1>
+                            <label class="badge bg-gray">[[ vm.name ]]</label>
+                            <small class="badge bg-green">[[ vm.mem_total ]] GB
+                            </small>
+                            <span v-bind:class="[vm.status==='unkown'?'badge bg-gray':
+                                (vm.status==='running'?'badge bg-green':'badge bg-yellow')]">[[ vm.status ]]
+                            </span>
+                            <small>
+                                <img id="app_icon" height="30" style="border-radius:3px;"
+                                     src="/static/AppSimulator/images/app/[[vm.app_name]]/app_icon.png">
+                            </small>
+                            <div class="box-tools pull-left">
+                                <span class="label label-warning">VMware</span>
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="emulator-capture">
+                                <img id="current" height="240" class="capture" src="[[vm.capture]]">
+                                <img id="before" height="240" class="capture" src="[[vm.capture_before]]">
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     </div>
@@ -381,15 +373,40 @@
                 dataType: "json",
                 error: function (xhr, err) {
                     obj.msg = "Failure";
-                    console.error("[dashboard] getVMwaresAPI", err);
+                    console.error("[dashboard] getVMwares", err);
                 },
                 success: function (data, status) {
+                    console.log('getVMwares', data);
                     obj.msg = "OK";
                     for (let i = 0; i < 1000; i++) {
                         obj.vmwares.shift();
                     }
                     for (let i = 0; i < data['ret'].length; i++) {
                         obj.vmwares.push(data['ret'][i])
+                    }
+                }
+            };
+            $.ajax(opt);
+        }
+
+        function getHosts(obj) {
+            let opt = {
+                url: '/AppSimulator/getHostsAPI/',
+                type: 'GET',
+                data: {},
+                dataType: "json",
+                error: function (xhr, err) {
+                    obj.msg = "Failure";
+                    console.error("[dashboard] getHosts", err);
+                },
+                success: function (data, status) {
+                    console.log('getHosts', data);
+                    obj.msg = "OK";
+                    for (let i = 0; i < 1000; i++) {
+                        obj.hosts.shift();
+                    }
+                    for (let i = 0; i < data['ret'].length; i++) {
+                        obj.hosts.push(data['ret'][i])
                     }
                 }
             };
@@ -411,8 +428,9 @@
                 tasksCnt: 4,
                 dockerName: 'nox-1',
                 dockersCnt: 0,
-                app_list: [],
+                support_app_list: ['douyin', 'miaopai', 'dianping'],
                 vmwares: [],
+                hosts: [],
                 emulators: [
                     {
                         ip: '192.168.31.227',
@@ -538,26 +556,29 @@
             },
             created: function () {
                 getVMwares(this);
+                getHosts(this);
             },
             watch: {},
             computed: {
-                dockersCnt: function () {
-                    let cnt = 0;
-                    this.rpcServer.forEach(server => {
-                        cnt += server.dockers.length;
-                    });
-                    return cnt;
-                },
-                app_list: function () {
-                    let l = [];
-                    this.rpcServer.forEach(server => {
-                        server.app.forEach(app => {
-                            l.push(app);
-                        });
-                    });
-                    return Array.from(new Set(l));
-                }
+        {#dockersCnt: function () {#}
+        {#    let cnt = 0;#}
+        {#    this.rpcServer.forEach(server => {#}
+        {#        cnt += server.dockers.length;#}
+        {#    });#}
+        {#    return cnt;#}
+        {#},#}
+            {#app_list: function () {#}
+            {#    let l = [];#}
+            {#    this.rpcServer.forEach(server => {#}
+            {#        server.app.forEach(app => {#}
+            {#            l.push(app);#}
+            {#        });#}
+            {#    });#}
+            {#    return Array.from(new Set(l));#}
+            {#}#}
             }
-        });
+        }
+        )
+        ;
     </script>
 {% endblock body_tail %}

@@ -3,10 +3,10 @@ import os
 import time
 import cv2
 import aircv as ac
-import ftplib
+from ftplib import FTP
 import win32gui
 import pyautogui
-from Controller.setting import WORK_PATH
+from Controller.setting import *
 from Controller.Common import common_log
 from Controller.NoxConADB import NoxConADB
 
@@ -65,13 +65,14 @@ class NoxConSelenium(NoxConADB):
         capture_before_path = self._work_path + '\\Controller\\images\\temp\\capture_' + self._docker_name + '_before.png'
         if os.access(capture_before_path, os.F_OK):
             os.remove(capture_before_path)
-        os.rename(capture_path, capture_before_path)
+        if os.access(capture_path, os.F_OK):
+            os.rename(capture_path, capture_before_path)
 
         self.adb_shell("screencap -p /sdcard/" + capture_name)
         self.adb_cmd("pull /sdcard/" + capture_name + " " + self._work_path + '\\Controller\\images\\temp')
         self._capture_obj = ac.imread(self._work_path + '\\Controller\\images\\temp\\' + capture_name)
 
-        # self.ftp_upload(local_file=capture_name, remote_dir='172.16.253.36', remote_file=capture_name)
+        # self.ftp_upload(local_file=capture_name, remote_file=capture_name)
 
     def find_element(self, comment, timeout):
         # True(False), x, y
@@ -248,35 +249,45 @@ class NoxConSelenium(NoxConADB):
             time.sleep(1)
             return True
 
-    def ftp_upload(self, local_file, remote_dir, remote_file):
-        if not self._FTP_TRANSMISSION: return
+    def ftp_upload(self, capture_name, capture_before_name, mode='mnox'):
+        # Controller\images\temp\capture_nox-1.png ->
+        # static\AppSimulator(ftp root)\images\temp\mnox(VM)\capture_nox-1.png
+        bufsize = 1024  # 设置缓冲器大小
+        # task = self._taskId
+        if not self._FTP_TRANSMISSION:
+            return
 
-        ftp_server_ip = '172.16.3.2'
-        username = 'admin'
-        password = 'zhxg@2018'
-
-        f = ftplib.FTP(ftp_server_ip)
-        f.login(username, password)
-        pwd_path = f.pwd()
+        ftp = FTP()
+        ftp.connect(FTP_SERVER_IP, 21)
+        ftp.login(FTP_USER_NAME, FTP_PASSWORD)
+        pwd_path = ftp.pwd()
         self._log('FTP path:', pwd_path)
 
-        bufsize = 1024  # 设置缓冲器大小
-        fp = open(local_file, 'rb')
-        before_local_file = local_file[:-len('.png')] + '_before.png'
-        fp_before = open(before_local_file, 'rb')
-        # f.set_debuglevel(2)
-        try:
-            f.delete(remote_dir + '/' + remote_file)
-            f.delete(remote_dir + '/' + remote_file + "_before")
-            f.rmd(remote_dir)
-        except Exception as e:
-            self._log('ftp_upload error:', e)
-            pass
+        fp = open(self._work_path + '\\Controller\\images\\temp\\' + capture_name, 'rb')
+        if os.access(self._work_path + '\\Controller\\images\\temp\\' + capture_before_name, os.F_OK):
+            fp_before = open(self._work_path + '\\Controller\\images\\temp\\' + capture_before_name, 'rb')
+        else:
+            fp_before = fp
 
-        f.mkd(remote_dir)
-        f.storbinary('STOR ' + remote_dir + '/' + remote_file, fp, bufsize)
-        f.storbinary('STOR ' + remote_dir + '/' + remote_file + "_before", fp_before, bufsize)
-        f.set_debuglevel(0)
+        # f.set_debuglevel(2)
+        if mode == 'vmware':
+            remote_dir = 'images/temp/VM'
+        else:
+            remote_dir = 'images/temp/mnox'
+
+        # try:
+        #     ftp.delete(remote_dir + '/' + capture_name)
+        #     ftp.delete(remote_dir + '/' + capture_before_name)
+        #     ftp.rmd(remote_dir)
+        # except Exception as e:
+        #     self._log('ftp_upload error:', e)
+        #     pass
+
+        # ftp.mkd(remote_dir)
+        ftp.storbinary('STOR ' + remote_dir + '/' + capture_name, fp, bufsize)
+        ftp.storbinary('STOR ' + remote_dir + '/' + capture_before_name, fp_before, bufsize)
+        ftp.set_debuglevel(0)
+        ftp.quit()
         fp.close()
 
     def script(self):
@@ -289,3 +300,18 @@ class NoxConSelenium(NoxConADB):
         #     ret = self.app_quit(wait_time=1)
 
         self.script()
+
+
+if __name__ == "__main__":
+    task = {
+        'taskId': 1,
+        'app_name': 'miaopai',
+        'docker_name': 'nox-' + str(1),
+        'timer_no': 4  # 14s
+    }
+    me = NoxConSelenium(task, 'single')
+    me._FTP_TRANSMISSION = True
+    start = time.time()
+    me.ftp_upload('capture_nox-1.png', 'capture_nox-1_before.png')
+    end = time.time()
+    print(end-start)
