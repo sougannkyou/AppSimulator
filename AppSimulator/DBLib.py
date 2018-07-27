@@ -81,14 +81,28 @@ class MongoDriver(object):
         self.activeInfo = self._db.activeInfo
         self._DEBUG = False
 
+
+    # -------------  logger -----------------------------------------------------------------
+    def log_find_by_ip(self, ip=None):
+        ret = []
+        cond = {}
+        if ip:
+            cond = {'ip': ip}
+
+        log_list = self.logger.find(cond).sort('time', pymongo.DESCENDING).skip(0).limit(200)
+        for log in log_list:
+            log.pop('_id')
+            log['time'] = datetime.fromtimestamp(log['time']).strftime("%m-%d %H:%M:%S") if log['time'] else ''
+            log['msg'] = log['msg'].decode('gbk') if isinstance(log['msg'], bytes) else log['msg']
+            ret.append(log)
+        return ret
     # -------------  emulators ---------------------------------
     def emulator_get_hosts(self):
         hosts = []
         l = self.hosts.find({'host_type': 'emulator'})
         for h in l:
             h.pop('_id')
-            host = self.emulator_find_by_host(h['ip'])
-            h['emulators'] = host
+            h['emulators'] = self.emulator_find_by_host(h['ip'])
             hosts.append(h)
         return hosts
 
@@ -180,29 +194,13 @@ class MongoDriver(object):
             ret.append(r)
         return ret
 
-    # -------------  logger -----------------------------------------------------------------
-    def log_find_by_ip(self, ip=None):
-        ret = []
-        cond = {}
-        if ip:
-            cond = {'ip': ip}
-
-        log_list = self.logger.find(cond).sort('time', pymongo.DESCENDING).skip(0).limit(200)
-        for log in log_list:
-            log.pop('_id')
-            log['time'] = datetime.fromtimestamp(log['time']).strftime("%m-%d %H:%M:%S") if log['time'] else ''
-            log['msg'] = log['msg'].decode('gbk') if isinstance(log['msg'], bytes) else log['msg']
-            ret.append(log)
-        return ret
-
     # ----------------- vmwares -------------------------------------------------------------
     def vm_get_hosts(self):
         hosts = []
         l = self.hosts.find({'host_type': 'vmware'})
         for h in l:
             h.pop('_id')
-            host = self.vm_find_by_host(host_ip=h['ip'])
-            h['vmwares'] = host
+            h['vmwares'] = self.vm_find_by_host(host_ip=h['ip'])
             hosts.append(h)
         return hosts
 

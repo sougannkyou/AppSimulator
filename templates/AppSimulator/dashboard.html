@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block header_tail %}
-    {#<meta http-equiv="refresh" content="5">#}
+{#    <meta http-equiv="refresh" content="1">#}
     <link rel="stylesheet" href="{% static 'AppSimulator/css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
 {% endblock header_tail %}
@@ -108,7 +108,7 @@
         <div class="row nav-tabs-custom">
             <div class="tab-content">
                 <!-------------------------- emulators -------------------------------------------------->
-                <section v-for="host in hosts" class="col-md-12 connectedSortable">
+                <section v-for="host in emulator_hosts" class="col-md-12 connectedSortable">
                     <div class="box box-info">
                         <div class="box-header with-border"><!-- host info-->
                             <h1 class="box-title label bg-gray">[[ host.ip ]]</h1>
@@ -130,7 +130,7 @@
                         </div>
                         <!---------------------------- emulator info -------------------------->
                         <div class="box-body">
-                            <div class="docker col-md-3" v-for="emulator in host.emulators">
+                            <div class="docker col-md-2" v-for="emulator in host.emulators">
                                 <small>
                                     <img id="current" height="30" style="border-radius:3px;"
                                          src="[[emulator.app_icon]]">
@@ -141,10 +141,8 @@
                                         [[ emulator.status ]]
                                     </span>
                                 <div class="docker-capture">
-                                    <img id="current" height="240" class="capture"
-                                         src="[[emulator.capture]]">
-                                    <img id="before" height="240" class="capture"
-                                         src="[[emulator.capture_before]]">
+                                    <img id="current" height="240" class="capture" src="[[emulator.capture]]">
+    {#                                    <img id="before" height="240" class="capture" src="[[emulator.capture_before]]">#}
                                 </div>
                             </div>
                         </div>
@@ -158,34 +156,35 @@
                     </div>
                 </section>
                 <!--------------------------- vmwares ------------------------------->
-                <section v-for="vm in vmwares" class="col-md-12 connectedSortable">
+                <section  v-for="host in vmware_hosts" class="col-md-12 connectedSortable">
                     <div class="box box-warning">
-                        <div class="box-header with-border">
-                            <h1 class="box-title label bg-gray">[[ vm.local_ip ]] @ [[ vm.host_ip ]]</h1>
-                            <label class="badge bg-gray">[[ vm.name ]]</label>
-                            <small class="badge bg-green">[[ vm.mem_total ]] GB
-                            </small>
-                            <span v-bind:class="[vm.status==='unkown'?'badge bg-gray':
-                                (vm.status==='running'?'badge bg-green':'badge bg-yellow')]">[[ vm.status ]]
-                            </span>
-                            <small>
-                                <img id="app_icon" height="30" style="border-radius:3px;"
-                                     src="/static/AppSimulator/images/app/[[vm.app_name]]/app_icon.png">
-                            </small>
-                            <div class="box-tools pull-left">
-                                <span class="label label-warning">VMware</span>
-                                <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                                    <i class="fa fa-minus"></i>
-                                </button>
-                                <button type="button" class="btn btn-box-tool" data-widget="remove">
-                                    <i class="fa fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="box-body">
-                            <div class="emulator-capture">
-                                <img id="current" height="240" class="capture" src="[[vm.capture]]">
-                                <img id="before" height="240" class="capture" src="[[vm.capture_before]]">
+                        <h2 style="margin-left:20px;">[[ host.ip ]] <small class="badge bg-green">[[ host.mem_total ]] GB</small></h2>
+                        <div v-for="vm in host.vmwares" class="col-md-4 connectedSortable">
+                            <div class="box box-warning">
+                                <div class="box-header with-border">
+                                    <h1 class="box-title label bg-gray">[[ vm.local_ip ]]</h1>
+                                    <label class="badge bg-gray">[[ vm.name ]]</label>
+                                    <span v-bind:class="[vm.status==='unkown'?'badge bg-gray':
+                                        (vm.status==='running'?'badge bg-green':'badge bg-yellow')]">[[ vm.status ]]
+                                    </span>
+                                    <img id="app_icon" height="30" style="border-radius:3px;"
+                                         src="/static/AppSimulator/images/app/[[vm.app_name]]/app_icon.png">
+                                    <div class="box-tools pull-left">
+                                        <span class="label label-warning">VMware</span>
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div class="emulator-capture">
+                                        <img id="current" height="240" class="capture" src="[[vm.capture]]">
+                                        {#<img id="before" height="240" class="capture" src="[[vm.capture_before]]">#}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -365,48 +364,52 @@
             $.ajax(opt);
         }
 
-        function getVMwares(obj) {
+        function getVMwareHosts(obj) {
             let opt = {
-                url: '/AppSimulator/getVMwaresAPI/',
+                url: '/AppSimulator/getHostsAPI/',
                 type: 'GET',
-                data: {},
+                data: {
+                    host_type:'vmware'
+                },
                 dataType: "json",
                 error: function (xhr, err) {
                     obj.msg = "Failure";
                     console.error("[dashboard] getVMwares", err);
                 },
                 success: function (data, status) {
-                    console.log('getVMwares', data);
+                    console.log('getVMwareHosts', data);
                     obj.msg = "OK";
                     for (let i = 0; i < 1000; i++) {
-                        obj.vmwares.shift();
+                        obj.vmware_hosts.shift();
                     }
                     for (let i = 0; i < data['ret'].length; i++) {
-                        obj.vmwares.push(data['ret'][i])
+                        obj.vmware_hosts.push(data['ret'][i])
                     }
                 }
             };
             $.ajax(opt);
         }
 
-        function getHosts(obj) {
+        function getEmulatorHosts(obj) {
             let opt = {
                 url: '/AppSimulator/getHostsAPI/',
                 type: 'GET',
-                data: {},
+                data: {
+                    host_type:'emulator'
+                },
                 dataType: "json",
                 error: function (xhr, err) {
                     obj.msg = "Failure";
                     console.error("[dashboard] getHosts", err);
                 },
                 success: function (data, status) {
-                    console.log('getHosts', data);
+                    console.log('getEmulatorHosts', data);
                     obj.msg = "OK";
                     for (let i = 0; i < 1000; i++) {
-                        obj.hosts.shift();
+                        obj.emulator_hosts.shift();
                     }
                     for (let i = 0; i < data['ret'].length; i++) {
-                        obj.hosts.push(data['ret'][i])
+                        obj.emulator_hosts.push(data['ret'][i])
                     }
                 }
             };
@@ -429,93 +432,8 @@
                 dockerName: 'nox-1',
                 dockersCnt: 0,
                 support_app_list: ['douyin', 'miaopai', 'dianping'],
-                vmwares: [],
-                hosts: [],
-                emulators: [
-                    {
-                        ip: '192.168.31.227',
-                        memory_total: '7.9',
-                        memory_free: '1.9',
-                        app: ['douyin', 'dianping', 'miaopai'],
-                        dockers: [{
-                            name: 'nox-1',
-                            app: 'douyin',
-                            status: DEVICE_STATUS_RUN,
-                            cnt: 0,
-                            dedup_cnt: 0,
-                            gps: {}
-                        }, {
-                            name: 'nox-2',
-                            app: 'dianping',
-                            status: DEVICE_STATUS_RUN,
-                            cnt: 0,
-                            dedup_cnt: 0,
-                            gps: {}
-                        }, {
-                            name: 'nox-3',
-                            app: 'miaopai',
-                            status: DEVICE_STATUS_RUN,
-                            cnt: 0,
-                            dedup_cnt: 0,
-                            gps: {}
-                        }, {
-                            name: 'nox-4',
-                            app: 'miaopai',
-                            status: DEVICE_STATUS_RUN,
-                            cnt: 0,
-                            dedup_cnt: 0,
-                            gps: {}
-                        }, {
-                            name: 'nox-5',
-                            app: 'miaopai',
-                            status: DEVICE_STATUS_RUN,
-                            cnt: 0,
-                            dedup_cnt: 0,
-                            gps: {}
-                        }, {
-                            name: 'nox-6',
-                            app: 'miaopai',
-                            status: DEVICE_STATUS_RUN,
-                            cnt: 0,
-                            dedup_cnt: 0,
-                            gps: {}
-                        }]
-                    }, {
-                        ip: '192.168.31.228',
-                        memory_total: '7.9',
-                        memory_free: '1.9',
-                        app: ['douyin', 'dianping', 'miaopai'],
-                        dockers: [{
-                            name: 'nox-1',
-                            app: 'douyin',
-                            status: DEVICE_STATUS_RUN,
-                            cnt: 0,
-                            dedup_cnt: 0,
-                            gps: {}
-                        }, {
-                            name: 'nox-2',
-                            app: 'dianping',
-                            status: DEVICE_STATUS_RUN,
-                            cnt: 0,
-                            dedup_cnt: 0,
-                            gps: {}
-                        }, {
-                            name: 'nox-3',
-                            app: 'miaopai',
-                            status: DEVICE_STATUS_RUN,
-                            cnt: 0,
-                            dedup_cnt: 0,
-                            gps: {}
-                        }, {
-                            name: 'nox-4',
-                            app: 'miaopai',
-                            status: DEVICE_STATUS_RUN,
-                            cnt: 0,
-                            dedup_cnt: 0,
-                            gps: {}
-                        }]
-                    }
-                ],
+                vmware_hosts: [],
+                emulator_hosts: [],
                 gps: {
                     district: '海淀区',
                     lng_lat: "",
@@ -555,8 +473,8 @@
                 }
             },
             created: function () {
-                getVMwares(this);
-                getHosts(this);
+                getVMwareHosts(this);
+                getEmulatorHosts(this);
             },
             watch: {},
             computed: {

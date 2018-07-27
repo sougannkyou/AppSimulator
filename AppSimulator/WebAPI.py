@@ -240,7 +240,12 @@ def getVMwareActiveInfoAPI(request):
 
 # ------- hosts ----------------------------------------------------------------
 def getHostsAPI(request):
-    ret = MDB.emulator_get_hosts()
+    host_type = request.GET.get('host_type')
+    if host_type == 'emulator':
+        ret = MDB.emulator_get_hosts()
+    else:
+        ret = MDB.vm_get_hosts()
+
     output = JsonResponse({
         'ret': ret,
     })
