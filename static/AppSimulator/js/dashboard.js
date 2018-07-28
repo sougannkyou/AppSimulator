@@ -5,11 +5,30 @@ function ajaxError(err, msg) {
 }
 
 const DEBUG_TIME = 1;
+
+
 // ------------------ DeviceCrawlCntInfo  ------------------
-// setInterval(function () {
-//     $("#before").attr('src', src = "/static/AppSimulator/images/capture_before.png?t=" + Math.random());
-//     $("#current").attr('src', src = "/static/AppSimulator/images/capture.png?t=" + Math.random());
-// }, 1000);
+function refresh_img_src(img_src) {
+    let i = img_src.indexOf('?t=');
+    if (i > 0) {
+        return img_src.substr(0, i) + '?t=' + Math.random();
+    } else {
+        return img_src + '?t=' + Math.random();
+    }
+}
+
+setInterval(function () {
+    $(".emulator-capture").each(function (index,element) {
+        // console.log(element.src);
+        element.src = refresh_img_src(element.src);
+    });
+
+    $(".vm-capture").each(function (index,element) {
+        // console.log(element.src);
+        element.src = refresh_img_src(element.src);
+    });
+    // $("#current").attr('src', src = "/static/AppSimulator/images/capture.png?t=" + Math.random());
+}, 1000);
 
 setInterval(function () {
     $.ajax({
