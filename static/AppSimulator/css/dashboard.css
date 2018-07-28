@@ -5,6 +5,9 @@ div.emulator {
 }
 
 div.emulator-capture {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
     margin-top: 5px;
     padding: 0 10px 0 10px;
     width: 100%;
@@ -24,6 +27,7 @@ img.app-icon-big {
 }
 
 img.capture {
+    alignment: center;
     border-radius: 3px;
     margin: 5px 10px 0 10px;
 }

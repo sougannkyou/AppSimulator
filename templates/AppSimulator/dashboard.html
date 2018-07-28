@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block header_tail %}
-{#    <meta http-equiv="refresh" content="1">#}
+    {#    <meta http-equiv="refresh" content="1">#}
     <link rel="stylesheet" href="{% static 'AppSimulator/css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
 {% endblock header_tail %}
@@ -110,10 +110,9 @@
                 <!-------------------------- emulators -------------------------------------------------->
                 <section v-for="host in emulator_hosts" class="col-md-12 connectedSortable">
                     <div class="box box-info">
-                        <div class="box-header with-border"><!-- host info-->
+                        <div class="box-header"><!-- host info-->
                             <h1 class="box-title label bg-gray">[[ host.ip ]]</h1>
-                            <small class="badge bg-green">[[ host.mem_total ]] GB
-                            </small>
+                            <small class="badge bg-green">[[ host.mem_total ]] GB</small>
                             <small v-for="app_name in host.support_app_list">
                                 <img id="app_icon" height="30" style="border-radius:3px;"
                                      src="/static/AppSimulator/images/app/[[app_name]]/app_icon.png">
@@ -128,21 +127,32 @@
                                 </button>
                             </div>
                         </div>
-                        <!---------------------------- emulator info -------------------------->
+                        <!---------------------------- emulator item -------------------------->
                         <div class="box-body">
                             <div class="docker col-md-2" v-for="emulator in host.emulators">
-                                <small>
-                                    <img id="current" height="30" style="border-radius:3px;"
-                                         src="[[emulator.app_icon]]">
-                                </small>
-                                <label class="badge bg-gray">[[ emulator.name ]]</label>
-                                <span v-bind:class="[emulator.status==='unkown'?'badge bg-gray':
+                                <div class="box box-info">
+                                    <div class="box-header">
+                                        <small><img id="current" height="30" style="border-radius:3px;"
+                                                    src="[[emulator.app_icon]]"></small>
+                                        <label class="badge bg-gray">[[ emulator.name ]]</label>
+                                        <span v-bind:class="[emulator.status==='unkown'?'badge bg-gray':
                                         (emulator.status==='running'?'badge bg-green':'badge bg-yellow')]">
-                                        [[ emulator.status ]]
-                                    </span>
-                                <div class="docker-capture">
-                                    <img id="current" height="240" class="capture" src="[[emulator.capture]]">
-    {#                                    <img id="before" height="240" class="capture" src="[[emulator.capture_before]]">#}
+                                        [[ emulator.status ]]</span>
+                                        <div class="box-tools pull-left">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body ">
+                                        <div class="emulator-capture">
+                                            <img id="current" height="240" class="capture1" src="[[emulator.capture]]">
+                                            {# <img id="before" height="240" class="capture" src="[[emulator.capture_before]]">#}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -156,12 +166,17 @@
                     </div>
                 </section>
                 <!--------------------------- vmwares ------------------------------->
-                <section  v-for="host in vmware_hosts" class="col-md-12 connectedSortable">
+                <section v-for="host in vmware_hosts" class="col-md-12 connectedSortable">
                     <div class="box box-warning">
-                        <h2 style="margin-left:20px;">[[ host.ip ]] <small class="badge bg-green">[[ host.mem_total ]] GB</small></h2>
+                        <div class="box-header">
+                            <h2 style="margin-left:20px;">[[ host.ip ]]
+                                <small class="badge bg-green">[[ host.mem_total ]] GB</small>
+                            </h2>
+
+                        </div>
                         <div v-for="vm in host.vmwares" class="col-md-4 connectedSortable">
                             <div class="box box-warning">
-                                <div class="box-header with-border">
+                                <div class="box-header">
                                     <h1 class="box-title label bg-gray">[[ vm.local_ip ]]</h1>
                                     <label class="badge bg-gray">[[ vm.name ]]</label>
                                     <span v-bind:class="[vm.status==='unkown'?'badge bg-gray':
@@ -369,7 +384,7 @@
                 url: '/AppSimulator/getHostsAPI/',
                 type: 'GET',
                 data: {
-                    host_type:'vmware'
+                    host_type: 'vmware'
                 },
                 dataType: "json",
                 error: function (xhr, err) {
@@ -395,7 +410,7 @@
                 url: '/AppSimulator/getHostsAPI/',
                 type: 'GET',
                 data: {
-                    host_type:'emulator'
+                    host_type: 'emulator'
                 },
                 dataType: "json",
                 error: function (xhr, err) {
