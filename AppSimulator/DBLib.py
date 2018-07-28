@@ -81,7 +81,6 @@ class MongoDriver(object):
         self.activeInfo = self._db.activeInfo
         self._DEBUG = False
 
-
     # -------------  logger -----------------------------------------------------------------
     def log_find_by_ip(self, ip=None):
         ret = []
@@ -96,6 +95,7 @@ class MongoDriver(object):
             log['msg'] = log['msg'].decode('gbk') if isinstance(log['msg'], bytes) else log['msg']
             ret.append(log)
         return ret
+
     # -------------  emulators ---------------------------------
     def emulator_get_hosts(self):
         hosts = []
@@ -105,6 +105,12 @@ class MongoDriver(object):
             h['emulators'] = self.emulator_find_by_host(h['ip'])
             hosts.append(h)
         return hosts
+
+    def emulator_get_task(self, taskId):
+        if taskId:
+            return self.tasks.find_one({'taskId': taskId})
+        else:
+            return None
 
     def emulator_find_by_host(self, host_ip=None):
         ret = []
@@ -118,6 +124,9 @@ class MongoDriver(object):
             emu.pop('_id')
             pre = 'http://' + emu['host_ip'] + ':8000/static/AppSimulator/images/'
             emu['app_icon'] = pre + 'app/' + emu['app_name'] + '/app_icon.png'
+            taskId = emu['taskId'] if 'taskId' in emu else None
+            task = self.emulator_get_task(taskId)
+            emu['timer'] = TIMER[task['timer_no'] if task else 0]
             emu['capture'] = pre + 'temp/emulators/capture_' + emu['name'] + '.png'
             emu['capture_before'] = pre + 'temp/emulators/capture_' + emu['name'] + '_before.png'
             ret.append(emu)

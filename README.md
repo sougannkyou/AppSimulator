@@ -56,15 +56,15 @@ pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple psutil opencv-python==3
 6)数据结构
 [tasks]
 {
-    "taskId" : 222,
+    "taskId" : 3,
     "orgTaskId":0,
     "script" : "script_douyin.py",
     "live_cycle": "once"/"never",
-    "host_ip": "172.16.253.232",
+    "host_ip": "172.16.253.37",
     "app_name" : "douyin",
     "status" : "wait",  // unkown, wait, building, build_ok, build_ng, running, run_ok, run_ng
     "docker_type": "vmware"/"emulator",
-    "timer_no": 0,
+    "timer_no": 3,
     "dockerId": ObjectId("emulators") or ObjectId("vmwares"),
     "start_time" : 0,
     "up_time" : 0,

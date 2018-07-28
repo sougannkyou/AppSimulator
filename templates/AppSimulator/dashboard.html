@@ -2,13 +2,14 @@
 {% load static %}
 
 {% block header_tail %}
-{#    <meta http-equiv="refresh" content="1">#}
+    {#    <meta http-equiv="refresh" content="1">#}
     <link rel="stylesheet" href="{% static 'AppSimulator/css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
 {% endblock header_tail %}
 
 {% block section_content %}
     <div id="main" v-cloak>
+        <label id="systime"></label>
         <div class="row">
             <div class="col-md-2">
                 <div class="small-box bg-aqua">
@@ -134,6 +135,9 @@
                                         <span v-bind:class="[emulator.status==='unkown'?'badge bg-gray':
                                         (emulator.status==='running'?'badge bg-green':'badge bg-yellow')]">
                                         [[ emulator.status ]]</span>
+                                        <label class="badge bg-red">
+                                            <i class="fa fa-clock-o"></i> [[ emulator.timer ]]s
+                                        </label>
                                         <div class="box-tools pull-left">
                                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                                 <i class="fa fa-minus"></i>
