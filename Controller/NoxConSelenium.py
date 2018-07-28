@@ -1,6 +1,7 @@
 # coding:utf-8
 import os
 import time
+import shutil
 import cv2
 import aircv as ac
 from ftplib import FTP
@@ -60,9 +61,14 @@ class NoxConSelenium(NoxConADB):
         self.adb_shell("am start -n com.android.settings/.Settings")
         return True
 
-    def get_capture(self, capture_name):
+    def get_capture(self):
+        capture_name = 'capture_' + self._docker_name + '.png'
+        capture_before_name = 'capture_' + self._docker_name + '_before.png'
         capture_path = self._work_path + '\\Controller\\images\\temp\\' + capture_name
-        capture_before_path = self._work_path + '\\Controller\\images\\temp\\capture_' + self._docker_name + '_before.png'
+        capture_before_path = self._work_path + '\\Controller\\images\\temp\\' + capture_before_name
+        static_capture_path = self._work_path + '\\static\\AppSimulator\\images\\temp\emulators\\' + capture_name
+        static_capture_before_path = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\' + capture_before_name
+
         if os.access(capture_before_path, os.F_OK):
             os.remove(capture_before_path)
         if os.access(capture_path, os.F_OK):
@@ -72,14 +78,14 @@ class NoxConSelenium(NoxConADB):
         self.adb_cmd("pull /sdcard/" + capture_name + " " + self._work_path + '\\Controller\\images\\temp')
         self._capture_obj = ac.imread(self._work_path + '\\Controller\\images\\temp\\' + capture_name)
 
-        # self.ftp_upload(local_file=capture_name, remote_file=capture_name)
+        shutil.copy(capture_path, static_capture_path)
+        shutil.copy(capture_before_path, static_capture_before_path)
 
     def find_element(self, comment, timeout):
         # True(False), x, y
-        capture_name = "capture_" + self._docker_name + ".png"
         img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
         while timeout > 0:
-            self.get_capture(capture_name)
+            self.get_capture()
             from datetime import datetime
             # start = datetime.now()
             pos = ac.find_template(self._capture_obj, img_obj)
@@ -98,9 +104,8 @@ class NoxConSelenium(NoxConADB):
 
     def find_elements(self, comment, timeout):
         ret = []
-        capture_name = "capture_" + self._docker_name + ".png"
         img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
-        self.get_capture(capture_name)
+        self.get_capture()
 
         while timeout > 0:
             pos_list = ac.find_all_template(self._capture_obj, img_obj)
@@ -115,7 +120,7 @@ class NoxConSelenium(NoxConADB):
             else:
                 time.sleep(1)
                 timeout -= 1
-                self.get_capture(capture_name)
+                self.get_capture()
                 self._log('<<info>> 未匹配：', comment + ' ' + str(timeout) + 's')
 
         return len(ret) > 0, ret
@@ -314,4 +319,4 @@ if __name__ == "__main__":
     start = time.time()
     me.ftp_upload('capture_nox-1.png', 'capture_nox-1_before.png')
     end = time.time()
-    print(end-start)
+    print(end - start)
