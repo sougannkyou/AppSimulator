@@ -252,6 +252,27 @@ def getHostsAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
+def addHostAPI(request):
+    ip = request.POST.get('ip')
+    host_type = request.POST.get('host_type')
+    timer_max_cnt = request.POST.get('timer_max_cnt')
+    mem_total = request.POST.get('mem_total')
+    support_app_list = request.POST.get('support_app_list')
+
+    host = {
+        "ip": ip,
+        "host_type": host_type,
+        "support_app_list": support_app_list.split(','),
+        "timer_max_cnt": int(timer_max_cnt),
+        "mem_total": float(mem_total)
+    }
+    ret = MDB.emulator_add_host(host)
+    output = JsonResponse({
+        'ret': True if ret else False,
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
 # ------- logger ----------------------------------------------------------------
 def getLoggerAPI(request):
     ip = request.GET.get('ip')

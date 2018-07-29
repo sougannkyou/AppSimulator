@@ -106,6 +106,13 @@ class MongoDriver(object):
             hosts.append(h)
         return hosts
 
+    def emulator_add_host(self, host):
+        h = self.hosts.find_one({'ip': 'ip'})
+        if h:
+            return None
+        else:
+            return self.hosts.insert(host)
+
     def emulator_get_task(self, taskId):
         if taskId:
             return self.tasks.find_one({'taskId': taskId})
