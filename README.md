@@ -108,3 +108,6 @@ mongorestore -h 192.168.31.227:27017 -d AppSimulator c:\MongoDB\backup\AppSimula
 
 [todo]
 修改地域， 文本输入， 匹配杂乱背景，无明显标示无法切分
+
+/static/AppSimulator/images/temp/emulators/capture_nox-1.png
+static\AppSimulator\images\temp\emulators
