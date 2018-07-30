@@ -133,8 +133,9 @@ class MongoDriver(object):
     # ---------- emulator -----------------------
     def emulator_create(self, task):
         return self.emulators.insert({  # ObjectId('5b5031baf930a530c47275d2')
-            'docker_name': 'nox-' + str(task['taskId']),
+            'name': 'nox-' + str(task['taskId']),
             'taskId': task['taskId'],
+            'app_name': task['app_name'],
             'host_ip': LOCAL_IP,
             'status': STATUS_DOCKER_RUN,
             'start_time': int(datetime.now().timestamp()),

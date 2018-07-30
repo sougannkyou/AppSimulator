@@ -180,11 +180,11 @@ class MongoDriver(object):
 
         for r in l:
             r.pop('_id')
-            r.pop('dockerId')
+            if 'dockerId' in r: r.pop('dockerId')
             r['start_time'] = datetime.fromtimestamp(r['start_time']).strftime("%Y-%m-%d %H:%M:%S") \
-                if r['start_time'] else ''
+                if 'start_time' in r and r['start_time'] else ''
             r['end_time'] = datetime.fromtimestamp(r['end_time']).strftime("%Y-%m-%d %H:%M:%S") \
-                if r['end_time'] else ''
+                if 'end_time' in r and r['end_time'] else ''
             ret.append(r)
 
         return ret
@@ -198,16 +198,13 @@ class MongoDriver(object):
             info.pop('_id')
         return info
 
-    def get_rpc_servers(self, app_name=None):
+    # ----------------- all -------------------------------------------------------------
+    def all_get_hosts(self):
         ret = []
-        if app_name:
-            l = self.rpcServer.find({'app_name': {'$in': [app_name]}})
-        else:
-            l = self.rpcServer.find()
-
-        for r in l:
-            r.pop('_id')
-            ret.append(r)
+        for h in self.hosts.find():
+            h.pop('_id')
+            h['timer_max_cnt'] = '-' if h['host_type'] == 'vmware' else h['timer_max_cnt']
+            ret.append(h)
         return ret
 
     # ----------------- vmwares -------------------------------------------------------------

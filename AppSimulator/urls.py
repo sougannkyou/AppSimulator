@@ -13,7 +13,7 @@ from AppSimulator.WebAPI import (
     setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,
     getDeviceCaptureAPI, getProxyServerInfoAPI,
     runTasksAPI,
-    getVMwaresAPI,getHostsAPI, getLoggerAPI
+    getVMwaresAPI, getHostsAPI, getAllHostsAPI, getLoggerAPI
 )
 
 cache_time_out = 60 * 3
@@ -45,6 +45,8 @@ urlpatterns = patterns('',
                        url(r'^getVMwaresAPI/$', getVMwaresAPI, name='getVMwaresAPI'),
                        # hosts
                        url(r'^getHostsAPI/$', getHostsAPI, name='getHostsAPI'),
+                       # all hosts
+                       url(r'^getAllHostsAPI/$', getAllHostsAPI, name='getAllHostsAPI'),
                        # logger
                        url(r'^getLoggerAPI/$', getLoggerAPI, name='getLoggerAPI'),
                        )

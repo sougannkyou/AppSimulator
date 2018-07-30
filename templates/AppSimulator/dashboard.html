@@ -9,99 +9,95 @@
 
 {% block section_content %}
     <div id="main" v-cloak>
-        <label id="systime"></label>
+        <label class="badge bg-red ">
+            <i class="fa fa-clock-o fa-lg"></i>&nbsp;&nbsp;<span id="systime"></span>
+        </label>
         <div class="row">
-            <div class="col-md-2">
-                <div class="small-box bg-aqua">
-                    <div class="inner">
-                        <p>Server - Memory</p>
-                        <h3>[[ proxyServerInfo.memory_rate ]]%</h3>
-                    </div>
-                    <div class="icon">
-                        <img class="top-icon" src="{% static 'AppSimulator/images/page/memory.png' %}">
-                    </div>
-                    <a href="/AppSimulator/dashboard/" class="small-box-footer">
-                        详情&nbsp;
-                        <i class="fa fa-arrow-circle-right"></i>
-                    </a>
-                    {#<button v-on:click="startProxyServer" class="btn btn-xs btn-success">重启代理服务</button>#}
-                </div>
-            </div>
             <div class="col-md-2">
                 <div class="small-box bg-green">
                     <div class="inner">
-                        <p>Server - CPU</p>
-                        <h3>[[ proxyServerInfo.cpu_percent ]]%</h3>
+                        <p>Running</p>
+                        <h3>10</h3>
                     </div>
                     <div class="icon">
-                        <img class="top-icon" src="{% static 'AppSimulator/images/page/cpu.png' %}">
+                        <i class="fa fa-check"></i>
                     </div>
                     <a href="/AppSimulator/dashboard/" class="small-box-footer">
-                        详情&nbsp;
-                        <i class="fa fa-arrow-circle-right"></i>
+                        More&nbsp;<i class="fa fa-arrow-circle-right"></i>
                     </a>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="small-box bg-yellow">
                     <div class="inner">
-                        <p>Server - HD</p>
-                        <h3>[[ proxyServerInfo.hd_percent ]]%</h3>
+                        <p>Warring</p>
+                        <h3>10</h3>
                     </div>
                     <div class="icon">
-                        <img class="top-icon" src="{% static 'AppSimulator/images/page/hd.png' %}">
+                        <i class="fa fa-exclamation-triangle"></i>
                     </div>
-                    <a href="/AppSimulator/dashboard/" class="small-box-footer">
-                        详情&nbsp;
-                        <i class="fa fa-arrow-circle-right"></i>
+                    <a href="/AppSimulator/logger/" class="small-box-footer">
+                        Log&nbsp;<i class="fa fa-arrow-circle-right"></i>
                     </a>
                 </div>
             </div>
             <div class="col-md-2">
-                <div class="small-box bg-red">
+                <div class="small-box bg-gray-active">
                     <div class="inner">
-                        <p>Dedup/Total (10s)</p>
-                        <h3>10
-                            <small>10</small>
-                        </h3>
+                        <p>Hosts</p>
+                        <h3>[[ hosts_cnt ]]</h3>
                     </div>
                     <div class="icon">
-                        <i class="fa fa-star-half-empty"></i>
+                        <img class="top-icon" src="{% static 'AppSimulator/images/page/host.png' %}">
                     </div>
-                    <a href="/AppSimulator/dashboard/" class="small-box-footer">
-                        详情&nbsp;
-                        <i class="fa fa-arrow-circle-right"></i>
+                    <a href="/AppSimulator/hosts/" class="small-box-footer">
+                        More&nbsp;<i class="fa fa-arrow-circle-right"></i>
                     </a>
                 </div>
             </div>
-            <div class="col-md-2"><!-- rpc server / dockers -->
-                <div class="small-box bg-gray">
+            <div class="col-md-2">
+                <div class="small-box bg-light-blue">
                     <div class="inner">
-                        <p>Host - Emulator(VMware)</p>
-                        <h3>[[ rpcServer | count ]] / [[ dockersCnt ]]</h3>
+                        <p>VMware</p>
+                        <h3>[[ vmware_cnt ]]
+                            <small>[[ vmware_hosts | count ]] host</small>
+                        </h3>
+                    </div>
+                    <div class="icon">
+                        <img class="top-icon" src="{% static 'AppSimulator/images/page/vmware.png' %}">
+                    </div>
+                    <a href="/AppSimulator/vmware/" class="small-box-footer">
+                        More&nbsp;<i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="small-box bg-aqua">
+                    <div class="inner">
+                        <p>Emulator</p>
+                        <h3>[[ emulator_cnt ]]
+                            <small>[[ emulator_hosts | count ]] host</small>
+                        </h3>
                     </div>
                     <div class="icon">
                         <img class="top-icon" src="{% static 'AppSimulator/images/page/emulator.png' %}">
                     </div>
-                    <a href="/AppSimulator/hosts/" class="small-box-footer">
-                        详情&nbsp;
-                        <i class="fa fa-arrow-circle-right"></i>
+                    <a href="/AppSimulator/tasks/" class="small-box-footer">
+                        Tasks&nbsp;<i class="fa fa-arrow-circle-right"></i>
                     </a>
                 </div>
             </div>
-            <div class="col-md-2"><!-- Support App -->
+            <div class="col-md-2">
                 <div class="small-box bg-gray">
                     <div class="inner">
                         <p>Support App</p>
                         <label v-for="app in support_app_list">
-                            <img height="40" v-bind:class="[app_name===app?'app-icon-big':'app-icon']"
-                                 v-on:click="setAppName(app)"
+                            <img height="40" class="app-icon"
                                  src="/static/AppSimulator/images/app/[[app]]/app_icon.png">
                         </label>
                     </div>
                     <a href="/AppSimulator/dashboard/" class="small-box-footer">
-                        详情&nbsp;
-                        <i class="fa fa-arrow-circle-right"></i>
+                        Hosts&nbsp;<i class="fa fa-arrow-circle-right"></i>
                     </a>
                 </div>
             </div>
@@ -113,13 +109,14 @@
                     <div class="box box-info">
                         <div class="box-header"><!-- host info-->
                             <h1 class="box-title label bg-gray">[[ host.ip ]]</h1>
-                            <small class="badge bg-green">[[ host.mem_total ]] GB</small>
+                            <small class="badge bg-green-active" style="margin:-20px 0 0 -10px;">[[ host.mem_total ]] GB
+                            </small>
                             <small v-for="app_name in host.support_app_list">
                                 <img id="app_icon" height="30" style="border-radius:3px;"
                                      src="/static/AppSimulator/images/app/[[app_name]]/app_icon.png">
                             </small>
                             <div class="box-tools pull-left">
-                                <span class="label label-info">多模拟器</span>
+                                <span class="label label-info">Multi - Emulator</span>
                                 <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                     <i class="fa fa-minus"></i>
                                 </button>
@@ -130,15 +127,16 @@
                             <div class="docker col-md-2" v-for="emulator in host.emulators">
                                 <div class="box box-default" style="background-color:#c4c4c4;">
                                     <div class="box-header">
+                                        <h1 class="box-title label bg-gray">[[ emulator.name ]]</h1>
                                         <img height="30" style="border-radius:3px;" src="[[emulator.app_icon]]">
-                                        <label class="badge bg-gray">[[ emulator.name ]]</label>
-                                        <span v-bind:class="[emulator.status==='unkown'?'badge bg-gray':
+                                        <span style="margin:-30px 0 0 -7px;"
+                                              v-bind:class="[emulator.status==='unkown'?'badge bg-gray':
                                         (emulator.status==='running'?'badge bg-green':'badge bg-yellow')]">
                                         [[ emulator.status ]]</span>
-                                        <label class="badge bg-red">
-                                            <i class="fa fa-clock-o"></i> [[ emulator.timer ]]s
-                                        </label>
                                         <div class="box-tools pull-left">
+                                            <label class="badge bg-red">
+                                                <i class="fa fa-clock-o fa-lg"></i> [[ emulator.timer ]]s
+                                            </label>
                                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                                 <i class="fa fa-minus"></i>
                                             </button>
@@ -163,12 +161,13 @@
                 </section>
                 <!--------------------------- vmwares ------------------------------->
                 <section v-for="host in vmware_hosts" class="col-md-12 connectedSortable">
-                    <div class="box box-warning">
+                    <div class="box box-primary">
                         <div class="box-header"><!-- host info-->
                             <h1 class="box-title label bg-gray">[[ host.ip ]]</h1>
-                            <small class="badge bg-green">[[ host.mem_total ]] GB</small>
+                            <small class="badge bg-green-active" style="margin:-20px 0 0 -10px;">[[ host.mem_total ]] GB
+                            </small>
                             <div class="box-tools pull-left">
-                                <span class="label label-warning">VMware</span>
+                                <span class="label label-primary">VMware + Emulator</span>
                                 <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                     <i class="fa fa-minus"></i>
                                 </button>
@@ -178,23 +177,23 @@
                             <div v-for="vm in host.vmwares" class="col-md-4 connectedSortable">
                                 <div class="box box-default" style="background-color:#c4c4c4;">
                                     <div class="box-header">
-                                        <h1 class="box-title label bg-gray">[[ vm.local_ip ]]</h1>
-                                        <label class="badge bg-gray">[[ vm.name ]]</label>
-                                        <span v-bind:class="[vm.status==='unkown'?'badge bg-gray':
-                                        (vm.status==='running'?'badge bg-green':'badge bg-yellow')]">[[ vm.status ]]
-                                    </span>
+                                        <h1 class="box-title label bg-gray">[[ vm.name ]]</h1>
                                         <img id="app_icon" height="30" style="border-radius:3px;"
                                              src="/static/AppSimulator/images/app/[[vm.app_name]]/app_icon.png">
+                                        <span style="margin:-30px 0 0 -7px;"
+                                              v-bind:class="[vm.status==='unkown'?'badge bg-gray':
+                                        (vm.status==='running'?'badge bg-green':'badge bg-yellow')]">[[ vm.status ]]
+                                        </span>
                                         <div class="box-tools pull-left">
+                                            <span class="label label-default">[[ vm.local_ip ]]</span>
                                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                                 <i class="fa fa-minus"></i>
                                             </button>
                                         </div>
                                     </div>
                                     <div class="box-body" style="text-align:center;">
-                                        <img height="240" style="border-radius:3px;margin: 0 auto;"
-                                             class="vm-capture" src="[[vm.capture]]">
-                                        {#<img id="before" height="240" class="capture" src="[[vm.capture_before]]">#}
+                                        <img height="240" style="border-radius:3px;margin: 0 auto;" class="vm-capture"
+                                             src="[[vm.capture]]">
                                     </div>
                                 </div>
                             </div>
@@ -434,18 +433,21 @@
         let mainVue = new Vue({
             el: "#main",
             data: {
-                proxyServerInfo: {
+                /*
+               proxyServerInfo: {
                     memory_rate: 0,
                     cpu_percent: 0,
                     hd_percent: 0
                 },
+                */
                 app_name: '', // 'douyin', 'dianping', 'miaopai'
                 tasksCnt: 4,
-                dockerName: 'nox-1',
-                dockersCnt: 0,
+                emulator_cnt: 0,
                 support_app_list: ['douyin', 'miaopai', 'dianping'],
                 vmware_hosts: [],
                 emulator_hosts: [],
+                hosts_cnt: 0,
+                vmware_cnt: 0,
                 gps: {
                     district: '海淀区',
                     lng_lat: "",
@@ -490,25 +492,33 @@
             },
             watch: {},
             computed: {
-        {#dockersCnt: function () {#}
-        {#    let cnt = 0;#}
-        {#    this.rpcServer.forEach(server => {#}
-        {#        cnt += server.dockers.length;#}
-        {#    });#}
-        {#    return cnt;#}
-        {#},#}
-            {#app_list: function () {#}
-            {#    let l = [];#}
-            {#    this.rpcServer.forEach(server => {#}
-            {#        server.app.forEach(app => {#}
-            {#            l.push(app);#}
-            {#        });#}
-            {#    });#}
-            {#    return Array.from(new Set(l));#}
-            {#}#}
+                hosts_cnt: function () {
+                    return this.vmware_hosts.length + this.emulator_hosts.length;
+                },
+                vmware_cnt: function () {
+                    let cnt = 0;
+                    this.vmware_hosts.forEach(host => {
+                        cnt += host.vmwares.length;
+                    });
+                    return cnt;
+                },
+                emulator_cnt: function () {
+                    let cnt = 0;
+                    this.emulator_hosts.forEach(host => {
+                        cnt += host.emulators.length;
+                    });
+                    return cnt;
+                },
+                app_list: function () {
+                    let l = [];
+                    this.rpcServer.forEach(server => {
+                        server.app.forEach(app => {
+                            l.push(app);
+                        });
+                    });
+                    return Array.from(new Set(l));
+                }
             }
-        }
-        )
-        ;
+        });
     </script>
 {% endblock body_tail %}

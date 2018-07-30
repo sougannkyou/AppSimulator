@@ -6,17 +6,15 @@ function ajaxError(err, msg) {
 
 const DEBUG_TIME = 1;
 
-function showTime() {
+
+setInterval(function() {
     nowtime = new Date();
-    year = nowtime.getFullYear();
-    month = nowtime.getMonth() + 1;
-    date = nowtime.getDate();
-    document.getElementById("systime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
-}
+    // year = nowtime.getFullYear();
+    // month = nowtime.getMonth() + 1;
+    // date = nowtime.getDate();
+    document.getElementById("systime").innerText = nowtime.toLocaleString();
+}, 1000);
 
-setInterval("showTime()", 1000);
-
-// ------------------ DeviceCrawlCntInfo  ------------------
 function refresh_img_src(img_src) {
     let i = img_src.indexOf('?t=');
     if (i > 0) {
@@ -28,15 +26,12 @@ function refresh_img_src(img_src) {
 
 setInterval(function () {
     $(".emulator-capture").each(function (index, element) {
-        // console.log(element.src);
         element.src = refresh_img_src(element.src);
     });
 
     $(".vm-capture").each(function (index, element) {
-        // console.log(element.src);
         element.src = refresh_img_src(element.src);
     });
-    // $("#current").attr('src', src = "/static/AppSimulator/images/capture.png?t=" + Math.random());
 }, 1000);
 
 setInterval(function () {

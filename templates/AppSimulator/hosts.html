@@ -14,12 +14,9 @@
                 <div class="box-header">
                     <h3 class="box-title">Hosts</h3>
                     <div class="box-tools">
-                        <div class="input-group input-group-sm" style="width: 150px;">
-                            <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
-                            <div class="input-group-btn">
-                                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
-                            </div>
-                        </div>
+                        <a class="btn btn-primary" title="back" href="/AppSimulator/dashboard/">
+                            <i class="fa fa-fw fa-lg fa-arrow-left pull-right"></i>
+                        </a>
                     </div>
                 </div>
                 <div class="box-body table-responsive no-padding">
@@ -27,33 +24,37 @@
                         <tbody>
                         <tr>
                             <th width="10%">IP</th>
-                            <th width="15%">Support APP</th>
+                            <th width="10%">Host Type</th>
+                            <th width="40%">Support APP</th>
                             <th width="10%">Timer_max_cnt</th>
-                            <th width="10%">Memory</th>
+                            <th width="10%">Memory Total</th>
                         </tr>
-                        <tr style="border:2px solid lightslategray">
+                        <tr v-for="h in hosts">
+                            <td>[[ h.ip ]]</td>
+                            <td>[[ h.host_type ]]</td>
+                            <td><img height="40" class="app-icon" v-for="app in h.support_app_list"
+                                     src="/static/AppSimulator/images/app/[[app]]/app_icon.png"></td>
+                            <td>[[ h.timer_max_cnt ]]</td>
+                            <td>[[ h.mem_total ]] GB</td>
+                            <td>
+                                <i class="fa fa-fw fa-lg fa-pencil-square-o"></i>
+                                <i class="fa fa-fw fa-lg fa-trash-o "></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" v-model="host.ip" placeholder="ip"></td>
+                            <td><input type="text" v-model="host.host_type" placeholder="vmware or emulator"></td>
                             <td>
                                 <label v-for="app in appAll">
-                                    <img v-bind:class="[task.app_name===app?'app-icon-big':'app-icon']"
+                                    <img height="40" class="app-icon"
+                                         v-bind:class="[app_name===app?'app-icon-big':'app-icon']"
                                          v-on:click="setAppName(app)"
                                          v-bind:src="'/static/AppSimulator/images/app/' + app + '/app_icon.png'">
                                 </label>
                             </td>
-                            <td>
-                                <input type="text" v-model="task.deviceType" placeholder="emulator/vm">
-                            </td>
-                            <td></td>
-                            <td></td>
-                            <td>
-                                <button v-on:click="addTask" class="fa fa-2x fa-plus-circle pull-right"
-                                        style="color:orange;" title="增加"></button>
-                            </td>
-                        </tr>
-                        <tr v-for="h in hosts">
-                            <td>[[ h.ip ]]</td>
-                            <td>[[ h.support_app_list ]]</td>
-                            <td>[[ t.timer_max_cnt ]]</td>
-                            <td>[[ t.mem_total ]]</td>
+                            <td><input type="text" v-model="host.timer_max_cnt" placeholder=""></td>
+                            <td><input type="text" v-model="host.mem_total" placeholder=""></td>
+                            <td><i v-on:click="addTask" class="fa fa-fw fa-2x fa-plus-square-o" title="增加"></i></td>
                         </tr>
                         </tbody>
                     </table>
@@ -94,9 +95,9 @@
         const STATUS_SCRIPT_SUSPEND = 'script_suspend';  // task interrupt
         const STATUS_SCRIPT_COMPLETE = 'script_run_complete';  // task complete
 
-        function getHosts(obj) {
+        function getAllHosts(obj) {
             let opt = {
-                url: '/AppSimulator/getHostsAPI/',
+                url: '/AppSimulator/getAllHostsAPI/',
                 type: 'GET',
                 data: {
                     {#status: ''#}
@@ -104,9 +105,10 @@
                 dataType: "json",
                 error: function (xhr, err) {
                     obj.msg = "failure";
-                    console.error("[tasks] getHostsAPI", err);
+                    console.error("[tasks] getAllHosts", err);
                 },
                 success: function (data, status) {
+                    console.log(data);
                     for (let i = 0; i < 1000; i++) {
                         obj.hosts.shift();
                     }
@@ -164,7 +166,7 @@
                 }
             },
             created: function () {
-                getHosts(this);
+                getAllHosts(this);
             },
             watch: {},
             computed: {}

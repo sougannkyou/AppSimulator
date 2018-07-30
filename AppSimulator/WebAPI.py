@@ -251,6 +251,12 @@ def getHostsAPI(request):
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
+def getAllHostsAPI(request):
+    ret = MDB.all_get_hosts()
+    output = JsonResponse({
+        'ret': ret,
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 def addHostAPI(request):
     ip = request.POST.get('ip')
