@@ -29,7 +29,7 @@ STATUS_SCRIPT_START = 'script_start'  # script running ...
 STATUS_SCRIPT_START_OK = 'script_start_ok'
 STATUS_SCRIPT_START_NG = 'script_start_ng'
 STATUS_SCRIPT_SUSPEND = 'script_suspend'  # task interrupt
-STATUS_SCRIPT_COMPLETE = 'script_run_complete'  # task complete
+STATUS_SCRIPT_RUN_OK = 'script_run_ok'  # task run complete
 
 LIVE_CYCLE_NEVER = 'never'
 LIVE_CYCLE_ONCE = 'once'

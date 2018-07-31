@@ -29,18 +29,6 @@
                             <th width="10%">Timer_max_cnt</th>
                             <th width="10%">Memory Total</th>
                         </tr>
-                        <tr v-for="h in hosts">
-                            <td>[[ h.ip ]]</td>
-                            <td>[[ h.host_type ]]</td>
-                            <td><img height="40" class="app-icon" v-for="app in h.support_app_list"
-                                     src="/static/AppSimulator/images/app/[[app]]/app_icon.png"></td>
-                            <td>[[ h.timer_max_cnt ]]</td>
-                            <td>[[ h.mem_total ]] GB</td>
-                            <td>
-                                <i class="fa fa-fw fa-lg fa-pencil-square-o"></i>
-                                <i class="fa fa-fw fa-lg fa-trash-o "></i>
-                            </td>
-                        </tr>
                         <tr>
                             <td><input type="text" v-model="host.ip" placeholder="ip"></td>
                             <td><input type="text" v-model="host.host_type" placeholder="vmware or emulator"></td>
@@ -55,6 +43,18 @@
                             <td><input type="text" v-model="host.timer_max_cnt" placeholder=""></td>
                             <td><input type="text" v-model="host.mem_total" placeholder=""></td>
                             <td><i v-on:click="addTask" class="fa fa-fw fa-2x fa-plus-square-o" title="增加"></i></td>
+                        </tr>
+                        <tr v-for="h in hosts">
+                            <td>[[ h.ip ]]</td>
+                            <td>[[ h.host_type ]]</td>
+                            <td><img height="40" class="app-icon" v-for="app in h.support_app_list"
+                                     src="/static/AppSimulator/images/app/[[app]]/app_icon.png"></td>
+                            <td>[[ h.timer_max_cnt ]]</td>
+                            <td>[[ h.mem_total ]] GB</td>
+                            <td>
+                                <i class="fa fa-fw fa-lg fa-pencil-square-o"></i>
+                                <i class="fa fa-fw fa-lg fa-trash-o "></i>
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -93,7 +93,7 @@
         const STATUS_SCRIPT_START_OK = 'script_start_ok';
         const STATUS_SCRIPT_START_NG = 'script_start_ng';
         const STATUS_SCRIPT_SUSPEND = 'script_suspend';  // task interrupt
-        const STATUS_SCRIPT_COMPLETE = 'script_run_complete';  // task complete
+        const STATUS_SCRIPT_RUN_OK = 'script_run_ok';  // task run complete
 
         function getAllHosts(obj) {
             let opt = {

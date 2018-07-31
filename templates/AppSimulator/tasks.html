@@ -23,6 +23,7 @@
                         <tbody>
                         <tr>
                             <th width="5%">TaskId</th>
+                            <th width="5%">From</th>
                             <th width="15%">APP</th>
                             <th width="10%">IP</th>
                             <th width="15%">Script</th>
@@ -33,6 +34,7 @@
                         </tr>
                         <tr>
                             <td>-</td>
+                            <td>-</td>
                             <td>
                                 <label v-for="app in app_name_list">
                                     <img v-bind:class="[task.app_name===app?'app-icon-big':'app-icon']"
@@ -41,20 +43,14 @@
                                 </label>
                             </td>
                             <td>N/A</td>
-                            <td>
-                                <input type="text" v-model="task.script" placeholder="script">
-                            </td>
+                            <td><input type="text" v-model="task.script" placeholder="script"></td>
                             <td>
                                 <input id="never" name="live_cycle" type="radio" v-model="task.live_cycle"
                                        value="never" checked>never
                                 <input id="once" name="live_cycle" type="radio" v-model="task.live_cycle"
                                        value="once">once
                             </td>
-                            <td>
-                                <span v-bind:class="[task.status==='wait'?'label label-default':
-                                (task.status==='running'?'label label-success':'label label-warring')]">[[ task.status ]]
-                                </span>
-                            </td>
+                            <td><span class="label label-default">[[ task.status ]]</span></td>
                             <td>N/A</td>
                             <td>N/A</td>
                             <td>
@@ -62,7 +58,12 @@
                             </td>
                         </tr>
                         <tr v-for="t in tasks">
-                            <td>[[ t.taskId ]]</td>
+                            <td><label class="label label-default">[[ t.taskId ]]</label></td>
+                            <td>
+                                <label v-bind:class="[t.orgTaskId===0?'label label-gray':'label label-default']">
+                                    [[ t.orgTaskId ]]
+                                </label>
+                            </td>
                             <td>
                                 <img class="app-icon"
                                      v-bind:src="'/static/AppSimulator/images/app/'+t.app_name+'/app_icon.png'">
@@ -71,8 +72,8 @@
                             <td>[[ t.script ]]</td>
                             <td>[[ t.live_cycle ]]</td>
                             <td>
-                                <span v-bind:class="[t.status==='wait'?'label label-default':
-                                (t.status==='running'?'label label-success':'label label-warring')]">[[ t.status ]]
+                                <span v-bind:class="[t.status.indexOf('_ok')!=-1?'label label-success':
+                                (t.status.indexOf('_ng')!=-1?'label label-danger':'label label-default')]">[[ t.status ]]
                                 </span>
                             </td>
                             <td>[[ t.start_time ]]</td>
@@ -115,7 +116,7 @@
         const STATUS_SCRIPT_START_OK = 'script_start_ok';
         const STATUS_SCRIPT_START_NG = 'script_start_ng';
         const STATUS_SCRIPT_SUSPEND = 'script_suspend';  // task interrupt
-        const STATUS_SCRIPT_COMPLETE = 'script_run_complete';  // task complete
+        const STATUS_SCRIPT_RUN_OK = 'script_run_ok';  // task run complete
 
         function getTasks(obj) {
             let opt = {

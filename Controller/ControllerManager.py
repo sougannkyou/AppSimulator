@@ -182,7 +182,7 @@ class Manager(object):
     def nox_run_task_complete(self, taskId):
         task = self._mdb.task_find_by_taskId(int(taskId))
         print('task', taskId, task)
-        task['status'] = STATUS_SCRIPT_COMPLETE
+        task['status'] = STATUS_SCRIPT_RUN_OK
         self._mdb.task_change_status(task)
         if task['live_cycle'] == LIVE_CYCLE_NEVER:
             self._log('<<info>> nox_run_task_complete', 'clone')

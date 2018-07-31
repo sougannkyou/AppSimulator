@@ -125,14 +125,16 @@
                         <!---------------------------- emulator item -------------------------->
                         <div class="box-body">
                             <div class="docker col-md-2" v-for="task in host.tasks">
-                                <div class="box box-default" >
+                                <div class="box box-default">
                                     <div class="box-header" style="background-color:#b4b4b4;">
                                         <img height="30" style="border-radius:3px;" src="[[task.app_icon]]">
                                         <span style="margin:-25px 0 0 -7px;"
                                               v-bind:class="[task.status.indexOf('_ng')!=-1?'badge bg-red':
-                                        (task.status.indexOf('_ok')!=-1?'badge bg-green':'badge bg-yellow')]">
+                                        (task.status.indexOf('_ok')!=-1?'badge bg-green':'badge bg-gray')]">
                                         [[ task.status ]]</span>
                                         <div class="box-tools pull-left">
+                                            <i v-show="task.status.indexOf('script')!==-1" class="fa fa-phone"
+                                               v-on:click="shake(host.ip, task.taskId)"></i>
                                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                                 <i class="fa fa-minus"></i>
                                             </button>
@@ -143,7 +145,9 @@
                                              class="emulator-capture" src="[[task.capture]]">
                                     </div>
                                     <div class="box-footer" style="background-color:#b4b4b4;">
-                                        <h1 class="box-title label bg-gray">task[[ task.taskId ]]</h1>
+                                        <h2 class="box-title label bg-gray">task[[ task.taskId ]]
+                                            <small v-show="task.orgTaskId!==0">task[[ task.orgTaskId ]]</small>
+                                        </h2>
                                         <label class="badge bg-red pull-right">
                                             <i class="fa fa-clock-o fa-lg"></i> [[ task.timer_no ]]s
                                         </label>
@@ -428,6 +432,24 @@
             $.ajax(opt);
         }
 
+        function emulatorShake(host_ip, taskId) {
+            let opt = {
+                url: 'http://' + host_ip + ':8000/AppSimulator/emulatorShakeAPI/',
+                type: 'GET',
+                data: {
+                    taskId: taskId
+                },
+                dataType: "json",
+                error: function (xhr, err) {
+                    console.error("[dashboard] emulatorShake", err);
+                },
+                success: function (data, status) {
+                    console.log('emulatorShake', data);
+                }
+            };
+            $.ajax(opt);
+        }
+
         //----------------------------------------------------------------------------
         Vue.config.delimiters = ['[[', ']]'];
         //----------------------------------------------------------------------------
@@ -518,6 +540,9 @@
                         });
                     });
                     return Array.from(new Set(l));
+                },
+                shake: function (host_ip, taskId) {
+                    emulatorShake(host_ip, taskId);
                 }
             }
         });

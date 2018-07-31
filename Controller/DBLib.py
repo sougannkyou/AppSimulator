@@ -120,7 +120,7 @@ class MongoDriver(object):
 
     def task_change_status(self, task):
         now = int(datetime.now().timestamp())
-        if task['status'] == STATUS_SCRIPT_COMPLETE:
+        if task['status'] == STATUS_SCRIPT_RUN_OK:
             self.tasks.update({'_id': task['_id']},
                               {"$set": {'status': task['status'], 'up_time': now, 'end_time': now}})
         else:

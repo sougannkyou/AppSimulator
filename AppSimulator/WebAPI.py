@@ -20,6 +20,7 @@ from django.http import HttpResponse, JsonResponse
 
 from AppSimulator.DBLib import MongoDriver, RedisDriver
 from AppSimulator.RPCLib import *
+from Controller.NoxConDocker import NoxConDocker
 
 MDB = MongoDriver()
 RDB = RedisDriver()
@@ -86,7 +87,8 @@ def quitAppAPI(request):
 
 def startScriptAPI(request):
     deviceId = request.GET.get('deviceId')  # 设备ID
-
+    docker = NoxConDocker(task_info=task)
+    docker.shake(1)
     output = JsonResponse({
         'ret': ret,
     })
@@ -251,12 +253,14 @@ def getHostsAPI(request):
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
+
 def getAllHostsAPI(request):
     ret = MDB.all_get_hosts()
     output = JsonResponse({
         'ret': ret,
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
 
 def addHostAPI(request):
     ip = request.POST.get('ip')
@@ -275,6 +279,19 @@ def addHostAPI(request):
     ret = MDB.emulator_add_host(host)
     output = JsonResponse({
         'ret': True if ret else False,
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
+def emulatorShakeAPI(request):
+    taskId = request.POST.get('taskId')
+    task = MDB.tasks_find_by_taskId(taskId)
+    if task:
+        docker = NoxConDocker(task_info=task)
+        docker.shake(100)
+
+    output = JsonResponse({
+        'ret': True if task else False,
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
