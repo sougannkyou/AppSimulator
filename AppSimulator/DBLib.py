@@ -102,7 +102,7 @@ class MongoDriver(object):
         l = self.hosts.find({'host_type': 'emulator'})
         for h in l:
             h.pop('_id')
-            h['emulators'] = self.emulator_find_by_host(h['ip'])
+            h['tasks'] = self.tasks_find_by_host(h['ip'])
             hosts.append(h)
         return hosts
 
@@ -137,6 +137,24 @@ class MongoDriver(object):
             emu['capture'] = pre + 'temp/emulators/capture_' + emu['name'] + '.png'
             emu['capture_before'] = pre + 'temp/emulators/capture_' + emu['name'] + '_before.png'
             ret.append(emu)
+        return ret
+
+    def tasks_find_by_host(self, host_ip=None):
+        ret = []
+        if host_ip:
+            cond = {'host_ip': host_ip, 'status': {'$ne': 'disable'}}
+        else:
+            cond = {'status': {'$ne': 'disable'}}
+
+        tasks = self.tasks.find(cond)
+        for task in tasks:
+            task.pop('_id')
+            task.pop('dockerId')
+            pre = 'http://' + task['host_ip'] + ':8000/static/AppSimulator/images/'
+            task['app_icon'] = pre + 'app/' + task['app_name'] + '/app_icon.png'
+            task['timer_no'] = TIMER[task['timer_no'] if task else 0]
+            task['capture'] = pre + 'temp/emulators/capture_nox-' + str(task['taskId']) + '.png'
+            ret.append(task)
         return ret
 
     def emulator_get_taskId(self):

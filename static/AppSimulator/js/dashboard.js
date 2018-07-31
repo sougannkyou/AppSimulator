@@ -34,50 +34,50 @@ setInterval(function () {
     });
 }, 1000);
 
-setInterval(function () {
-    $.ajax({
-        url: '/AppSimulator/getDeviceCrawlCntAPI/',
-        type: 'get',
-        contentType: "application/json; charset=UTF-8",
-        data: {
-            app_name: mainVue.app_name,
-        },
-        error: function (xhr, err) {
-            ajaxError(err, 'DeviceInfo');
-        },
-        success: function (data, textStatus) {
-            let ret = data.ret;
-            mainVue.devices.dedup_cnt = ret.dedup_cnt;
-            mainVue.devices.cnt = ret.cnt;
-        }
-    });
-}, 10 * 1000 * DEBUG_TIME);
+// setInterval(function () {
+//     $.ajax({
+//         url: '/AppSimulator/getDeviceCrawlCntAPI/',
+//         type: 'get',
+//         contentType: "application/json; charset=UTF-8",
+//         data: {
+//             app_name: mainVue.app_name,
+//         },
+//         error: function (xhr, err) {
+//             ajaxError(err, 'DeviceInfo');
+//         },
+//         success: function (data, textStatus) {
+//             let ret = data.ret;
+//             mainVue.devices.dedup_cnt = ret.dedup_cnt;
+//             mainVue.devices.cnt = ret.cnt;
+//         }
+//     });
+// }, 10 * 1000 * DEBUG_TIME);
 
-setInterval(function getProxyServerInfoAPI() {
-    if (mainVue.deviceId === '') {
-        alert("请选择设备。");
-        return false;
-    }
-    let opt = {
-        url: '/AppSimulator/getProxyServerInfoAPI/',
-        type: 'GET',
-        data: {
-            deviceId: mainVue.deviceId,
-        },
-        dataType: "json",
-        error: function (xhr, err) {
-            mainVue.msg = "Failure";
-            console.error("[dashboard] setDeviceGPSAPI", err);
-        },
-        success: function (data, status) {
-            mainVue.proxyServerInfo.hd_percent = data['hd_info']['percent'];
-            mainVue.proxyServerInfo.memory_rate = ((data['mem_info']['total'] - data['mem_info']['free']) * 100 / data['mem_info']['total']).toFixed(1);
-            mainVue.proxyServerInfo.cpu_percent = data['cpu_info']['percent'];
-            mainVue.msg = "OK";
-        }
-    };
-    $.ajax(opt);
-}, 10 * 1000 * DEBUG_TIME);
+// setInterval(function getProxyServerInfoAPI() {
+//     if (mainVue.deviceId === '') {
+//         alert("请选择设备。");
+//         return false;
+//     }
+//     let opt = {
+//         url: '/AppSimulator/getProxyServerInfoAPI/',
+//         type: 'GET',
+//         data: {
+//             deviceId: mainVue.deviceId,
+//         },
+//         dataType: "json",
+//         error: function (xhr, err) {
+//             mainVue.msg = "Failure";
+//             console.error("[dashboard] setDeviceGPSAPI", err);
+//         },
+//         success: function (data, status) {
+//             mainVue.proxyServerInfo.hd_percent = data['hd_info']['percent'];
+//             mainVue.proxyServerInfo.memory_rate = ((data['mem_info']['total'] - data['mem_info']['free']) * 100 / data['mem_info']['total']).toFixed(1);
+//             mainVue.proxyServerInfo.cpu_percent = data['cpu_info']['percent'];
+//             mainVue.msg = "OK";
+//         }
+//     };
+//     $.ajax(opt);
+// }, 10 * 1000 * DEBUG_TIME);
 
 setInterval(function getDevicesStatusAPI() {
     let opt = {

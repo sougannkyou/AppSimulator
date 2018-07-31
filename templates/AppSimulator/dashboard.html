@@ -124,28 +124,29 @@
                         </div>
                         <!---------------------------- emulator item -------------------------->
                         <div class="box-body">
-                            <div class="docker col-md-2" v-for="emulator in host.emulators">
-                                <div class="box box-default" style="background-color:#c4c4c4;">
-                                    <div class="box-header">
-                                        <h1 class="box-title label bg-gray">[[ emulator.name ]]</h1>
-                                        <img height="30" style="border-radius:3px;" src="[[emulator.app_icon]]">
-                                        <span style="margin:-30px 0 0 -7px;"
-                                              v-bind:class="[emulator.status==='unkown'?'badge bg-gray':
-                                        (emulator.status==='running'?'badge bg-green':'badge bg-yellow')]">
-                                        [[ emulator.status ]]</span>
+                            <div class="docker col-md-2" v-for="task in host.tasks">
+                                <div class="box box-default" >
+                                    <div class="box-header" style="background-color:#b4b4b4;">
+                                        <img height="30" style="border-radius:3px;" src="[[task.app_icon]]">
+                                        <span style="margin:-25px 0 0 -7px;"
+                                              v-bind:class="[task.status.indexOf('_ng')!=-1?'badge bg-red':
+                                        (task.status.indexOf('_ok')!=-1?'badge bg-green':'badge bg-yellow')]">
+                                        [[ task.status ]]</span>
                                         <div class="box-tools pull-left">
-                                            <label class="badge bg-red">
-                                                <i class="fa fa-clock-o fa-lg"></i> [[ emulator.timer ]]s
-                                            </label>
                                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                                 <i class="fa fa-minus"></i>
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="box-body" style="text-align:center;">
+                                    <div class="box-body" style="text-align:center;background-color:#c4c4c4;">
                                         <img height="240" style="border-radius:3px;margin: 0 auto;"
-                                             class="emulator-capture" src="[[emulator.capture]]">
-                                        {# <img id="before" height="240" class="capture" src="[[emulator.capture_before]]">#}
+                                             class="emulator-capture" src="[[task.capture]]">
+                                    </div>
+                                    <div class="box-footer" style="background-color:#b4b4b4;">
+                                        <h1 class="box-title label bg-gray">task[[ task.taskId ]]</h1>
+                                        <label class="badge bg-red pull-right">
+                                            <i class="fa fa-clock-o fa-lg"></i> [[ task.timer_no ]]s
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -175,14 +176,14 @@
                         </div>
                         <div class="box-body">
                             <div v-for="vm in host.vmwares" class="col-md-4 connectedSortable">
-                                <div class="box box-default" style="background-color:#c4c4c4;">
-                                    <div class="box-header">
+                                <div class="box box-default">
+                                    <div class="box-header" style="background-color:#b4b4b4;">
                                         <h1 class="box-title label bg-gray">[[ vm.name ]]</h1>
                                         <img id="app_icon" height="30" style="border-radius:3px;"
                                              src="/static/AppSimulator/images/app/[[vm.app_name]]/app_icon.png">
-                                        <span style="margin:-30px 0 0 -7px;"
-                                              v-bind:class="[vm.status==='unkown'?'badge bg-gray':
-                                        (vm.status==='running'?'badge bg-green':'badge bg-yellow')]">[[ vm.status ]]
+                                        <span style="margin:-25px 0 0 -7px;"
+                                              v-bind:class="[vm.status.indexOf('_ng')!=-1?'badge bg-red':
+                                        (vm.status.indexOf('_ok')!=-1?'badge bg-green':'badge bg-yellow')]">[[ vm.status ]]
                                         </span>
                                         <div class="box-tools pull-left">
                                             <span class="label label-default">[[ vm.local_ip ]]</span>
@@ -191,7 +192,7 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="box-body" style="text-align:center;">
+                                    <div class="box-body" style="text-align:center;background-color:#c4c4c4;">
                                         <img height="240" style="border-radius:3px;margin: 0 auto;" class="vm-capture"
                                              src="[[vm.capture]]">
                                     </div>
@@ -505,7 +506,7 @@
                 emulator_cnt: function () {
                     let cnt = 0;
                     this.emulator_hosts.forEach(host => {
-                        cnt += host.emulators.length;
+                        cnt += host.tasks.length;
                     });
                     return cnt;
                 },

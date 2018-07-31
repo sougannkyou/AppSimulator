@@ -1,6 +1,7 @@
 # coding:utf-8
 import time
 import psutil
+import shutil
 import subprocess
 from pprint import pprint
 from Controller.setting import *
@@ -14,6 +15,7 @@ class NoxConDocker(object):
         self._taskId = task_info['taskId']
         self._local_ip = LOCAL_IP
         self._org_path = os.getcwd()
+        self._work_path = WORK_PATH
         self._app_name = task_info['app_name']
         self._docker_name = 'nox-' + str(task_info['taskId'])
         self._taskId = task_info['taskId']
@@ -187,6 +189,10 @@ class NoxConDocker(object):
         return False if ret.find('failed') > 0 or ret.find('not') > 0 else True
 
     def create(self, force=False):
+        poweron = self._work_path + '\\Controller\\images\\temp\\emulators\\poweron.png'
+        static_capture_path = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\capture_' + self._docker_name + '.png'
+        shutil.copy(poweron, static_capture_path)
+
         ret, msg = self._check()
         if not ret:
             return False, msg
