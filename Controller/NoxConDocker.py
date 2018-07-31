@@ -189,7 +189,7 @@ class NoxConDocker(object):
         return False if ret.find('failed') > 0 or ret.find('not') > 0 else True
 
     def create(self, force=False):
-        poweron = self._work_path + '\\Controller\\images\\temp\\emulators\\poweron.png'
+        poweron = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\poweron.png'
         static_capture_path = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\capture_' + self._docker_name + '.png'
         shutil.copy(poweron, static_capture_path)
 
