@@ -6,7 +6,7 @@ FOR /L %%i in (1,1,1000000) DO CALL :VM_LOOP
 GOTO :EOF
 ::--------------------------------------------------
 :VM_LOOP
-FOR /L %%i in (1,1,2) DO CALL :VM_SCREEN_CAPTURE %%i
+FOR /L %%i in (1,1,5) DO CALL :VM_SCREEN_CAPTURE %%i
 TIMEOUT 1
 GOTO :EOF
 ::--------------------------------------------------
