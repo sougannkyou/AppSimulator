@@ -175,9 +175,9 @@ def getDeviceCrawlCntAPI(request):
 
 def getDevicesStatusAPI(request):
     app_name = request.GET.get('app_name')
-    ret = MDB.get_devices_status(app_name)  # {'device1':'running','device2':'unkown'}
+    # ret = MDB.get_devices_status(app_name)  # {'device1':'running','device2':'unkown'}
     output = JsonResponse({
-        'ret': ret,
+        'ret': 'ok',
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
