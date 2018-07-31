@@ -282,8 +282,8 @@ def addHostAPI(request):
 
 
 def emulatorShakeAPI(request):
-    taskId = request.GET.get('taskId')
-    cnt = request.GET.get('cnt')
+    taskId = int(request.GET.get('taskId'))
+    cnt = int(request.GET.get('cnt'))
     task = MDB.tasks_find_by_taskId(taskId)
     if task:
         docker = NoxConDocker(task_info=task)
