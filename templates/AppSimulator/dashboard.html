@@ -433,12 +433,13 @@
             $.ajax(opt);
         }
 
-        function emulatorShake(host_ip, taskId) {
+        function emulatorShake(host_ip, taskId, cnt) {
             let opt = {
                 url: 'http://' + host_ip + ':8000/AppSimulator/emulatorShakeAPI/',
                 type: 'GET',
                 data: {
-                    taskId: taskId
+                    taskId: taskId,
+                    cnt: cnt
                 },
                 dataType: "json",
                 error: function (xhr, err) {
@@ -510,7 +511,7 @@
                     runTasks(this);
                 },
                 shake: function (host_ip, taskId) {
-                    emulatorShake(host_ip, taskId);
+                    emulatorShake(host_ip, taskId, 20);
                 }
             },
             created: function () {
