@@ -133,7 +133,8 @@
                                         (task.status.indexOf('_ok')!=-1?'badge bg-green':'badge bg-gray')]">
                                         [[ task.status ]]</span>
                                         <div class="box-tools pull-left">
-                                            <i v-show="task.status.indexOf('script')!==-1" class="fa fa-phone"
+                                            <i v-show="task.status.indexOf('script_start_ok')!==-1"
+                                               class="fa fa-fw fa-lg fa-phone text-green"
                                                v-on:click="shake(host.ip, task.taskId)"></i>
                                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                                 <i class="fa fa-minus"></i>

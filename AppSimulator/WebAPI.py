@@ -282,11 +282,11 @@ def addHostAPI(request):
 
 
 def emulatorShakeAPI(request):
-    taskId = request.POST.get('taskId')
+    taskId = request.GET.get('taskId')
     task = MDB.tasks_find_by_taskId(taskId)
     if task:
         docker = NoxConDocker(task_info=task)
-        docker.shake(100)
+        docker.shake(20)
 
     output = JsonResponse({
         'ret': True if task else False,
