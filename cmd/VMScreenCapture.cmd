@@ -13,7 +13,7 @@ GOTO :EOF
 :VM_SCREEN_CAPTURE
 @ECHO OFF
 SET vmName=vm%1
-SET current="%APPSIMULATOR_WORK_PATH%\static\AppSimulator\images\VM\capture_%vmName%.png"
+SET current="%APPSIMULATOR_WORK_PATH%\static\AppSimulator\images\temp\vmwares\capture_%vmName%.png"
 ::SET before="%APPSIMULATOR_WORK_PATH%\static\AppSimulator\images\VM\capture_%vmName%_before.png"
 ::MOVE %current% %before%
 %vmrun%  -T ws -gu win7_64 -gp zhxg2018 captureScreen "%workspace%\%vmName%\%vmx%" %current%
