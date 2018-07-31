@@ -79,48 +79,48 @@ setInterval(function () {
 //     $.ajax(opt);
 // }, 10 * 1000 * DEBUG_TIME);
 
-setInterval(function getDevicesStatusAPI() {
-    let opt = {
-        url: '/AppSimulator/getDevicesStatusAPI/',
-        type: 'GET',
-        data: {scope_times: 30, interval_times: 10}, // 单位秒
-        dataType: "json",
-        data: {
-            deviceId: mainVue.deviceId,
-            app_name: mainVue.app_name,
-        },
-        error: function (xhr, err) {
-            mainVue.msg = "Failure";
-            console.error("[dashboard] getDevicesStatusAPI", err);
-        },
-        success: function (data, status) {
-            console.log("getDevicesStatusAPI", mainVue.devices.statusList.length, data.ret);
-            for (let i = 0; i < 100; i++) {
-                mainVue.devices.statusList.shift();
-            }
-            for (let i = 0; i < data.ret.length; i++) {
-                mainVue.devices.statusList.push(data.ret[i]);
-            }
-            mainVue.msg = "OK";
-        }
-    };
-    $.ajax(opt);
-}, 10 * 1000 * DEBUG_TIME); // 单位秒
+// setInterval(function getDevicesStatusAPI() {
+//     let opt = {
+//         url: '/AppSimulator/getDevicesStatusAPI/',
+//         type: 'GET',
+//         data: {scope_times: 30, interval_times: 10}, // 单位秒
+//         dataType: "json",
+//         data: {
+//             deviceId: mainVue.deviceId,
+//             app_name: mainVue.app_name,
+//         },
+//         error: function (xhr, err) {
+//             mainVue.msg = "Failure";
+//             console.error("[dashboard] getDevicesStatusAPI", err);
+//         },
+//         success: function (data, status) {
+//             console.log("getDevicesStatusAPI", mainVue.devices.statusList.length, data.ret);
+//             for (let i = 0; i < 100; i++) {
+//                 mainVue.devices.statusList.shift();
+//             }
+//             for (let i = 0; i < data.ret.length; i++) {
+//                 mainVue.devices.statusList.push(data.ret[i]);
+//             }
+//             mainVue.msg = "OK";
+//         }
+//     };
+//     $.ajax(opt);
+// }, 10 * 1000 * DEBUG_TIME); // 单位秒
 
-function getDeviceCaptureAPI() {
-    $.ajax({
-        url: '/AppSimulator/getDeviceCaptureAPI/',
-        type: 'get',
-        contentType: "application/json; charset=UTF-8",
-        error: function (xhr, err) {
-            ajaxError(err, 'getDeviceCaptureAPI');
-        },
-        success: function (data, textStatus) {
-        }
-    });
-}
-
-getDeviceCaptureAPI();
+// function getDeviceCaptureAPI() {
+//     $.ajax({
+//         url: '/AppSimulator/getDeviceCaptureAPI/',
+//         type: 'get',
+//         contentType: "application/json; charset=UTF-8",
+//         error: function (xhr, err) {
+//             ajaxError(err, 'getDeviceCaptureAPI');
+//         },
+//         success: function (data, textStatus) {
+//         }
+//     });
+// }
+//
+// getDeviceCaptureAPI();
 
 // (function memoryMonitor() {
 //     let myChart = echarts.init(document.getElementById("memory_monitor"), THEME);

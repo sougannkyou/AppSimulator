@@ -87,8 +87,6 @@ def quitAppAPI(request):
 
 def startScriptAPI(request):
     deviceId = request.GET.get('deviceId')  # 设备ID
-    docker = NoxConDocker(task_info=task)
-    docker.shake(1)
     output = JsonResponse({
         'ret': ret,
     })
@@ -177,7 +175,7 @@ def getDevicesStatusAPI(request):
     app_name = request.GET.get('app_name')
     # ret = MDB.get_devices_status(app_name)  # {'device1':'running','device2':'unkown'}
     output = JsonResponse({
-        'ret': 'ok',
+        'ret': [],
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 

@@ -507,6 +507,9 @@
                 },
                 runTasks: function () {
                     runTasks(this);
+                },
+                shake: function (host_ip, taskId) {
+                    emulatorShake(host_ip, taskId);
                 }
             },
             created: function () {
@@ -540,9 +543,6 @@
                         });
                     });
                     return Array.from(new Set(l));
-                },
-                shake: function (host_ip, taskId) {
-                    emulatorShake(host_ip, taskId);
                 }
             }
         });
