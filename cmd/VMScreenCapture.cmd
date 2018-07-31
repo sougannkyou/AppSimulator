@@ -2,7 +2,7 @@ SET vmrun=C:\VMware\Workstation\vmrun.exe
 SET workspace=C:\VMware\VM
 SET vmx=Windows 7 x64.vmx
 
-FOR /L %%i in (1,1,100) DO CALL :VM_LOOP
+FOR /L %%i in (1,1,1000000) DO CALL :VM_LOOP
 GOTO :EOF
 ::--------------------------------------------------
 :VM_LOOP
