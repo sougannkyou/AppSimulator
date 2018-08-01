@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
 
-img = cv2.imread('videos.png')
+img = cv2.imread('douyin1.png')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-edges = cv2.Canny(gray, 100, 120)
+edges = cv2.Canny(gray, 200, 220)
 minLineLength = 10000
 maxLineGap = 100
 lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 20, minLineLength, maxLineGap)
