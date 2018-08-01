@@ -2,7 +2,9 @@
 import os
 import sys
 
-sys.path.append(os.getcwd())
+# sys.path.append(os.getcwd())
+# sys.path.append('C:\Python\Python35\Lib\site-packages\cv2')
+# print(sys.path)
 
 import time
 from Controller.setting import APPSIMULATOR_MODE
@@ -21,38 +23,72 @@ class MySelenium(NoxConSelenium):
     def script(self):
         try:
             ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
-            if ret: self.click_xy(x, y, wait_time=20)
+            if ret:
+                self.click_xy(x, y, wait_time=20)
+            else:
+                self._log("error", "app not found.")
+                return None
             ret, x, y = self.find_element(comment='忽略升级', timeout=10)
             if ret:
                 self.click_xy(x, y, wait_time=2)
 
-            ret = self.click_xy(200, 200, wait_time=10)  # 选择一个视频
+            self.click_xy(200, 200, wait_time=10)  # 选择一个视频
 
-            while ret:
-                ret, x, y = self.find_element(comment='分享', timeout=10)
-                if ret:
-                    self.click_xy(x, y, wait_time=2)  # click 分享
-                    if ret:
-                        ret, x, y = self.find_element(comment='复制链接', timeout=10)
-                        if ret:
-                            self.click_xy(x, y, wait_time=1)
-                        else:  # retry once
-                            ret, x, y = self.find_element(comment='分享', timeout=10)
-                            if ret:
-                                self.click_xy(x, y, wait_time=2)  # click 分享
-                                if ret:
-                                    ret, x, y = self.find_element(comment='复制链接', timeout=10)
-                                    if ret:
-                                        self.click_xy(x, y, wait_time=1)
-                else:
-                    ret = self.find_element(comment='广告', timeout=10)
-                    if ret:
-                        ret = self.next_page_700(wait_time=5)
-
-                self.next_page_700(wait_time=5)
-
+            # fail = 0
+            # while True:
+            #     if fail >= 3:
+            #         self._log("error", "fail to find element for too manay times.")
+            #         return None
+            #     ret, x, y = self.find_element(comment='分享', timeout=10)
+            #     if ret:
+            #         self.click_xy(x, y, wait_time=2)  # click 分享
+            #         ret, x, y = self.find_element(comment='复制链接', timeout=10)
+            #         if ret:
+            #             self.click_xy(x, y, wait_time=1)
+            #             fail = 0
+            #         else:
+            #             ret, x, y = self.find_element(comment='广告', timeout=10)
+            #             if not ret:
+            #                 fail += 1
+            #                 # self.click_xy(x, y, wait_time=2)  # click 分享
+            #                 # if ret:
+            #                 #     ret, x, y = self.find_element(comment='复制链接', timeout=10)
+            #                 #     if ret:
+            #                 #         self.click_xy(x, y, wait_time=1)
+            #     else:
+            #         ret, x, y = self.find_element(comment='广告', timeout=10)
+            #         if not ret:
+            #             fail += 1
+            #             # ret = self.next_page_700(wait_time=5)
+            #     self.next_page_700(wait_time=5)
+            self.crawl(tries=3)
         except Exception as e:
             self._log('error:', e)
+
+    def crawl(self, tries=3):
+        def crawl(_tries):
+            if _tries <= 0:
+                self._log("error", "fail to find element for too manay times.")
+                return None
+            ret, x, y = self.find_element(comment='分享', timeout=10)
+            if ret:
+                self.click_xy(x, y, wait_time=2)  # click 分享
+                ret, x, y = self.find_element(comment='复制链接', timeout=10)
+                if ret:
+                    self.click_xy(x, y, wait_time=1)
+                    _tries = tries
+                else:
+                    ret, x, y = self.find_element(comment='广告', timeout=10)
+                    if not ret:
+                        _tries -= 1
+            else:
+                ret, x, y = self.find_element(comment='广告', timeout=10)
+                if not ret:
+                    _tries -= 1
+            self.next_page_700(wait_time=5)
+            time.sleep(2)
+            return crawl(_tries)
+        return crawl(tries)
 
 
 ##################################################################################
@@ -65,14 +101,14 @@ def main(task, mode):
     try:
         me = MySelenium(task_info=task, mode=mode)
         me.set_comment_to_pic({
-            "选择一个视频": 'images/huoshan/clickone.png',
-            "APP图标": 'images/huoshan/app_icon.png',
-            "忽略升级": 'images/huoshan/ignore_upgrade.png',
-            "广告": 'images/huoshan/ad.png',
-            "分享": 'images/huoshan/share.png',
-            "复制链接": 'images/huoshan/copylink.png',
+            "选择一个视频": 'images/{}/clickone.png'.format(task["app_name"]),
+            "APP图标": 'images/{}/app_icon.png'.format(task["app_name"]),
+            "忽略升级": 'images/{}/ignore_upgrade.png'.format(task["app_name"]),
+            "广告": 'images/{}/ad.png'.format(task["app_name"]),
+            "分享": 'images/{}/share.png'.format(task["app_name"]),
+            "复制链接": 'images/{}/copylink.png'.format(task["app_name"]),
         })
-        me._DEBUG = True
+        # me._DEBUG = True
         me.run()
     except Exception as e:
         msg = '<<error>>'
