@@ -25,9 +25,20 @@ def preprocess(gray):
     dilation2 = cv2.dilate(erosion, element2, iterations=3)
 
     # 7. 存储中间图片
+    cv2.namedWindow("binary", cv2.WINDOW_NORMAL)
+    cv2.imshow("binary", binary)
     cv2.imwrite("binary.png", binary)
+
+    cv2.namedWindow("dilation", cv2.WINDOW_NORMAL)
+    cv2.imshow("dilation", dilation)
     cv2.imwrite("dilation.png", dilation)
+
+    cv2.namedWindow("erosion", cv2.WINDOW_NORMAL)
+    cv2.imshow("erosion", erosion)
     cv2.imwrite("erosion.png", erosion)
+
+    cv2.namedWindow("dilation2", cv2.WINDOW_NORMAL)
+    cv2.imshow("dilation2", dilation2)
     cv2.imwrite("dilation2.png", dilation2)
 
     return dilation2
@@ -102,6 +113,6 @@ if __name__ == '__main__':
     # 读取文件
     # imagePath = sys.argv[1]
     # image_path = 'text.png'
-    image_path = 'dianping_ng.png'
+    image_path = 'dianping8.png'
     img = cv2.imread(image_path)
     detect(img)
