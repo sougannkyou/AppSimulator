@@ -161,10 +161,12 @@ class NoxConADB(object):
             cmdline = self._make_command(cmd)
             self.adb_cmd_before(cmdline)
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            process.wait()
+            # process.wait()
             (stdout, stderr) = process.communicate()
-            self._stdout = stdout.decode('utf8').replace('\r', '').replace('\n', '')
-            self._stderr = stderr.decode('utf8').replace('\r', '').replace('\n', '')
+            print('stdout:', stdout.decode('gbk'))
+            print('stderr:', stderr.decode('gbk'))
+            self._stdout = stdout.decode('gbk').replace('\r', '').replace('\n', '')
+            self._stderr = stderr.decode('gbk').replace('\r', '').replace('\n', '')
         except Exception as e:
             self._log('[adb_cmd] error:', e)
         finally:

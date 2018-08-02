@@ -67,6 +67,7 @@ class NoxConSelenium(NoxConADB):
         static_capture_path = self._work_path + '\\static\\AppSimulator\\images\\temp\emulators\\' + capture_name
 
         self.adb_shell("screencap -p /sdcard/" + capture_name)
+        print('get_capture', self.get_stdout())
         self.adb_cmd("pull /sdcard/" + capture_name + " " + self._work_path + '\\Controller\\images\\temp')
         self._capture_obj = ac.imread(self._work_path + '\\Controller\\images\\temp\\' + capture_name)
 
