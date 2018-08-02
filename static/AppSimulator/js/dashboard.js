@@ -32,7 +32,7 @@ setInterval(function () {
     $(".vm-capture").each(function (index, element) {
         element.src = refresh_img_src(element.src);
     });
-}, 1000);
+}, 5000);
 
 // setInterval(function () {
 //     $.ajax({

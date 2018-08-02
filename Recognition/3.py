@@ -4,8 +4,11 @@ import aircv as ac
 # img_obj = ac.imread("douyin/share.png")
 # img_bg = ac.imread("douyin/bg5.jpg")
 
-img_obj = ac.imread("images/huoshan/share.png")
-img_bg = ac.imread("images/huoshan/bg2.png")
+# img_obj = ac.imread("images/huoshan/share.png")
+# img_bg = ac.imread("images/huoshan/bg2.png")
+
+img_obj = ac.imread("dianping_dafen.png")
+img_bg = ac.imread("dianping_ng.png")
 
 
 def debug(x, y):
@@ -20,8 +23,10 @@ def debug(x, y):
 
 
 def test():
-    pos = ac.find_template(img_bg, img_obj)
+    pos = ac.find_template(img_bg, img_obj, threshold=0.7)
     print(pos)
+    ret = ac.find_all_template(img_bg, img_obj, threshold=0.7)
+    print(ret)
     return pos
 
 
