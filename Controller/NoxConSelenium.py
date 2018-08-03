@@ -68,10 +68,11 @@ class NoxConSelenium(NoxConADB):
         capture_path = self._work_path + '\\Controller\\images\\temp\\' + capture_name
         static_capture_path = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\' + capture_name
 
-        modify_t = os.stat(capture_path).st_mtime
-        now = datetime.now().timestamp()
-        if now - modify_t > 60:
-            shutil.copy(bg_path, capture_path)
+        if os.access(capture_path, os.R_OK):
+            modify_t = os.stat(capture_path).st_mtime
+            now = datetime.now().timestamp()
+            if now - modify_t > 60:
+                shutil.copy(bg_path, capture_path)
 
         # emulator ==> pc temp
         self.adb_shell("screencap -p /sdcard/" + capture_name)
@@ -135,7 +136,7 @@ class NoxConSelenium(NoxConADB):
     def next_page(self, from_x=240, from_y=700, to_x=240, to_y=10, wait_time=2):
         self._log('<<info>> next_page', '翻页')
         # self .clear_cache()
-        self.adb_shell("input swipe " + str(from_x) + " " + str(from_y) + " " + str(to_x) + " " + str(to_y))
+        self.adb_shell("input swipe " + str(from_x) + " " + str(from_y) + " " + str(to_x) + " " + str(to_y) + " 4000")
         time.sleep(wait_time)
         return True
 
@@ -292,7 +293,7 @@ class NoxConSelenium(NoxConADB):
         pass  # overwrite
 
     def run(self):
-        self.unlock(timeout=10)
+        # self.unlock(timeout=10)
         # self.get_new_phone()
         # if ret and is_app_restart:
         #     ret = self.app_quit(wait_time=1)
