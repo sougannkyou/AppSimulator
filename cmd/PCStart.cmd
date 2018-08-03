@@ -1,3 +1,5 @@
+TIMEOUT 60
 cd %APPSIMULATOR_WORK_PATH%\cmd
 VMClone.cmd
+TIMEOUT 60
 WebStart.cmd
