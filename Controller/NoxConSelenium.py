@@ -171,10 +171,11 @@ class NoxConSelenium(NoxConADB):
         time.sleep(wait_time)
         return True
 
-    def input_cn(self, text, timeout):
+    def input_cn(self, text, wait_time=5):
         self._log('<<info>> input_cn', text)
         # adb shell am broadcast -a ADB_INPUT_TEXT --es msg '输入汉字'
         self.adb_shell("am broadcast -a ADB_INPUT_TEXT --es msg '" + text + "'")
+        time.sleep(wait_time)
         return True
 
     def check_upgrade(self, timeout):
