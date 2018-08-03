@@ -63,6 +63,19 @@ class MongoDriver(object):
         })
 
     # ---------- tasks -----------------------
+    def task_get_timer_no(self, host_ip):
+        timer_no = -1
+        used = set()
+        tasks = self.tasks.find({'host_ip': host_ip, 'status': STATUS_SCRIPT_START_OK})
+        for task in tasks:
+            used.add(task['timer_no'])
+
+        t = set(range(len(TIMER))) - set(used)
+        if len(t) > 0:
+            timer_no = t.pop()
+
+        return timer_no
+
     def get_taskId(self):
         taskId = 1
         m = self.tasks.aggregate([{"$group": {'_id': '', 'max_id': {"$max": "$taskId"}}}])
@@ -121,11 +134,23 @@ class MongoDriver(object):
     def task_change_status(self, task):
         now = int(datetime.now().timestamp())
         if task['status'] == STATUS_SCRIPT_RUN_OK:
-            self.tasks.update({'_id': task['_id']},
-                              {"$set": {'status': task['status'], 'up_time': now, 'end_time': now}})
+            self.tasks.update({'_id': task['_id']}, {"$set": {
+                'status': task['status'],
+                'up_time': now,
+                'end_time': now
+            }})
+        elif task['status'] == STATUS_WAIT:
+            self.tasks.update({'_id': task['_id']}, {"$set": {
+                'status': task['status'],
+                'host_ip': '',
+                'up_time': now,
+                'end_time': 0
+            }})
         else:
-            self.tasks.update({'_id': task['_id']},
-                              {"$set": {'status': task['status'], 'up_time': now}})
+            self.tasks.update({'_id': task['_id']}, {"$set": {
+                'status': task['status'],
+                'up_time': now
+            }})
 
     def task_set_docker(self, task, docker):
         self.tasks.update({'_id': task['_id']}, {"$set": {'dockerId': docker['_id']}})
@@ -224,6 +249,6 @@ if __name__ == '__main__':
     db = MongoDriver()
     db._DEBUG = True
     # pprint(db.vm_find_vm_by_host(host_ip))
-    pprint(db.task_find_by_taskId(10))
+    # pprint(db.task_find_by_taskId(10))
     # db.update_device_statistics_info(info, SCOPE_TIMES)
-    # pprint(db.get_devices_status())
+    pprint(db.task_get_timer_no(host_ip='172.16.250.199'))

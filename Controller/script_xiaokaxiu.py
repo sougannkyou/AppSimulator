@@ -54,7 +54,7 @@ class MySelenium(NoxConSelenium):
                     _tries -= 1
             else:
                 _tries -= 1
-            self.next_page_700(wait_time=5)
+            self.next_page(wait_time=5)
             time.sleep(2)
             return crawl(_tries)
 
@@ -102,17 +102,19 @@ if __name__ == "__main__":
     _DEBUG = True
 
     if APPSIMULATOR_MODE == 'vmware':
-        taskId = 5
+        taskId = -1
+        timer_no = -1
         mode = 'single'
     else:
         taskId = sys.argv[1]
+        timer_no = sys.argv[2]
         mode = 'multi'
 
     task = {
         'taskId': taskId,
         'app_name': 'xiaokaxiu',
         'docker_name': 'nox-' + str(taskId),
-        'timer_no': 2  # 5s
+        'timer_no': timer_no
     }
     main(task=task, mode=mode)
     print("Close after 30 seconds.")

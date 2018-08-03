@@ -1,6 +1,7 @@
 # coding:utf-8
 import os
 import time
+from datetime import datetime
 import shutil
 import cv2
 import aircv as ac
@@ -62,15 +63,22 @@ class NoxConSelenium(NoxConADB):
         return True
 
     def get_capture(self):
+        bg_path = self._work_path + '\\Controller\\images\\bg.png'
         capture_name = 'capture_' + self._docker_name + '.png'
         capture_path = self._work_path + '\\Controller\\images\\temp\\' + capture_name
-        static_capture_path = self._work_path + '\\static\\AppSimulator\\images\\temp\emulators\\' + capture_name
+        static_capture_path = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\' + capture_name
 
+        modify_t = os.stat(capture_path).st_mtime
+        now = datetime.now().timestamp()
+        if now - modify_t > 60:
+            shutil.copy(bg_path, capture_path)
+
+        # emulator ==> pc temp
         self.adb_shell("screencap -p /sdcard/" + capture_name)
-        print('get_capture', self.get_stdout())
         self.adb_cmd("pull /sdcard/" + capture_name + " " + self._work_path + '\\Controller\\images\\temp')
-        self._capture_obj = ac.imread(self._work_path + '\\Controller\\images\\temp\\' + capture_name)
 
+        self._capture_obj = ac.imread(capture_path)
+        # pc temp ==> pc static
         shutil.copy(capture_path, static_capture_path)
 
     def find_element(self, comment, timeout):
@@ -124,22 +132,14 @@ class NoxConSelenium(NoxConADB):
         time.sleep(wait_time)
         return True
 
-    def next_page(self, wait_time):
+    def next_page(self, from_x=240, from_y=700, to_x=240, to_y=10, wait_time=2):
         self._log('<<info>> next_page', '翻页')
         # self .clear_cache()
-        self.adb_shell("input swipe 10 400 10 10")
-        # self.adb_shell("input swipe 10 700 10 10")
+        self.adb_shell("input swipe " + str(from_x) + " " + str(from_y) + " " + str(to_x) + " " + str(to_y))
         time.sleep(wait_time)
         return True
 
-    def next_page_700(self, wait_time):
-        self._log('<<info>> next_page', '翻页')
-        # self .clear_cache()
-        self.adb_shell("input swipe 10 700 10 10")
-        time.sleep(wait_time)
-        return True
-
-    def next_page_browser(self, wait_time):
+    def next_page_browser(self, wait_time=3):
         self._log('<<info>> next_page_browser', '浏览器翻页')
         # KEYCODE_PAGE_UP = 92
         self.adb_shell("input keyevent 93")  # KEYCODE_PAGE_DOWN = 93
@@ -179,10 +179,11 @@ class NoxConSelenium(NoxConADB):
         time.sleep(wait_time)
         return True
 
-    def input_cn(self, text, timeout):
+    def input_cn(self, text, wait_time=5):
         self._log('<<info>> input_cn', text)
         # adb shell am broadcast -a ADB_INPUT_TEXT --es msg '输入汉字'
         self.adb_shell("am broadcast -a ADB_INPUT_TEXT --es msg '" + text + "'")
+        time.sleep(wait_time)
         return True
 
     def check_upgrade(self, timeout):

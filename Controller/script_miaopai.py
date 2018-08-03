@@ -44,7 +44,7 @@ class MySelenium(NoxConSelenium):
                                 if ret: ret, x, y = self.find_element(comment='复制链接', timeout=10)
                                 if ret: ret = self.click_xy_timer(x, y, wait_time=1)
 
-                self.next_page(wait_time=5)
+                self.next_page(from_y=400, to_y=10, wait_time=5)
 
         except Exception as e:
             self._log('error:', e)
@@ -90,18 +90,18 @@ if __name__ == "__main__":
     _DEBUG = True
 
     if APPSIMULATOR_MODE == 'vmware':
-        taskId = 3
+        taskId = -1
+        timer_no = -1
         mode = 'single'
-        docker_name = 'vm1'
     else:
         taskId = sys.argv[1]
+        timer_no = sys.argv[2]
         mode = 'multi'
-        docker_name = 'nox-' + str(taskId)
 
     task = {
         'taskId': taskId,
         'app_name': 'miaopai',
-        'docker_name': docker_name,
+        'docker_name': 'nox-' + str(taskId),
         'timer_no': 4  # 14s
     }
 

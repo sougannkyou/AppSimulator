@@ -100,16 +100,22 @@ class Manager(object):
         try:
             org_path = os.getcwd()
             os.chdir(self._work_path)
+            timer_no = self._mdb.task_get_timer_no(host_ip=LOCAL_IP)  # Index of TIMER, start 0
+            if timer_no == -1:
+                self._log('error', 'not fond timer_no')
+                return False, 'timer_no'
+
             cmd = 'START "task-' + str(task_info['taskId']) + '" '
-            cmd += 'python ' + self._work_path + '\Controller\\' + task_info['script'] + ' ' + str(task_info['taskId'])
+            cmd += 'python ' + self._work_path + '\Controller\\' + task_info['script'] + ' ' + \
+                   str(task_info['taskId']) + ' ' + str(task_info['timer_no'])
             # cmd += ' >>' + self._work_path + '\Controller\log\\task-' + str(task['taskId']) + '.log 2>&1'
             self._log('<<info>> run_script cmd:\n', cmd)
             os.system(cmd)
             os.chdir(org_path)
-            return True
+            return True, ''
         except Exception as e:
             self._log('run_script error:', e)
-            return False
+            return False, e
 
     def nox_start(self, task, docker, retry_cnt):
         docker.stop()
@@ -209,10 +215,15 @@ class Manager(object):
                 if ret:  # docker run ok
                     # 3)script run ok(ng)
                     self._mdb.task_set_docker(task, docker_info)  # bind docker to task
-                    ret = self.nox_run_script(task_info=task)
-                    task['status'] = STATUS_SCRIPT_START_OK if ret else STATUS_SCRIPT_START_NG
-                    self._mdb.task_change_status(task)
+                    ret, msg = self.nox_run_script(task_info=task)
+                    if ret:
+                        task['status'] = STATUS_SCRIPT_START_OK
+                    elif msg == 'timer_no':  # not found timer_no
+                        task['status'] = STATUS_WAIT
+                    else:
+                        task['status'] = STATUS_SCRIPT_START_NG
 
+                    self._mdb.task_change_status(task)
             else:
                 self._log('<<info>> start_tasks', 'not found waiting task, retry after 60s.')
                 time.sleep(1 * 60)

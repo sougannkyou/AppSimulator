@@ -5,8 +5,11 @@ import sys
 sys.path.append(os.getcwd())
 
 import time
-from datetime import datetime
+from Controller.setting import APPSIMULATOR_MODE
+from Controller.Common import *
+from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
+from Controller.ControllerManager import Manager
 
 urls = [
     "https://m.toutiaocdn.cn/group/6565684301512311300/?iid=14592851837&app=news_article&timestamp=1528703355&tt_from=android_share&utm_medium=toutiao_android&utm_campaign=client_share",
@@ -84,15 +87,23 @@ def main(task_info, mode):
 
 #################################################################################
 if __name__ == "__main__":
-    # docker_name = sys.argv[1]
-    # taskId = sys.argv[1]
-    taskId = 2
+    _DEBUG = True
+
+    if APPSIMULATOR_MODE == 'vmware':
+        taskId = -1
+        timer_no = -1
+        mode = 'single'
+    else:
+        taskId = sys.argv[1]
+        timer_no = sys.argv[2]
+        mode = 'multi'
+
     task = {
         'taskId': taskId,
-        'app_name': 'miaopai',
+        'app_name': 'toutiao',
         'docker_name': 'nox-' + str(taskId),
         'timer_no': 2
     }
     main(task_info=task, mode='single')
-    print("Close after 60 seconds.")
-    time.sleep(60)
+    print("Close after 30 seconds.")
+    time.sleep(30)

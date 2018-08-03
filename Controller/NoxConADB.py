@@ -163,14 +163,18 @@ class NoxConADB(object):
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             # process.wait()
             (stdout, stderr) = process.communicate()
-            print('stdout:', stdout.decode('gbk'))
-            print('stderr:', stderr.decode('gbk'))
+            # print('stdout:', stdout.decode('gbk'))
+            # print('stderr:', stderr.decode('gbk'))
             self._stdout = stdout.decode('gbk').replace('\r', '').replace('\n', '')
             self._stderr = stderr.decode('gbk').replace('\r', '').replace('\n', '')
         except Exception as e:
             self._log('[adb_cmd] error:', e)
         finally:
             os.chdir(self._org_path)  # 恢复路径
+            # if self._stdout.find('device not exist!') != -1 or \
+            #         self._stdout.find('error: no devices/emulators found') != -1:
+            #     print(self._stdout)
+            #     raise Exception("offline")
 
         return
 

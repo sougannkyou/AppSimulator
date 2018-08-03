@@ -5,11 +5,16 @@ import sys
 sys.path.append(os.getcwd())
 
 import time
-from datetime import datetime
+from Controller.setting import APPSIMULATOR_MODE
+from Controller.Common import *
+from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
+from Controller.ControllerManager import Manager
+
+_DEBUG = False
 
 urls = [
-    "http://www.dianping.com/shop/93643555",
+    "http://www.dianping.com/shop/508130",
 ]
 
 keywords = [
@@ -41,16 +46,14 @@ class MySelenium(NoxConSelenium):
         if ret: ret, x, y = self.find_element(comment='APP图标', timeout=10)
         if ret: ret = self.click_xy(x, y, wait_time=2)
         if ret: ret, x, y = self.find_element(comment='附近热搜', timeout=5)
-        if ret: ret = self.click_xy(x, y, wait_time=1)
-        time.sleep(3)
-        if ret: ret = self.input_cn(keywords[0], timeout=1)
-        time.sleep(5)
+        if ret: ret = self.click_xy(x, y, wait_time=3)
+        if ret: ret = self.input_cn(keywords[0], wait_time=5)
         if ret: ret, x, y = self.find_element(comment='搜索', timeout=5)
         if ret: ret = self.click_xy(x, y + 30, wait_time=1)
 
         ret, x, y = self.find_element(comment='APP打开结果OK', timeout=60)
         find = False
-        pos_list = []
+        _pos_list = []
         for i in range(5):
             ret, x, y = self.find_element(comment='全部网友点评', timeout=5)
             if ret:
@@ -59,38 +62,35 @@ class MySelenium(NoxConSelenium):
                 break
             else:
                 ret = self.next_page(wait_time=1)
-
+        fail = 0
         while find and ret:
             if ret:
-                ret, pos_list = self.find_elements(comment='打分', timeout=10)
-                if not ret:
-                    ret = self.next_page(wait_time=1)
-                    print('next_page:', page_cnt)
-
-            for pos in pos_list:
-                (x, y) = pos
-                if ret: ret = self.click_xy(x, y, wait_time=1)
-                if ret:
-                    ret, x, y = self.find_element(comment='分享', timeout=10)
+                ret, pos_list = self.find_elements(comment='分享', timeout=10)
+                if pos_list == _pos_list:
+                    fail += 1
+                    if fail >= 5:
+                        break
                 else:
+                    fail = 0
+                _pos_list = pos_list
+                for pos in pos_list:
                     (x, y) = pos
                     if ret: ret = self.click_xy(x, y, wait_time=1)
-                    if ret: ret, x, y = self.find_element(comment='分享', timeout=10)
+                    if ret: ret, x, y = self.find_element(comment='复制链接', timeout=10)
+                    if ret: ret = self.click_xy_timer(x, y, wait_time=1)
 
-                if ret: ret = self.click_xy(x, y, wait_time=1)
-                if ret: ret, x, y = self.find_element(comment='复制链接', timeout=10)
-                if ret: ret = self.click_xy(x, y, wait_time=1)
-                if ret: ret = self.back(wait_time=1)
-
-            if ret: ret = self.next_page(wait_time=1)
+            ret = self.next_page(wait_time=1)
 
 
 ##################################################################################
-def main(task_info, mode):
+def main(task, mode):
+    msg = ''
+    error = ''
     start = datetime.now()
-    print("[Script " + task_info['docker_name'] + "] run start.", start)
+    common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
+
     try:
-        me = MySelenium(task_info=task_info, mode=mode)
+        me = MySelenium(task_info=task, mode=mode)
         me.set_comment_to_pic({
             "web打开APP": 'images/dianping/webOpenApp.png',
             "APP打开结果OK": 'images/dianping/search_ready.png',
@@ -103,28 +103,47 @@ def main(task_info, mode):
             "复制链接": 'images/dianping/copy_link.png',
             "打分": 'images/dianping/dafen.png',
         })
-        me.set_gps(39.984727, 116.310050)  # 中关村
+        me._DEBUG = True
         me.run()
-
-        end = datetime.now()
-        print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s")
-        return True
     except Exception as e:
+        msg = '<<error>>'
+        error = e
+    finally:
         end = datetime.now()
-        print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s\nerror:", e)
-        return False
+        if APPSIMULATOR_MODE != 'vmware':  # multi nox console
+            common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'multi nox console mode.', '')
+            docker = NoxConDocker(task)
+            docker.quit()
+            docker.remove()
+            m = Manager()
+            m.nox_run_task_complete(task['taskId'])
+            time.sleep(10)
+
+        common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'] + 'end.',
+                   msg + 'total times:' + str((end - start).seconds) + 's', error)
+        return
 
 
 #################################################################################
 if __name__ == "__main__":
-    # taskId = sys.argv[1]
-    taskId = 1
+    _DEBUG = True
+
+    if APPSIMULATOR_MODE == 'vmware':
+        taskId = -1
+        timer_no = -1
+        mode = 'single'
+    else:
+        taskId = sys.argv[1]
+        timer_no = sys.argv[2]
+        mode = 'multi'
+
     task = {
         'taskId': taskId,
         'app_name': 'dianping',
         'docker_name': 'nox-' + str(taskId),
-        'timer_no': 2
+        'timer_no': timer_no
     }
-    main(task_info=task, mode='single')
-    print("Close after 60 seconds.")
-    time.sleep(60)
+    main(task=task, mode=mode)
+    print("Close after 30 seconds.")
+    time.sleep(30)
+
