@@ -58,8 +58,8 @@ class VMDocker(object):
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             # process.wait()
             (stdout, stderr) = process.communicate()
-            _stdout = stdout.decode('utf8')
-            _stderr = stderr.decode('utf8')
+            _stdout = stdout.decode('gbk')
+            _stderr = stderr.decode('gbk')
         except Exception as e:
             self._log('_exec_vmrun_cmd error:', e)
         finally:
@@ -141,7 +141,7 @@ def main(task_info):
     vm = VMDocker(task_info=task_info)
     vm._DEBUG = True
     vm.get_local_ip()
-    print(vm.set_run_app('aaaaa'))
+    print(vm.set_run_app('douyin'))
     # return docker.start(wait_times=2)
 
 
