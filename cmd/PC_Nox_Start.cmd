@@ -1,3 +1,5 @@
+cd %APPSIMULATOR_WORK_PATH%
 TIMEOUT 60
-cd %APPSIMULATOR_WORK_PATH%\cmd
-START "WebServer" WebStart.cmd
+START "WebServer" cmd\WebStart.cmd
+TIMEOUT 10
+START "Multi Nox Monitor" python Controller\NoxMonitor.py
