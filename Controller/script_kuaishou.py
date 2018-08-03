@@ -37,7 +37,7 @@ class MySelenium(NoxConSelenium):
                                 self.click_xy_timer(x, y, wait_time=1)
                                 self.back(wait_time=1)
 
-                self.next_page(wait_time=5)
+                self.next_page(from_y=400, to_y=10, wait_time=5)
 
         except Exception as e:
             self._log('error:', e)

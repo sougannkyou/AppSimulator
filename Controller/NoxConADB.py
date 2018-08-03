@@ -170,6 +170,9 @@ class NoxConADB(object):
         except Exception as e:
             self._log('[adb_cmd] error:', e)
         finally:
+            if self._stdout.find('device not exist!') != -1 or \
+                    self._stdout.find('error: no devices/emulators found') != -1:
+                raise Exception("offline")
             os.chdir(self._org_path)  # 恢复路径
 
         return

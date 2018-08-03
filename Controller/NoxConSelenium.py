@@ -124,22 +124,14 @@ class NoxConSelenium(NoxConADB):
         time.sleep(wait_time)
         return True
 
-    def next_page(self, wait_time):
+    def next_page(self, from_x=240, from_y=700, to_x=240, to_y=10, wait_time=2):
         self._log('<<info>> next_page', '翻页')
         # self .clear_cache()
-        self.adb_shell("input swipe 10 400 10 10")
-        # self.adb_shell("input swipe 10 700 10 10")
+        self.adb_shell("input swipe " + str(from_x) + " " + str(from_y) + " " + str(to_x) + " " + str(to_y))
         time.sleep(wait_time)
         return True
 
-    def next_page_700(self, wait_time):
-        self._log('<<info>> next_page', '翻页')
-        # self .clear_cache()
-        self.adb_shell("input swipe 10 700 10 10")
-        time.sleep(wait_time)
-        return True
-
-    def next_page_browser(self, wait_time):
+    def next_page_browser(self, wait_time=3):
         self._log('<<info>> next_page_browser', '浏览器翻页')
         # KEYCODE_PAGE_UP = 92
         self.adb_shell("input keyevent 93")  # KEYCODE_PAGE_DOWN = 93

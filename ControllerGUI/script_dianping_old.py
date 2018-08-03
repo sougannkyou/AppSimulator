@@ -63,7 +63,7 @@ class MySimulator(Simulator):
                 ret = self.click_xy(x, y, timeout=1)
                 break
             else:
-                ret = self.next_page(timeout=1)
+                ret = self.next_page(wait_time=1)
 
         while find and ret:
             if ret:

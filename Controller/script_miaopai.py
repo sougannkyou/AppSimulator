@@ -44,7 +44,7 @@ class MySelenium(NoxConSelenium):
                                 if ret: ret, x, y = self.find_element(comment='复制链接', timeout=10)
                                 if ret: ret = self.click_xy_timer(x, y, wait_time=1)
 
-                self.next_page(wait_time=5)
+                self.next_page(from_y=400, to_y=10, wait_time=5)
 
         except Exception as e:
             self._log('error:', e)

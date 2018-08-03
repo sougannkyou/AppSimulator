@@ -85,7 +85,7 @@ class MySelenium(NoxConSelenium):
                 ret, x, y = self.find_element(comment='广告', timeout=10)
                 if not ret:
                     _tries -= 1
-            self.next_page_700(wait_time=5)
+            self.next_page(wait_time=5)
             time.sleep(2)
             return crawl(_tries)
         return crawl(tries)

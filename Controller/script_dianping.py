@@ -58,13 +58,13 @@ class MySelenium(NoxConSelenium):
                 ret = self.click_xy(x, y, wait_time=1)
                 break
             else:
-                ret = self.next_page(wait_time=1)
+                ret = self.next_page(from_y=400, to_y=10, wait_time=1)
 
         while find and ret:
             if ret:
                 ret, pos_list = self.find_elements(comment='打分', timeout=10)
                 if not ret:
-                    ret = self.next_page(wait_time=1)
+                    ret = self.next_page(from_y=400, to_y=10, wait_time=1)
                     print('next_page:', page_cnt)
 
             for pos in pos_list:
@@ -82,7 +82,7 @@ class MySelenium(NoxConSelenium):
                 if ret: ret = self.click_xy(x, y, wait_time=1)
                 if ret: ret = self.back(wait_time=1)
 
-            if ret: ret = self.next_page(wait_time=1)
+            if ret: ret = self.next_page(from_y=400, to_y=10, wait_time=1)
 
 
 ##################################################################################
