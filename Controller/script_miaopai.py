@@ -90,18 +90,18 @@ if __name__ == "__main__":
     _DEBUG = True
 
     if APPSIMULATOR_MODE == 'vmware':
-        taskId = 3
+        taskId = -1
+        timer_no = -1
         mode = 'single'
-        docker_name = 'vm1'
     else:
         taskId = sys.argv[1]
+        timer_no = sys.argv[2]
         mode = 'multi'
-        docker_name = 'nox-' + str(taskId)
 
     task = {
         'taskId': taskId,
         'app_name': 'miaopai',
-        'docker_name': docker_name,
+        'docker_name': 'nox-' + str(taskId),
         'timer_no': 4  # 14s
     }
 

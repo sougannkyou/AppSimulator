@@ -83,10 +83,12 @@ if __name__ == "__main__":
     _DEBUG = True
 
     if APPSIMULATOR_MODE == 'vmware':
-        taskId = 3
+        taskId = -1
+        timer_no = -1
         mode = 'single'
     else:
         taskId = sys.argv[1]
+        timer_no = sys.argv[2]
         mode = 'multi'
 
     task = {

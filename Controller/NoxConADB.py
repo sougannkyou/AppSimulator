@@ -163,8 +163,8 @@ class NoxConADB(object):
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             # process.wait()
             (stdout, stderr) = process.communicate()
-            print('stdout:', stdout.decode('gbk'))
-            print('stderr:', stderr.decode('gbk'))
+            # print('stdout:', stdout.decode('gbk'))
+            # print('stderr:', stderr.decode('gbk'))
             self._stdout = stdout.decode('gbk').replace('\r', '').replace('\n', '')
             self._stderr = stderr.decode('gbk').replace('\r', '').replace('\n', '')
         except Exception as e:

@@ -77,7 +77,7 @@ class MySelenium(NoxConSelenium):
                     (x, y) = pos
                     if ret: ret = self.click_xy(x, y, wait_time=1)
                     if ret: ret, x, y = self.find_element(comment='复制链接', timeout=10)
-                    if ret: ret = self.click_xy(x, y, wait_time=1)
+                    if ret: ret = self.click_xy_timer(x, y, wait_time=1)
 
             ret = self.next_page(wait_time=1)
 
@@ -129,8 +129,8 @@ if __name__ == "__main__":
     _DEBUG = True
 
     if APPSIMULATOR_MODE == 'vmware':
-        taskId = 0
-        timer_no = 0
+        taskId = -1
+        timer_no = -1
         mode = 'single'
     else:
         taskId = sys.argv[1]
