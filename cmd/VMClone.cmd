@@ -4,13 +4,13 @@ SET VMRUN_EXE=C:\VMware\Workstation\vmrun.exe
 SET workspace=D:\VMware\VM
 SET VMX_FILE=Windows 7 x64.vmx
 ::---- main vm1 vm2 vm3 vm4 vm5  -------------------
-FOR /L %%i in (1 1 5) do CALL :STOP_VM %%i
+FOR /L %%i in (1 1 1) do CALL :STOP_VM %%i
 
 CALL :KILL_VM
 
-FOR /L %%i in (1 1 5) do CALL :CLONE_VM %%i
+FOR /L %%i in (1 1 1) do CALL :CLONE_VM %%i
 
-FOR /L %%i in (1 1 5) do CALL :START_VM %%i
+FOR /L %%i in (1 1 1) do CALL :START_VM %%i
 
 GOTO :EOF
 ::--------------------------------------------------
