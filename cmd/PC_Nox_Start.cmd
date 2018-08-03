@@ -1,0 +1,3 @@
+TIMEOUT 60
+cd %APPSIMULATOR_WORK_PATH%\cmd
+START "WebServer" WebStart.cmd
