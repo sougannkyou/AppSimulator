@@ -1,6 +1,7 @@
 # coding:utf-8
 import os
 import time
+from datetime import datetime
 import shutil
 import cv2
 import aircv as ac
@@ -62,14 +63,22 @@ class NoxConSelenium(NoxConADB):
         return True
 
     def get_capture(self):
+        bg_path = self._work_path + '\\Controller\\images\\bg.png'
         capture_name = 'capture_' + self._docker_name + '.png'
         capture_path = self._work_path + '\\Controller\\images\\temp\\' + capture_name
         static_capture_path = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\' + capture_name
 
+        modify_t = os.stat(capture_path).st_mtime
+        now = datetime.now().timestamp()
+        if now - modify_t > 60:
+            shutil.copy(bg_path, capture_path)
+
+        # emulator ==> pc temp
         self.adb_shell("screencap -p /sdcard/" + capture_name)
         self.adb_cmd("pull /sdcard/" + capture_name + " " + self._work_path + '\\Controller\\images\\temp')
-        self._capture_obj = ac.imread(self._work_path + '\\Controller\\images\\temp\\' + capture_name)
 
+        self._capture_obj = ac.imread(capture_path)
+        # pc temp ==> pc static
         shutil.copy(capture_path, static_capture_path)
 
     def find_element(self, comment, timeout):
