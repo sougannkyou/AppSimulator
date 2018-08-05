@@ -140,7 +140,7 @@ class NoxConADB(object):
 
     def adb_cmd_before(self, cmdline):
         # overwrite NoxConADB adb_cmd_before
-        if self.mode == 'multi' and self._timer_flg and self._timer_no > 0:
+        if self.mode == 'multi' and self._timer_flg and self._timer_no >= 0:
             cycle = 3 * len(TIMER)
             now = datetime.now().second % cycle
             if now > TIMER[self._timer_no]:
