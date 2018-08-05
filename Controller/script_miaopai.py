@@ -102,7 +102,7 @@ if __name__ == "__main__":
         'taskId': taskId,
         'app_name': 'miaopai',
         'docker_name': 'nox-' + str(taskId),
-        'timer_no': 4  # 14s
+        'timer_no': timer_no
     }
 
     main(task=task, mode=mode)

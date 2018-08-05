@@ -91,8 +91,9 @@ if __name__ == "__main__":
         'taskId': taskId,
         'app_name': 'douyin',
         'docker_name': 'nox-' + str(taskId),
-        'timer_no': 1  # 5s
+        'timer_no': timer_no
     }
+
     main(task_info=task, mode=mode)
     print("Close after 30 seconds.")
     time.sleep(30)

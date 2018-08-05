@@ -28,6 +28,7 @@
                             <th width="10%">IP</th>
                             <th width="15%">Script</th>
                             <th width="10%">Live Cycle</th>
+                            <th width="10%">Timer</th>
                             <th width="10%">Status</th>
                             <th width="10%">Start Time</th>
                             <th width="10%">End Time</th>
@@ -44,11 +45,15 @@
                             </td>
                             <td>N/A</td>
                             <td><input type="text" v-model="task.script" placeholder="script"></td>
-                            <td>
+                            <td><!-- Live Cycle -->
                                 <input id="never" name="live_cycle" type="radio" v-model="task.live_cycle"
                                        value="never" checked>never
                                 <input id="once" name="live_cycle" type="radio" v-model="task.live_cycle"
                                        value="once">once
+                            </td>
+                            <td><!-- Timer -->
+                                <input id="timer_on" name="timer" type="radio" v-model="task.timer" value="on">on
+                                <input id="timer_off" name="timer" type="radio" v-model="task.timer" value="off" checked>off
                             </td>
                             <td><span class="label label-default">[[ task.status ]]</span></td>
                             <td>N/A</td>
@@ -71,6 +76,7 @@
                             <td>[[ t.host_ip ]]</td>
                             <td>[[ t.script ]]</td>
                             <td>[[ t.live_cycle ]]</td>
+                            <td>[[ t.timer_on ]]</td>
                             <td>
                                 <span v-bind:class="[t.status.indexOf('_ok')!=-1?'label label-success':
                                 (t.status.indexOf('_ng')!=-1?'label label-danger':'label label-default')]">[[ t.status ]]
@@ -152,6 +158,7 @@
                     script: obj.task.script,
                     app_name: obj.task.app_name,
                     live_cycle: obj.task.live_cycle,
+                    timer_on: obj.task.timer_on,
                 },
                 dataType: "json",
                 error: function (xhr, err) {
@@ -172,7 +179,7 @@
         let mainVue = new Vue({
             el: "#main",
             data: {
-                app_name_list: ['douyin', 'miaopai', 'kuaishou', 'huoshan','xigua','xiaokaxiu'],
+                app_name_list: ['douyin', 'miaopai', 'kuaishou', 'huoshan', 'xigua', 'xiaokaxiu'],
                 task: {
                     taskId: '等待分配',
                     ip: '等待分配',
@@ -180,6 +187,7 @@
                     script: '',
                     host_type: 'emulator',
                     live_cycle: 'never',
+                    timer: 'off', // on off
                     app_name: '',
                     status: STATUS_WAIT
                 },

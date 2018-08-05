@@ -157,7 +157,7 @@ class MongoDriver(object):
             task = self.emulator_get_task(taskId)
             emu['timer'] = TIMER[task['timer_no'] if task else 0]
             emu['capture'] = pre + 'temp/emulators/capture_' + emu['name'] + '.png'
-            emu['capture_before'] = pre + 'temp/emulators/capture_' + emu['name'] + '_before.png'
+            # emu['capture_before'] = pre + 'temp/emulators/capture_' + emu['name'] + '_before.png'
             ret.append(emu)
         return ret
 
@@ -178,10 +178,11 @@ class MongoDriver(object):
             "app_name": task['app_name'],
             "status": STATUS_WAIT,
             "live_cycle": task['live_cycle'],
+            "timer": task['timer'],
+            "timer_no": 0,
             "host_ip": '',
             "start_time": int(datetime.now().timestamp()),
             "up_time": 0,
-            "timer_no": 0,
             "dockerId": ''
         })
         return taskId
