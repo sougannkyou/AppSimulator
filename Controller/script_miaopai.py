@@ -33,7 +33,8 @@ class MySelenium(NoxConSelenium):
                         if ret:
                             ret, x, y = self.find_element(comment='复制链接', timeout=10)
                             if ret:
-                                ret = self.click_xy_timer(x, y, wait_time=1)
+                                # ret = self.click_xy_timer(x, y, wait_time=1)
+                                ret = self.click_xy(x, y, wait_time=1)
                             else:  # upgrade?
                                 # ret = self.check_upgrade(timeout=2)
                                 # if ret:
@@ -42,7 +43,8 @@ class MySelenium(NoxConSelenium):
                                 if ret: ret = self.click_xy(x, y, wait_time=1)
 
                                 if ret: ret, x, y = self.find_element(comment='复制链接', timeout=10)
-                                if ret: ret = self.click_xy_timer(x, y, wait_time=1)
+                                # if ret: ret = self.click_xy_timer(x, y, wait_time=1)
+                                if ret: ret = self.click_xy(x, y, wait_time=1)
 
                 self.next_page()
 
@@ -73,13 +75,14 @@ def main(task, mode):
     finally:
         end = datetime.now()
         if APPSIMULATOR_MODE != 'vmware':  # multi nox console
-            common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'multi nox console mode.', '')
+            common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'multi nox console mode.',
+                       'Script end.')
             docker = NoxConDocker(task)
             docker.quit()
             docker.remove()
             m = Manager()
             m.nox_run_task_complete(task['taskId'])
-            time.sleep(10)
+            time.sleep(60)
 
         common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'] + 'end.',
                    msg + 'total times:' + str((end - start).seconds) + 's', error)

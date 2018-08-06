@@ -179,7 +179,7 @@ class MongoDriver(object):
             "status": STATUS_WAIT,
             "live_cycle": task['live_cycle'],
             "timer": task['timer'],
-            "timer_no": 0,
+            "timer_no": -1 if task['timer'] == 'off' else 0,
             "host_ip": '',
             "start_time": int(datetime.now().timestamp()),
             "up_time": 0,
