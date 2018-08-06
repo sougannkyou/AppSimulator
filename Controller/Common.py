@@ -18,7 +18,7 @@ def common_runscript_countdown():
         conf_path = WORK_PATH + '\cmd\\NoxResetCounter.conf'
         f = open(conf_path, 'r')
         cnt = f.readline()
-        common_log(True, 'common_runscript_countdown', 'counter', cnt)
+        common_log(True, '', 'common_runscript_countdown', 'counter', cnt)
         if int(cnt) > 0:
             n = open(conf_path, 'w')
             n.write(str(int(cnt) - 1))
@@ -26,7 +26,7 @@ def common_runscript_countdown():
             os.system('%APPSIMULATOR_WORK_PATH%\cmd\StartScript.cmd')
 
     except Exception as e:
-        common_log(True, 'common_runscript_countdown', 'error', e)
+        common_log(True, '', 'common_runscript_countdown', 'error', e)
     finally:
         f.close()
 
