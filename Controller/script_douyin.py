@@ -84,7 +84,7 @@ if __name__ == "__main__":
         mode = 'single'
     else:
         taskId = sys.argv[1]
-        timer_no = sys.argv[2]
+        timer_no = int(sys.argv[2])
         mode = 'multi'
 
     task = {

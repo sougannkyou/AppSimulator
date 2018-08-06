@@ -114,7 +114,7 @@ class NoxConDocker(object):
         return self._docker_name
 
     def shake(self, cnt):
-        self._log('<<info>> shake', 'Remind ' + str(cnt) + ' times')
+        self._log('<<info>> shake', str(cnt) + ' times')
         for _ in range(cnt):
             self._exec_nox_cmd(self._make_cmd("action -name:" + self._docker_name + " -key:call.shake -value:null"))
         return True

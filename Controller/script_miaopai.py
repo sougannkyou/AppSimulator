@@ -33,8 +33,8 @@ class MySelenium(NoxConSelenium):
                         if ret:
                             ret, x, y = self.find_element(comment='复制链接', timeout=10)
                             if ret:
-                                # ret = self.click_xy_timer(x, y, wait_time=1)
-                                ret = self.click_xy(x, y, wait_time=1)
+                                ret = self.click_xy_timer(x, y, wait_time=1)
+                                # ret = self.click_xy(x, y, wait_time=1)
                             else:  # upgrade?
                                 # ret = self.check_upgrade(timeout=2)
                                 # if ret:
@@ -43,8 +43,8 @@ class MySelenium(NoxConSelenium):
                                 if ret: ret = self.click_xy(x, y, wait_time=1)
 
                                 if ret: ret, x, y = self.find_element(comment='复制链接', timeout=10)
-                                # if ret: ret = self.click_xy_timer(x, y, wait_time=1)
-                                if ret: ret = self.click_xy(x, y, wait_time=1)
+                                if ret: ret = self.click_xy_timer(x, y, wait_time=1)
+                                # if ret: ret = self.click_xy(x, y, wait_time=1)
 
                 self.next_page()
 
@@ -98,7 +98,7 @@ if __name__ == "__main__":
         mode = 'single'
     else:
         taskId = sys.argv[1]
-        timer_no = sys.argv[2]
+        timer_no = int(sys.argv[2])
         mode = 'multi'
 
     task = {
