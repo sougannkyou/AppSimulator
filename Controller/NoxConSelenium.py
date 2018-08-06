@@ -65,7 +65,9 @@ class NoxConSelenium(NoxConADB):
     def get_capture(self):
         bg_path = self._work_path + '\\Controller\\images\\bg.png'
         capture_name = 'capture_' + self._docker_name + '.png'
+        capture_before_name = 'capture_' + self._docker_name + '_before.png'
         capture_path = self._work_path + '\\Controller\\images\\temp\\' + capture_name
+        capture_before_path = self._work_path + '\\Controller\\images\\temp\\' + capture_before_name
         static_capture_path = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\' + capture_name
 
         if os.access(capture_path, os.R_OK):
@@ -134,6 +136,7 @@ class NoxConSelenium(NoxConADB):
         return True
 
     def next_page(self, from_x=240, from_y=700, to_x=240, to_y=10, wait_time=2):
+        # 480 * 800
         self._log('<<info>> next_page', '翻页')
         # self .clear_cache()
         self.adb_shell("input swipe " + str(from_x) + " " + str(from_y) + " " + str(to_x) + " " + str(to_y) + " 2000")
@@ -151,9 +154,9 @@ class NoxConSelenium(NoxConADB):
         if not self._DEBUG:
             return
 
-        cv2.circle(img=self._capture_obj, center=(int(x), int(y)), radius=30, color=(0, 0, 255), thickness=1)
-        cv2.putText(img=self._capture_obj, text='click', org=(int(x) - 40, int(y) + 10),
-                    fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(0, 0, 255), thickness=1)
+        cv2.circle(img=self._capture_obj, center=(int(x), int(y)), radius=30, color=(0, 255, 0), thickness=2)
+        cv2.putText(img=self._capture_obj, text='Click', org=(int(x) - 38, int(y) + 10),
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(0, 255, 0), thickness=1)
         cv2.startWindowThread()
         cv2.imshow('Debugger', self._capture_obj)
         cv2.waitKey(wait_time * 1000)
