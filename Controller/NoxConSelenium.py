@@ -63,22 +63,27 @@ class NoxConSelenium(NoxConADB):
         return True
 
     def get_capture(self):
-        bg_path = self._work_path + '\\Controller\\images\\bg.png'
+        capture_default_path = self._work_path + '\\Controller\\images\\temp\\default.png'
         capture_name = 'capture_' + self._docker_name + '.png'
         capture_before_name = 'capture_' + self._docker_name + '_before.png'
         capture_path = self._work_path + '\\Controller\\images\\temp\\' + capture_name
         capture_before_path = self._work_path + '\\Controller\\images\\temp\\' + capture_before_name
         static_capture_path = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\' + capture_name
 
-        if os.access(capture_path, os.R_OK):
+        if not os.access(capture_before_path, os.R_OK):
+            shutil.copy(capture_default_path, capture_before_path)
+
+        if not os.access(capture_path, os.R_OK):
+            shutil.copy(capture_default_path, capture_path)
+        else:
             modify_t = os.stat(capture_path).st_mtime
             now = datetime.now().timestamp()
             if now - modify_t > 60:
-                shutil.copy(bg_path, capture_path)
-        else:
-            shutil.copy(bg_path, capture_path)
+                shutil.copy(capture_default_path, capture_path)
+            else:
+                shutil.copy(capture_path, capture_before_path)
 
-        # emulator ==> pc temp
+        # emulator ==> pc temp  可能获取失败
         self.adb_shell("screencap -p /sdcard/" + capture_name)
         self.adb_cmd("pull /sdcard/" + capture_name + " " + self._work_path + '\\Controller\\images\\temp')
 
@@ -204,7 +209,7 @@ class NoxConSelenium(NoxConADB):
         self.adb_cmd('reboot')
         time.sleep(wait_time)
 
-    def back(self, wait_time):
+    def back(self, wait_time=1):
         self._log('back', '')
         self.adb_shell('input keyevent 4')  # KEYCODE_BACK
         time.sleep(wait_time)
