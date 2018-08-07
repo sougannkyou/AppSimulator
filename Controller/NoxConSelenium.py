@@ -75,6 +75,8 @@ class NoxConSelenium(NoxConADB):
             now = datetime.now().timestamp()
             if now - modify_t > 60:
                 shutil.copy(bg_path, capture_path)
+        else:
+            shutil.copy(bg_path, capture_path)
 
         # emulator ==> pc temp
         self.adb_shell("screencap -p /sdcard/" + capture_name)
