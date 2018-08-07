@@ -77,7 +77,7 @@ def main(task, mode):
             "分享": 'images/{}/share.png'.format(task["app_name"]),
             "复制链接": 'images/{}/copylink.png'.format(task["app_name"]),
         })
-        me._DEBUG = True
+        # me._DEBUG = True
         me.run()
     except Exception as e:
         msg = '<<error>>'
