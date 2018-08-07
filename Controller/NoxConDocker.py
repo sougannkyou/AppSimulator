@@ -211,6 +211,7 @@ class NoxConDocker(object):
             ret = self.remove()
             if not ret:
                 msg = 'remove failed!'
+                self._log('<<error>> remove', msg)
                 return False, msg
 
         # time.sleep(10)
@@ -218,11 +219,13 @@ class NoxConDocker(object):
         ret = self.add()
         if not ret:
             msg = 'add failed!'
+            self._log('<<error>> add', msg)
             return False, msg
 
         ret = self.pull(self._app_name)
         if not ret:
             msg = 'pull failed!'
+            self._log('<<error>> pull', msg)
             return False, msg
 
         return True, msg

@@ -165,8 +165,8 @@ class NoxConADB(object):
             (stdout, stderr) = process.communicate()
             # print('stdout:', stdout.decode('gbk'))
             # print('stderr:', stderr.decode('gbk'))
-            self._stdout = stdout.decode('gbk').replace('\r', '').replace('\n', '')
-            self._stderr = stderr.decode('gbk').replace('\r', '').replace('\n', '')
+            self._stdout = stdout.decode('utf8').replace('\r', '').replace('\n', '')
+            self._stderr = stderr.decode('utf8').replace('\r', '').replace('\n', '')
         except Exception as e:
             self._log('[adb_cmd] error:', e)
         finally:
