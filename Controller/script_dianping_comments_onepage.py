@@ -46,6 +46,7 @@ class MySelenium(NoxConSelenium):
 
         # border_path = self._work_path + '\\Controller\\images\\dianping\\border.png'
         self.border_path = self._work_path + '\\Controller\\images\\dianping\\border_128_128.png'
+        self.page_line_path = self._work_path + '\\Controller\\images\\dianping\\page_line.png'
 
     def get_photo_top_y(self):
         img_obj = ac.imread(self.capture_path)
@@ -65,10 +66,10 @@ class MySelenium(NoxConSelenium):
 
         return ret
 
-    def get_page_line_y(self):
+    def get_page_line_y(self, img_path):
         l = []
-        img_obj = cv2.imread(self.capture_comment_cut_path)
-        img_border = cv2.imread(self.border_path)  # 分页线
+        img_obj = cv2.imread(img_path)
+        img_border = cv2.imread(self.page_line_path)  # 分页线
         ret = ac.find_all_template(img_obj, img_border, threshold=0.95)
         for r in ret:
             (x, y) = r['result']
@@ -85,9 +86,10 @@ class MySelenium(NoxConSelenium):
         if is_first:
             self.scroll(from_y=140, to_y=10, wait_time=1)
         else:
-            line_y = self.get_page_line_y()
+            line_y = self.get_page_line_y(self.capture_path)
+            print('alignment_page', is_first, line_y)
             if line_y != -1:
-                self.scroll(from_y=line_y, to_y=navigator_bar_h, wait_time=1)
+                self.scroll(from_y=line_y + 10, to_y=navigator_bar_h, wait_time=1)
 
     def concat(self):
         '''
@@ -132,13 +134,14 @@ class MySelenium(NoxConSelenium):
         if photo_top_y != -1:
             cut_y = photo_top_y - border_size / 2
         else:
-            page_line_y = self.get_page_line_y()
+            page_line_y = self.get_page_line_y(self.capture_comment_cut_path)
             if page_line_y != -1:
                 cut_y = page_line_y
 
         img = Image.open(self.capture_comment_path)
         if cut_y != -1:
             img = img.crop((0, 180, SCREEN_WIDTH, cut_y - border_size / 2))
+
         img.save(self.capture_comment_cut_path)
 
     def ocr(self):
@@ -150,7 +153,8 @@ class MySelenium(NoxConSelenium):
             print('-------------------\n', 'not found comment')
 
     def script(self):
-        self.alignment_page(is_first=True)
+        self.get_capture()
+        self.alignment_page(is_first=False)
         ret, x, y = self.find_element(comment='展开全文', timeout=5)
         if ret:
             self.click_xy(x, y, wait_time=1)
@@ -160,11 +164,11 @@ class MySelenium(NoxConSelenium):
         # nox_adb.exe shell screencap -p /sdcard/capture.png
         # nox_adb.exe pull /sdcard/capture.png c:\Nox\
 
-        is_one_page, _, page_line_y = self.find_element(comment='分页线', timeout=5, threshold=0.95)
+        is_one_page, _, page_line_y = self.find_element(comment='分页线', timeout=3, threshold=0.95)
         if is_one_page:
             self.one_page_cut(page_line_y)
         else:
-            self.scroll(from_y=670, to_y=10, wait_time=1)
+            self.scroll(from_y=800, to_y=navigator_bar_h, wait_time=1)
             self.get_capture()  # 更新截图
             self.two_page_cut()
 
@@ -229,4 +233,4 @@ if __name__ == "__main__":
 
     main(task=task, mode=mode)
     print("Close after 30 seconds.")
-    time.sleep(30)
+    # time.sleep(30)

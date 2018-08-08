@@ -157,8 +157,9 @@ class NoxConSelenium(NoxConADB):
         return True
 
     def scroll(self, from_y=700, to_y=10, wait_time=1):
-        self._log('<<info>> scroll', 'scroll')
-        self.adb_shell("input swipe 240 " + str(from_y) + " 240 " + str(to_y) + " 2000")
+        cmd = "input swipe 240 " + str(int(from_y)) + " 240 " + str(int(to_y)) + " " + str(int((from_y - to_y) * 5))
+        self._log('<<info>> scroll', cmd)
+        self.adb_shell(cmd)
         time.sleep(wait_time)
         return True
 
