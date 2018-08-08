@@ -8,6 +8,10 @@ SCOPE_TIMES = 1 * 60
 
 GB = 1024 * 1024 * 1024
 
+# ---------------------- 模拟器屏幕尺寸 -----------------------------
+SCREEN_HEIGHT = 800
+SCREEN_WIDTH = 480
+
 # ---------------------- db -----------------------------
 MONGODB_SERVER_IP = os.environ["MONGODB_SERVER_IP"]
 MONGODB_SERVER_PORT = int(os.environ["MONGODB_SERVER_PORT"])

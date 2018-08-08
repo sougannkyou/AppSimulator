@@ -156,6 +156,12 @@ class NoxConSelenium(NoxConADB):
         time.sleep(wait_time)
         return True
 
+    def scroll(self, from_y=700, to_y=10, wait_time=1):
+        self._log('<<info>> scroll', 'scroll')
+        self.adb_shell("input swipe 240 " + str(from_y) + " 240 " + str(to_y) + " 2000")
+        time.sleep(wait_time)
+        return True
+
     def _debug(self, x, y, wait_time):
         if not self._DEBUG:
             return

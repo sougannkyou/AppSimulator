@@ -11,13 +11,18 @@ from datetime import datetime
 import pytesseract
 
 import time
-from Controller.setting import APPSIMULATOR_MODE
+from Controller.setting import *
 from Controller.Common import *
 from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
 from Controller.ControllerManager import Manager
 
 _DEBUG = False
+
+navigator_bar_h = 73
+author_area_h = 67  # 评论人顶端区域高度
+category_area_h = 75  # 顶端分类：全部，好评，，，  高度
+border_size = 128
 
 
 class MySelenium(NoxConSelenium):
@@ -60,55 +65,92 @@ class MySelenium(NoxConSelenium):
 
         return ret
 
-    def pic_to_ocr(self, one_page, photo_top_y, page_line_y):
-        # start = datetime.now()
-        if one_page:
-            y = 800
-            img = Image.open(self.capture_path)
-            if photo_top_y != -1:
-                y = photo_top_y
-            else:
-                if page_line_y != -1:
-                    y = page_line_y
+    def get_page_line_y(self):
+        l = []
+        img_obj = cv2.imread(self.capture_comment_cut_path)
+        img_border = cv2.imread(self.border_path)  # 分页线
+        ret = ac.find_all_template(img_obj, img_border, threshold=0.95)
+        for r in ret:
+            (x, y) = r['result']
+            l.append(y)
+        if l:
+            ret = min(l)
+        else:
+            ret = -1
 
-            img = img.crop((0, 75 + 67, 480, y - 128 / 2))
-            img.save(self.capture_comment_cut_path)
+        return ret
 
-        else:  # page_line_y is next page y
-            # 前后页分别截图
-            img = Image.open(self.capture_before_path)
-            # img = img.crop((0, 0, 480, 750))
-            img.save(self.capture_before_cut_path)
+    def alignment_page(self, is_first=False):
+        # 跳过分类区
+        if is_first:
+            self.scroll(from_y=140, to_y=10, wait_time=1)
+        else:
+            line_y = self.get_page_line_y()
+            if line_y != -1:
+                self.scroll(from_y=line_y, to_y=navigator_bar_h, wait_time=1)
 
-            img = Image.open(self.capture_path)
-            img = img.crop((0, 75, 480, 800))
-            img.save(self.capture_cut_path)
+    def concat(self):
+        '''
+            前后页截图 合成 滚屏效果
+        '''
+        img_before = Image.open(self.capture_before_path)
+        # img_before = img_before.crop((0, 0, SCREEN_WIDTH, 750))
+        img_before.save(self.capture_before_cut_path)
 
-            # 800 * 480
-            img1 = cv2.imread(self.capture_before_cut_path)
-            img2 = cv2.imread(self.capture_cut_path)
+        img_current = Image.open(self.capture_path)
+        img_current = img_current.crop((0, category_area_h, SCREEN_WIDTH, SCREEN_HEIGHT))  # 切掉导航栏
+        img_current.save(self.capture_cut_path)
 
-            # 纵向合成
-            img_concat = np.vstack((img1, img2))
-            cv2.imwrite(self.capture_comment_path, img_concat)
+        # 800 * 480
+        img_before = cv2.imread(self.capture_before_cut_path)
+        img_current = cv2.imread(self.capture_cut_path)
 
-            # 合成图截图
-            img = Image.open(self.capture_comment_path)
-            img = img.crop((0, 180, 480, min_y - h / 2))
-            img.save(self.capture_comment_cut_path)
+        # 纵向合成
+        img_concat = np.vstack((img_before, img_current))
+        cv2.imwrite(self.capture_comment_path, img_concat)
 
-            image = Image.open(self.capture_comment_cut_path)
-            code = pytesseract.image_to_string(image, lang='chi_sim')
-            if code:
-                print('-------------------\n', code)
-            else:
-                print('-------------------\n', 'not found comment')
+    def one_page_cut(self, page_line_y):
+        '''
+            return: self.capture_comment_cut_path
+        '''
+        cut_y = page_line_y
+        photo_top_y = self.get_photo_top_y()
+        if photo_top_y != -1:
+            cut_y = photo_top_y - border_size / 2
+
+        img = Image.open(self.capture_path)
+        img = img.crop((0, category_area_h + author_area_h, SCREEN_WIDTH, cut_y))
+        img.save(self.capture_comment_cut_path)
+
+    def two_page_cut(self):
+        '''
+            return: self.capture_comment_cut_path
+        '''
+        cut_y = -1
+        self.concat()  # 合成前后图
+        photo_top_y = self.get_photo_top_y()
+        if photo_top_y != -1:
+            cut_y = photo_top_y - border_size / 2
+        else:
+            page_line_y = self.get_page_line_y()
+            if page_line_y != -1:
+                cut_y = page_line_y
+
+        img = Image.open(self.capture_comment_path)
+        if cut_y != -1:
+            img = img.crop((0, 180, SCREEN_WIDTH, cut_y - border_size / 2))
+        img.save(self.capture_comment_cut_path)
+
+    def ocr(self):
+        image = Image.open(self.capture_comment_cut_path)
+        code = pytesseract.image_to_string(image, lang='chi_sim')
+        if code:
+            print('-------------------\n', code)
+        else:
+            print('-------------------\n', 'not found comment')
 
     def script(self):
-        # ret, x, y = self.find_element(comment='APP打开结果OK', timeout=60)
-        # 跳过分类区
-        self.next_page(from_y=140, to_y=10, wait_time=1)
-
+        self.alignment_page(is_first=True)
         ret, x, y = self.find_element(comment='展开全文', timeout=5)
         if ret:
             self.click_xy(x, y, wait_time=1)
@@ -118,20 +160,16 @@ class MySelenium(NoxConSelenium):
         # nox_adb.exe shell screencap -p /sdcard/capture.png
         # nox_adb.exe pull /sdcard/capture.png c:\Nox\
 
-        ret, _, page_line_y = self.find_element(comment='分页线', timeout=5)
-        if ret:
-            photo_top_y = self.get_photo_top_y()
+        is_one_page, _, page_line_y = self.find_element(comment='分页线', timeout=5, threshold=0.95)
+        if is_one_page:
+            self.one_page_cut(page_line_y)
         else:
-            ret = self.next_page(from_y=670, to_y=10, wait_time=1)
+            self.scroll(from_y=670, to_y=10, wait_time=1)
             self.get_capture()  # 更新截图
-            photo_top_y = self.get_photo_top_y()
-            if photo_top_y == -1:
-                ret, _, page_line_y = self.find_element(comment='分页线', timeout=5)
+            self.two_page_cut()
 
-        self.pic_to_ocr(one_page=ret, photo_top_y=photo_top_y, page_line_y=page_line_y)
-
+        self.ocr()
         # self.back()
-        # ret = self.next_page(wait_time=1)
 
 
 ##################################################################################
