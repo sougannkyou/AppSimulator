@@ -19,8 +19,8 @@ from Controller.ControllerManager import Manager
 
 _DEBUG = False
 
-navigator_bar_h = 73
-author_area_h = 67  # 评论人顶端区域高度
+navigator_bar_h = 74
+author_area_h = 58  # 评论人顶端区域高度
 category_area_h = 75  # 顶端分类：全部，好评，，，  高度
 border_size = 128
 
@@ -48,8 +48,8 @@ class MySelenium(NoxConSelenium):
         self.border_path = self._work_path + '\\Controller\\images\\dianping\\border_128_128.png'
         self.page_line_path = self._work_path + '\\Controller\\images\\dianping\\page_line.png'
 
-    def get_photo_top_y(self):
-        img_obj = ac.imread(self.capture_path)
+    def get_photo_top_y(self, img_path):
+        img_obj = ac.imread(img_path)
         # 照片图框 152 * 152 or 128 * 128
         img_border = ac.imread(self.border_path)
         h, w, _ = img_border.shape
@@ -90,6 +90,9 @@ class MySelenium(NoxConSelenium):
             print('alignment_page', is_first, line_y)
             if line_y != -1:
                 self.scroll(from_y=line_y + 10, to_y=navigator_bar_h, wait_time=1)
+            else:
+                self.goto_next_page()
+                # self.alignment_page(is_first=False)
 
     def concat(self):
         '''
@@ -116,12 +119,12 @@ class MySelenium(NoxConSelenium):
             return: self.capture_comment_cut_path
         '''
         cut_y = page_line_y
-        photo_top_y = self.get_photo_top_y()
+        photo_top_y = self.get_photo_top_y(self.capture_path)
         if photo_top_y != -1:
             cut_y = photo_top_y - border_size / 2
 
         img = Image.open(self.capture_path)
-        img = img.crop((0, category_area_h + author_area_h, SCREEN_WIDTH, cut_y))
+        img = img.crop((0, navigator_bar_h + author_area_h, SCREEN_WIDTH, cut_y))
         img.save(self.capture_comment_cut_path)
 
     def two_page_cut(self):
@@ -130,7 +133,7 @@ class MySelenium(NoxConSelenium):
         '''
         cut_y = -1
         self.concat()  # 合成前后图
-        photo_top_y = self.get_photo_top_y()
+        photo_top_y = self.get_photo_top_y(self.capture_comment_path)
         if photo_top_y != -1:
             cut_y = photo_top_y - border_size / 2
         else:
@@ -140,22 +143,28 @@ class MySelenium(NoxConSelenium):
 
         img = Image.open(self.capture_comment_path)
         if cut_y != -1:
-            img = img.crop((0, 180, SCREEN_WIDTH, cut_y - border_size / 2))
+            img = img.crop((0, navigator_bar_h + author_area_h, SCREEN_WIDTH, cut_y))
 
         img.save(self.capture_comment_cut_path)
+
+    def goto_next_page(self):
+        # from_y=SCREEN_HEIGHT(800) 无效
+        self.scroll(from_y=SCREEN_HEIGHT - 1, to_y=60, wait_time=1)
 
     def ocr(self):
         image = Image.open(self.capture_comment_cut_path)
         code = pytesseract.image_to_string(image, lang='chi_sim')
+        print('--------------------------------------------------------------------------\n')
         if code:
-            print('-------------------\n', code)
+            print(code.replace('\n\n', '\n'))
         else:
-            print('-------------------\n', 'not found comment')
+            print('not found comment')
+        print('--------------------------------------------------------------------------\n')
 
     def script(self):
         self.get_capture()
         self.alignment_page(is_first=False)
-        ret, x, y = self.find_element(comment='展开全文', timeout=5)
+        ret, x, y = self.find_element(comment='展开全文', timeout=1)
         if ret:
             self.click_xy(x, y, wait_time=1)
             self.get_capture()
@@ -164,11 +173,11 @@ class MySelenium(NoxConSelenium):
         # nox_adb.exe shell screencap -p /sdcard/capture.png
         # nox_adb.exe pull /sdcard/capture.png c:\Nox\
 
-        is_one_page, _, page_line_y = self.find_element(comment='分页线', timeout=3, threshold=0.95)
+        is_one_page, _, page_line_y = self.find_element(comment='分页线', timeout=1, threshold=0.95)
         if is_one_page:
             self.one_page_cut(page_line_y)
         else:
-            self.scroll(from_y=800, to_y=navigator_bar_h, wait_time=1)
+            self.goto_next_page()
             self.get_capture()  # 更新截图
             self.two_page_cut()
 
@@ -178,11 +187,8 @@ class MySelenium(NoxConSelenium):
 
 ##################################################################################
 def main(task, mode):
-    msg = ''
-    error = ''
     start = datetime.now()
-    common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
-
+    # common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
     try:
         me = MySelenium(task_info=task, mode=mode)
         me.set_comment_to_pic({
@@ -203,11 +209,10 @@ def main(task, mode):
         me._DEBUG = True
         me.run()
     except Exception as e:
-        msg = '<<error>>'
-        error = e
+        print('error:', e)
     finally:
         end = datetime.now()
-        print(error)
+        print('times:', (end - start).seconds)
         return
 
 
