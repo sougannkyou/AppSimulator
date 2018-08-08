@@ -91,17 +91,17 @@ class NoxConSelenium(NoxConADB):
         # pc temp ==> pc static
         shutil.copy(capture_path, static_capture_path)
 
-    def find_element(self, comment, timeout):
+    def find_element(self, comment, timeout, threshold=0.7):
         # True(False), x, y
         img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
         while timeout > 0:
             self.get_capture()
             from datetime import datetime
             # start = datetime.now()
-            pos = ac.find_template(self._capture_obj, img_obj)
+            pos = ac.find_template(self._capture_obj, img_obj, threshold=threshold)
             # end = datetime.now()
             # print('find_template', (end - start).microseconds)
-            if pos and pos['confidence'] > 0.7:
+            if pos:
                 self._log('<<info>> 匹配到：', comment + ' ' + str(timeout) + 's')
                 x, y = pos['result']
                 return True, x, y
@@ -112,17 +112,16 @@ class NoxConSelenium(NoxConADB):
 
         return False, -1, -1
 
-    def find_elements(self, comment, timeout):
+    def find_elements(self, comment, timeout, threshold=0.7):
         ret = []
         img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
         self.get_capture()
 
         while timeout > 0:
-            pos_list = ac.find_all_template(self._capture_obj, img_obj)
+            pos_list = ac.find_all_template(self._capture_obj, img_obj, threshold=threshold)
             for pos in pos_list:
-                if pos['confidence'] > 0.9:
-                    (x, y) = pos['result']
-                    ret.append((int(x), int(y)))
+                (x, y) = pos['result']
+                ret.append((int(x), int(y)))
 
             if len(ret) > 0:
                 self._log('<<info>> 匹配到：' + comment, str(len(ret)) + '个')

@@ -42,7 +42,8 @@ class MySelenium(NoxConSelenium):
         # border_path = self._work_path + '\\Controller\\images\\dianping\\border.png'
         self.border_path = self._work_path + '\\Controller\\images\\dianping\\border_128_128.png'
 
-    def get_photo_top_y(self, img_obj):
+    def get_photo_top_y(self):
+        img_obj = ac.imread(self.capture_path)
         # 照片图框 152 * 152 or 128 * 128
         img_border = ac.imread(self.border_path)
         h, w, _ = img_border.shape
@@ -70,7 +71,7 @@ class MySelenium(NoxConSelenium):
                 if page_line_y != -1:
                     y = page_line_y
 
-            img = img.crop((0, 75, 480, y))
+            img = img.crop((0, 75 + 67, 480, y - 128 / 2))
             img.save(self.capture_comment_cut_path)
 
         else:  # page_line_y is next page y
@@ -119,13 +120,11 @@ class MySelenium(NoxConSelenium):
 
         ret, _, page_line_y = self.find_element(comment='分页线', timeout=5)
         if ret:
-            img_obj = Image.open(self.capture_path)
-            photo_top_y = self.get_photo_top_y(img_obj)
+            photo_top_y = self.get_photo_top_y()
         else:
             ret = self.next_page(from_y=670, to_y=10, wait_time=1)
             self.get_capture()  # 更新截图
-            img_obj = Image.open(self.capture_path)
-            photo_top_y = self.get_photo_top_y(img_obj)
+            photo_top_y = self.get_photo_top_y()
             if photo_top_y == -1:
                 ret, _, page_line_y = self.find_element(comment='分页线', timeout=5)
 

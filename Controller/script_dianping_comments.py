@@ -105,10 +105,10 @@ class MySelenium(NoxConSelenium):
 
     def script(self):
         # ret, x, y = self.find_element(comment='APP打开结果OK', timeout=60)
-        # while ret:
-        self.next_page(from_y=210, to_y=10, wait_time=1)
+        #
+        self.next_page(from_y=140, to_y=10, wait_time=1)
 
-        ret, x, y = self.find_element(comment='展开全文', timeout=10)
+        ret, x, y = self.find_element(comment='展开全文', timeout=5)
         if ret:
             self.click_xy(x, y, wait_time=1)
             self.get_capture()
@@ -116,17 +116,17 @@ class MySelenium(NoxConSelenium):
         # nox_adb.exe shell input swipe 240 670 240 10 2000
         # nox_adb.exe shell screencap -p /sdcard/capture.png
         # nox_adb.exe pull /sdcard/capture.png c:\Nox\
-        ret, _, page_line_y = self.find_element(comment='分页线', timeout=10)
+        ret, _, page_line_y = self.find_element(comment='分页线', timeout=5)
         if ret:
-            img_obj = Image.open(self.capture_path)
+            img_obj = cv2.imread(self.capture_path)
             photo_top_y = self.get_photo_top_y(img_obj)
         else:
             ret = self.next_page(from_y=670, to_y=10, wait_time=1)
             self.get_capture()  # 更新截图
-            img_obj = Image.open(self.capture_path)
+            img_obj = cv2.imread(self.capture_path)
             photo_top_y = self.get_photo_top_y(img_obj)
             if photo_top_y == -1:
-                ret, _, page_line_y = self.find_element(comment='分页线', timeout=10)
+                ret, _, page_line_y = self.find_element(comment='分页线', timeout=5)
 
         self.pic_to_ocr(one_page=ret, photo_top_y=photo_top_y, page_line_y=page_line_y)
 
