@@ -22,44 +22,51 @@
                     <table class="table table-hover">
                         <tbody>
                         <tr>
-                            <th width="5%">TaskId</th>
-                            <th width="5%">From</th>
-                            <th width="15%">APP</th>
+                            <th width="3%">TaskId</th>
+                            <th width="3%">From</th>
+                            <th width="8%">APP</th>
                             <th width="10%">IP</th>
                             <th width="15%">Script</th>
-                            <th width="10%">Live Cycle</th>
-                            <th width="10%">Timer</th>
+                            <th width="5%">Live Cycle</th>
+                            <th width="5%">Timer</th>
                             <th width="10%">Status</th>
                             <th width="10%">Start Time</th>
                             <th width="10%">End Time</th>
+                            <th width="10%">Spend Time</th>
+                            <th width="10%">Operation</th>
                         </tr>
                         <tr>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>
+                            <td>-</td><!-- TaskId -->
+                            <td>-</td><!-- Parent TaskId -->
+                            <td><!-- APP -->
                                 <label v-for="app in app_name_list">
                                     <img v-bind:class="[task.app_name===app?'app-icon-big':'app-icon']"
                                          v-on:click="setAppName(app)"
                                          v-bind:src="'/static/AppSimulator/images/app/' + app + '/app_icon.png'">
                                 </label>
                             </td>
-                            <td>N/A</td>
-                            <td><input type="text" v-model="task.script" placeholder="script"></td>
+                            <td>N/A</td><!-- IP -->
+                            <td><!-- Script -->
+                                <input type="text" v-model="task.script" placeholder="script">
+                            </td>
                             <td><!-- Live Cycle -->
                                 <input id="never" name="live_cycle" type="radio" v-model="task.live_cycle"
-                                       value="never" checked>never
+                                       value="never" checked>never<br>
                                 <input id="once" name="live_cycle" type="radio" v-model="task.live_cycle"
                                        value="once">once
                             </td>
                             <td><!-- Timer -->
-                                <input id="timer_on" name="timer" type="radio" v-model="task.timer" value="on">on
+                                <input id="timer_on" name="timer" type="radio" v-model="task.timer" value="on">on<br>
                                 <input id="timer_off" name="timer" type="radio" v-model="task.timer" value="off" checked>off
                             </td>
-                            <td><span class="label label-default">[[ task.status ]]</span></td>
-                            <td>N/A</td>
-                            <td>N/A</td>
-                            <td>
-                                <i v-on:click="addTask" class="fa fa-fw fa-2x fa-plus-square-o" title="增加"></i>
+                            <td><!-- Status -->
+                                <span class="label label-default">[[ task.status ]]</span>
+                            </td>
+                            <td>N/A</td><!-- Start Time -->
+                            <td>N/A</td><!-- End Time -->
+                            <td>N/A</td><!-- Spend Time -->
+                            <td><!-- Operation -->
+                                <i v-on:click="addTask" class="fa fa-fw fa-3x fa-plus-square-o" title="增加task"></i>
                             </td>
                         </tr>
                         <tr v-for="t in tasks">
@@ -84,6 +91,7 @@
                             </td>
                             <td>[[ t.start_time ]]</td>
                             <td>[[ t.end_time ]]</td>
+                            <td>[[ t.spend_time ]]</td>
                         </tr>
                         </tbody>
                     </table>

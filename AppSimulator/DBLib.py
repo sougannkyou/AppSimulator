@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, time
 import pymongo
 import redis
 from AppSimulator.setting import *
-from AppSimulator.Common import common_log
+from AppSimulator.Common import *
 
 
 # ------------------------ web server db lib ----------------------
@@ -111,6 +111,8 @@ class MongoDriver(object):
             pre = 'http://' + task['host_ip'] + ':8000/static/AppSimulator/images/'
             task['app_icon'] = pre + 'app/' + task['app_name'] + '/app_icon.png'
             task['timer_no'] = TIMER[task['timer_no'] if task else 0]
+            task['spend_times'] = times_format(seconds=(task['up_time'] - task['start_time'])) \
+                if task['up_time'] > 0 else '00:00:00'
             task['capture'] = pre + 'temp/emulators/capture_nox-' + str(task['taskId']) + '.png'
             ret.append(task)
         return ret
@@ -204,9 +206,10 @@ class MongoDriver(object):
         for r in l:
             r.pop('_id')
             if 'dockerId' in r: r.pop('dockerId')
-            r['start_time'] = datetime.fromtimestamp(r['start_time']).strftime("%Y-%m-%d %H:%M:%S") \
+            r['spend_time'] = times_format(seconds=(r['up_time'] - r['start_time'])) if r['up_time'] > 0 else '00:00:00'
+            r['start_time'] = datetime.fromtimestamp(r['start_time']).strftime("%m-%d %H:%M:%S") \
                 if 'start_time' in r and r['start_time'] else ''
-            r['end_time'] = datetime.fromtimestamp(r['end_time']).strftime("%Y-%m-%d %H:%M:%S") \
+            r['end_time'] = datetime.fromtimestamp(r['end_time']).strftime("%m-%d %H:%M:%S") \
                 if 'end_time' in r and r['end_time'] else ''
             ret.append(r)
 
