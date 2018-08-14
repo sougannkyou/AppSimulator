@@ -5,7 +5,7 @@ import shutil
 import subprocess
 from pprint import pprint
 from Controller.setting import *
-from Controller.Common import common_log
+from Controller.Common import *
 from Controller.DBLib import MongoDriver
 
 
@@ -124,13 +124,14 @@ class NoxConDocker(object):
         time.sleep(wait_time)
         self._exec_nox_cmd(self._make_cmd("quit -name:" + self._docker_name))
         time.sleep(wait_time)
-        return True
+        stdout = common_exec_cmd(self._DEBUG, 'TASKLIST /FI "WINDOWTITLE eq ' + self._docker_name + '"')
+        # win10 win7 cmd 提示信息
+        return stdout.replace('\r\n', '') == '信息: 没有运行的任务匹配指定标准。'
 
     def stop(self, wait_time=2):
         self._log('<<info>> stop', 'wait: ' + str(wait_time) + 's')
-        self.kill_task()
-        self.quit(wait_time=wait_time)
-        return True
+        self.kill_task()  # kill 掉 cmd 启动的 python  script_xxx.py
+        return self.quit(wait_time=wait_time)
 
     def stop_all(self):
         self._log('<<info>> stop_all', 'wait: 10s')
@@ -206,7 +207,11 @@ class NoxConDocker(object):
 
         if len(dockers) == 1:
             if dockers[0]['status'] == STATUS_DOCKER_RUN:
-                self.stop(wait_time=5)
+                ret = self.stop(wait_time=5)
+                if not ret:
+                    msg = 'stop failed!'
+                    self._log('<<error>> stop', msg)
+                    return False, msg
 
             ret = self.remove()
             if not ret:

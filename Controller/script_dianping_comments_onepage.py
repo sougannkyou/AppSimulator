@@ -1,19 +1,19 @@
 # coding:utf-8
 import os
 import sys
+from datetime import datetime
+import time
 
 sys.path.append(os.getcwd())
+from pprint import pprint
 from PIL import Image
 import cv2
 import numpy as np
 import aircv as ac
-from datetime import datetime
 import pytesseract
 
-import time
 from Controller.setting import *
 from Controller.Common import *
-from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
 from Controller.ControllerManager import Manager
 
@@ -39,6 +39,9 @@ class MySelenium(NoxConSelenium):
         self.capture_cut_path = self._work_path + '\\Controller\\images\\temp\\' + self.capture_cut_name
         self.capture_before_cut_path = self._work_path + '\\Controller\\images\\temp\\' + self.capture_before_cut_name
 
+        self.capture_concat_name = 'capture_' + self._docker_name + '_concat.png'
+        self.capture_concat_path = self._work_path + '\\Controller\\images\\temp\\' + self.capture_concat_name
+
         self.capture_comment_name = 'capture_' + self._docker_name + '_comment.png'
         self.capture_comment_cut_name = 'capture_' + self._docker_name + '_comment_cut.png'
         self.capture_comment_path = self._work_path + '\\Controller\\images\\temp\\' + self.capture_comment_name
@@ -47,6 +50,7 @@ class MySelenium(NoxConSelenium):
         # border_path = self._work_path + '\\Controller\\images\\dianping\\border.png'
         self.border_path = self._work_path + '\\Controller\\images\\dianping\\border_128_128.png'
         self.page_line_path = self._work_path + '\\Controller\\images\\dianping\\page_line.png'
+        self.dafen_path = self._work_path + '\\Controller\\images\\dianping\\dafen.png'
 
     def get_photo_top_y(self, img_path):
         img_obj = ac.imread(img_path)
@@ -81,6 +85,24 @@ class MySelenium(NoxConSelenium):
 
         return ret
 
+    def get_comment_top_y(self, img_path):
+        l = []
+        img_obj = cv2.imread(img_path)
+        img_border = cv2.imread(self.dafen_path)  # 打分
+        ret = ac.find_all_template(img_obj, img_border, threshold=0.8)
+        pprint(ret)
+        for r in ret:
+            (x, y) = r['result']
+            l.append(y)
+
+        if l:
+            ret = min(l) + 5
+        else:
+            ret = -1
+
+        print("打分 y:", ret)
+        return ret
+
     def alignment_page(self, is_first=False):
         # 跳过分类区
         if is_first:
@@ -112,7 +134,15 @@ class MySelenium(NoxConSelenium):
 
         # 纵向合成
         img_concat = np.vstack((img_before, img_current))
-        cv2.imwrite(self.capture_comment_path, img_concat)
+        cv2.imwrite(self.capture_concat_path, img_concat)
+
+    def cut_comment(self):
+        page_line_y = self.get_page_line_y(self.capture_concat_path)
+        img = Image.open(self.capture_concat_path)
+        if page_line_y != -1:
+            img = img.crop((0, 0, SCREEN_WIDTH, page_line_y))
+
+        img.save(self.capture_comment_path)
 
     def one_page_cut(self, page_line_y):
         '''
@@ -124,7 +154,11 @@ class MySelenium(NoxConSelenium):
             cut_y = photo_top_y - border_size / 2
 
         img = Image.open(self.capture_path)
-        img = img.crop((0, navigator_bar_h + author_area_h, SCREEN_WIDTH, cut_y))
+        comment_top_y = self.get_comment_top_y(img_path=self.capture_comment_path)
+        if comment_top_y == -1:
+            img = img.crop((0, navigator_bar_h + author_area_h, SCREEN_WIDTH, cut_y))
+        else:
+            img = img.crop((0, comment_top_y, SCREEN_WIDTH, cut_y))
         img.save(self.capture_comment_cut_path)
 
     def two_page_cut(self):
@@ -132,7 +166,9 @@ class MySelenium(NoxConSelenium):
             return: self.capture_comment_cut_path
         '''
         cut_y = -1
-        self.concat()  # 合成前后图
+        self.concat()  # 拼接两张图
+        self.cut_comment()
+
         photo_top_y = self.get_photo_top_y(self.capture_comment_path)
         if photo_top_y != -1:
             cut_y = photo_top_y - border_size / 2
@@ -143,7 +179,11 @@ class MySelenium(NoxConSelenium):
 
         img = Image.open(self.capture_comment_path)
         if cut_y != -1:
-            img = img.crop((0, navigator_bar_h + author_area_h, SCREEN_WIDTH, cut_y))
+            comment_top_y = self.get_comment_top_y(img_path=self.capture_comment_path)
+            if comment_top_y == -1:
+                img = img.crop((0, navigator_bar_h + author_area_h, SCREEN_WIDTH, cut_y))
+            else:
+                img = img.crop((0, comment_top_y, SCREEN_WIDTH, cut_y))
 
         img.save(self.capture_comment_cut_path)
 
@@ -152,6 +192,7 @@ class MySelenium(NoxConSelenium):
         self.scroll(from_y=SCREEN_HEIGHT - 1, to_y=60, wait_time=1)
 
     def ocr(self):
+        start = datetime.now()
         image = Image.open(self.capture_comment_cut_path)
         code = pytesseract.image_to_string(image, lang='chi_sim')
         print('--------------------------------------------------------------------------\n')
@@ -160,6 +201,8 @@ class MySelenium(NoxConSelenium):
         else:
             print('not found comment')
         print('--------------------------------------------------------------------------\n')
+        end = datetime.now()
+        print('ocr times:', (end - start).seconds, 's')
 
     def script(self):
         self.get_capture()
@@ -212,7 +255,7 @@ def main(task, mode):
         print('error:', e)
     finally:
         end = datetime.now()
-        print('times:', (end - start).seconds)
+        print('total times:', (end - start).seconds, 's')
         return
 
 
@@ -237,5 +280,5 @@ if __name__ == "__main__":
     }
 
     main(task=task, mode=mode)
-    print("Close after 30 seconds.")
+    # print("Close after 30 seconds.")
     # time.sleep(30)

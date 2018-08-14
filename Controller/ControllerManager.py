@@ -122,7 +122,7 @@ class Manager(object):
         self.nox_check_stop(docker, retry=True, wait_time=30)
         ret = docker.run(force=True)  # docker run: create and start
         if ret:
-            ret = self.nox_start_check(task_info=task, timeout=60)
+            ret = self.nox_start_check(task_info=task, timeout=60)  # 可匹配到app图标?
             if ret:
                 ret = self.nox_start_success(docker=docker)
             else:
