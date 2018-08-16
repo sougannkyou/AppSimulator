@@ -141,9 +141,11 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="box-body" style="text-align:center;background-color:#c4c4c4;">
+                                    <div class="box-body"
+                                         style="text-align:center;background-color:#c4c4c4;height:260px;">
                                         <img height="240" style="border-radius:3px;margin: 0 auto;"
-                                             class="emulator-capture" src="[[task.capture]]">
+                                             class="emulator-capture" v-bind:src="task.capture" onerror="notfind();">
+                                        <!--  onerror="notfind();" -->
                                     </div>
                                     <div class="box-footer" style="background-color:#b4b4b4;">
                                         <h2 class="box-title label bg-gray">task[[ task.taskId ]]
@@ -237,6 +239,13 @@
         const DEVICE_STATUS_UNKOWN = 'unkown';
         const DEVICE_STATUS_RUN = 'running';
         const DEVICE_STATUS_SUSPEND = 'suspend';
+
+        function notfind() {
+            let img = event.srcElement;
+            {#img.attr('height','20px')#}
+            img.src = "/static/AppSimulator/images/page/emulator.png";
+            img.onerror = null; // 控制不要一直跳动
+        }
 
         function setDeviceGPS(obj) {
             if (obj.deviceId === '') {

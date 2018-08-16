@@ -96,7 +96,7 @@ class NoxConSelenium(NoxConADB):
         img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
         while timeout > 0:
             self.get_capture()
-            from datetime import datetime
+            # from datetime import datetime
             # start = datetime.now()
             pos = ac.find_template(self._capture_obj, img_obj, threshold=threshold)
             # end = datetime.now()
