@@ -145,7 +145,8 @@ class NoxConSelenium(NoxConADB):
         # 480 * 800
         self._log('<<info>> next_page', '翻页')
         # self .clear_cache()
-        self.adb_shell("input swipe " + str(from_x) + " " + str(from_y) + " " + str(to_x) + " " + str(to_y) + " 2000")
+        self.adb_shell("input swipe " + str(from_x) + " " + str(from_y) + " " + str(to_x) + " " + str(to_y) + " " +
+                       str(int((from_y - to_y) * 5)))
         time.sleep(wait_time)
         return True
 

@@ -2,7 +2,7 @@ import os
 import subprocess
 from datetime import datetime
 # import logging
-# -----------------colorama模块的一些常量---------------------------
+# -----------------colorama常量---------------------------
 # Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 # Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 # Style: DIM, NORMAL, BRIGHT, RESET_ALL
@@ -19,31 +19,31 @@ MDB = MongoDriver()
 class ColorLog(object):
     #  前景色:红色  背景色:默认
     def red(self, s):
-        return Fore.RED + s + Fore.RESET
+        return Fore.RED + str(s) + Fore.RESET
 
     #  前景色:绿色  背景色:默认
     def green(self, s):
-        return Fore.GREEN + s + Fore.RESET
+        return Fore.GREEN + str(s) + Fore.RESET
 
     #  前景色:黄色  背景色:默认
     def yellow(self, s):
-        return Fore.YELLOW + s + Fore.RESET
+        return Fore.YELLOW + str(s) + Fore.RESET
 
     #  前景色:蓝色  背景色:默认
     def blue(self, s):
-        return Fore.BLUE + s + Fore.RESET
+        return Fore.BLUE + str(s) + Fore.RESET
 
     #  前景色:洋红色  背景色:默认
     def magenta(self, s):
-        return Fore.MAGENTA + s + Fore.RESET
+        return Fore.MAGENTA + str(s) + Fore.RESET
 
     #  前景色:青色  背景色:默认
     def cyan(self, s):
-        return Fore.CYAN + s + Fore.RESET
+        return Fore.CYAN + str(s) + Fore.RESET
 
     #  前景色:白色  背景色:默认
     def white(self, s):
-        return Fore.WHITE + s + Fore.RESET
+        return Fore.WHITE + str(s) + Fore.RESET
 
     #  前景色:黑色  背景色:默认
     def black(self, s):
@@ -51,17 +51,13 @@ class ColorLog(object):
 
     #  前景色:白色  背景色:绿色
     def white_green(self, s):
-        return Fore.WHITE + Back.GREEN + s + Fore.RESET + Back.RESET
+        return Fore.WHITE + Back.GREEN + str(s) + Fore.RESET + Back.RESET
 
 
 def common_log(_DEBUG, taskId, func, prefix, msg):
     MDB.log(taskId, func, prefix, msg)
     if _DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-        color = ColorLog()
-        if prefix.find('error') != -1:
-            print(datetime.now().strftime('%H:%M:%S') + ' [' + func + ']', prefix, color.red(msg))
-        else:  # <<info>>
-            print(datetime.now().strftime('%H:%M:%S') + ' [' + func + ']', prefix, color.yellow(msg))
+        print(datetime.now().strftime('%H:%M:%S') + ' [' + func + ']', prefix, msg)
 
 
 def common_exec_cmd(_DEBUG, cmdline):
