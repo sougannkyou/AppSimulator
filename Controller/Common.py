@@ -1,17 +1,67 @@
 import os
-# import logging
 import subprocess
 from datetime import datetime
+# import logging
+# -----------------colorama模块的一些常量---------------------------
+# Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
+# Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
+# Style: DIM, NORMAL, BRIGHT, RESET_ALL
+from colorama import init, Fore, Back, Style
+
+init(autoreset=True)
+
 from Controller.setting import WORK_PATH
 from Controller.DBLib import MongoDriver
 
 MDB = MongoDriver()
 
 
+class ColorLog(object):
+    #  前景色:红色  背景色:默认
+    def red(self, s):
+        return Fore.RED + s + Fore.RESET
+
+    #  前景色:绿色  背景色:默认
+    def green(self, s):
+        return Fore.GREEN + s + Fore.RESET
+
+    #  前景色:黄色  背景色:默认
+    def yellow(self, s):
+        return Fore.YELLOW + s + Fore.RESET
+
+    #  前景色:蓝色  背景色:默认
+    def blue(self, s):
+        return Fore.BLUE + s + Fore.RESET
+
+    #  前景色:洋红色  背景色:默认
+    def magenta(self, s):
+        return Fore.MAGENTA + s + Fore.RESET
+
+    #  前景色:青色  背景色:默认
+    def cyan(self, s):
+        return Fore.CYAN + s + Fore.RESET
+
+    #  前景色:白色  背景色:默认
+    def white(self, s):
+        return Fore.WHITE + s + Fore.RESET
+
+    #  前景色:黑色  背景色:默认
+    def black(self, s):
+        return Fore.BLACK
+
+    #  前景色:白色  背景色:绿色
+    def white_green(self, s):
+        return Fore.WHITE + Back.GREEN + s + Fore.RESET + Back.RESET
+
+
 def common_log(_DEBUG, taskId, func, prefix, msg):
     MDB.log(taskId, func, prefix, msg)
     if _DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-        print(datetime.now().strftime('%H:%M:%S') + ' [' + func + ']', prefix, msg)
+        color = ColorLog()
+        if prefix.find('error') != -1:
+            print(datetime.now().strftime('%H:%M:%S') + ' [' + func + ']', prefix, color.red(msg))
+        else:  # <<info>>
+            print(datetime.now().strftime('%H:%M:%S') + ' [' + func + ']', prefix, color.yellow(msg))
 
 
 def common_exec_cmd(_DEBUG, cmdline):
@@ -53,6 +103,16 @@ def common_runscript_countdown():
 
 
 if __name__ == "__main__":
+    # color = Colored()
+    # print(color.red('I am red!'))
+    # print(color.green('I am gree!'))
+    # print(color.yellow('I am yellow!'))
+    # print(color.blue('I am blue!'))
+    # print(color.magenta('I am magenta!'))
+    # print(color.cyan('I am cyan!'))
+    # print(color.white('I am white!'))
+    # print(color.white_green('I am white green!'))
+
     # common_runscript_countdown()
     _docker_name = 'nox-99'
     # _docker_name = 'nox-1'
