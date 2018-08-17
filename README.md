@@ -50,8 +50,9 @@ REDIS_SERVER_IP = 172.16.253.37
     
 5）python3 pip install
 python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
-pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
-pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple psutil pandas opencv-python==3.4.1.15 Pillow aircv pypiwin32 protobuf grpcio grpcio-tools pyautogui==0.9.36 matplotlib opencv-contrib-python
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements_web.txt
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements_controller.txt
+#pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple termcolor psutil pandas opencv-python==3.4.1.15 Pillow aircv pypiwin32 protobuf grpcio grpcio-tools pyautogui==0.9.36 matplotlib opencv-contrib-python
 
 6)数据结构
 [tasks]

@@ -242,9 +242,8 @@
 
         function notfind() {
             let img = event.srcElement;
-            {#img.attr('height','20px')#}
-            img.src = "/static/AppSimulator/images/page/emulator.png";
-            img.onerror = null; // 控制不要一直跳动
+            img.src = "/static/AppSimulator/images/page/default.png";
+            // img.onerror = null; // 控制不要一直跳动
         }
 
         function setDeviceGPS(obj) {
