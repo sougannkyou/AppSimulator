@@ -240,9 +240,8 @@ if __name__ == "__main__":
 
     task = {
         'taskId': taskId,
-        'app_name': 'xiaohongshu_test',
+        'app_name': 'xiaohongshu',
         'docker_name': 'nox-' + str(taskId),
-        'timer_no': timer_no,
         'option': {
             'keyword': "玫琳凯",
         },
