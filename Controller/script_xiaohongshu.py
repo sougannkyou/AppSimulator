@@ -22,7 +22,7 @@ class MySelenium(NoxConSelenium):
 
     def script(self):
         try:
-            self.unlock(timeout=10)
+            # self.unlock(timeout=10)
             self.open_app()
             self.ignore_update()
             if not self.find_search_area():
