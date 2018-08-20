@@ -169,7 +169,7 @@ class MySelenium(NoxConSelenium):
 
     def _crawl(self, tries):
         _tries = tries
-        for i in range(50):
+        for i in range(10):
             if _tries <= 0:
                 self._log("error", "fail to find element for too manay times.")
                 return None
@@ -183,6 +183,8 @@ class MySelenium(NoxConSelenium):
                         _tries -= 1
             else:
                 _tries -= 1
+
+
             self.next_page(wait_time=5)
             time.sleep(2)
 
