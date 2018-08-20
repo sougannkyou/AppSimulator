@@ -1,16 +1,10 @@
 # coding:utf-8
 import os
 import sys
-
-# import socket
-
-# timeout = 1
-# socket.setdefaulttimeout(timeout)
-sys.path.append(os.getcwd())
-# sys.path.append('C:\Python\Python35\Lib\site-packages\cv2')
-# print(sys.path)
-
 import time
+
+sys.path.append(os.getcwd())
+
 from Controller.setting import APPSIMULATOR_MODE
 from Controller.Common import *
 from Controller.NoxConDocker import NoxConDocker
