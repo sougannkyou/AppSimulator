@@ -107,6 +107,12 @@ pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements_control
 mongodump -h 172.16.253.37:27017 -d AppSimulator -o c:\MongoDB\backup
 mongorestore -h 192.168.31.227:27017 -d AppSimulator c:\MongoDB\backup\AppSimulator
 
+[锁屏] 
+adb shell rm /data/system/*.key
+
+[adbkeyboard] 
+adb shell pm uninstall com.android.adbkeyboard
+
 [todo]
 修改地域， 文本输入， 匹配杂乱背景，无明显标示无法切分
 

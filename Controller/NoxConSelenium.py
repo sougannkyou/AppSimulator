@@ -229,9 +229,9 @@ class NoxConSelenium(NoxConADB):
             time.sleep(wait_time)
         return True
 
-    def __unlock(self, wait_time):
-        # self.adb_shell('rm /data/system/*.key')  # rm /data/system/*.key
-        # time.sleep(wait_time)
+    def _unlock(self, wait_time):
+        self.adb_shell('rm /data/system/*.key')  # rm /data/system/*.key
+        time.sleep(wait_time)
         return True
 
     def unlock(self, timeout):
