@@ -2,6 +2,7 @@
 import os
 import sys
 import socket
+
 timeout = 1
 socket.setdefaulttimeout(timeout)
 # sys.path.append(os.getcwd())
@@ -26,6 +27,7 @@ class MySelenium(NoxConSelenium):
 
     def script(self):
         try:
+            self.unlock(timeout=10)
             self.open_app()
             self.ignore_update()
             if not self.find_search_area():
@@ -129,11 +131,11 @@ class MySelenium(NoxConSelenium):
         #     self._log("crawl_one", "未匹配到返回图标")
         #     return False
         # 如果是视频，暂停视频！！！
-        #x, y = 240, 300
-        #self.click_xy(x, y, wait_time=2)
-        #判断是不是视频
-        #ret, x, y = self.find_element(comment="视频", timeout=3)
-        #if ret:
+        # x, y = 240, 300
+        # self.click_xy(x, y, wait_time=2)
+        # 判断是不是视频
+        # ret, x, y = self.find_element(comment="视频", timeout=3)
+        # if ret:
         if not self.is_article():
             self.open_video_detail()
             self.close_video_detail()
@@ -183,6 +185,7 @@ class MySelenium(NoxConSelenium):
             self.next_page(wait_time=5)
             time.sleep(2)
 
+
 ##################################################################################
 def main(task, mode):
     msg = ''
@@ -203,7 +206,7 @@ def main(task, mode):
             "视频+关注": 'images/{}/video_follow.png'.format(task["app_name"]),
             "文章+关注": 'images/{}/article_follow.png'.format(task["app_name"]),
         })
-        #me._DEBUG = True
+        # me._DEBUG = True
         me._DEBUG = False
         me.run()
     except Exception as e:
