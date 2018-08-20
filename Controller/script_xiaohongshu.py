@@ -1,6 +1,7 @@
 # coding:utf-8
 import os
 import sys
+
 # import socket
 
 # timeout = 1
@@ -245,6 +246,7 @@ if __name__ == "__main__":
         'taskId': taskId,
         'app_name': 'xiaohongshu',
         'docker_name': 'nox-' + str(taskId),
+        'timer_no': timer_no,
         'option': {
             'keyword': "玫琳凯",
         },
