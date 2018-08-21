@@ -192,10 +192,12 @@ def getResultSampleAPI(request):
 def addTaskAPI(request):
     app_name = request.POST.get('app_name')
     script = request.POST.get('script')
+    ip = request.POST.get('ip')
     live_cycle = request.POST.get('live_cycle', 'once')
     timer = request.POST.get('timer', 'off')
     ret = MDB.emulator_add_task({
         'script': script,
+        'ip': ip,
         'app_name': app_name,
         'live_cycle': live_cycle,
         'timer': timer

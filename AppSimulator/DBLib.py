@@ -182,7 +182,7 @@ class MongoDriver(object):
             "live_cycle": task['live_cycle'],
             "timer": task['timer'],
             "timer_no": -1 if task['timer'] == 'off' else 0,
-            "host_ip": '',
+            "host_ip": task['ip'],
             "start_time": int(datetime.now().timestamp()),
             "up_time": 0,
             "dockerId": ''

@@ -2,103 +2,106 @@
 {% load static %}
 
 {% block header_tail %}
-    <link rel="stylesheet" href="{% static 'AppSimulator/css/tasks.css' %}">
-    <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
+  <link rel="stylesheet" href="{% static 'AppSimulator/css/tasks.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
 {% endblock header_tail %}
 
 {% block section_content %}
-    <div id="main" v-cloak>
-        <div class="col-xs-12">
-            <div class="box box-primary">
-                <div class="box-header">
-                    <h3 class="box-title">Emulator Tasks</h3>
-                    <div class="box-tools">
-                        <a class="btn btn-primary" title="back" href="/AppSimulator/dashboard/">
-                            <i class="fa fa-fw fa-lg fa-arrow-left pull-right"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="box-body table-responsive no-padding">
-                    <table class="table table-hover">
-                        <tbody>
-                        <tr>
-                            <th width="3%">TaskId</th>
-                            <th width="3%">From</th>
-                            <th width="8%">APP</th>
-                            <th width="10%">IP</th>
-                            <th width="15%">Script</th>
-                            <th width="5%">Live Cycle</th>
-                            <th width="5%">Timer</th>
-                            <th width="10%">Status</th>
-                            <th width="10%">Start Time</th>
-                            <th width="10%">End Time</th>
-                            <th width="10%">Spend Time</th>
-                            <th width="10%">Operation</th>
-                        </tr>
-                        <tr>
-                            <td>-</td><!-- TaskId -->
-                            <td>-</td><!-- Parent TaskId -->
-                            <td><!-- APP -->
-                                <label v-for="app in app_name_list">
-                                    <img v-bind:class="[task.app_name===app?'app-icon-big':'app-icon']"
-                                         v-on:click="setAppName(app)"
-                                         v-bind:src="'/static/AppSimulator/images/app/' + app + '/app_icon.png'">
-                                </label>
-                            </td>
-                            <td>N/A</td><!-- IP -->
-                            <td><!-- Script -->
-                                <input type="text" v-model="task.script" placeholder="script">
-                            </td>
-                            <td><!-- Live Cycle -->
-                                <input id="never" name="live_cycle" type="radio" v-model="task.live_cycle"
-                                       value="never" checked>never<br>
-                                <input id="once" name="live_cycle" type="radio" v-model="task.live_cycle"
-                                       value="once">once
-                            </td>
-                            <td><!-- Timer -->
-                                <input id="timer_on" name="timer" type="radio" v-model="task.timer" value="on">on<br>
-                                <input id="timer_off" name="timer" type="radio" v-model="task.timer" value="off" checked>off
-                            </td>
-                            <td><!-- Status -->
-                                <span class="label label-default">[[ task.status ]]</span>
-                            </td>
-                            <td>N/A</td><!-- Start Time -->
-                            <td>N/A</td><!-- End Time -->
-                            <td>N/A</td><!-- Spend Time -->
-                            <td><!-- Operation -->
-                                <i v-on:click="addTask" class="fa fa-fw fa-3x fa-plus-square-o" title="增加task"></i>
-                            </td>
-                        </tr>
-                        <tr v-for="t in tasks">
-                            <td><label class="label label-default">[[ t.taskId ]]</label></td>
-                            <td>
-                                <label v-bind:class="[t.orgTaskId===0?'label label-gray':'label label-default']">
-                                    [[ t.orgTaskId ]]
-                                </label>
-                            </td>
-                            <td>
-                                <img class="app-icon"
-                                     v-bind:src="'/static/AppSimulator/images/app/'+t.app_name+'/app_icon.png'">
-                            </td>
-                            <td>[[ t.host_ip ]]</td>
-                            <td>[[ t.script ]]</td>
-                            <td>[[ t.live_cycle ]]</td>
-                            <td>[[ t.timer_on ]]</td>
-                            <td>
-                                <span v-bind:class="[t.status.indexOf('_ok')!=-1?'label label-success':
-                                (t.status.indexOf('_ng')!=-1?'label label-danger':'label label-default')]">[[ t.status ]]
-                                </span>
-                            </td>
-                            <td>[[ t.start_time ]]</td>
-                            <td>[[ t.end_time ]]</td>
-                            <td>[[ t.spend_time ]]</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  <div id="main" v-cloak>
+    <div class="col-xs-12">
+      <div class="box box-primary">
+        <div class="box-header">
+          <h3 class="box-title">Emulator Tasks</h3>
+          <div class="box-tools">
+            <a class="btn btn-primary" title="back" href="/AppSimulator/dashboard/">
+              <i class="fa fa-fw fa-lg fa-arrow-left pull-right"></i>
+            </a>
+          </div>
         </div>
+        <div class="box-body table-responsive no-padding">
+          <table class="table table-hover">
+            <tbody>
+            <tr>
+              <th width="3%">TaskId</th>
+              <th width="3%">From</th>
+              <th width="8%">APP</th>
+              <th width="10%">IP</th>
+              <th width="15%">Script</th>
+              <th width="5%">Live Cycle</th>
+              <th width="5%">Timer</th>
+              <th width="10%">Status</th>
+              <th width="10%">Start Time</th>
+              <th width="10%">End Time</th>
+              <th width="10%">Spend Time</th>
+              <th width="10%">Operation</th>
+            </tr>
+            <tr>
+              <td>-</td><!-- TaskId -->
+              <td>-</td><!-- Parent TaskId -->
+              <td><!-- APP -->
+                <label v-for="app in app_name_list">
+                  <img v-bind:class="[task.app_name===app?'app-icon-big':'app-icon']"
+                       v-on:click="setAppName(app)"
+                       v-bind:src="'/static/AppSimulator/images/app/' + app + '/app_icon.png'">
+                </label>
+              </td>
+              <td>
+                <input type="text" v-model="task.ip" placeholder="可指定ip">
+              </td><!-- IP -->
+              <td><!-- Script -->
+                <input type="text" v-model="task.script" placeholder="script">
+              </td>
+              <td><!-- Live Cycle -->
+                <input id="never" name="live_cycle" type="radio" v-model="task.live_cycle"
+                       value="never" checked>never<br>
+                <input id="once" name="live_cycle" type="radio" v-model="task.live_cycle"
+                       value="once">once
+              </td>
+              <td><!-- Timer -->
+                <input id="timer_on" name="timer" type="radio" v-model="task.timer" value="on">on<br>
+                <input id="timer_off" name="timer" type="radio" v-model="task.timer" value="off"
+                       checked>off
+              </td>
+              <td><!-- Status -->
+                <span class="label label-default">[[ task.status ]]</span>
+              </td>
+              <td>N/A</td><!-- Start Time -->
+              <td>N/A</td><!-- End Time -->
+              <td>N/A</td><!-- Spend Time -->
+              <td><!-- Operation -->
+                <i v-on:click="addTask" class="fa fa-fw fa-3x fa-plus-square-o" title="增加task"></i>
+              </td>
+            </tr>
+            <tr v-for="t in tasks">
+              <td><label class="label label-default">[[ t.taskId ]]</label></td>
+              <td>
+                <label v-bind:class="[t.orgTaskId===0?'label label-gray':'label label-default']">
+                  [[ t.orgTaskId ]]
+                </label>
+              </td>
+              <td>
+                <img class="app-icon"
+                     v-bind:src="'/static/AppSimulator/images/app/'+t.app_name+'/app_icon.png'">
+              </td>
+              <td>[[ t.host_ip ]]</td>
+              <td>[[ t.script ]]</td>
+              <td>[[ t.live_cycle ]]</td>
+              <td>[[ t.timer_on ]]</td>
+              <td>
+                <span v-bind:class="[t.status.indexOf('_ok')!=-1?'label label-success':
+                (t.status.indexOf('_ng')!=-1?'label label-danger':'label label-default')]">[[ t.status ]]
+                </span>
+              </td>
+              <td>[[ t.start_time ]]</td>
+              <td>[[ t.end_time ]]</td>
+              <td>[[ t.spend_time ]]</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
+  </div>
 {% endblock section_content %}
 
 {% block jquery_js %}
@@ -106,124 +109,125 @@
 {% endblock jquery_js %}
 
 {% block body_tail %}
-    <!-- page script -->
-    <script type="text/javascript"
-            src="{% static 'plugins/echarts/extension/dataTool.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'plugins/echarts/echarts-all-3.js' %}"></script>
-    <script type="text/javascript" src="{% static 'dist/js/demo.js' %}"></script>
-    <script type="text/javascript" src="{% static 'backend/js/theme/dark.js' %}"></script>
-    <script type="text/javascript" src="{% static 'backend/js/theme/infographic.js' %}"></script>
-    <script type="text/javascript" src="{% static 'backend/js/theme/macarons.js' %}"></script>
-    <script type="text/javascript" src="{% static 'backend/js/theme/roma.js' %}"></script>
-    <script type="text/javascript" src="{% static 'backend/js/theme/shine.js' %}"></script>
-    <script type="text/javascript" src="{% static 'backend/js/theme/vintage.js' %}"></script>
-    <script type="text/javascript" src="{% static 'plugins/vue1/vue.js' %}"></script>
-    <script type="text/javascript" src="{% static 'AppSimulator/js/csrf.js' %}"></script>
-    <script type="text/javascript">
-        const STATUS_UNKOWN = 'unkown';
-        const STATUS_WAIT = 'wait'; // wait
-        const STATUS_DOCKER_RUN = 'docker_run';  // docker running(create and run) ...
-        const STATUS_DOCKER_RUN_OK = 'docker_run_ok';
-        const STATUS_DOCKER_RUN_NG = 'docker_run_ng';
+  <!-- page script -->
+  <script type="text/javascript"
+          src="{% static 'plugins/echarts/extension/dataTool.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'plugins/echarts/echarts-all-3.js' %}"></script>
+  <script type="text/javascript" src="{% static 'dist/js/demo.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/theme/dark.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/theme/infographic.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/theme/macarons.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/theme/roma.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/theme/shine.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/theme/vintage.js' %}"></script>
+  <script type="text/javascript" src="{% static 'plugins/vue1/vue.js' %}"></script>
+  <script type="text/javascript" src="{% static 'AppSimulator/js/csrf.js' %}"></script>
+  <script type="text/javascript">
+    const STATUS_UNKOWN = 'unkown';
+    const STATUS_WAIT = 'wait'; // wait
+    const STATUS_DOCKER_RUN = 'docker_run';  // docker running(create and run) ...
+    const STATUS_DOCKER_RUN_OK = 'docker_run_ok';
+    const STATUS_DOCKER_RUN_NG = 'docker_run_ng';
 
-        const STATUS_SCRIPT_START = 'script_start'; // script running ...
-        const STATUS_SCRIPT_START_OK = 'script_start_ok';
-        const STATUS_SCRIPT_START_NG = 'script_start_ng';
-        const STATUS_SCRIPT_SUSPEND = 'script_suspend';  // task interrupt
-        const STATUS_SCRIPT_RUN_OK = 'script_run_ok';  // task run complete
+    const STATUS_SCRIPT_START = 'script_start'; // script running ...
+    const STATUS_SCRIPT_START_OK = 'script_start_ok';
+    const STATUS_SCRIPT_START_NG = 'script_start_ng';
+    const STATUS_SCRIPT_SUSPEND = 'script_suspend';  // task interrupt
+    const STATUS_SCRIPT_RUN_OK = 'script_run_ok';  // task run complete
 
-        function getTasks(obj) {
-            let opt = {
-                url: '/AppSimulator/getTasksAPI/',
-                type: 'GET',
-                data: {
-                    // status: ''
-                },
-                dataType: "json",
-                error: function (xhr, err) {
-                    obj.msg = "failure";
-                    console.error("[tasks] getTasksAPI", err);
-                },
-                success: function (data, status) {
-                    console.log(data)
-                    for (let i = 0; i < 1000; i++) {
-                        obj.tasks.shift();
-                    }
-                    for (let i = 0; i < data['ret'].length; i++) {
-                        obj.tasks.push(data['ret'][i])
-                    }
-                    obj.msg = "success";
-                }
-            };
-            $.ajax(opt);
+    function getTasks(obj) {
+      let opt = {
+        url: '/AppSimulator/getTasksAPI/',
+        type: 'GET',
+        data: {
+          // status: ''
+        },
+        dataType: "json",
+        error: function (xhr, err) {
+          obj.msg = "failure";
+          console.error("[tasks] getTasksAPI", err);
+        },
+        success: function (data, status) {
+          console.log(data)
+          for (let i = 0; i < 1000; i++) {
+            obj.tasks.shift();
+          }
+          for (let i = 0; i < data['ret'].length; i++) {
+            obj.tasks.push(data['ret'][i])
+          }
+          obj.msg = "success";
         }
+      };
+      $.ajax(opt);
+    }
 
-        function addTask(obj) {
-            let opt = {
-                url: '/AppSimulator/addTaskAPI/',
-                type: 'POST',
-                data: {
-                    script: obj.task.script,
-                    app_name: obj.task.app_name,
-                    live_cycle: obj.task.live_cycle,
-                    timer_on: obj.task.timer_on,
-                },
-                dataType: "json",
-                error: function (xhr, err) {
-                    obj.msg = "failure";
-                    console.error("[tasks] addTaskAPI", err);
-                },
-                success: function (data, status) {
-                    obj.msg = "success";
-                    getTasks(obj);
-                }
-            };
-            $.ajax(opt);
+    function addTask(obj) {
+      let opt = {
+        url: '/AppSimulator/addTaskAPI/',
+        type: 'POST',
+        data: {
+          script: obj.task.script,
+          ip: obj.task.ip,
+          app_name: obj.task.app_name,
+          live_cycle: obj.task.live_cycle,
+          timer_on: obj.task.timer_on,
+        },
+        dataType: "json",
+        error: function (xhr, err) {
+          obj.msg = "failure";
+          console.error("[tasks] addTaskAPI", err);
+        },
+        success: function (data, status) {
+          obj.msg = "success";
+          getTasks(obj);
         }
+      };
+      $.ajax(opt);
+    }
 
-        //----------------------------------------------------------------------------
-        Vue.config.delimiters = ['[[', ']]'];
-        //----------------------------------------------------------------------------
-        let mainVue = new Vue({
-            el: "#main",
-            data: {
-                app_name_list: ['douyin', 'miaopai', 'kuaishou', 'huoshan', 'xigua', 'xiaokaxiu','xiaohongshu'],
-                task: {
-                    taskId: '等待分配',
-                    ip: '等待分配',
-                    port: '等待分配',
-                    script: '',
-                    host_type: 'emulator',
-                    live_cycle: 'never',
-                    timer: 'off', // on off
-                    app_name: '',
-                    status: STATUS_WAIT
-                },
-                tasks: [],
-                msg: ""
-            },
-            methods: {
-                setAppName: function (app_name) {
-                    if (this.task.app_name !== app_name) {
-                        this.task.app_name = app_name;
-                        this.task.script = 'script_' + app_name + '.py';
-                    } else {
-                        this.task.app_name = '';
-                        this.task.script = '';
-                    }
-                },
-                addTask: function () {
-                    // this.tasks.push(this.task);
-                    addTask(this);
-                }
-            },
-            created: function () {
-                getTasks(this);
-            },
-            watch: {},
-            computed: {}
-        });
-    </script>
+    //----------------------------------------------------------------------------
+    Vue.config.delimiters = ['[[', ']]'];
+    //----------------------------------------------------------------------------
+    let mainVue = new Vue({
+      el: "#main",
+      data: {
+        app_name_list: ['douyin', 'miaopai', 'kuaishou', 'huoshan', 'xigua', 'xiaokaxiu', 'xiaohongshu'],
+        task: {
+          taskId: '等待分配',
+          ip: '',
+          port: '等待分配',
+          script: '',
+          host_type: 'emulator',
+          live_cycle: 'never',
+          timer: 'off', // on off
+          app_name: '',
+          status: STATUS_WAIT
+        },
+        tasks: [],
+        msg: ""
+      },
+      methods: {
+        setAppName: function (app_name) {
+          if (this.task.app_name !== app_name) {
+            this.task.app_name = app_name;
+            this.task.script = 'script_' + app_name + '.py';
+          } else {
+            this.task.app_name = '';
+            this.task.script = '';
+          }
+        },
+        addTask: function () {
+          // this.tasks.push(this.task);
+          addTask(this);
+        }
+      },
+      created: function () {
+        getTasks(this);
+      },
+      watch: {},
+      computed: {}
+    });
+  </script>
 {% endblock body_tail %}
 
 

@@ -7,9 +7,6 @@ import redis
 from Controller.setting import *
 
 
-# from Controller.Common import common_log
-
-
 # ------------------------ docker db lib ----------------------
 class RedisDriver(object):
     def __init__(self):
@@ -94,12 +91,23 @@ class MongoDriver(object):
 
         cnt = self.tasks.find({'status': STATUS_DOCKER_RUN, 'host_ip': LOCAL_IP}).count()
         if cnt > len(TIMER):
-            return None, ''
+            return None, '超过 TIMER 个数.'
 
-        task = self.tasks.find_one({
+        task = self.tasks.find_one({  # 优先：复诊
             'status': STATUS_WAIT,
-            '$or': [{'host_ip': ''}, {'host_ip': LOCAL_IP, 'orgTaskId': {'$ne': 0}}]
+            'host_ip': LOCAL_IP, 'orgTaskId': {'$ne': 0}
         })
+        if not task:  # 其次：指定给自己的
+            task = self.tasks.find_one({
+                'status': STATUS_WAIT,
+                'host_ip': LOCAL_IP
+            })
+            if not task:  # 最后：还没人做的
+                task = self.tasks.find_one({
+                    'status': STATUS_WAIT,
+                    'host_ip': ''
+                })
+
         if task:
             self.tasks.update({'_id': task['_id']}, {'$set': {'host_ip': LOCAL_IP}})
             return task, 'ok'
