@@ -8,7 +8,7 @@ from AppSimulator.views import (
 )
 
 from AppSimulator.WebAPI import (
-    addTaskAPI, getTasksAPI,
+    addTaskAPI, removeTaskAPI, getTasksAPI,
     getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI,
     setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,
     getDeviceCaptureAPI, getProxyServerInfoAPI,
@@ -25,6 +25,7 @@ urlpatterns = patterns('',
                        url(r'^vmware/$', VMwareView.as_view(), name='vmware'),
                        url(r'^logger/$', LoggerView.as_view(), name='logger'),
                        url(r'^addTaskAPI/$', addTaskAPI, name='addTaskAPI'),
+                       url(r'^removeTaskAPI/$', removeTaskAPI, name='removeTaskAPI'),
                        url(r'^getTasksAPI/$', getTasksAPI, name='getTasksAPI'),
 
                        url(r'^getDeviceCrawlCntAPI/$', getDeviceCrawlCntAPI, name='getDeviceCrawlCntAPI'),

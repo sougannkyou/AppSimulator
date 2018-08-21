@@ -28,12 +28,13 @@
               <th width="10%">IP</th>
               <th width="15%">Script</th>
               <th width="5%">Live Cycle</th>
+              <th width="10%">Schedule</th>
               <th width="5%">Timer</th>
-              <th width="10%">Status</th>
-              <th width="10%">Start Time</th>
-              <th width="10%">End Time</th>
-              <th width="10%">Spend Time</th>
-              <th width="10%">Operation</th>
+              <th width="5%">Status</th>
+              <th width="8%">Start Time</th>
+              <th width="8%">End Time</th>
+              <th width="8%">Spend Time</th>
+              <th width="8%">Operation</th>
             </tr>
             <tr>
               <td>-</td><!-- TaskId -->
@@ -41,12 +42,12 @@
               <td><!-- APP -->
                 <label v-for="app in app_name_list">
                   <img v-bind:class="[task.app_name===app?'app-icon-big':'app-icon']"
-                       v-on:click="setAppName(app)"
+                       v-on:click="setAppName(app)" v-bind:title="app"
                        v-bind:src="'/static/AppSimulator/images/app/' + app + '/app_icon.png'">
                 </label>
               </td>
               <td>
-                <input type="text" v-model="task.ip" placeholder="可指定ip">
+                <input type="text" v-model="task.ip" placeholder="IP address">
               </td><!-- IP -->
               <td><!-- Script -->
                 <input type="text" v-model="task.script" placeholder="script">
@@ -57,10 +58,14 @@
                 <input id="once" name="live_cycle" type="radio" v-model="task.live_cycle"
                        value="once">once
               </td>
+              <td>
+                <input type="text" v-model="task.schedule.start" placeholder="Start YYYY-MM-DD hh:mm:ss">
+                <input type="text" v-model="task.schedule.end" placeholder="End YYYY-MM-DD hh:mm:ss">
+                <input type="text" v-model="task.schedule.cycle" placeholder="Cycle（minus）">
+              </td>
               <td><!-- Timer -->
                 <input id="timer_on" name="timer" type="radio" v-model="task.timer" value="on">on<br>
-                <input id="timer_off" name="timer" type="radio" v-model="task.timer" value="off"
-                       checked>off
+                <input id="timer_off" name="timer" type="radio" v-model="task.timer" value="off" checked>off
               </td>
               <td><!-- Status -->
                 <span class="label label-default">[[ task.status ]]</span>
@@ -69,7 +74,7 @@
               <td>N/A</td><!-- End Time -->
               <td>N/A</td><!-- Spend Time -->
               <td><!-- Operation -->
-                <i v-on:click="addTask" class="fa fa-fw fa-3x fa-plus-square-o" title="增加task"></i>
+                <i v-on:click="addTask" class="fa fa-fw fa-3x fa-plus-square-o" title="add task"></i>
               </td>
             </tr>
             <tr v-for="t in tasks">
@@ -86,6 +91,7 @@
               <td>[[ t.host_ip ]]</td>
               <td>[[ t.script ]]</td>
               <td>[[ t.live_cycle ]]</td>
+              <td>[[ t.schedule.start ]]<br>[[ t.schedule.end ]]<br>[[ t.schedule.cycle ]]</td>
               <td>[[ t.timer_on ]]</td>
               <td>
                 <span v-bind:class="[t.status.indexOf('_ok')!=-1?'label label-success':
@@ -95,6 +101,9 @@
               <td>[[ t.start_time ]]</td>
               <td>[[ t.end_time ]]</td>
               <td>[[ t.spend_time ]]</td>
+              <td>
+                <i v-on:click="removeTask(t.taskId)" class="fa fa-fw fa-2x fa-minus-square-o" title="remove task"></i>
+              </td>
             </tr>
             </tbody>
           </table>
@@ -170,6 +179,9 @@
           ip: obj.task.ip,
           app_name: obj.task.app_name,
           live_cycle: obj.task.live_cycle,
+          schedule_start: obj.task.schedule.start, // 0000-00-00 00:00:00
+          schedule_end: obj.task.schedule.end,     // 0000-00-00 00:00:00
+          schedule_cycle: obj.task.schedule.cycle, // 24 * 60
           timer_on: obj.task.timer_on,
         },
         dataType: "json",
@@ -180,6 +192,26 @@
         success: function (data, status) {
           obj.msg = "success";
           getTasks(obj);
+        }
+      };
+      $.ajax(opt);
+    }
+
+    function removeTask(taskId) {
+      let opt = {
+        url: '/AppSimulator/removeTaskAPI/',
+        type: 'POST',
+        data: {
+          taskId: taskId
+        },
+        dataType: "json",
+        error: function (xhr, err) {
+          mainVue.msg = "failure";
+          console.error("[tasks] removeTaskAPI", err);
+        },
+        success: function (data, status) {
+          mainVue.msg = "success";
+          getTasks(mainVue);
         }
       };
       $.ajax(opt);
@@ -199,6 +231,11 @@
           script: '',
           host_type: 'emulator',
           live_cycle: 'never',
+          schedule: {
+            start: '', // "0000-00-00 00:00:00"
+            end: '', // "0000-00-00 00:00:00"
+            cycle: '',// 24 * 60
+          },
           timer: 'off', // on off
           app_name: '',
           status: STATUS_WAIT
@@ -219,6 +256,9 @@
         addTask: function () {
           // this.tasks.push(this.task);
           addTask(this);
+        },
+        removeTask: function (taskId) {
+          removeTask(taskId);
         }
       },
       created: function () {

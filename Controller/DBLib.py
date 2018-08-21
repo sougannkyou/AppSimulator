@@ -97,12 +97,12 @@ class MongoDriver(object):
             'status': STATUS_WAIT,
             'host_ip': LOCAL_IP, 'orgTaskId': {'$ne': 0}
         })
-        if not task:  # 其次：指定给自己的
+        if not task:  # 其次：挂自己号的
             task = self.tasks.find_one({
                 'status': STATUS_WAIT,
                 'host_ip': LOCAL_IP
             })
-            if not task:  # 最后：还没人做的
+            if not task:  # 最后：没人管的
                 task = self.tasks.find_one({
                     'status': STATUS_WAIT,
                     'host_ip': ''
@@ -115,8 +115,7 @@ class MongoDriver(object):
         return None, ''
 
     def task_get_my_prepare_tasks_cnt(self):
-        return self.tasks.find(
-            {'status': {'$in': [STATUS_WAIT]}, 'host_ip': LOCAL_IP}).count()
+        return self.tasks.find({'status': {'$in': [STATUS_WAIT]}, 'host_ip': LOCAL_IP}).count()
 
     def task_find_by_taskId(self, taskId):
         return self.tasks.find_one({'taskId': taskId})
@@ -130,6 +129,7 @@ class MongoDriver(object):
             "app_name": task['app_name'],
             "status": STATUS_WAIT,
             "live_cycle": task['live_cycle'],
+            "schedule": task['schedule'],
             "host_ip": task['host_ip'],
             "start_time": int(datetime.now().timestamp()),
             "up_time": 0,
@@ -138,6 +138,12 @@ class MongoDriver(object):
             "dockerId": ''
         })
         return taskId
+
+    def task_clone_schedule(self, task):
+        tasks = self.tasks.find({'$neq': {'schedule.start': ''}})
+        for task in tasks:
+            pass
+        return
 
     def task_change_status(self, task):
         now = int(datetime.now().timestamp())

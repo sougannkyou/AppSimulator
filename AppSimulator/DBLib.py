@@ -180,6 +180,7 @@ class MongoDriver(object):
             "app_name": task['app_name'],
             "status": STATUS_WAIT,
             "live_cycle": task['live_cycle'],
+            "schedule": task['schedule'],
             "timer": task['timer'],
             "timer_no": -1 if task['timer'] == 'off' else 0,
             "host_ip": task['ip'],
@@ -188,6 +189,12 @@ class MongoDriver(object):
             "dockerId": ''
         })
         return taskId
+
+    def emulator_remove_task(self, taskId):
+        self.tasks.remove({
+            "taskId": taskId
+        })
+        return True
 
     def emulator_get_one_wait_task(self):
         task = self.tasks.find_one({'status': STATUS_WAIT, 'host_ip': ''})

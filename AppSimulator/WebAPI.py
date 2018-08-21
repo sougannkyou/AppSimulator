@@ -2,7 +2,9 @@
 import os
 import sys
 import psutil
+import time
 from pprint import pprint
+from datetime import datetime
 from io import StringIO
 import bson.binary
 import traceback
@@ -194,14 +196,36 @@ def addTaskAPI(request):
     script = request.POST.get('script')
     ip = request.POST.get('ip')
     live_cycle = request.POST.get('live_cycle', 'once')
+    schedule_start = request.POST.get('schedule_start'),
+    schedule_end = request.POST.get('schedule_end'),
+    schedule_cycle = request.POST.get('schedule_cycle'),
     timer = request.POST.get('timer', 'off')
+
+    start = time.mktime(datetime.strptime(schedule_start, "%Y-%m-%d %H:%M:%S").timetuple())
+    end = time.mktime(datetime.strptime(schedule_end, "%Y-%m-%d %H:%M:%S").timetuple())
+
     ret = MDB.emulator_add_task({
         'script': script,
         'ip': ip,
         'app_name': app_name,
         'live_cycle': live_cycle,
+        'schedule': {
+            'start': start,
+            'end': end,
+            'cycle': schedule_cycle,
+            'clone_time': 0
+        },
         'timer': timer
     })
+    output = JsonResponse({
+        'ret': ret
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
+def removeTaskAPI(request):
+    taskId = request.POST.get('taskId')
+    ret = MDB.emulator_remove_task(int(taskId))
     output = JsonResponse({
         'ret': ret
     })
