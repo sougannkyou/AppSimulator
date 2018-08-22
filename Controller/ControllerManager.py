@@ -105,9 +105,9 @@ class Manager(object):
                 self._log('error', 'not fond timer_no')
                 return False, 'timer_no'
 
-            cmd = 'START "task-' + str(task_info['taskId']) + '" '
-            cmd += 'python ' + self._work_path + '\Controller\\script\\' + task_info['script'] + ' ' + \
-                   str(task_info['taskId']) + ' ' + str(timer_no)
+            cmd = 'START "task-' + str(task_info['taskId']) + '" ' + \
+                  'python ' + self._work_path + '\Controller\\script\\' + task_info['script'] + ' ' + \
+                  str(task_info['taskId']) + ' ' + str(timer_no)
             # cmd += ' >>' + self._work_path + '\Controller\log\\task-' + str(task['taskId']) + '.log 2>&1'
             self._log('<<info>> run_script cmd:\n', cmd)
             os.system(cmd)
@@ -199,7 +199,7 @@ class Manager(object):
             self._mdb.task_clone(task)
 
     def nox_run_schedule(self):
-        self._mdb.task_clone_schedule()
+        return self._mdb.task_reset_schedule()
 
     def nox_run_tasks(self):
         # 1)docker running -> 2)docker run ok(ng) -> 3)script run ok(ng)
@@ -234,8 +234,11 @@ class Manager(object):
 
                     self._mdb.task_change_status(task)
             else:
-                self._log('<<info>> start_tasks', 'not found waiting task, retry after 60s.')
+                cnt = self.nox_run_schedule()
+                if cnt:
+                    self._log('<<info>> run_schedule', 'reset {} task to wait status.'.format(cnt))
 
+                self._log('<<info>> start_tasks', 'not found waiting task, retry after 60s.')
                 time.sleep(1 * 60)
 
     # --------------------------- vmwares --------------------------------------------------------

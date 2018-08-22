@@ -74,7 +74,7 @@ class MongoDriver(object):
         return timer_no
 
     def get_taskId(self):
-        taskId = 1
+        taskId = 100
         m = self.tasks.aggregate([{"$group": {'_id': '', 'max_id': {"$max": "$taskId"}}}])
         for i in m:
             taskId = int(i['max_id']) + 1  # taskId自增
@@ -139,11 +139,27 @@ class MongoDriver(object):
         })
         return taskId
 
-    def task_clone_schedule(self, task):
-        tasks = self.tasks.find({'$neq': {'schedule.start': ''}})
+    def task_reset_schedule(self):
+        cnt = 0
+        now = int(datetime.now().timestamp())
+        cond = {
+            'schedule.start': {'$lte': now},
+            'schedule.end': {'$gte': now},
+            'host_ip': LOCAL_IP,
+            'status': {'$ne': STATUS_WAIT}
+        }
+        tasks = self.tasks.find(cond)
         for task in tasks:
-            pass
-        return
+            if now - task['schedule']['run_time'] > task['schedule']['cycle']:
+                print('aaaa', now, task['schedule']['run_time'], task['schedule']['cycle'])
+                pprint(task)
+                cnt += 1
+                self.tasks.update({'_id': task['_id']}, {'$set': {
+                    'schedule.run_time': now,
+                    'status': STATUS_WAIT
+                }})
+
+        return cnt
 
     def task_change_status(self, task):
         now = int(datetime.now().timestamp())
@@ -267,4 +283,5 @@ if __name__ == '__main__':
     # pprint(db.vm_find_vm_by_host(host_ip))
     # pprint(db.task_find_by_taskId(10))
     # db.update_device_statistics_info(info, SCOPE_TIMES)
-    pprint(db.task_get_timer_no(host_ip='172.16.250.199'))
+    # pprint(db.task_get_timer_no(host_ip='172.16.250.199'))
+    db.task_reset_schedule()

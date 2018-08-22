@@ -74,7 +74,9 @@
               <td>N/A</td><!-- End Time -->
               <td>N/A</td><!-- Spend Time -->
               <td><!-- Operation -->
-                <i v-on:click="addTask" class="fa fa-fw fa-3x fa-plus-square-o" title="add task"></i>
+                <button v-on:click="addTask" title="add task" v-bind:disabled="task.app_name==''" class="btn btn-primary">
+                  <i class="fa fa-fw fa-2x fa-plus-square-o"></i>
+                </button>
               </td>
             </tr>
             <tr v-for="t in tasks">
@@ -85,8 +87,7 @@
                 </label>
               </td>
               <td>
-                <img class="app-icon"
-                     v-bind:src="'/static/AppSimulator/images/app/'+t.app_name+'/app_icon.png'">
+                <img class="app-icon" v-bind:src="'/static/AppSimulator/images/app/'+t.app_name+'/app_icon.png'">
               </td>
               <td>[[ t.host_ip ]]</td>
               <td>[[ t.script ]]</td>
@@ -233,12 +234,12 @@
           host_type: 'emulator',
           live_cycle: 'never',
           schedule: {
-            start: '', // "0000-00-00 00:00:00"
-            end: '', // "0000-00-00 00:00:00"
-            run_time: '',// "0000-00-00 00:00:00"
-            cycle: '',// 24 * 60
+            start: '',    // "0000-00-00 00:00:00"
+            end: '',      // "0000-00-00 00:00:00"
+            run_time: '', // "0000-00-00 00:00:00"
+            cycle: '',    // 24 * 60
           },
-          timer: 'off', // on off
+          timer: 'off',   // on off
           app_name: '',
           status: STATUS_WAIT
         },
