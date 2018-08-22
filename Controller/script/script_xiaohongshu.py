@@ -1,10 +1,6 @@
 # coding:utf-8
-import os
 import sys
 import time
-
-sys.path.append(os.getcwd())
-
 from Controller.setting import APPSIMULATOR_MODE
 from Controller.Common import *
 from Controller.NoxConSelenium import NoxConSelenium

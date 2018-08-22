@@ -1,17 +1,13 @@
 # coding:utf-8
-import os
 import sys
 import time
-
-sys.path.append(os.getcwd())
-
 from Controller.setting import APPSIMULATOR_MODE
 from Controller.Common import *
 from Controller.NoxConSelenium import NoxConSelenium
 from Controller.ControllerManager import Manager
 
 
-#################################################################################
+##################################################################################
 class MySelenium(NoxConSelenium):
     def __init__(self, task_info, mode):
         super().__init__(task_info=task_info, mode=mode)
@@ -19,26 +15,39 @@ class MySelenium(NoxConSelenium):
     def script(self):
         try:
             ret, x, y = self.find_element(comment='APP图标', timeout=10)  # unlock ok
-            if ret: self.click_xy(x, y, wait_time=2)
-
-            while ret:
-                ret, pos_list = self.find_elements(comment='点击一个视频', timeout=10)
-                if ret:
-                    for pos in pos_list:
-                        (x, y) = pos
-                        self.click_xy(x, y, wait_time=2)
-                        ret, x, y = self.find_element(comment='分享', timeout=10)
-                        if ret:
-                            self.click_xy_timer(x, y, wait_time=1)
-                            ret, x, y = self.find_element(comment='复制链接', timeout=10)
-                            if ret:
-                                self.click_xy_timer(x, y, wait_time=1)
-                                self.back(wait_time=1)
-
-                self.next_page(from_y=400, to_y=10, wait_time=5)
-
+            if ret:
+                self.click_xy(x, y, wait_time=20)
+            else:
+                self._log("error", "app not found.")
+                return None
+            # ret, x, y = self.find_element(comment='忽略升级', timeout=10)
+            # if ret:
+            #     self.click_xy(x, y, wait_time=2)
+            self.crawl(tries=5)
         except Exception as e:
             self._log('error:', e)
+
+    def crawl(self, tries=3):
+        def crawl(_tries):
+            if _tries <= 0:
+                self._log("error", "fail to find element for too manay times.")
+                return None
+            ret, poses = self.find_elements(comment='分享', timeout=10)
+            if ret:
+                for x, y in poses:
+                    self.click_xy(x, y, wait_time=2)  # click 分享
+                    ret, x, y = self.find_element(comment='复制链接', timeout=10)
+                    if ret:
+                        self.click_xy(x, y, wait_time=1)
+                        _tries = tries
+                    else:
+                        _tries -= 1
+            else:
+                _tries -= 1
+            self.next_page(wait_time=5)
+            return crawl(_tries)
+
+        return crawl(tries)
 
 
 ##################################################################################
@@ -47,14 +56,14 @@ def main(task, mode):
     error = ''
     start = datetime.now()
     common_log(True, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
+
     try:
         me = MySelenium(task_info=task, mode=mode)
         me.set_comment_to_pic({
-            "APP图标": 'images/kuaishou/app_icon.png',
-            "点击一个视频": 'images/kuaishou/clickone.png',
-            "分享": 'images/kuaishou/share.png',
-            "复制链接": 'images/kuaishou/copylink.png',
-            "跳过软件升级": 'images/kuaishou/ignore_upgrade.png',
+            "APP图标": 'images/{}/app_icon.png'.format(task["app_name"]),
+            "广告": 'images/{}/ad.png'.format(task["app_name"]),
+            "分享": 'images/{}/share.png'.format(task["app_name"]),
+            "复制链接": 'images/{}/copylink.png'.format(task["app_name"]),
         })
         # me._DEBUG = True
         me.run()
@@ -85,7 +94,7 @@ if __name__ == "__main__":
 
     task = {
         'taskId': taskId,
-        'app_name': 'kuaishou',
+        'app_name': 'xigua',
         'docker_name': 'nox-' + str(taskId),
         'timer_no': timer_no
     }

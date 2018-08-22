@@ -196,13 +196,13 @@ def addTaskAPI(request):
     script = request.POST.get('script')
     ip = request.POST.get('ip')
     live_cycle = request.POST.get('live_cycle', 'once')
-    schedule_start = request.POST.get('schedule_start'),
-    schedule_end = request.POST.get('schedule_end'),
-    schedule_cycle = request.POST.get('schedule_cycle'),
+    schedule_start = request.POST.get('schedule_start')
+    schedule_end = request.POST.get('schedule_end')
+    schedule_cycle = request.POST.get('schedule_cycle')
     timer = request.POST.get('timer', 'off')
 
-    start = time.mktime(datetime.strptime(schedule_start, "%Y-%m-%d %H:%M:%S").timetuple())
-    end = time.mktime(datetime.strptime(schedule_end, "%Y-%m-%d %H:%M:%S").timetuple())
+    start = time.mktime(datetime.strptime(schedule_start, "%Y-%m-%d %H:%M:%S").timetuple()) if schedule_start else 0
+    end = time.mktime(datetime.strptime(schedule_end, "%Y-%m-%d %H:%M:%S").timetuple()) if schedule_end else 0
 
     ret = MDB.emulator_add_task({
         'script': script,

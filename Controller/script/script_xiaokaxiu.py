@@ -1,10 +1,6 @@
 # coding:utf-8
-import os
 import sys
 import time
-
-sys.path.append(os.getcwd())
-
 from Controller.setting import APPSIMULATOR_MODE
 from Controller.Common import *
 from Controller.NoxConSelenium import NoxConSelenium
@@ -30,33 +26,6 @@ class MySelenium(NoxConSelenium):
 
             self.click_xy(200, 200, wait_time=10)  # 选择一个视频
 
-            # fail = 0
-            # while True:
-            #     if fail >= 3:
-            #         self._log("error", "fail to find element for too manay times.")
-            #         return None
-            #     ret, x, y = self.find_element(comment='分享', timeout=10)
-            #     if ret:
-            #         self.click_xy(x, y, wait_time=2)  # click 分享
-            #         ret, x, y = self.find_element(comment='复制链接', timeout=10)
-            #         if ret:
-            #             self.click_xy(x, y, wait_time=1)
-            #             fail = 0
-            #         else:
-            #             ret, x, y = self.find_element(comment='广告', timeout=10)
-            #             if not ret:
-            #                 fail += 1
-            #                 # self.click_xy(x, y, wait_time=2)  # click 分享
-            #                 # if ret:
-            #                 #     ret, x, y = self.find_element(comment='复制链接', timeout=10)
-            #                 #     if ret:
-            #                 #         self.click_xy(x, y, wait_time=1)
-            #     else:
-            #         ret, x, y = self.find_element(comment='广告', timeout=10)
-            #         if not ret:
-            #             fail += 1
-            #             # ret = self.next_page_700(wait_time=5)
-            #     self.next_page_700(wait_time=5)
             self.crawl(tries=3)
         except Exception as e:
             self._log('error:', e)
@@ -74,13 +43,9 @@ class MySelenium(NoxConSelenium):
                     self.click_xy(x, y, wait_time=1)
                     _tries = tries
                 else:
-                    ret, x, y = self.find_element(comment='广告', timeout=10)
-                    if not ret:
-                        _tries -= 1
-            else:
-                ret, x, y = self.find_element(comment='广告', timeout=10)
-                if not ret:
                     _tries -= 1
+            else:
+                _tries -= 1
             self.next_page(wait_time=5)
             time.sleep(2)
             return crawl(_tries)
@@ -93,7 +58,7 @@ def main(task, mode):
     msg = ''
     error = ''
     start = datetime.now()
-    common_log(True, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
+    common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
 
     try:
         me = MySelenium(task_info=task, mode=mode)
@@ -101,7 +66,6 @@ def main(task, mode):
             "选择一个视频": 'images/{}/clickone.png'.format(task["app_name"]),
             "APP图标": 'images/{}/app_icon.png'.format(task["app_name"]),
             "忽略升级": 'images/{}/ignore_upgrade.png'.format(task["app_name"]),
-            "广告": 'images/{}/ad.png'.format(task["app_name"]),
             "分享": 'images/{}/share.png'.format(task["app_name"]),
             "复制链接": 'images/{}/copylink.png'.format(task["app_name"]),
         })
@@ -122,7 +86,7 @@ def main(task, mode):
 
 #################################################################################
 if __name__ == "__main__":
-    # APPSIMULATOR_MODE = 'vmware'
+
     if APPSIMULATOR_MODE == 'vmware':
         taskId = -1
         timer_no = -1
@@ -134,7 +98,7 @@ if __name__ == "__main__":
 
     task = {
         'taskId': taskId,
-        'app_name': 'huoshan',
+        'app_name': 'xiaokaxiu',
         'docker_name': 'nox-' + str(taskId),
         'timer_no': timer_no
     }

@@ -106,8 +106,8 @@ class Manager(object):
                 return False, 'timer_no'
 
             cmd = 'START "task-' + str(task_info['taskId']) + '" '
-            cmd += 'python ' + self._work_path + '\Controller\\' + task_info['script'] + ' ' + \
-                   str(task_info['taskId']) + ' ' + str(task_info['timer_no'])
+            cmd += 'python ' + self._work_path + '\Controller\\script\\' + task_info['script'] + ' ' + \
+                   str(task_info['taskId']) + ' ' + str(timer_no)
             # cmd += ' >>' + self._work_path + '\Controller\log\\task-' + str(task['taskId']) + '.log 2>&1'
             self._log('<<info>> run_script cmd:\n', cmd)
             os.system(cmd)
@@ -222,7 +222,9 @@ class Manager(object):
                 if ret:  # docker run ok
                     # 3) script run ok(ng)
                     self._mdb.task_set_docker(task, docker_info)  # bind docker to task
+                    ###############################################
                     ret, msg = self.nox_run_script(task_info=task)
+                    ###############################################
                     if ret:
                         task['status'] = STATUS_SCRIPT_START_OK
                     elif msg == 'timer_no':  # not found timer_no

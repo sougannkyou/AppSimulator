@@ -1,10 +1,6 @@
 # coding:utf-8
-import os
 import sys
 import time
-from datetime import datetime
-
-sys.path.append(os.getcwd())
 from pprint import pprint
 from PIL import Image
 import cv2

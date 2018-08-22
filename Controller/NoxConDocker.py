@@ -216,7 +216,7 @@ class NoxConDocker(object):
             ret = self.remove()
             if not ret:
                 msg = 'remove failed!'
-                self._log('<<error>> remove', msg)
+                self._log('<<error>> ', msg)
                 return False, msg
 
         # time.sleep(10)
