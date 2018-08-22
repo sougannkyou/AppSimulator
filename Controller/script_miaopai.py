@@ -1,50 +1,17 @@
 # coding:utf-8
 import os
 import sys
-import signal
+import time
 
 sys.path.append(os.getcwd())
 
-import time
 from Controller.setting import APPSIMULATOR_MODE
 from Controller.Common import *
 from Controller.NoxConSelenium import NoxConSelenium
 from Controller.ControllerManager import Manager
 
-_DEBUG = False
-taskId = -1
-timer_no = -1
-mode = 'single'
 
-
-##################################################################################
-def task_finally():
-    if APPSIMULATOR_MODE == 'vmware':
-        return
-
-    m = Manager()
-    m.nox_run_task_complete(taskId)
-    print("task finally wait 30 seconds.")
-    time.sleep(30)
-
-
-def signal_int_handler(signal, frame):
-    print(taskId, 'You pressed Ctrl+C!')
-    task_finally()
-    return
-
-
-def signal_kill_handler(signal, frame):
-    print(taskId, 'be killed!')
-    task_finally()
-    return
-
-
-signal.signal(signal.SIGINT, signal_int_handler)
-signal.signal(signal.SIGKILL, signal_kill_handler)
-
-
-##################################################################################
+#################################################################################
 class MySelenium(NoxConSelenium):
     def __init__(self, task_info, mode):
         super().__init__(task_info=task_info, mode=mode)
@@ -88,7 +55,7 @@ def main(task, mode):
     msg = ''
     error = ''
     start = datetime.now()
-    common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
+    common_log(True, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
     try:
         me = MySelenium(task_info=task, mode=mode)
         me.set_comment_to_pic({
@@ -104,21 +71,22 @@ def main(task, mode):
         msg = '<<error>>'
         error = e
     finally:
-        task_finally()
-        end = datetime.now()
-        common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'] + 'end.',
-                   msg + 'total times:' + str((end - start).seconds) + 's', error)
+        if APPSIMULATOR_MODE != 'vmware':  # multi nox mode
+            m = Manager()
+            m.nox_run_task_finally(taskId)
+
+        common_log(True, task['taskId'], 'Script ' + task['docker_name'] + 'end.',
+                   msg + 'total times:' + str((datetime.now() - start).seconds) + 's', error)
         return
 
-
+#################################################################################
 if __name__ == "__main__":
-    _DEBUG = True
-
-    # signal.signal(signal.SIGINT, signal_int_handler)
-
     # APPSIMULATOR_MODE = 'vmware'
-
-    if APPSIMULATOR_MODE != 'vmware':
+    if APPSIMULATOR_MODE == 'vmware':
+        taskId = -1
+        timer_no = -1
+        mode = 'single'
+    else:
         taskId = sys.argv[1]
         timer_no = int(sys.argv[2])
         mode = 'multi'

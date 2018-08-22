@@ -1,8 +1,8 @@
 # coding:utf-8
 import os
 import sys
-from datetime import datetime
 import time
+from datetime import datetime
 
 sys.path.append(os.getcwd())
 from pprint import pprint
@@ -17,14 +17,13 @@ from Controller.Common import *
 from Controller.NoxConSelenium import NoxConSelenium
 from Controller.ControllerManager import Manager
 
-_DEBUG = False
-
 navigator_bar_h = 74
 author_area_h = 58  # 评论人顶端区域高度
 category_area_h = 75  # 顶端分类：全部，好评，，，  高度
 border_size = 128
 
 
+#################################################################################
 class MySelenium(NoxConSelenium):
     def __init__(self, task_info, mode):
         super().__init__(task_info=task_info, mode=mode)
@@ -229,11 +228,13 @@ class MySelenium(NoxConSelenium):
 
 
 ##################################################################################
-def main(task, mode):
+def main(task_info, mode):
+    msg = ''
+    error = ''
     start = datetime.now()
-    # common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
+    # common_log(True, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
     try:
-        me = MySelenium(task_info=task, mode=mode)
+        me = MySelenium(task_info=task_info, mode=mode)
         me.set_comment_to_pic({
             "web打开APP": 'images/dianping/webOpenApp.png',
             "APP打开结果OK": 'images/dianping/search_ready.png',
@@ -252,17 +253,21 @@ def main(task, mode):
         me._DEBUG = True
         me.run()
     except Exception as e:
-        print('error:', e)
+        msg = '<<error>>'
+        error = e
     finally:
-        end = datetime.now()
-        print('total times:', (end - start).seconds, 's')
+        if APPSIMULATOR_MODE != 'vmware':  # multi nox mode
+            m = Manager()
+            m.nox_run_task_finally(taskId)
+
+        common_log(True, task['taskId'], 'Script ' + task['docker_name'] + 'end.',
+                   msg + 'total times:' + str((datetime.now() - start).seconds) + 's', error)
         return
 
 
 #################################################################################
 if __name__ == "__main__":
-    _DEBUG = True
-    print("start")
+    # APPSIMULATOR_MODE = 'vmware'
     if APPSIMULATOR_MODE == 'vmware':
         taskId = -1
         timer_no = -1
@@ -279,6 +284,6 @@ if __name__ == "__main__":
         'timer_no': timer_no
     }
 
-    main(task=task, mode=mode)
-    # print("Close after 30 seconds.")
-    # time.sleep(30)
+    main(task_info=task, mode=mode)
+    print("Close after 30 seconds.")
+    time.sleep(30)

@@ -7,13 +7,11 @@ sys.path.append(os.getcwd())
 
 from Controller.setting import APPSIMULATOR_MODE
 from Controller.Common import *
-from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
 from Controller.ControllerManager import Manager
 
-_DEBUG = False
 
-
+##################################################################################
 class MySelenium(NoxConSelenium):
     def __init__(self, task_info, mode):
         super().__init__(task_info=task_info, mode=mode)
@@ -178,7 +176,6 @@ class MySelenium(NoxConSelenium):
             else:
                 _tries -= 1
 
-
             self.next_page(wait_time=5)
             time.sleep(2)
 
@@ -188,7 +185,7 @@ def main(task, mode):
     msg = ''
     error = ''
     start = datetime.now()
-    common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
+    common_log(True, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
 
     try:
         me = MySelenium(task_info=task, mode=mode)
@@ -210,27 +207,20 @@ def main(task, mode):
         msg = '<<error>>'
         error = e
     finally:
-        end = datetime.now()
-        if APPSIMULATOR_MODE != 'vmware':  # multi nox console
-            common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'multi nox console mode.', '')
-            docker = NoxConDocker(task)
-            docker.quit()
-            docker.remove()
+        if APPSIMULATOR_MODE != 'vmware':  # multi nox mode
             m = Manager()
-            m.nox_run_task_complete(task['taskId'])
-            time.sleep(10)
+            m.nox_run_task_finally(taskId)
 
-        common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'] + 'end.',
-                   msg + 'total times:' + str((end - start).seconds) + 's', str(error))
+        common_log(True, task['taskId'], 'Script ' + task['docker_name'] + 'end.',
+                   msg + 'total times:' + str((datetime.now() - start).seconds) + 's', error)
         return
 
 
+#################################################################################
 if __name__ == "__main__":
-    _DEBUG = True
-
+    # APPSIMULATOR_MODE = 'vmware'
     if APPSIMULATOR_MODE == 'vmware':
-        # taskId = -1
-        taskId = 123
+        taskId = -1
         timer_no = -1
         mode = 'single'
     else:
@@ -249,5 +239,5 @@ if __name__ == "__main__":
     }
 
     main(task=task, mode=mode)
-    print("Close after 30 seconds.")
+    print("Quit after 30 seconds.")
     time.sleep(30)

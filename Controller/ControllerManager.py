@@ -185,7 +185,7 @@ class Manager(object):
         time.sleep(10)
         return True
 
-    def nox_run_task_complete(self, taskId):
+    def nox_run_task_finally(self, taskId):
         task = self._mdb.task_find_by_taskId(int(taskId))
 
         docker = NoxConDocker(task)
@@ -198,7 +198,7 @@ class Manager(object):
             self._log('<<info>> nox_run_task_complete', 'clone')
             self._mdb.task_clone(task)
 
-    def nox_schedule(self):
+    def nox_run_schedule(self):
         self._mdb.task_clone_schedule()
 
     def nox_run_tasks(self):
@@ -206,13 +206,13 @@ class Manager(object):
         while True:
             task, msg = self._mdb.task_get_one_for_run()
             if task:
-                # 1)docker run
+                # 1) docker run
                 task['status'] = STATUS_DOCKER_RUN
                 self._mdb.task_change_status(task)
                 docker = NoxConDocker(task_info=task)
                 ret = self.nox_start(task=task, docker=docker, retry_cnt=2)
 
-                # 2)docker run ok(ng)
+                # 2) docker run ok(ng)
                 status = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
                 docker_info = {'_id': self._mdb.emulator_create(task), 'status': status}
                 self._mdb.emulator_change_status(docker_info)
@@ -220,7 +220,7 @@ class Manager(object):
                 self._mdb.task_change_status(task)
 
                 if ret:  # docker run ok
-                    # 3)script run ok(ng)
+                    # 3) script run ok(ng)
                     self._mdb.task_set_docker(task, docker_info)  # bind docker to task
                     ret, msg = self.nox_run_script(task_info=task)
                     if ret:

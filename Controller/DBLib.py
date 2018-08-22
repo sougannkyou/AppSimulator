@@ -120,7 +120,7 @@ class MongoDriver(object):
     def task_find_by_taskId(self, taskId):
         return self.tasks.find_one({'taskId': taskId})
 
-    def task_clone(self, task):
+    def task_clone(self, task):  # copy from db
         taskId = self.get_taskId()
         self.tasks.insert({
             "taskId": taskId,
@@ -167,7 +167,9 @@ class MongoDriver(object):
             }})
 
     def task_set_docker(self, task, docker):
-        self.tasks.update({'_id': task['_id']}, {"$set": {'dockerId': docker['_id']}})
+        self.tasks.update({'_id': task['_id']}, {"$set": {
+            'dockerId': docker['_id']
+        }})
 
     # ---------- emulator -----------------------
     def emulator_create(self, task):
@@ -213,7 +215,7 @@ class MongoDriver(object):
             ret.append(vm)
         return ret
 
-    def vm_record_share_cnt(self, vm_info, scope_times):  # 时间窗式记录采集量
+    def vm_record_share_cnt(self, vm_info, scope_times):  # 时间窗记录采集量
         # self._log("vm_record_share_cnt\t", vm_info['ip'] + ':\t' + str(vm_info['cnt']))
         old_time = int((datetime.now() - timedelta(seconds=scope_times)).timestamp())
         self.activeInfo.remove({'time': {'$lte': old_time}})

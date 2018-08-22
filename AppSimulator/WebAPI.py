@@ -212,8 +212,8 @@ def addTaskAPI(request):
         'schedule': {
             'start': start,
             'end': end,
+            'run_time': 0,
             'cycle': schedule_cycle,
-            'clone_time': 0
         },
         'timer': timer
     })

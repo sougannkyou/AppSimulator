@@ -91,7 +91,8 @@
               <td>[[ t.host_ip ]]</td>
               <td>[[ t.script ]]</td>
               <td>[[ t.live_cycle ]]</td>
-              <td>[[ t.schedule.start ]]<br>[[ t.schedule.end ]]<br>[[ t.schedule.cycle ]]</td>
+              <td>[[ t.schedule.start ]]<br>[[ t.schedule.end ]]<br>[[ t.schedule.run_time ]]<br>[[ t.schedule.cycle ]]
+              </td>
               <td>[[ t.timer_on ]]</td>
               <td>
                 <span v-bind:class="[t.status.indexOf('_ok')!=-1?'label label-success':
@@ -234,6 +235,7 @@
           schedule: {
             start: '', // "0000-00-00 00:00:00"
             end: '', // "0000-00-00 00:00:00"
+            run_time: '',// "0000-00-00 00:00:00"
             cycle: '',// 24 * 60
           },
           timer: 'off', // on off

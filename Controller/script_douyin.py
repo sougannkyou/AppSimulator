@@ -1,13 +1,12 @@
 # coding:utf-8
 import os
 import sys
+import time
 
 sys.path.append(os.getcwd())
 
-import time
 from Controller.Common import *
 from Controller.setting import APPSIMULATOR_MODE
-from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
 from Controller.ControllerManager import Manager
 
@@ -60,18 +59,12 @@ def main(task_info, mode):
         msg = '<<error>>'
         error = e
     finally:
-        end = datetime.now()
-        if APPSIMULATOR_MODE != 'vmware':  # multi nox console
-            common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'multi nox console mode.', '')
-            docker = NoxConDocker(task)
-            docker.quit()
-            docker.remove()
+        if APPSIMULATOR_MODE != 'vmware':  # multi nox mode
             m = Manager()
-            m.nox_run_task_complete(task['taskId'])
-            time.sleep(10)
+            m.nox_run_task_finally(taskId)
 
-        common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'] + 'end.',
-                   msg + 'total times:' + str((end - start).seconds) + 's', error)
+        common_log(True, task['taskId'], 'Script ' + task['docker_name'] + 'end.',
+                   msg + 'total times:' + str((datetime.now() - start).seconds) + 's', error)
         return
 
 

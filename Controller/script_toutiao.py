@@ -1,13 +1,12 @@
 # coding:utf-8
 import os
 import sys
+import time
 
 sys.path.append(os.getcwd())
 
-import time
 from Controller.setting import APPSIMULATOR_MODE
 from Controller.Common import *
-from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
 from Controller.ControllerManager import Manager
 
@@ -29,7 +28,7 @@ comments = [
     "转发6",
 ]
 
-
+#################################################################################
 class MySelenium(NoxConSelenium):
     def __init__(self, task_info, mode):
         super().__init__(task_info=task_info, mode=mode)
@@ -54,7 +53,7 @@ class MySelenium(NoxConSelenium):
 
         ret, x, y = self.find_element(comment='writeComment', timeout=5)
         if ret: ret = self.click_xy(x, y, wait_time=2)
-        if ret: ret = self.input_cn(comments[0], timeout=1)
+        if ret: ret = self.input_cn(comments[0], wait_time=1)
         time.sleep(5)
         if ret: ret, x, y = self.find_element(comment='publish', timeout=5)
         if ret: ret = self.click_xy(x, y, wait_time=1)
@@ -63,8 +62,10 @@ class MySelenium(NoxConSelenium):
 
 ##################################################################################
 def main(task_info, mode):
+    msg = ''
+    error = ''
     start = datetime.now()
-    print("[Script " + task['docker_name'] + "] start at ", start)
+    common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
     try:
         me = MySelenium(task_info=task_info, mode=mode)
         me.set_comment_to_pic({
@@ -78,11 +79,17 @@ def main(task_info, mode):
 
         end = datetime.now()
         print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s")
-        return True
     except Exception as e:
-        end = datetime.now()
-        print("[Script " + task_info['docker_name'] + "] total times:", str((end - start).seconds) + "s\nerror:", e)
-        return False
+        msg = '<<error>>'
+        error = e
+    finally:
+        if APPSIMULATOR_MODE != 'vmware':  # multi nox mode
+            m = Manager()
+            m.nox_run_task_finally(taskId)
+
+        common_log(True, task['taskId'], 'Script ' + task['docker_name'] + 'end.',
+                   msg + 'total times:' + str((datetime.now() - start).seconds) + 's', error)
+        return
 
 
 #################################################################################
