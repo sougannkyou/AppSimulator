@@ -1,14 +1,13 @@
 # coding:utf-8
-import os
+# import os
 import sys
 import time
-
-sys.path.append(os.getcwd())
-
 from Controller.setting import APPSIMULATOR_MODE
 from Controller.Common import *
 from Controller.NoxConSelenium import NoxConSelenium
 from Controller.ControllerManager import Manager
+
+# sys.path.append(os.getcwd())
 
 
 #################################################################################
@@ -79,9 +78,10 @@ def main(task, mode):
                    msg + 'total times:' + str((datetime.now() - start).seconds) + 's', error)
         return
 
+
 #################################################################################
 if __name__ == "__main__":
-    # APPSIMULATOR_MODE = 'vmware'
+    APPSIMULATOR_MODE = 'vmware'
     if APPSIMULATOR_MODE == 'vmware':
         taskId = -1
         timer_no = -1

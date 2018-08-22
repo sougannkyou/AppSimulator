@@ -17,7 +17,6 @@ class NoxConSelenium(NoxConADB):
     '''
     可以使用Timer进行时分同步
     '''
-
     def __init__(self, task_info, mode):
         super().__init__(task_info, mode)
         self._DEBUG = False
