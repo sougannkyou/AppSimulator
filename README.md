@@ -102,10 +102,10 @@ pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements_control
     "start_time" : 0,
     "end_time" : 0
 }
-
+ 
 [mongodb]
 mongodump -h 172.16.253.37:27017 -d AppSimulator -o c:\MongoDB\backup
-mongorestore -h 192.168.31.227:27017 -d AppSimulator c:\MongoDB\backup\AppSimulator
+mongorestore -h 192.168.31.82:27017 -d AppSimulator c:\MongoDB\backup\AppSimulator
 
 [锁屏 4.4.2] 
 adb shell rm /data/system/*.key

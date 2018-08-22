@@ -198,8 +198,8 @@ class Manager(object):
             self._log('<<info>> nox_run_task_complete', 'clone')
             self._mdb.task_clone(task)
 
-    def nox_run_schedule(self):
-        return self._mdb.task_reset_schedule()
+    def nox_schedule(self):
+        return self._mdb.task_schedule_reset()
 
     def nox_run_tasks(self):
         # 1)docker running -> 2)docker run ok(ng) -> 3)script run ok(ng)
@@ -208,6 +208,7 @@ class Manager(object):
             if task:
                 # 1) docker run
                 task['status'] = STATUS_DOCKER_RUN
+                self._mdb.task_change_status(task)
                 self._mdb.task_change_status(task)
                 docker = NoxConDocker(task_info=task)
                 ret = self.nox_start(task=task, docker=docker, retry_cnt=2)
@@ -234,7 +235,7 @@ class Manager(object):
 
                     self._mdb.task_change_status(task)
             else:
-                cnt = self.nox_run_schedule()
+                cnt = self.nox_schedule()
                 if cnt:
                     self._log('<<info>> run_schedule', 'reset {} task to wait status.'.format(cnt))
 

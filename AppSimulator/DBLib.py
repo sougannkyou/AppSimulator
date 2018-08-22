@@ -91,7 +91,7 @@ class MongoDriver(object):
         log_list = self.logger.find(cond).sort('time', pymongo.DESCENDING).skip(0).limit(200)
         for log in log_list:
             log.pop('_id')
-            log['time'] = datetime.fromtimestamp(log['time']).strftime("%m-%d %H:%M:%S") if log['time'] else ''
+            log['time'] = timestamp2string(log['time'], "%m-%d %H:%M:%S") if log['time'] else ''
             log['msg'] = log['msg'].decode('gbk') if isinstance(log['msg'], bytes) else log['msg']
             ret.append(log)
         return ret
@@ -111,7 +111,7 @@ class MongoDriver(object):
             pre = 'http://' + task['host_ip'] + ':8000/static/AppSimulator/images/'
             task['app_icon'] = pre + 'app/' + task['app_name'] + '/app_icon.png'
             task['timer_no'] = TIMER[task['timer_no'] if task else 0]
-            task['spend_times'] = times_format(seconds=(task['up_time'] - task['start_time'])) \
+            task['spend_times'] = seconds_format(seconds=(task['up_time'] - task['start_time'])) \
                 if task['up_time'] > 0 else '00:00:00'
             task['capture'] = pre + 'temp/emulators/capture_nox-' + str(task['taskId']) + '.png'
             ret.append(task)
@@ -212,11 +212,14 @@ class MongoDriver(object):
 
         for r in l:
             r.pop('_id')
-            if 'dockerId' in r: r.pop('dockerId')
-            r['spend_time'] = times_format(seconds=(r['up_time'] - r['start_time'])) if r['up_time'] > 0 else '00:00:00'
-            r['start_time'] = datetime.fromtimestamp(r['start_time']).strftime("%m-%d %H:%M:%S") \
+            if 'dockerId' in r:
+                r.pop('dockerId')
+
+            r['spend_time'] = seconds_format(seconds=(r['up_time'] - r['start_time'])) \
+                if r['up_time'] > 0 else '00:00:00'
+            r['start_time'] = timestamp2string(r['start_time'], "%m-%d %H:%M:%S") \
                 if 'start_time' in r and r['start_time'] else ''
-            r['end_time'] = datetime.fromtimestamp(r['end_time']).strftime("%m-%d %H:%M:%S") \
+            r['end_time'] = timestamp2string(r['end_time'], "%m-%d %H:%M:%S") \
                 if 'end_time' in r and r['end_time'] else ''
             ret.append(r)
 
@@ -295,7 +298,7 @@ class MongoDriver(object):
 
         info_list = self.activeInfo.find(cond)
         for info in info_list:
-            t = datetime.fromtimestamp(info['time']).strftime("%Y-%m-%d %H:%M:%S") if info['time'] else ''
+            t = timestamp2string(info['time'], "%Y-%m-%d %H:%M:%S") if info['time'] else ''
             ret['interval'].append(t)
             ret['cntList'].append(info['cnt'])
         return ret

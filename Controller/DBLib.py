@@ -139,7 +139,7 @@ class MongoDriver(object):
         })
         return taskId
 
-    def task_reset_schedule(self):
+    def task_schedule_reset(self):
         cnt = 0
         now = int(datetime.now().timestamp())
         cond = {

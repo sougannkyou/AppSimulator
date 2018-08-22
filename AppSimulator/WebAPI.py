@@ -2,7 +2,6 @@
 import os
 import sys
 import psutil
-import time
 from pprint import pprint
 from datetime import datetime
 from io import StringIO
@@ -20,6 +19,7 @@ from django.http import HttpResponse, JsonResponse
 # from rest_framework.response import Response as restResponse
 # from rest_framework import status
 
+from AppSimulator.Common import *
 from AppSimulator.DBLib import MongoDriver, RedisDriver
 from AppSimulator.RPCLib import *
 from Controller.NoxConDocker import NoxConDocker
@@ -207,11 +207,9 @@ def addTaskAPI(request):
         'app_name': app_name,
         'live_cycle': live_cycle,
         'schedule': {
-            'start': int(time.mktime(datetime.strptime(schedule_start, "%Y-%m-%d %H:%M:%S").timetuple()))
-            if schedule_start else 0,
-            'end': int(time.mktime(datetime.strptime(schedule_end, "%Y-%m-%d %H:%M:%S").timetuple()))
-            if schedule_end else 9999999999,
-            'run_time': 0,
+            'start': string2timestamp(schedule_start) if schedule_start else 0,
+            'end': string2timestamp(schedule_end) if schedule_end else 9999999999,
+            'run_time': string2timestamp(schedule_start) if schedule_start else 0,
             'cycle': int(schedule_cycle) * 60 if schedule_cycle else 24 * 60 * 60,
         },
         'timer': timer

@@ -92,7 +92,7 @@ class NoxConDocker(object):
         self._log('stdout:\n', _stdout)
         if _stderr:
             self._log('stderr:\n', _stderr)
-            return ''
+            return '<<<error>>>' + _stderr
         else:
             time.sleep(1)
             return _stdout
@@ -186,8 +186,11 @@ class NoxConDocker(object):
         self._log('add', self._docker_name)
         time.sleep(2)
         ret = self._exec_nox_cmd(self._make_cmd("add -name:" + self._docker_name))
+        # ret = self._exec_nox_cmd(self._make_cmd("add -name:" + self._docker_name + ' -systemtype:4')) # nox 6.2.1
         time.sleep(2)
-        return False if ret.find('failed') > 0 or ret.find('not') > 0 else True
+        return False if ret.find('failed') != -1 or \
+                        ret.find('not') != -1 or \
+                        ret.find('system type err!') != -1 else True
 
     def create(self, force=False):
         poweron = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\poweron.png'
@@ -209,27 +212,27 @@ class NoxConDocker(object):
             if dockers[0]['status'] == STATUS_DOCKER_RUN:
                 ret = self.stop(wait_time=5)
                 if not ret:
-                    msg = 'stop failed!'
+                    msg = 'failed!'
                     self._log('<<error>> stop', msg)
                     return False, msg
 
             ret = self.remove()
             if not ret:
-                msg = 'remove failed!'
-                self._log('<<error>> ', msg)
+                msg = 'failed!'
+                self._log('<<error>> remove', msg)
                 return False, msg
 
         # time.sleep(10)
         # self.copy('nox-org')
         ret = self.add()
         if not ret:
-            msg = 'add failed!'
+            msg = 'failed!'
             self._log('<<error>> add', msg)
             return False, msg
 
         ret = self.pull(self._app_name)
         if not ret:
-            msg = 'pull failed!'
+            msg = 'failed!'
             self._log('<<error>> pull', msg)
             return False, msg
 
@@ -237,9 +240,9 @@ class NoxConDocker(object):
 
     def start(self, timeout=2):
         time.sleep(timeout)
-        self._exec_nox_cmd(self._make_cmd("launch -name:" + self._docker_name))
+        stdout = self._exec_nox_cmd(self._make_cmd("launch -name:" + self._docker_name))
         time.sleep(timeout)
-        return True
+        return stdout.find('player is not exist!') == -1
 
     def run(self, force=False):  # run = create + start
         ret, msg = self.create(force)
