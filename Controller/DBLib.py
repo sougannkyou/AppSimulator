@@ -139,20 +139,31 @@ class MongoDriver(object):
         })
         return taskId
 
-    def task_schedule_reset(self):
+    def task_schedule(self):
+        '''
+        1）超过计划起始时间则马上启动
+        2）等待任务空闲，不保证精确按照计划时间启动
+        3）修改状态为wait，由任务管理监控来启动
+        4）taskId不变情况下，任务管理启动会将上次启动任务及容器销毁后，启动本次任务。
+        '''
         cnt = 0
         now = int(datetime.now().timestamp())
         cond = {
             'schedule.start': {'$lte': now},
-            'schedule.end': {'$gte': now},
+            'schedule.end': {'$gt': now},
             'host_ip': LOCAL_IP,
             'status': {'$ne': STATUS_WAIT}
         }
         tasks = self.tasks.find(cond)
         for task in tasks:
-            if now - task['schedule']['run_time'] > task['schedule']['cycle']:
-                print('aaaa', now, task['schedule']['run_time'], task['schedule']['cycle'])
-                pprint(task)
+            start = task['schedule']['start']
+            cycle = task['schedule']['cycle']
+            run = task['schedule']['run_time']
+            now_cycle, _ = divmod(now - start, cycle)
+            run_cycle, _ = divmod(run - start, cycle)
+            if not now_cycle <= run_cycle < now_cycle + 1:
+                # print('task_schedule_reset', now_cycle, now, start, run, cycle)
+                # pprint(task)
                 cnt += 1
                 self.tasks.update({'_id': task['_id']}, {'$set': {
                     'schedule.run_time': now,

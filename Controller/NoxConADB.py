@@ -6,7 +6,7 @@ import re
 import random
 import subprocess
 from Controller.setting import *
-from Controller.Common import common_log
+from Controller.Common import *
 
 
 class NoxConADB(object):
@@ -147,7 +147,10 @@ class NoxConADB(object):
                 wait_time = cycle + TIMER[self._timer_no] - now
             else:
                 wait_time = TIMER[self._timer_no] - now
-            self._log('<<info>> timer_no:' + str(self._timer_no), 'sleep ' + str(wait_time) + 's')
+
+            tobe = datetime.fromtimestamp(int(datetime.now().timestamp()) + wait_time).strftime("%m-%d %H:%M:%S")
+            self._log('<<info>> timer_no:' + str(self._timer_no),
+                      'will run at ' + tobe + '(sleep ' + str(wait_time) + 's)')
             time.sleep(wait_time)
             self._set_task_conf()
             self._log('[adb_cmd]<<info>> ' + datetime.now().strftime('%H:%M:%S %f') + '\n', cmdline)

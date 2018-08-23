@@ -7,9 +7,12 @@ def now_timestamp():
 
 
 def seconds_format(seconds):
-    hours, remainder = divmod(seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    return "{h:0>2d}:{m:0>2d}:{s:0>2d}".format(h=hours, m=minutes, s=seconds)
+    if isinstance(seconds, int) and seconds > 0:
+        hours, remainder = divmod(seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return "{h:0>2d}:{m:0>2d}:{s:0>2d}".format(h=hours, m=minutes, s=seconds)
+    else:
+        return 'N/A'
 
 
 def string2timestamp(s, format_str="%Y-%m-%d %H:%M:%S"):
@@ -17,7 +20,10 @@ def string2timestamp(s, format_str="%Y-%m-%d %H:%M:%S"):
 
 
 def timestamp2string(t, format_str="%Y-%m-%d %H:%M:%S"):
-    return datetime.fromtimestamp(t).strftime(format_str)
+    if isinstance(t, int) and t > 0 and t != 9999999999:
+        return datetime.fromtimestamp(t).strftime(format_str)
+    else:
+        return ''
 
 
 def common_log(_DEBUG, func, prefix, msg):

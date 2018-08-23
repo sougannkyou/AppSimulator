@@ -2,8 +2,8 @@
 import time
 import psutil
 import shutil
-import subprocess
 from pprint import pprint
+import win32gui
 from Controller.setting import *
 from Controller.Common import *
 from Controller.DBLib import MongoDriver
@@ -101,19 +101,23 @@ class NoxConDocker(object):
         dockers = self.ps(docker_name=docker_name, docker_status=STATUS_DOCKER_RUN_OK)
         for d in dockers:
             cmd = 'TASKKILL /F /T /PID ' + str(d['pid'])  # 不能强杀，会造成 ERR：1037
-            self._log('_cmd_kill_task', cmd)
-            os.system(cmd)
+            common_exec_cmd(True, cmd)
+            # os.system(cmd)
 
     def kill_task(self):
         # <<cmd>> taskkill /f /t /fi "WINDOWTITLE eq task-99"
         cmd = 'TASKKILL /F /T /FI "WINDOWTITLE eq task-' + str(self._taskId) + '"'
-        self._log('<<info>> kill_task', cmd)
-        os.system(cmd)
+        common_exec_cmd(True, cmd)
+        # os.system(cmd)
 
     def get_name(self):
         return self._docker_name
 
     def shake(self, cnt):
+        hwnd = win32gui.FindWindow(None,  self._docker_name)
+        if hwnd:
+            win32gui.SetForegroundWindow(hwnd)
+
         self._log('<<info>> shake', str(cnt) + ' times')
         for _ in range(cnt):
             self._exec_nox_cmd(self._make_cmd("action -name:" + self._docker_name + " -key:call.shake -value:null"))

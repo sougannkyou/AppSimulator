@@ -199,7 +199,7 @@ class Manager(object):
             self._mdb.task_clone(task)
 
     def nox_schedule(self):
-        return self._mdb.task_schedule_reset()
+        return self._mdb.task_schedule()
 
     def nox_run_tasks(self):
         # 1)docker running -> 2)docker run ok(ng) -> 3)script run ok(ng)

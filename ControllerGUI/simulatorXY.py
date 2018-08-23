@@ -125,7 +125,7 @@ class Simulator(object):
         # 匹配element图像
         # pprint(pos)
         obj_pic_path = self._PIC_PATH[comment]
-        while (timeout > 0):
+        while timeout > 0:
             win32gui.SetForegroundWindow(self.hwnd)
             left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
             app_bg_box = (left, top, right, bottom)

@@ -9,3 +9,9 @@ img.app-icon-big {
     border-radius: 3px;
     margin: 0 5px 0 5px;
 }
+
+div.schedule {
+    border: 2px solid gray;
+    height: 20px;
+    width: 10%;
+}

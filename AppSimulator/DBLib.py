@@ -186,6 +186,7 @@ class MongoDriver(object):
             "host_ip": task['ip'],
             "start_time": int(datetime.now().timestamp()),
             "up_time": 0,
+            "end_time": 0,
             "dockerId": ''
         })
         return taskId
@@ -215,12 +216,13 @@ class MongoDriver(object):
             if 'dockerId' in r:
                 r.pop('dockerId')
 
-            r['spend_time'] = seconds_format(seconds=(r['up_time'] - r['start_time'])) \
-                if r['up_time'] > 0 else '00:00:00'
-            r['start_time'] = timestamp2string(r['start_time'], "%m-%d %H:%M:%S") \
-                if 'start_time' in r and r['start_time'] else ''
-            r['end_time'] = timestamp2string(r['end_time'], "%m-%d %H:%M:%S") \
-                if 'end_time' in r and r['end_time'] else ''
+            r['spend_time'] = seconds_format(seconds=(r['up_time'] - r['start_time']))
+            r['start_time'] = timestamp2string(r['start_time'], "%m-%d %H:%M:%S")
+            r['end_time'] = timestamp2string(r['end_time'], "%m-%d %H:%M:%S")
+            r['schedule']['start'] = timestamp2string(r['schedule']['start'], "%m-%d %H:%M:%S")
+            r['schedule']['end'] = timestamp2string(r['schedule']['end'], "%m-%d %H:%M:%S")
+            r['schedule']['run_time'] = timestamp2string(r['schedule']['run_time'], "%m-%d %H:%M:%S")
+            r['schedule']['cycle'] = int(r['schedule']['cycle'] / 60)
             ret.append(r)
 
         return ret

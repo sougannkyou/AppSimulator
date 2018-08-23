@@ -74,7 +74,8 @@
               <td>N/A</td><!-- End Time -->
               <td>N/A</td><!-- Spend Time -->
               <td><!-- Operation -->
-                <button v-on:click="addTask" title="add task" v-bind:disabled="task.app_name==''" class="btn btn-primary">
+                <button v-on:click="addTask" title="add task" v-bind:disabled="task.app_name==''"
+                        class="btn btn-primary">
                   <i class="fa fa-fw fa-2x fa-plus-square-o"></i>
                 </button>
               </td>
@@ -92,7 +93,11 @@
               <td>[[ t.host_ip ]]</td>
               <td>[[ t.script ]]</td>
               <td>[[ t.live_cycle ]]</td>
-              <td>[[ t.schedule.start ]]<br>[[ t.schedule.end ]]<br>[[ t.schedule.run_time ]]<br>[[ t.schedule.cycle ]]
+              <td>
+                <div class="schedule">start:&nbsp;[[ t.schedule.start ]]</div>
+                <div class="schedule">end:&nbsp;&nbsp;&nbsp;[[ t.schedule.end ]]</div>
+                <div class="schedule">run:&nbsp;&nbsp;&nbsp;[[ t.schedule.run_time ]]</div>
+                <div class="schedule">cycle:&nbsp;[[ t.schedule.cycle ]]</div>
               </td>
               <td>[[ t.timer_on ]]</td>
               <td>
@@ -159,7 +164,7 @@
           console.error("[tasks] getTasksAPI", err);
         },
         success: function (data, status) {
-          console.log(data)
+          console.log(data);
           for (let i = 0; i < 1000; i++) {
             obj.tasks.shift();
           }

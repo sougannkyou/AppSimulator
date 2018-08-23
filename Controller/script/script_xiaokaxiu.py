@@ -58,7 +58,7 @@ def main(task, mode):
     msg = ''
     error = ''
     start = datetime.now()
-    common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
+    common_log(True, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
 
     try:
         me = MySelenium(task_info=task, mode=mode)

@@ -72,7 +72,7 @@ def common_exec_cmd(_DEBUG, cmdline):
     except Exception as e:
         common_log(_DEBUG, -1, 'common_exec_cmd', 'error', e)
     finally:
-        common_log(_DEBUG, -1, 'common_exec_cmd success.\n', cmdline, _stdout)
+        common_log(_DEBUG, -1, 'common_exec_cmd', cmdline, _stdout)
 
     if _stderr:
         return ''
