@@ -144,7 +144,7 @@ class MongoDriver(object):
         1）超过计划起始时间则马上启动
         2）等待任务空闲，不保证精确按照计划时间启动
         3）修改状态为wait，由任务管理监控来启动
-        4）taskId不变情况下，任务管理启动会将上次启动任务及容器销毁后，启动本次任务。
+        4）taskId不变，任务管理启动会将上次启动的任务及容器销毁，而后启动本次任务。
         '''
         cnt = 0
         now = int(datetime.now().timestamp())
@@ -273,9 +273,9 @@ class MongoDriver(object):
             if len(l) > 0 and l[-1] > 0:
                 status['cnt'] = l[-1]
                 if l[0] == l[-1]:
-                    status['status'] = STATUS_SCRIPT_RUN_SUSPEND
+                    status['status'] = STATUS_SCRIPT_SUSPEND
                 else:
-                    status['status'] = STATUS_SCRIPT_RUNNING
+                    status['status'] = STATUS_SCRIPT_START_OK
 
             devices_status.append(status)
 
