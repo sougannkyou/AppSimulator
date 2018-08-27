@@ -4,6 +4,7 @@ import psutil
 import shutil
 from pprint import pprint
 import win32gui
+import win32com.client
 from Controller.setting import *
 from Controller.Common import *
 from Controller.DBLib import MongoDriver
@@ -114,7 +115,9 @@ class NoxConDocker(object):
         return self._docker_name
 
     def shake(self, cnt):
-        hwnd = win32gui.FindWindow(None,  self._docker_name)
+        shell = win32com.client.Dispatch("WScript.Shell")
+        shell.SendKeys('%')
+        hwnd = win32gui.FindWindow(None, self._docker_name)
         if hwnd:
             win32gui.SetForegroundWindow(hwnd)
 

@@ -156,7 +156,7 @@ class Manager(object):
         if ret:
             ret, x, y = driver.find_element(comment='很抱歉', timeout=10)  # 匹配到“很抱歉”字样
             if ret:
-                self._log('<<info>> check_docker_run', task_info['docker_name'] + ' 匹配到“很抱歉”.')
+                self._log('<<info>> check_docker_run', docker_name + ' 匹配到“很抱歉”.')
                 return False
             else:
                 ret, x, y = driver.find_element(comment='APP图标', timeout=10)  # 可匹配到app图标
