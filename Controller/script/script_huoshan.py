@@ -118,7 +118,7 @@ def main(task, mode):
 
 #################################################################################
 if __name__ == "__main__":
-    # APPSIMULATOR_MODE = 'vmware'
+    # APPSIMULATOR_MODE = 'vmware' # on
     if APPSIMULATOR_MODE == 'vmware':
         taskId = -1
         timer_no = -1

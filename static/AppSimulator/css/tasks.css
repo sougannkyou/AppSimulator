@@ -11,7 +11,7 @@ img.app-icon-big {
 }
 
 div.schedule {
-    border: 2px solid gray;
+    border: 1px dashed gray;
     height: 20px;
-    width: 10%;
+    /*width: 10%;*/
 }

@@ -53,10 +53,8 @@
                 <input type="text" v-model="task.script" placeholder="script">
               </td>
               <td><!-- Live Cycle -->
-                <input id="never" name="live_cycle" type="radio" v-model="task.live_cycle"
-                       value="never" checked>never<br>
-                <input id="once" name="live_cycle" type="radio" v-model="task.live_cycle"
-                       value="once">once
+                <input id="live_cycle_never" name="live_cycle" type="radio" v-model="task.live_cycle" value="never">never<br>
+                <input id="live_cycle_once" name="live_cycle" type="radio" v-model="task.live_cycle" value="once" checked>once
               </td>
               <td>
                 <input type="text" v-model="task.schedule.start" placeholder="Start YYYY-MM-DD hh:mm:ss">
@@ -97,7 +95,7 @@
                 <div class="schedule">start:&nbsp;[[ t.schedule.start ]]</div>
                 <div class="schedule">end:&nbsp;&nbsp;&nbsp;[[ t.schedule.end ]]</div>
                 <div class="schedule">run:&nbsp;&nbsp;&nbsp;[[ t.schedule.run_time ]]</div>
-                <div class="schedule">cycle:&nbsp;[[ t.schedule.cycle ]]</div>
+                <div class="schedule">cycle:&nbsp;[[ t.schedule.cycle ]] minus</div>
               </td>
               <td>[[ t.timer_on ]]</td>
               <td>
@@ -272,8 +270,19 @@
       created: function () {
         getTasks(this);
       },
-      watch: {},
-      computed: {}
+      watch: {},//deep: true
+      computed: {
+        'task.live_cycle': function () {
+          console.log('this.task.schedule.cycle', this.task.schedule.cycle);
+          if (this.task.schedule.cycle !== '') {
+            console.log('once');
+            return 'once';
+          } else {
+            console.log('never');
+            return 'never';
+          }
+        }
+      }
     });
   </script>
 {% endblock body_tail %}
