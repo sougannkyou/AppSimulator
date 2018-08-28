@@ -1,4 +1,3 @@
-# coding=utf-8
 import os
 
 APPSIMULATOR_MODE = os.getenv('APPSIMULATOR_MODE')

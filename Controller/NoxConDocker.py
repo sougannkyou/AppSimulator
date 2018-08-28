@@ -1,4 +1,5 @@
 # coding:utf-8
+import os
 import time
 import psutil
 import shutil
@@ -202,7 +203,8 @@ class NoxConDocker(object):
     def create(self, force=False):
         poweron = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\poweron.png'
         static_capture_path = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\capture_' + self._docker_name + '.png'
-        shutil.copy(poweron, static_capture_path)
+        if os.access(static_capture_path, os.R_OK):
+            shutil.copy(poweron, static_capture_path)
 
         ret, msg = self._check()
         if not ret:

@@ -1,10 +1,11 @@
-# coding:utf-8
+import sys
 import os
 import time
-from datetime import datetime
 import re
 import random
-import subprocess
+
+sys.path.append(os.getcwd())
+
 from Controller.setting import *
 from Controller.Common import *
 

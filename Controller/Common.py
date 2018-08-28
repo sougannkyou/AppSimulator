@@ -1,6 +1,10 @@
+import sys
 import os
 import subprocess
 from datetime import datetime
+
+sys.path.append(os.getcwd())
+
 # import logging
 # -----------------colorama常量---------------------------
 # Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
@@ -80,7 +84,7 @@ def common_exec_cmd(_DEBUG, cmdline):
         return _stdout
 
 
-def common_runscript_countdown():
+def __common_runscript_countdown():
     try:
         conf_path = WORK_PATH + '\cmd\\NoxResetCounter.conf'
         f = open(conf_path, 'r')

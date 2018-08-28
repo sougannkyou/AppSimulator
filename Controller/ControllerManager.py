@@ -1,4 +1,4 @@
-# coding:utf-8
+import sys
 import os
 import time
 import subprocess
@@ -6,6 +6,9 @@ import psutil
 import importlib
 import importlib.util
 import win32gui
+
+sys.path.append(os.getcwd())
+
 from Controller.setting import *
 from Controller.Common import common_log
 from Controller.DBLib import MongoDriver, RedisDriver
@@ -97,23 +100,25 @@ class Manager(object):
             return False
 
     def nox_run_script(self, task_info):
+        org_path = os.getcwd()
+        os.chdir(self._work_path)
         try:
-            org_path = os.getcwd()
-            os.chdir(self._work_path)
             timer_no = self._mdb.task_get_timer_no(host_ip=LOCAL_IP)  # Index of TIMER, start 0
             if timer_no == -1:
                 self._log('error', 'not fond timer_no')
                 return False, 'timer_no'
 
+            ##################################################################################################
             cmd = 'START "task-' + str(task_info['taskId']) + '" ' + \
                   'python ' + self._work_path + '\Controller\\script\\' + task_info['script'] + ' ' + \
                   str(task_info['taskId']) + ' ' + str(timer_no)
-            # cmd += ' >>' + self._work_path + '\Controller\log\\task-' + str(task['taskId']) + '.log 2>&1'
             self._log('<<info>> run_script cmd:\n', cmd)
             os.system(cmd)
+            ##################################################################################################
             os.chdir(org_path)
             return True, ''
         except Exception as e:
+            os.chdir(org_path)
             self._log('run_script error:', e)
             return False, e
 

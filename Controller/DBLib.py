@@ -50,14 +50,17 @@ class MongoDriver(object):
 
     # ---------- log -----------------------
     def log(self, taskId, func, prefix, msg):
-        self.logger.insert({
-            'time': int(datetime.now().timestamp()),
-            'ip': LOCAL_IP,
-            'taskId': int(taskId) if taskId and isinstance(taskId, str) else taskId,
-            'func': func,
-            'prefix': prefix,
-            'msg': msg.decode('gbk') if isinstance(msg, bytes) else msg
-        })
+        try:
+            self.logger.insert({
+                'time': int(datetime.now().timestamp()),
+                'ip': LOCAL_IP,
+                'taskId': int(taskId) if taskId and isinstance(taskId, str) else taskId,
+                'func': func,
+                'prefix': prefix,
+                'msg': msg.decode('gbk') if isinstance(msg, bytes) else msg
+            })
+        except Exception as e:
+            print('mongodb connect error!')
 
     # ---------- tasks -----------------------
     def task_get_timer_no(self, host_ip):

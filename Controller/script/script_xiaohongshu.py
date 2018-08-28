@@ -1,6 +1,10 @@
 # coding:utf-8
 import sys
 import time
+import os
+
+sys.path.append(os.getcwd())
+
 from Controller.setting import APPSIMULATOR_MODE
 from Controller.Common import *
 from Controller.NoxConSelenium import NoxConSelenium
@@ -203,7 +207,7 @@ def main(task, mode):
         msg = '<<error>>'
         error = e
     finally:
-        if APPSIMULATOR_MODE != 'vmware':  # multi nox mode
+        if APPSIMULATOR_MODE == 'multi':  # multi nox mode
             m = Manager()
             m.nox_run_task_finally(taskId)
 
@@ -214,15 +218,13 @@ def main(task, mode):
 
 #################################################################################
 if __name__ == "__main__":
-    # APPSIMULATOR_MODE = 'vmware'
-    if APPSIMULATOR_MODE == 'vmware':
+    # APPSIMULATOR_MODE = 'single' # debug
+    if APPSIMULATOR_MODE == 'single':
         taskId = -1
         timer_no = -1
-        mode = 'single'
     else:
         taskId = sys.argv[1]
         timer_no = sys.argv[2]
-        mode = 'multi'
 
     task = {
         'taskId': taskId,
@@ -234,6 +236,6 @@ if __name__ == "__main__":
         },
     }
 
-    main(task=task, mode=mode)
+    main(task=task, mode=APPSIMULATOR_MODE)
     print("Quit after 30 seconds.")
     time.sleep(30)

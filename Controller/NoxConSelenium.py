@@ -1,5 +1,4 @@
 # coding:utf-8
-import os
 import time
 from datetime import datetime
 import shutil
@@ -17,6 +16,7 @@ class NoxConSelenium(NoxConADB):
     '''
     可以使用Timer进行时分同步
     '''
+
     def __init__(self, task_info, mode):
         super().__init__(task_info, mode)
         self._DEBUG = False
@@ -88,18 +88,14 @@ class NoxConSelenium(NoxConADB):
 
         self._capture_obj = ac.imread(capture_path)
         # pc temp ==> pc static
-        shutil.copy(capture_path, static_capture_path)
+        if os.access(static_capture_path, os.R_OK):
+            shutil.copy(capture_path, static_capture_path)
 
     def find_element(self, comment, timeout, threshold=0.7):
-        # True(False), x, y
         img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
         while timeout > 0:
             self.get_capture()
-            # from datetime import datetime
-            # start = datetime.now()
             pos = ac.find_template(self._capture_obj, img_obj, threshold=threshold)
-            # end = datetime.now()
-            # print('find_template', (end - start).microseconds)
             if pos:
                 self._log('<<info>> 匹配到：', comment + ' ' + str(timeout) + 's')
                 x, y = pos['result']
@@ -143,7 +139,6 @@ class NoxConSelenium(NoxConADB):
     def next_page(self, from_x=240, from_y=700, to_x=240, to_y=10, wait_time=2):
         # 480 * 800
         self._log('<<info>> next_page', '翻页')
-        # self .clear_cache()
         self.adb_shell("input swipe " + str(from_x) + " " + str(from_y) + " " + str(to_x) + " " + str(to_y) + " " +
                        str(int((from_y - to_y) * 5)))
         time.sleep(wait_time)
@@ -184,9 +179,9 @@ class NoxConSelenium(NoxConADB):
 
     def click_xy_timer(self, x, y, wait_time):
         self._debug(x, y, wait_time=2)
-        self._timer_flg = True  # NoxConADB adb_cmd_before() on
+        self._timer_flg = True
         self.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)))
-        self._timer_flg = False  # NoxConADB adb_cmd_before() off
+        self._timer_flg = False
         time.sleep(wait_time)
         return True
 
@@ -196,9 +191,8 @@ class NoxConSelenium(NoxConADB):
         time.sleep(wait_time)
         return True
 
-    def input_cn(self, text, wait_time=5):
+    def input_cn(self, text, wait_time=5):  # 输入汉字
         self._log('<<info>> input_cn', text)
-        # adb shell am broadcast -a ADB_INPUT_TEXT --es msg '输入汉字'
         self.adb_shell("am broadcast -a ADB_INPUT_TEXT --es msg '" + text + "'")
         time.sleep(wait_time)
         return True
@@ -264,7 +258,7 @@ class NoxConSelenium(NoxConADB):
             time.sleep(1)
             return True
 
-    def ftp_upload(self, capture_name, capture_before_name, mode='mnox'):
+    def __ftp_upload(self, capture_name, capture_before_name, mode='mnox'):
         # Controller\images\temp\capture_nox-1.png ->
         # static\AppSimulator(ftp root)\images\temp\mnox(VM)\capture_nox-1.png
         bufsize = 1024  # 设置缓冲器大小
@@ -308,12 +302,15 @@ class NoxConSelenium(NoxConADB):
     def script(self):
         pass  # overwrite
 
-    def run(self):
+    def run_before(self):
         # self.unlock(timeout=10)
         # self.get_new_phone()
-        # if ret and is_app_restart:
+        # if is_app_restart:
         #     ret = self.app_quit(wait_time=1)
+        pass  # overwrite
 
+    def run(self):
+        self.run_before()
         self.script()
 
 
