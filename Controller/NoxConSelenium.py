@@ -28,7 +28,7 @@ class NoxConSelenium(NoxConADB):
         }
         self._work_path = WORK_PATH
         self._capture_obj = None
-        if mode == 'single':
+        if mode == MODE_SINGLE:
             self.hwnd = win32gui.FindWindow(None, '夜神模拟器')
         else:
             self.hwnd = None
@@ -321,7 +321,7 @@ if __name__ == "__main__":
         'docker_name': 'nox-' + str(1),
         'timer_no': 4  # 14s
     }
-    me = NoxConSelenium(task, 'single')
+    me = NoxConSelenium(task, MODE_SINGLE)
     me._FTP_TRANSMISSION = True
     start = time.time()
     me.ftp_upload('capture_nox-1.png', 'capture_nox-1_before.png')

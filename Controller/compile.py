@@ -1,6 +1,6 @@
-# import compileall
-#
-# compileall.compile_dir('./')
-import py_compile
+import compileall
 
-py_compile.compile('./NoxConADB.py')
+compileall.compile_dir('./')
+# import py_compile
+
+# py_compile.compile('./NoxConADB.py')

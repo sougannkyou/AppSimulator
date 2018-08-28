@@ -161,7 +161,7 @@ def main(task, mode):
         msg = '<<error>>'
         error = e
     finally:
-        if APPSIMULATOR_MODE == 'multi':  # multi nox mode
+        if APPSIMULATOR_MODE == MODE_MULTI:  # multi nox mode
             m = Manager()
             m.nox_run_task_finally(taskId)
 
@@ -172,8 +172,8 @@ def main(task, mode):
 
 #################################################################################
 if __name__ == "__main__":
-    # APPSIMULATOR_MODE = 'single'
-    if APPSIMULATOR_MODE == 'single':
+    # APPSIMULATOR_MODE = MODE_SINGLE
+    if APPSIMULATOR_MODE == MODE_SINGLE:
         taskId = -1
         timer_no = -1
     else:

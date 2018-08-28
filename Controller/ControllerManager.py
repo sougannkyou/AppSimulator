@@ -152,7 +152,7 @@ class Manager(object):
         return False
 
     def nox_start_check(self, task_info, timeout=60):
-        driver = NoxConSelenium(task_info=task_info, mode='multi')
+        driver = NoxConSelenium(task_info=task_info, mode=MODE_MULTI)
         driver.set_comment_to_pic({
             "APP图标": 'images/' + task_info['app_name'] + '/app_icon.png',
         })

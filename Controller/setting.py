@@ -36,6 +36,10 @@ STATUS_SCRIPT_RUN_OK = 'script_run_ok'  # task run complete
 
 LIVE_CYCLE_NEVER = 'never'
 LIVE_CYCLE_ONCE = 'once'
+
+MODE_SINGLE = 'single'
+MODE_MULTI = 'multi'
+
 # ---------------------- rpc -----------------------------
 RPC_SERVER_TIMEOUT = 30
 RPC_PORT = 8003

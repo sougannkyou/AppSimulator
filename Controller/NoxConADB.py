@@ -127,7 +127,7 @@ class NoxConADB(object):
 
     def _make_command(self, cmd):
         # NoxConsole.exe adb -name:nox-22 -command:"version"
-        if self.mode == 'multi':  # multi: Nox >6.1.0
+        if self.mode == MODE_MULTI:  # multi: Nox >6.1.0
             cmd_str = self._console_binary + ' adb -name:' + self._docker_name + ' -command:"' + cmd + '"'
         else:  # single: Nox 3.8.1
             cmd_str = self._adb_binary + ' ' + cmd
@@ -141,7 +141,7 @@ class NoxConADB(object):
 
     def adb_cmd_before(self, cmdline):
         # overwrite NoxConADB adb_cmd_before
-        if self.mode == 'multi' and self._timer_flg and self._timer_no >= 0:
+        if self.mode == MODE_MULTI and self._timer_flg and self._timer_no >= 0:
             cycle = 3 * len(TIMER)
             now = datetime.now().second % cycle
             if now > TIMER[self._timer_no]:
@@ -509,7 +509,7 @@ if __name__ == "__main__":
         'docker_name': 'nox-2',
         'timer_no': 2
     }
-    me = NoxConADB(task_info=task, mode='multi')
+    me = NoxConADB(task_info=task, mode=MODE_MULTI)
     me._DEBUG = True
 
     # print(my.get_adb_version())

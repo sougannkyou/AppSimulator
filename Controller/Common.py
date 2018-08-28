@@ -14,7 +14,7 @@ from colorama import init, Fore, Back, Style
 
 init(autoreset=True)
 
-from Controller.setting import WORK_PATH
+from Controller.setting import *
 from Controller.DBLib import MongoDriver
 
 MDB = MongoDriver()
@@ -59,7 +59,9 @@ class ColorLog(object):
 
 
 def common_log(_DEBUG, taskId, func, prefix, msg):
-    MDB.log(taskId, func, prefix, msg)
+    if APPSIMULATOR_MODE == MODE_MULTI:
+        MDB.log(taskId, func, prefix, msg)
+
     if _DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
         print(datetime.now().strftime('%H:%M:%S') + ' [' + func + ']', prefix, msg)
 
