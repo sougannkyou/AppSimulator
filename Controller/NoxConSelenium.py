@@ -324,6 +324,6 @@ if __name__ == "__main__":
     me = NoxConSelenium(task, MODE_SINGLE)
     me._FTP_TRANSMISSION = True
     start = time.time()
-    me.ftp_upload('capture_nox-1.png', 'capture_nox-1_before.png')
+    # me.ftp_upload('capture_nox-1.png', 'capture_nox-1_before.png')
     end = time.time()
     print(end - start)
