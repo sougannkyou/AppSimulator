@@ -6,7 +6,6 @@ import random
 
 sys.path.append(os.getcwd())
 
-from Controller.setting import *
 from Controller.Common import *
 
 
@@ -84,7 +83,6 @@ class NoxConADB(object):
     def get_android_version(self):
         self._clean()
         self.adb_shell("getprop ro.build.version.release")
-        # return self._stdout.decode('utf8')
         return self._stdout
 
     def clear_cache(self):
@@ -98,7 +96,6 @@ class NoxConADB(object):
             return False
         else:
             self.adb_shell("pm clear " + packages[self._app_name])
-            # Success
         return True
 
     def set_gps(self, latitude, longitude):

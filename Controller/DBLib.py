@@ -165,8 +165,7 @@ class MongoDriver(object):
             now_cycle, _ = divmod(now - start, cycle)
             run_cycle, _ = divmod(run - start, cycle)
             if not now_cycle <= run_cycle < now_cycle + 1:
-                # print('task_schedule_reset', now_cycle, now, start, run, cycle)
-                # pprint(task)
+                print('task_schedule set task-' + str(task['_id']) + 'status to wait.')
                 cnt += 1
                 self.tasks.update({'_id': task['_id']}, {'$set': {
                     'schedule.run_time': now,

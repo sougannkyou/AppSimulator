@@ -200,7 +200,7 @@ class Manager(object):
         task['status'] = STATUS_SCRIPT_RUN_OK
         self._mdb.task_change_status(task)
         if task['live_cycle'] == LIVE_CYCLE_NEVER:
-            self._log('<<info>> nox_run_task_complete', 'clone')
+            self._log('<<info>> nox_run_task_finally', 'Clone Task ...')
             self._mdb.task_clone(task)
 
     def nox_schedule(self):
@@ -240,7 +240,9 @@ class Manager(object):
 
                     self._mdb.task_change_status(task)
             else:
+                ###############################################
                 cnt = self.nox_schedule()
+                ###############################################
                 if cnt:
                     self._log('<<info>> run_schedule', 'reset {} task to wait status.'.format(cnt))
 

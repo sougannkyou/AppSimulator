@@ -1,4 +1,4 @@
-# coding:utf-8
+import sys
 import os
 import time
 import psutil
@@ -6,7 +6,8 @@ import shutil
 from pprint import pprint
 import win32gui
 import win32com.client
-from Controller.setting import *
+
+sys.path.append(os.getcwd())
 from Controller.Common import *
 from Controller.DBLib import MongoDriver
 
