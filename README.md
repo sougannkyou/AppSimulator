@@ -12,16 +12,19 @@
 
 [VM] 
 使用桥接
-00:0c:29:79:08:7e   tester-1    172.16.2.88
-00:0c:29:04:ca:80   tester-2    172.16.2.87
-00:0c:29:f4:b2:63   tester-3    172.16.2.86
-
-00:0c:29:6E:c8:68   172.16.2.?     vm1     
-00:0c:29:0a:00:94   172.16.2.104    vm2     
-00:0c:29:f7:e3:2b   172.16.2.105    vm3     
-00:0c:29:3c:91:27   172.16.2.106    vm4     
-00:0c:29:e9:ca:4e   172.16.2.107    vm5     
+00:0c:29:0a:00:94   172.16.2.104    tester-1    
+00:0c:29:f7:e3:2b   172.16.2.105    tester-2     
+00:0c:29:3c:91:27   172.16.2.106    tester-3   
+00:0c:29:e9:ca:4e   172.16.2.107         
 00:50:56:c0:00:01   172.16.2.108   
+
+00:0c:29:79:08:7e   
+00:0c:29:04:ca:80   
+00:0c:29:f4:b2:63  
+
+00:0c:29:6E:c8:68   
+    
+
 
 [Nox]
 nox-1 
@@ -56,6 +59,12 @@ pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements_control
 #pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple psutil pandas opencv-python==3.4.1.15 Pillow aircv pypiwin32 protobuf grpcio grpcio-tools pyautogui==0.9.36 matplotlib opencv-contrib-python
 
 6)数据结构
+[taskId]
+{
+    "_id" : "counter",
+    "count" : 12
+}
+
 [tasks]
 {
     "taskId" : 3,

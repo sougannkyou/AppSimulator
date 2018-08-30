@@ -60,7 +60,7 @@ class MySelenium(NoxConSelenium):
                 ret = self.click_xy(x, y, wait_time=1)
                 break
             else:
-                ret = self.next_page(from_y=710, to_y=10, wait_time=1)
+                ret = self.v_scroll(from_y=710, to_y=10, wait_time=1)
         fail = 0
         while find and ret:
             if ret:
@@ -78,7 +78,7 @@ class MySelenium(NoxConSelenium):
                     if ret: ret, x, y = self.find_element(comment='复制链接', timeout=10)
                     if ret: ret = self.click_xy_timer(x, y, wait_time=1)
 
-            ret = self.next_page(from_y=710, to_y=10, wait_time=1)
+            ret = self.v_scroll(from_y=710, to_y=10, wait_time=1)
 
 
 ##################################################################################

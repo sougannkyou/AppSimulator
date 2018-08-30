@@ -30,7 +30,7 @@ class MySelenium(NoxConSelenium):
         page_cnt = 0
         while ret:  # 更新 -> 分享 -> 复制链接
             print('page_cnt', page_cnt)
-            self.next_page_comments(wait_time=5)
+            self.v_scroll(wait_time=5)
             page_cnt += 1
 
 

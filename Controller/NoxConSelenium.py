@@ -129,20 +129,20 @@ class NoxConSelenium(NoxConADB):
 
         return len(ret) > 0, ret
 
-    def next_page_comments(self, wait_time):
-        self._log('<<info>> next_page_comments', '翻页')
-        # self .clear_cache()
-        self.adb_shell("input swipe 300 750 300 350")
-        time.sleep(wait_time)
-        return True
-
-    def next_page(self, from_x=240, from_y=700, to_x=240, to_y=10, wait_time=2):
-        # 480 * 800
-        self._log('<<info>> next_page', '翻页')
-        self.adb_shell("input swipe " + str(from_x) + " " + str(from_y) + " " + str(to_x) + " " + str(to_y) + " " +
-                       str(int((from_y - to_y) * 5)))
-        time.sleep(wait_time)
-        return True
+    # def next_page_comments(self, wait_time):
+    #     self._log('<<info>> next_page_comments', '翻页')
+    #     # self .clear_cache()
+    #     self.adb_shell("input swipe 300 750 300 350")
+    #     time.sleep(wait_time)
+    #     return True
+    #
+    # def next_page(self, from_x=240, from_y=700, to_x=240, to_y=10, wait_time=2):
+    #     # 480 * 800
+    #     self._log('<<info>> next_page', '翻页')
+    #     self.adb_shell("input swipe " + str(from_x) + " " + str(from_y) + " " + str(to_x) + " " + str(to_y) + " " +
+    #                    str(int((from_y - to_y) * 5)))
+    #     time.sleep(wait_time)
+    #     return True
 
     def next_page_browser(self, wait_time=3):
         self._log('<<info>> next_page_browser', '浏览器翻页')
@@ -151,8 +151,27 @@ class NoxConSelenium(NoxConADB):
         time.sleep(wait_time)
         return True
 
-    def scroll(self, from_y=700, to_y=10, wait_time=1):
-        cmd = "input swipe 240 " + str(int(from_y)) + " 240 " + str(int(to_y)) + " " + str(int((from_y - to_y) * 5))
+    def h_scroll(self, from_x=10, from_y=400, to_x=470, to_y=400, wait_time=1):  # 水平方向滑动
+        if to_x == from_x or from_y != to_y:
+            self._log('<<info>> h_scroll', 'parameter error.')
+            return False
+
+        cmd = "input swipe {} {} {} {} {}".format(
+            int(from_x), int(from_y), int(to_x), int(to_y), abs(int((to_x - from_x) * 5))
+        )
+        self._log('<<info>> scroll', cmd)
+        self.adb_shell(cmd)
+        time.sleep(wait_time)
+        return True
+
+    def v_scroll(self, from_x=SCREEN_WIDTH / 2, from_y=700, to_x=SCREEN_WIDTH / 2, to_y=50, wait_time=1):  # 垂直方向滑动
+        if to_y == from_y or from_x != to_x:
+            self._log('<<info>> v_scroll', 'parameter error.')
+            return False
+
+        cmd = "input swipe {} {} {} {} {}".format(
+            int(from_x), int(from_y), int(to_x), int(to_y), abs(int((to_x - from_x) * 5))
+        )
         self._log('<<info>> scroll', cmd)
         self.adb_shell(cmd)
         time.sleep(wait_time)
@@ -204,6 +223,36 @@ class NoxConSelenium(NoxConADB):
             self.click_xy(x, y, wait_time=2)
 
         return ret
+
+    def key_search(self, wait_time=1):
+        self._log('key_search', '')
+        self.adb_shell('input keyevent 84')  # KEYCODE_SEARCH
+        time.sleep(wait_time)
+        return True
+
+    def key_up(self, wait_time=1):  # 导航键 向上
+        self._log('key_up', '')
+        self.adb_shell('input keyevent 19')  # KEYCODE_DPAD_UP
+        time.sleep(wait_time)
+        return True
+
+    def key_down(self, wait_time=1):  # 导航键 向下
+        self._log('key_down', '')
+        self.adb_shell('input keyevent 20')  # KEYCODE_DPAD_DOWN
+        time.sleep(wait_time)
+        return True
+
+    def key_left(self, wait_time=1):  # 导航键 向左
+        self._log('key_left', '')
+        self.adb_shell('input keyevent 21')  # KEYCODE_DPAD_LEFT
+        time.sleep(wait_time)
+        return True
+
+    def key_right(self, wait_time=1):  # 导航键 向右
+        self._log('key_right', '')
+        self.adb_shell('input keyevent 22')  # KEYCODE_DPAD_RIGHT
+        time.sleep(wait_time)
+        return True
 
     def reboot(self, wait_time):
         self.adb_cmd('reboot')

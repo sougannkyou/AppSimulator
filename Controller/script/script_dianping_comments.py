@@ -103,7 +103,7 @@ class MySelenium(NoxConSelenium):
     def script(self):
         # ret, x, y = self.find_element(comment='APP打开结果OK', timeout=60)
         #
-        self.next_page(from_y=140, to_y=10, wait_time=1)
+        self.v_scroll(from_y=140, to_y=10, wait_time=1)
 
         ret, x, y = self.find_element(comment='展开全文', timeout=5)
         if ret:
@@ -118,7 +118,7 @@ class MySelenium(NoxConSelenium):
             img_obj = cv2.imread(self.capture_path)
             photo_top_y = self.get_photo_top_y(img_obj)
         else:
-            ret = self.next_page(from_y=670, to_y=10, wait_time=1)
+            ret = self.v_scroll(from_y=670, to_y=10, wait_time=1)
             self.get_capture()  # 更新截图
             img_obj = cv2.imread(self.capture_path)
             photo_top_y = self.get_photo_top_y(img_obj)

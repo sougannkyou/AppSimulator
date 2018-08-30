@@ -2,6 +2,7 @@
 from pprint import pprint
 from datetime import datetime, timedelta, time
 import pymongo
+from pymongo import ReturnDocument
 import redis
 from AppSimulator.setting import *
 from AppSimulator.Common import *
@@ -74,6 +75,7 @@ class MongoDriver(object):
         self.deviceConfig = self._db.deviceConfig
         self.rpcServer = self._db.rpcServer
         self.tasks = self._db.tasks
+        self.taskId = self._db.taskId
         self.logger = self._db.logger
         self.hosts = self._db.hosts
         self.vmwares = self._db.vmwares
@@ -164,12 +166,18 @@ class MongoDriver(object):
         return ret
 
     def emulator_get_taskId(self):
-        taskId = 1
-        m = self.tasks.aggregate([{"$group": {'_id': '', 'max_id': {"$max": "$taskId"}}}])
-        for i in m:
-            taskId = i['max_id'] + 1  # taskId自增
+        # taskId = 1
+        # m = self.tasks.aggregate([{"$group": {'_id': '', 'max_id': {"$max": "$taskId"}}}])
+        # for i in m:
+        #     taskId = i['max_id'] + 1  # taskId自增
+        # return taskId
 
-        return taskId
+        counter = self.taskId.find_one_and_update(
+            {'_id': 'counter'},
+            {'$inc': {'count': 1}},
+            return_document=ReturnDocument.AFTER  # 返回修改后的内容
+        )
+        return counter['count']
 
     def emulator_add_task(self, task):
         taskId = self.emulator_get_taskId()
@@ -181,6 +189,7 @@ class MongoDriver(object):
             "status": STATUS_WAIT,
             "live_cycle": task['live_cycle'],
             "schedule": task['schedule'],
+            ""
             "timer": task['timer'],
             "timer_no": -1 if task['timer'] == 'off' else 0,
             "host_ip": task['ip'],
@@ -309,10 +318,10 @@ class MongoDriver(object):
 # ------------------------ server db lib ----------------------
 if __name__ == '__main__':
     # from .setting import
-    r = RedisDriver()
-    pprint(r.get_crwal_cnt_by_device())
+    # r = RedisDriver()
+    # pprint(r.get_crwal_cnt_by_device())
 
     info = {'device1': 10, 'device2': 20, 'device3': 30, 'device4': 40}
     db = MongoDriver()
     # db.update_device_statistics_info(info, SCOPE_TIMES)
-    # pprint(db.get_devices_status())
+    pprint(db.emulator_get_taskId())

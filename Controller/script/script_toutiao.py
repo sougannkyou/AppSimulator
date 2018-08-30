@@ -66,7 +66,7 @@ def main(task_info, mode):
     msg = ''
     error = ''
     start = datetime.now()
-    common_log(_DEBUG, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
+    common_log(True, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
     try:
         me = MySelenium(task_info=task_info, mode=mode)
         me.set_comment_to_pic({

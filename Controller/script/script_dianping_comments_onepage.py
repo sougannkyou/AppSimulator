@@ -9,6 +9,7 @@ import aircv as ac
 import pytesseract
 
 sys.path.append(os.getcwd())
+
 from Controller.setting import *
 from Controller.Common import *
 from Controller.NoxConSelenium import NoxConSelenium

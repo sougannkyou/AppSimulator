@@ -1,25 +1,25 @@
 # coding:utf-8
 import os
 import sys
-from pprint import pprint
+from datetime import datetime
 
 sys.path.append(os.getcwd())
 from PIL import Image
-import cv2
-import numpy as np
-import aircv as ac
+import pytesseract
 
 
 def test():
-    obj = "C:\workspace\pyWorks\AppSimulator\Controller\images\\temp\\test.png"
-    border = "C:\workspace\pyWorks\AppSimulator\Controller\images\\temp\\border_128_128.png"
-    page_line = "C:\workspace\pyWorks\AppSimulator\Controller\images\\temp\\page_line.png"
-    img_obj = ac.imread(obj)
-    img_page_line = ac.imread(page_line)
-    img_border = ac.imread(border)
-    # l = ac.find_all_template(img_obj, img_border, threshold=0.5)
-    l = ac.find_all_template(img_obj, img_page_line, threshold=0.95)
-    pprint(l)
+    start = datetime.now()
+    image = Image.open('./2.png')
+    code = pytesseract.image_to_string(image, lang='chi_sim')
+    print('--------------------------------------------------------------------------\n')
+    if code:
+        print(code.replace('\n\n', '\n'))
+    else:
+        print('not found comment')
+    print('--------------------------------------------------------------------------\n')
+    end = datetime.now()
+    print('ocr times:', (end - start).seconds, 's')
 
 
 if __name__ == '__main__':

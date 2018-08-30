@@ -195,7 +195,7 @@ class MongoDriver(object):
                 'up_time': now
             }})
 
-    def task_set_docker(self, task, docker):
+    def task_bind_docker(self, task, docker):
         self.tasks.update({'_id': task['_id']}, {"$set": {
             'dockerId': docker['_id']
         }})

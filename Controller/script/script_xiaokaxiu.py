@@ -50,7 +50,7 @@ class MySelenium(NoxConSelenium):
                     _tries -= 1
             else:
                 _tries -= 1
-            self.next_page(wait_time=5)
+            self.v_scroll(wait_time=5)
             time.sleep(2)
             return crawl(_tries)
 

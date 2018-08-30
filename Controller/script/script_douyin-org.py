@@ -31,9 +31,9 @@ class MySelenium(NoxConSelenium):
                 ret, x, y = self.find_element(comment='跳过软件升级', timeout=10)
                 if ret:
                     self.click_xy(x, y, wait_time=1)
-                    self.next_page(wait_time=5)
+                    self.v_scroll(wait_time=5)
 
-            self.next_page(wait_time=5)
+            self.v_scroll(wait_time=5)
 
 
 ##################################################################################

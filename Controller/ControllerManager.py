@@ -103,10 +103,13 @@ class Manager(object):
         org_path = os.getcwd()
         os.chdir(self._work_path)
         try:
-            timer_no = self._mdb.task_get_timer_no(host_ip=LOCAL_IP)  # Index of TIMER, start 0
-            if timer_no == -1:
-                self._log('error', 'not fond timer_no')
-                return False, 'timer_no'
+            if task_info['timer'] == TIMER_ON:  # 从系统获取timer_no(Index of TIMER, start 0)
+                timer_no = self._mdb.task_get_timer_no(host_ip=LOCAL_IP)
+                if timer_no == -1:
+                    self._log('error', 'not fond timer_no')
+                    return False, 'timer_no'
+            else:  # timer:off 不使用timer功能
+                timer_no = -1
 
             ##################################################################################################
             cmd = 'START "task-' + str(task_info['taskId']) + '" ' + \
@@ -130,13 +133,13 @@ class Manager(object):
             ret = self.nox_start_check(task_info=task, timeout=60)  # 可匹配到app图标?
             if ret:
                 ret = self.nox_start_success(docker=docker)
-            else:
+            else:  # 模拟器启动失败则重试3次
                 ret = self.nox_start_error(task=task, docker=docker, retry_cnt=retry_cnt)
 
         return ret
 
     def nox_start_success(self, docker):
-        self._log('<<info>> docker_run_success', docker.get_name())
+        self._log('<<info>> nox_start_success', docker.get_name())
         time.sleep(2)
         docker.shake(1)
         # docker.set_docker_name()
@@ -144,9 +147,9 @@ class Manager(object):
         return True
 
     def nox_start_error(self, task, docker, retry_cnt):
-        self._log('<<info>> docker_run_error:', docker.get_name() + ' retry: ' + str(retry_cnt))
+        self._log('<<info>> nox_start_error:', docker.get_name() + '<<< retry >>> ' + str(retry_cnt))
         retry_cnt -= 1
-        if retry_cnt >= 0:
+        if retry_cnt > 0:  # 模拟器启动失败则重试
             return self.nox_start(task, docker, retry_cnt)
 
         return False
@@ -184,7 +187,7 @@ class Manager(object):
                 break
 
         if retry and wait_time == 0:  # retry
-            # docker._cmd_kill_task(self._docker_name)  # 不能强杀，会造成 ERR：1037
+            # docker._cmd_kill_task(self._docker_name)  # 不能强杀，会造成模拟器 ERR：1037
             docker.stop()
 
         time.sleep(10)
@@ -211,14 +214,16 @@ class Manager(object):
         while True:
             task, msg = self._mdb.task_get_one_for_run()
             if task:
-                # 1) docker run
+                # 1) 模拟器启动
                 task['status'] = STATUS_DOCKER_RUN
                 self._mdb.task_change_status(task)
                 self._mdb.task_change_status(task)
-                docker = NoxConDocker(task_info=task)
-                ret = self.nox_start(task=task, docker=docker, retry_cnt=2)
 
-                # 2) docker run ok(ng)
+                # 模拟器启动失败则重试3次
+                docker = NoxConDocker(task_info=task)
+                ret = self.nox_start(task=task, docker=docker, retry_cnt=3)
+
+                # 2) 模拟器启动：成功/失败
                 status = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
                 docker_info = {'_id': self._mdb.emulator_create(task), 'status': status}
                 self._mdb.emulator_change_status(docker_info)
@@ -226,14 +231,14 @@ class Manager(object):
                 self._mdb.task_change_status(task)
 
                 if ret:  # docker run ok
-                    # 3) script run ok(ng)
-                    self._mdb.task_set_docker(task, docker_info)  # bind docker to task
+                    # 3) 脚本启动：成功/失败
+                    self._mdb.task_bind_docker(task, docker_info)  # bind docker to task
                     ###############################################
                     ret, msg = self.nox_run_script(task_info=task)
                     ###############################################
                     if ret:
                         task['status'] = STATUS_SCRIPT_START_OK
-                    elif msg == 'timer_no':  # not found timer_no
+                    elif msg == 'timer_no':  # 系统无法获取可用 timer_no
                         task['status'] = STATUS_WAIT
                     else:
                         task['status'] = STATUS_SCRIPT_START_NG
