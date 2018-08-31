@@ -129,7 +129,7 @@ class NoxConDocker(object):
         return True
 
     def quit(self, wait_time=2):
-        self._log('<<info>> destroy', 'wait: ' + str(wait_time) + 's')
+        self._log('<<info>> quit', 'wait: ' + str(wait_time) + 's')
         time.sleep(wait_time)
         self._exec_nox_cmd(self._make_cmd("quit -name:" + self._docker_name))
         time.sleep(wait_time)

@@ -1,4 +1,3 @@
-# coding:utf-8
 import time
 from datetime import datetime
 import shutil
@@ -29,7 +28,7 @@ class NoxConSelenium(NoxConADB):
         self._work_path = WORK_PATH
         self._capture_obj = None
         if mode == MODE_SINGLE:
-            self.hwnd = win32gui.FindWindow(None, '夜神模拟器')
+            self.hwnd = win32gui.FindWindow(None, '夜神模拟器')  # unlock use
         else:
             self.hwnd = None
         self._UNLOCK_POS = {
@@ -107,7 +106,7 @@ class NoxConSelenium(NoxConADB):
 
         return False, -1, -1
 
-    def find_elements(self, comment, timeout, threshold=0.7):
+    def find_elements(self, comment, timeout, threshold=0.9):
         ret = []
         img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
         self.get_capture()
@@ -146,7 +145,6 @@ class NoxConSelenium(NoxConADB):
 
     def next_page_browser(self, wait_time=3):
         self._log('<<info>> next_page_browser', '浏览器翻页')
-        # KEYCODE_PAGE_UP = 92
         self.adb_shell("input keyevent 93")  # KEYCODE_PAGE_DOWN = 93
         time.sleep(wait_time)
         return True
@@ -170,7 +168,7 @@ class NoxConSelenium(NoxConADB):
             return False
 
         cmd = "input swipe {} {} {} {} {}".format(
-            int(from_x), int(from_y), int(to_x), int(to_y), abs(int((to_x - from_x) * 5))
+            int(from_x), int(from_y), int(to_x), int(to_y), abs(int((to_y - from_y) * 5))
         )
         self._log('<<info>> scroll', cmd)
         self.adb_shell(cmd)

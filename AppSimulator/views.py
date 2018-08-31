@@ -12,6 +12,11 @@ class TasksView(TemplateView):
     template_name = 'AppSimulator/tasks.html'
 
 
+class EmulatorsView(TemplateView):
+    queryset = []
+    template_name = 'AppSimulator/emulators.html'
+
+
 class HostsView(TemplateView):
     queryset = []
     template_name = 'AppSimulator/hosts.html'

@@ -21,7 +21,6 @@ from django.http import HttpResponse, JsonResponse
 
 from AppSimulator.Common import *
 from AppSimulator.DBLib import MongoDriver, RedisDriver
-from AppSimulator.RPCLib import *
 from Controller.NoxConDocker import NoxConDocker
 
 MDB = MongoDriver()
@@ -246,6 +245,13 @@ def runTasks():
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
+# ------- emulators ------------------------------------------------------------
+def getEmulatorsAPI(request):
+    tasks = MDB.emulator_get_tasks(status=STATUS_WAIT)
+    output = JsonResponse({
+        'ret': tasks
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 # ------- vmware ----------------------------------------------------------------
 def getVMwaresAPI(request):

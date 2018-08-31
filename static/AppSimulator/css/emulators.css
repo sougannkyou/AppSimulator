@@ -1,0 +1,17 @@
+img.app-icon {
+    height: 30px;
+    border-radius: 3px;
+    margin: 0 5px 0 5px;
+}
+
+img.app-icon-big {
+    height: 40px;
+    border-radius: 3px;
+    margin: 0 5px 0 5px;
+}
+
+div.schedule {
+    border: 1px dashed gray;
+    height: 20px;
+    /*width: 10%;*/
+}
