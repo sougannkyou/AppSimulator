@@ -160,12 +160,14 @@ class MongoDriver(object):
         tasks = self.tasks.find(cond)
         for task in tasks:
             start = task['schedule']['start']
+            if start == 0:  # 未设定任务开始时间视为无效
+                continue
             cycle = task['schedule']['cycle']
             run = task['schedule']['run_time']
             now_cycle, _ = divmod(now - start, cycle)
             run_cycle, _ = divmod(run - start, cycle)
             if not now_cycle <= run_cycle < now_cycle + 1:
-                print('task_schedule set task-' + str(task['_id']) + 'status to wait.')
+                print('task_schedule set task-' + str(task['taskId']) + 'status to wait.')
                 cnt += 1
                 self.tasks.update({'_id': task['_id']}, {'$set': {
                     'schedule.run_time': now,
@@ -228,7 +230,8 @@ class MongoDriver(object):
         return False
 
     def emulator_change_status(self, docker):
-        self.emulators.update({'_id': docker['_id']}, {"$set": {'status': docker['status']}})
+        now = int(datetime.now().timestamp())
+        self.emulators.update({'_id': docker['_id']}, {"$set": {'status': docker['status'], 'up_time': now}})
 
     # ---------- vmware -----------------------
     def vm_find_vm_by_host(self, host_ip=None):

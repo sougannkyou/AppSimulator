@@ -201,7 +201,7 @@ class NoxConDocker(object):
                         ret.find('not') != -1 or \
                         ret.find('system type err!') != -1 else True
 
-    def create(self, force=False):
+    def create(self):
         poweron = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\poweron.png'
         static_capture_path = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\capture_' + self._docker_name + '.png'
         if os.access(static_capture_path, os.R_OK):
@@ -254,8 +254,8 @@ class NoxConDocker(object):
         time.sleep(timeout)
         return stdout.find('player is not exist!') == -1
 
-    def run(self, force=False):  # run = create + start
-        ret, msg = self.create(force)
+    def run(self):  # run = create + start
+        ret, msg = self.create()
         if ret:
             ret = self.start()
 

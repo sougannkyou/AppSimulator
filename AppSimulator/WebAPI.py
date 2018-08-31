@@ -245,13 +245,15 @@ def runTasks():
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
+
 # ------- emulators ------------------------------------------------------------
 def getEmulatorsAPI(request):
-    tasks = MDB.emulator_get_tasks(status=STATUS_WAIT)
+    emulators = MDB.emulator_get_emulators(host_ip='')
     output = JsonResponse({
-        'ret': tasks
+        'ret': emulators
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
 
 # ------- vmware ----------------------------------------------------------------
 def getVMwaresAPI(request):

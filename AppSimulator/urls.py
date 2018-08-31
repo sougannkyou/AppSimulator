@@ -8,7 +8,7 @@ from AppSimulator.views import (
 )
 
 from AppSimulator.WebAPI import (
-    addTaskAPI, removeTaskAPI, getTasksAPI,
+    addTaskAPI, removeTaskAPI, getTasksAPI, getEmulatorsAPI,
     getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI,
     setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,
     getDeviceCaptureAPI, getProxyServerInfoAPI,
@@ -45,6 +45,7 @@ urlpatterns = patterns('',
                        url(r'^getProxyServerInfoAPI/$', getProxyServerInfoAPI, name='getProxyServerInfoAPI'),
                        # emulator
                        url(r'^emulatorShakeAPI/$', emulatorShakeAPI, name='emulatorShakeAPI'),
+                       url(r'^getEmulatorsAPI/$', getEmulatorsAPI, name='getEmulatorsAPI '),
                        # vmware
                        url(r'^getVMwaresAPI/$', getVMwaresAPI, name='getVMwaresAPI'),
                        # hosts

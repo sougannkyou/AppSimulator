@@ -96,13 +96,13 @@ class NoxConSelenium(NoxConADB):
             self.get_capture()
             pos = ac.find_template(self._capture_obj, img_obj, threshold=threshold)
             if pos:
-                self._log('<<info>> 匹配到：', comment + ' ' + str(timeout) + 's')
+                self._log('<<info>>', '匹配到：{} {}s'.format(comment, timeout))
                 x, y = pos['result']
                 return True, x, y
             else:
                 time.sleep(1)
                 timeout -= 1
-                self._log('<<info>> 未匹配：', comment + ' ' + str(timeout) + 's')
+                self._log('<<info>>', '未匹配：{} {}s'.format(comment, timeout))
 
         return False, -1, -1
 
@@ -190,14 +190,14 @@ class NoxConSelenium(NoxConADB):
 
     def click_xy(self, x, y, wait_time):
         self._debug(x, y, wait_time=2)
-        self.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)))
+        self.adb_shell('input tap {} {}'.format(int(x), int(y)))
         time.sleep(wait_time)
         return True
 
     def click_xy_timer(self, x, y, wait_time):
         self._debug(x, y, wait_time=2)
         self._timer_flg = True
-        self.adb_shell('input tap ' + str(int(x)) + ' ' + str(int(y)))
+        self.adb_shell('input tap {} {}'.format(int(x), int(y)))
         self._timer_flg = False
         time.sleep(wait_time)
         return True

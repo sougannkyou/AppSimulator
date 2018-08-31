@@ -99,8 +99,8 @@ class NoxConADB(object):
         return True
 
     def set_gps(self, latitude, longitude):
-        self.adb_shell("setprop persist.nox.gps.latitude " + str(latitude))
-        self.adb_shell("setprop persist.nox.gps.longitude " + str(longitude))
+        self.adb_shell("setprop persist.nox.gps.latitude {}".format(latitude))
+        self.adb_shell("setprop persist.nox.gps.longitude {}".format(longitude))
         return True
 
     def adb_start_web(self, url):
@@ -148,7 +148,7 @@ class NoxConADB(object):
 
             tobe = datetime.fromtimestamp(int(datetime.now().timestamp()) + wait_time).strftime("%m-%d %H:%M:%S")
             self._log('<<info>> timer_no:' + str(self._timer_no),
-                      'will run at ' + tobe + '(sleep ' + str(wait_time) + 's)')
+                      'will run at {} (sleep {} s)'.format(tobe, wait_time))
             time.sleep(wait_time)
             self._set_task_conf()
             self._log('[adb_cmd]<<info>> ' + datetime.now().strftime('%H:%M:%S %f') + '\n', cmdline)

@@ -236,6 +236,23 @@ class MongoDriver(object):
 
         return ret
 
+    def emulator_get_emulators(self, host_ip=None):
+        ret = []
+        cond = {}
+        # cond = {'status': STATUS_WAIT, 'host_ip': host_ip}
+        print("emulator_get_emulators")
+        emulators = self.emulators.find(cond)
+        for emu in emulators:
+            emu.pop('_id')
+            emu['spend_times'] = seconds_format(seconds=(emu['end_time'] - emu['start_time'])) \
+                if emu['end_time']>0 else 'N/A'
+            emu['start_time'] = timestamp2string(emu['start_time'], "%m-%d %H:%M:%S")
+            emu['end_time'] = timestamp2string(emu['end_time'], "%m-%d %H:%M:%S")
+            emu['up_time'] = timestamp2string(emu['up_time'], "%m-%d %H:%M:%S")
+
+            ret.append(emu)
+        return ret
+
     def emulator_set_task_server_ip(self, taskId, ip):
         self.tasks.update({'taskId': taskId}, {'$set': {'host_ip': ip}})
 

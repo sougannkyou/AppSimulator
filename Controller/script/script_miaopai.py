@@ -82,7 +82,6 @@ def main(task, mode):
 
 #################################################################################
 if __name__ == "__main__":
-    APPSIMULATOR_MODE = MODE_SINGLE
     if APPSIMULATOR_MODE == MODE_SINGLE:
         taskId = -1
         timer_no = -1
