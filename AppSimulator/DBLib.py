@@ -79,7 +79,7 @@ class MongoDriver(object):
         self.logger = self._db.logger
         self.hosts = self._db.hosts
         self.vmwares = self._db.vmwares
-        self.emulators = self._db.emulators
+        self.dockers = self._db.dockers
         self.activeInfo = self._db.activeInfo
         self._DEBUG = False
 
@@ -152,17 +152,17 @@ class MongoDriver(object):
         else:
             cond = {'status': {'$ne': 'disable'}}
 
-        emulators = self.emulators.find(cond)
-        for emu in emulators:
-            emu.pop('_id')
-            pre = 'http://' + emu['host_ip'] + ':8000/static/AppSimulator/images/'
-            emu['app_icon'] = pre + 'app/' + emu['app_name'] + '/app_icon.png'
-            taskId = emu['taskId'] if 'taskId' in emu else None
+        dockers = self.dockers.find(cond)
+        for d in dockers:
+            d.pop('_id')
+            pre = 'http://' + d['host_ip'] + ':8000/static/AppSimulator/images/'
+            d['app_icon'] = pre + 'app/' + d['app_name'] + '/app_icon.png'
+            taskId = d['taskId'] if 'taskId' in d else None
             task = self.emulator_get_task(taskId)
-            emu['timer'] = TIMER[task['timer_no'] if task else 0]
-            emu['capture'] = pre + 'temp/emulators/capture_' + emu['name'] + '.png'
+            d['timer'] = TIMER[task['timer_no'] if task else 0]
+            d['capture'] = pre + 'temp/emulators/capture_' + d['name'] + '.png'
             # emu['capture_before'] = pre + 'temp/emulators/capture_' + emu['name'] + '_before.png'
-            ret.append(emu)
+            ret.append(d)
         return ret
 
     def emulator_get_taskId(self):
@@ -241,16 +241,16 @@ class MongoDriver(object):
         cond = {}
         # cond = {'status': STATUS_WAIT, 'host_ip': host_ip}
         print("emulator_get_emulators")
-        emulators = self.emulators.find(cond)
-        for emu in emulators:
-            emu.pop('_id')
-            emu['spend_times'] = seconds_format(seconds=(emu['end_time'] - emu['start_time'])) \
-                if emu['end_time']>0 else 'N/A'
-            emu['start_time'] = timestamp2string(emu['start_time'], "%m-%d %H:%M:%S")
-            emu['end_time'] = timestamp2string(emu['end_time'], "%m-%d %H:%M:%S")
-            emu['up_time'] = timestamp2string(emu['up_time'], "%m-%d %H:%M:%S")
+        dockers = self.dockers.find(cond)
+        for d in dockers:
+            d.pop('_id')
+            d['spend_times'] = seconds_format(seconds=(d['end_time'] - d['start_time'])) \
+                if d['end_time'] > 0 else 'N/A'
+            d['start_time'] = timestamp2string(d['start_time'], "%m-%d %H:%M:%S")
+            d['end_time'] = timestamp2string(d['end_time'], "%m-%d %H:%M:%S")
+            d['up_time'] = timestamp2string(d['up_time'], "%m-%d %H:%M:%S")
 
-            ret.append(emu)
+            ret.append(d)
         return ret
 
     def emulator_set_task_server_ip(self, taskId, ip):

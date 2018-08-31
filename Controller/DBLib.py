@@ -41,7 +41,7 @@ class MongoDriver(object):
         self.hosts = self._db.hosts
         self.tasks = self._db.tasks
         self.logger = self._db.logger
-        self.emulators = self._db.emulators
+        self.dockers = self._db.dockers
         self.vmwares = self._db.vmwares
         self._DEBUG = False
 
@@ -197,17 +197,22 @@ class MongoDriver(object):
                 'up_time': now
             }})
 
-    def task_bind_docker(self, task, docker):
+    def task_bind_docker(self, task, docker_id):
         self.tasks.update({'_id': task['_id']}, {"$set": {
-            'dockerId': docker['_id']
+            'dockerId': docker_id
         }})
 
-    # ---------- emulator -----------------------
-    def emulator_create(self, task):
-        return self.emulators.insert({  # ObjectId('5b5031baf930a530c47275d2')
-            'name': 'nox-' + str(task['taskId']),
-            'taskId': task['taskId'],
-            'app_name': task['app_name'],
+    def task_unbind_docker(self, task):
+        self.tasks.update({'_id': task['_id']}, {"$set": {
+            'dockerId': None
+        }})
+
+    # ---------- dockers -----------------------
+    def docker_create(self, docker_info):
+        return self.dockers.insert({  # ObjectId('5b5031baf930a530c47275d2')
+            'name': 'nox-{}'.format(docker_info['taskId']),
+            'taskId': docker_info['taskId'],
+            'app_name': docker_info['app_name'],
             'host_ip': LOCAL_IP,
             'status': STATUS_DOCKER_RUN,
             'start_time': int(datetime.now().timestamp()),
@@ -215,23 +220,23 @@ class MongoDriver(object):
             'end_time': 0
         })
 
-    def emulator_end(self, taskId):
-        t = self.tasks.find_one({'taskId': taskId})
-        if t:
+    def docker_destroy(self, docker_info):
+        if docker_info['docker_id']:
             now = int(datetime.now().timestamp())
-            ret = self.emulators.update(
-                {'_id': t['dockerId']},
+            ret = self.dockers.update(
+                {'_id': docker_info['docker_id']},
                 {"$set": {
+                    'status': STATUS_DOCKER_DESTROY,
                     'up_time': now,
                     'end_time': now
                 }})
             return ret['nModified'] == 1
+        else:
+            return False
 
-        return False
-
-    def emulator_change_status(self, docker):
+    def docker_change_status(self, docker):
         now = int(datetime.now().timestamp())
-        self.emulators.update({'_id': docker['_id']}, {"$set": {'status': docker['status'], 'up_time': now}})
+        self.dockers.update({'_id': docker['_id']}, {"$set": {'status': docker['status'], 'up_time': now}})
 
     # ---------- vmware -----------------------
     def vm_find_vm_by_host(self, host_ip=None):

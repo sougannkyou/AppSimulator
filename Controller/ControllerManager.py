@@ -126,8 +126,9 @@ class Manager(object):
             return False, e
 
     def nox_start(self, task, docker, retry_cnt):
-        docker.stop()
-        self.nox_check_stop(docker, retry=True, wait_time=30)
+        docker.rmi(kill_script=True)
+        self.nox_stop_confirm(docker, retry=True, wait_time=30)
+
         ret = docker.run()  # docker run: create and start
         if ret:
             ret = self.nox_start_check(task_info=task, timeout=60)  # 进一步确认确保启动成功: 可匹配到app图标
@@ -150,10 +151,10 @@ class Manager(object):
     def nox_start_error(self, task, docker, retry_cnt):
         retry_cnt -= 1
         if retry_cnt > 0:  # 模拟器启动失败则重试
-            self._log('<<info>> nox_start_error', '<<<将再尝试 {} 次 重启 {}>>>'.format(retry_cnt, docker.get_name()))
+            self._log('<<info>> nox_start_error', '\n<<< 将再尝试 {} 次 重启 {} >>>\n'.format(retry_cnt, docker.get_name()))
             return self.nox_start(task, docker, retry_cnt)
         else:
-            docker.quit()
+            docker.rmi(kill_script=True)
 
         return False
 
@@ -178,20 +179,20 @@ class Manager(object):
 
                 return ret
 
-    def nox_check_stop(self, docker, retry=False, wait_time=30):
+    def nox_stop_confirm(self, docker, retry=False, wait_time=30):
         while wait_time > 0:
             hwnd = win32gui.FindWindow(None, docker.get_name())
             if hwnd:  # hwnd is 0 if not found
                 time.sleep(1)
-                self._log('<<info>> check_docker_stop', '正在等待 {} 停止，剩余：{} 秒.'.format(docker.get_name(), wait_time))
+                self._log('<<info>> nox_stop_confirm', '正在等待 {} 停止，剩余：{} 秒.'.format(docker.get_name(), wait_time))
                 wait_time -= 1
             else:  # not found the window
-                self._log('<<info>> check_docker_stop', '{} 已停止，剩余：{} 秒.'.format(docker.get_name(), wait_time))
+                self._log('<<info>> nox_stop_confirm', '{} 已停止，剩余：{} 秒.'.format(docker.get_name(), wait_time))
                 break
 
-        if retry and wait_time == 0:  # retry
-            # docker._cmd_kill_task(self._docker_name)  # 不能强杀，会造成模拟器 ERR：1037
-            docker.stop()
+        if retry and wait_time == 0:  # 不能强杀，会造成模拟器 ERR：1037
+            # docker._cmd_kill_task
+            docker.rmi(kill_script=True)
 
         time.sleep(10)
         return True
@@ -200,8 +201,7 @@ class Manager(object):
         task = self._mdb.task_find_by_taskId(int(taskId))
 
         docker = NoxConDocker(task)
-        docker.quit()
-        docker.remove()
+        docker.rmi(kill_script=True)
 
         task['status'] = STATUS_SCRIPT_RUN_OK
         self._mdb.task_change_status(task)
@@ -220,22 +220,17 @@ class Manager(object):
                 # 1) 模拟器启动
                 task['status'] = STATUS_DOCKER_RUN
                 self._mdb.task_change_status(task)
-                self._mdb.task_change_status(task)
 
                 #    模拟器启动失败则重试3次
-                docker_info = {'_id': self._mdb.emulator_create(task), 'status': STATUS_DOCKER_RUN}
                 docker = NoxConDocker(task_info=task)
                 ret = self.nox_start(task=task, docker=docker, retry_cnt=3)
 
                 # 2) 模拟器启动：成功/失败
                 status = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
-                docker_info['status'] = status
-                self._mdb.emulator_change_status(docker_info)
                 task['status'] = status
                 self._mdb.task_change_status(task)
 
                 if ret:  # 3) 脚本启动：成功/失败
-                    self._mdb.task_bind_docker(task, docker_info)  # bind docker to task
                     ###############################################
                     ret, msg = self.nox_run_script(task_info=task)
                     ###############################################

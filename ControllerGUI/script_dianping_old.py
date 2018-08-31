@@ -129,7 +129,7 @@ if __name__ == "__main__":
     emulator = Emulator('dianping')
     for i in range(1, 1 + tasks_cnt):
         print('launch_emulator nox-' + str(i))
-        emulator.launch_emulator('nox-' + str(i), force=True)
+        emulator.launch_emulator('nox-' + str(i))
 
     time.sleep(30)
 

@@ -16,12 +16,19 @@ class NoxConDocker(object):
     def __init__(self, task_info):
         self._DEBUG = True
         self._taskId = task_info['taskId']
+        self._task_info = task_info
         self._local_ip = LOCAL_IP
         self._org_path = os.getcwd()
         self._work_path = WORK_PATH
         self._app_name = task_info['app_name']
-        self._docker_name = 'nox-' + str(task_info['taskId'])
-        self._taskId = task_info['taskId']
+        self._docker_id = None
+        self._docker_name = 'nox-{}'.format(task_info['taskId'])
+        self._docker_info = {
+            'docker_id': self._docker_id,
+            'taskId': self._taskId,
+            'app_name': self._app_name,
+            'docker_name:': self._docker_name,
+        }
         self._mdb = MongoDriver()
 
     # def __del__(self):
@@ -128,22 +135,27 @@ class NoxConDocker(object):
             self._exec_nox_cmd(self._make_cmd("action -name:" + self._docker_name + " -key:call.shake -value:null"))
         return True
 
-    def quit(self, wait_time=2):
-        self._log('<<info>> quit', 'wait: ' + str(wait_time) + 's')
+    def rmi(self, kill_script=False, wait_time=2):  # remove docker image
+        self._log('<<info>> quit.', 'please wait {} s'.format(wait_time))
+        if kill_script:  # kill 掉 cmd 启动的 python script_xxx.py
+            self.kill_task()
+
         time.sleep(wait_time)
         self._exec_nox_cmd(self._make_cmd("quit -name:" + self._docker_name))
         time.sleep(wait_time)
+
+        # 确保窗体关闭
         stdout = common_exec_cmd(self._DEBUG, 'TASKLIST /FI "WINDOWTITLE eq ' + self._docker_name + '"')
-        # win10 win7 cmd 提示信息
-        return stdout.replace('\r\n', '') == '信息: 没有运行的任务匹配指定标准。'
+        if stdout.replace('\r\n', '') == '信息: 没有运行的任务匹配指定标准。':  # win10 win7 cmd 提示信息
+            self._exec_nox_cmd(self._make_cmd("remove -name:" + self._docker_name))
+            self._mdb.docker_destroy(self._docker_info)
+            self._mdb.task_unbind_docker(self._task_info)  # unbind task
+            return True
+        else:
+            return False
 
-    def stop(self, wait_time=2):
-        self._log('<<info>> stop', 'wait: ' + str(wait_time) + 's')
-        self.kill_task()  # kill 掉 cmd 启动的 python  script_xxx.py
-        return self.quit(wait_time=wait_time)
-
-    def stop_all(self):
-        self._log('<<info>> stop_all', 'wait: 10s')
+    def rmi_all(self):
+        self._log('<<info>> rmi_all', 'wait: 10s')
         time.sleep(2)
         self._exec_nox_cmd(self._make_cmd('quitall'))
         time.sleep(10)
@@ -161,18 +173,11 @@ class NoxConDocker(object):
                     id = s.split(',')[0]
                     pid = s.split(',')[-1]
 
-                    if (docker_status is None or status == docker_status) and \
-                            (docker_name is None or name == docker_name):
+                    if (docker_status is None or status == docker_status) and (
+                            docker_name is None or name == docker_name):
                         devices.append({'id': id, 'name': name, 'status': status, 'pid': pid})
 
         return devices
-
-    def remove(self):
-        self._log('remove', self._docker_name)
-        time.sleep(2)
-        self._exec_nox_cmd(self._make_cmd("remove -name:" + self._docker_name))
-        time.sleep(2)
-        return self._mdb.emulator_end(self._taskId)
 
     def pull(self, app_name):  # restore
         self._log('pull', self._docker_name + ' ' + app_name)
@@ -194,12 +199,24 @@ class NoxConDocker(object):
     def add(self):
         self._log('add', self._docker_name)
         time.sleep(2)
+        self._docker_id = self._mdb.docker_create(self._docker_info)
+        self._docker_info['docker_id'] = self._docker_id
+        self._mdb.task_bind_docker(self._task_info, self._docker_id)  # bind docker to task
         ret = self._exec_nox_cmd(self._make_cmd("add -name:" + self._docker_name))
         # ret = self._exec_nox_cmd(self._make_cmd("add -name:" + self._docker_name + ' -systemtype:4')) # nox 6.2.1
         time.sleep(2)
         return False if ret.find('failed') != -1 or \
                         ret.find('not') != -1 or \
-                        ret.find('system type err!') != -1 else True
+                        ret.find('system type err!') != -1 else True  # nox 6.2.1
+
+    # def remove(self):
+    #     self._log('remove', self._docker_name)
+    #     time.sleep(2)
+    #     self._exec_nox_cmd(self._make_cmd("remove -name:" + self._docker_name))
+    #     self._mdb.docker_destroy(self._docker_info)
+    #     self._mdb.task_unbind_docker(self._task_info)  # unbind task
+    #     time.sleep(2)
+    #     return True
 
     def create(self):
         poweron = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\poweron.png'
@@ -219,18 +236,18 @@ class NoxConDocker(object):
             return False, msg
 
         if len(dockers) == 1:
-            if dockers[0]['status'] == STATUS_DOCKER_RUN:
-                ret = self.stop(wait_time=5)
-                if not ret:
-                    msg = 'failed!'
-                    self._log('<<error>> stop', msg)
-                    return False, msg
-
-            ret = self.remove()
+            # if dockers[0]['status'] == STATUS_DOCKER_RUN:
+            ret = self.rmi(kill_script=True, wait_time=5)
             if not ret:
                 msg = 'failed!'
-                self._log('<<error>> remove', msg)
+                self._log('<<error>> stop', msg)
                 return False, msg
+
+            # ret = self.remove()
+            # if not ret:
+            #     msg = 'failed!'
+            #     self._log('<<error>> remove', msg)
+            #     return False, msg
 
         # time.sleep(10)
         # self.copy('nox-org')
@@ -266,7 +283,7 @@ class NoxConDocker(object):
 def main(task_info):
     docker = NoxConDocker(task_info=task_info)
     docker._DEBUG = True
-    return docker.run(force=True)
+    return docker.run()
 
 
 if __name__ == "__main__":
