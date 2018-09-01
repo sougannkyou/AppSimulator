@@ -16,13 +16,13 @@
       <div class="col-md-2">
         <div class="small-box bg-green">
           <div class="inner">
-            <p>Running</p>
-            <h3>10</h3>
+            <p>Tasks</p>
+            <h3>[[ tasks_cnt ]]</h3>
           </div>
           <div class="icon">
-            <i class="fa fa-check"></i>
+            <i class="fa fa-tasks"></i>
           </div>
-          <a href="/AppSimulator/dashboard/" class="small-box-footer">
+          <a href="/AppSimulator/tasks/" class="small-box-footer">
             More&nbsp;<i class="fa fa-arrow-circle-right"></i>
           </a>
         </div>
@@ -30,14 +30,14 @@
       <div class="col-md-2">
         <div class="small-box bg-yellow">
           <div class="inner">
-            <p>Warring</p>
-            <h3>10</h3>
+            <p>Log</p>
+            <h3>[[ log_cnt ]]</h3>
           </div>
           <div class="icon">
-            <i class="fa fa-exclamation-triangle"></i>
+            <i class="fa fa-warning"></i>
           </div>
-          <a href="/AppSimulator/logger/" class="small-box-footer">
-            Log&nbsp;<i class="fa fa-arrow-circle-right"></i>
+          <a href="/AppSimulator/log/" class="small-box-footer">
+            More&nbsp;<i class="fa fa-arrow-circle-right"></i>
           </a>
         </div>
       </div>
@@ -82,8 +82,8 @@
           <div class="icon">
             <img class="top-icon" src="{% static 'AppSimulator/images/page/emulator.png' %}">
           </div>
-          <a href="/AppSimulator/tasks/" class="small-box-footer">
-            Tasks&nbsp;<i class="fa fa-arrow-circle-right"></i>
+          <a href="/AppSimulator/emulators/" class="small-box-footer">
+            More&nbsp;<i class="fa fa-arrow-circle-right"></i>
           </a>
         </div>
       </div>
@@ -92,13 +92,12 @@
           <div class="inner">
             <p>Support App</p>
             <label v-for="app in support_app_list">
-              <img class="app-icon"
-                   src="/static/AppSimulator/images/app/[[app]]/app_icon.png">
+              <img class="app-icon" src="/static/AppSimulator/images/app/[[app]]/app_icon.png">
             </label>
           </div>
-          <a href="/AppSimulator/dashboard/" class="small-box-footer">
-            Hosts&nbsp;<i class="fa fa-arrow-circle-right"></i>
-          </a>
+          <div href="/AppSimulator/dashboard/" class="small-box-footer">
+            [[ support_app_list | count ]] Apps</i>
+          </div>
         </div>
       </div>
     </div>
@@ -173,7 +172,9 @@
           <div class="box box-primary">
             <div class="box-header"><!-- host info-->
               <h1 class="box-title label bg-gray">[[ host.ip ]]</h1>
-              <small class="badge bg-green-active" style="margin:-20px 0 0 -10px;">[[ host.mem_total ]] GB</small>
+              <small class="badge bg-green-active" style="margin:-20px 0 0 -10px;">[[ host.mem_total ]]
+                GB
+              </small>
               <div class="box-tools pull-left">
                 <span class="label label-primary">VMware + Emulator</span>
                 <button type="button" class="btn btn-box-tool" data-widget="collapse">
@@ -375,7 +376,6 @@
         type: 'GET',
         data: {
           app_name: obj.app_name,
-          tasks_cnt: obj.tasksCnt
         },
         dataType: "json",
         error: function (xhr, err) {
@@ -428,7 +428,7 @@
           console.error("[dashboard] getHosts", err);
         },
         success: function (data, status) {
-          console.log('getEmulatorHosts', data);
+          console.log('getHostsAPI', data);
           obj.msg = "OK";
           for (let i = 0; i < 1000; i++) {
             obj.emulator_hosts.shift();
@@ -460,6 +460,50 @@
       $.ajax(opt);
     }
 
+    function getLogCnt(obj) {
+      let opt = {
+        url: '/AppSimulator/getLogCntAPI/',
+        type: 'GET',
+        data: {},
+        dataType: "json",
+        error: function (xhr, err) {
+          obj.msg = "Failure";
+          console.error("[dashboard] getLogCnt", err);
+        },
+        success: function (data, status) {
+          console.log('getLogCnt', data);
+          obj.log_cnt = data['ret'];
+          obj.msg = "OK";
+        }
+      };
+      $.ajax(opt);
+    }
+
+    function getTasksCnt(obj) {
+      let opt = {
+        url: '/AppSimulator/getTasksCntAPI/',
+        type: 'GET',
+        data: {
+          host_ip: ''
+        },
+        dataType: "json",
+        error: function (xhr, err) {
+          obj.msg = "Failure";
+          console.error("[dashboard] getTasksCntAPI", err);
+        },
+        success: function (data, status) {
+          console.log('getTasksCntAPI', data);
+          obj.tasks_cnt = data['ret'];
+          obj.msg = "OK";
+        }
+      };
+      $.ajax(opt);
+    }
+
+    setInterval(function () {
+      getLogCnt(mainVue);
+      getTasksCnt(mainVue);
+    }, 5000);
     //----------------------------------------------------------------------------
     Vue.config.delimiters = ['[[', ']]'];
     //----------------------------------------------------------------------------
@@ -474,8 +518,9 @@
         },
         */
         app_name: '', // 'douyin', 'dianping', 'miaopai'
-        tasksCnt: 4,
         emulator_cnt: 0,
+        log_cnt: 0,
+        tasks_cnt: 0,
         support_app_list: ['douyin', 'miaopai', 'huoshan', 'xiaokaxiu', 'xigua', 'dianping'],
         vmware_hosts: [],
         emulator_hosts: [],

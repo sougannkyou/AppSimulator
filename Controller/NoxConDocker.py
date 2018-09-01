@@ -42,39 +42,39 @@ class NoxConDocker(object):
         msg = ''
         if not self._local_ip:
             msg = 'Must be set APPSIMULATOR_IP'
-            self._log('_check error:', msg)
+            self._log('<<error>> _check', msg)
             return False, msg
 
         if not self._app_name:
             msg = 'Must be set app_name'
-            self._log('_check error:', msg)
+            self._log('<<error>> _check', msg)
             return False, msg
 
         mem = psutil.virtual_memory()
         if mem.free < 1 * GB:  # < 1GB
             msg = 'Memory must be greater than 1GB.'
-            self._log('_check error:', msg)
+            self._log('<<error>> _check', msg)
             return False, msg
         else:
             self._log('_check', 'Memory: %.1f' % (mem.free / GB) + ' GB')
 
         if not os.access(NOX_BACKUP_PATH + '\\nox-' + self._app_name + '.npbk', os.R_OK):
             msg = 'Not found nox-' + self._app_name + '.npbk'
-            self._log('_check error', msg)
+            self._log('<<error>> _check', msg)
             return False, msg
 
         if len(self.ps(docker_name='nox-org')) == 0:
             msg = 'Not found nox-org.'
-            self._log('_check error:', msg)
+            self._log('<<error>> _check', msg)
             return False, msg
 
         running_dockers = self.ps(docker_status=STATUS_DOCKER_RUN_OK)
         if len(running_dockers) >= len(TIMER):
             msg = 'The number of starts can not be greater than timer counter ' + str(len(TIMER))
-            self._log('_check error:', msg)
+            self._log('<<error>> _check', msg)
             return False, msg
         else:
-            self._log('_check ok', 'Running dockers: ' + str(len(running_dockers)))
+            self._log('<<info>> _check', 'Running dockers: ' + str(len(running_dockers)))
 
         return True, msg
 
@@ -86,7 +86,7 @@ class NoxConDocker(object):
         _stdout = ''
         _stderr = ''
         try:
-            self._log('<<nox_cmd>> ', cmdline)
+            self._log('[nox_cmd] cmdline:', cmdline)
             time.sleep(1)
             os.chdir(NOX_BIN_PATH)  # 防止 BignoxVMS 写入.py本地
             process = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -95,14 +95,14 @@ class NoxConDocker(object):
             _stdout = stdout.decode('gbk')
             _stderr = stderr.decode('gbk')
         except Exception as e:
-            self._log('_exec_nox_cmd error:', e)
+            self._log('<<error>> _exec_nox_cmd Exception:\n', e)
         finally:
             os.chdir(self._org_path)  # 恢复路径
 
-        self._log('stdout:\n', _stdout)
+        self._log('[nox_cmd]<<<info>>> stdout:\n', _stdout)
         if _stderr:
-            self._log('stderr:\n', _stderr)
-            return '<<<error>>>' + _stderr
+            self._log('[nox_cmd]<<<info>>> stderr:\n', _stderr)
+            return 'error: {}'.format(_stderr)
         else:
             time.sleep(1)
             return _stdout
@@ -137,8 +137,8 @@ class NoxConDocker(object):
 
     def rmi(self, kill_script=False, wait_time=2):  # remove docker image
         self._log('<<info>> quit.', 'please wait {} s'.format(wait_time))
-        if kill_script:  # kill 掉 cmd 启动的 python script_xxx.py
-            self.kill_task()
+        # if kill_script:  # kill 掉 cmd 启动的 python script_xxx.py
+        #     self.kill_task()
 
         time.sleep(wait_time)
         self._exec_nox_cmd(self._make_cmd("quit -name:" + self._docker_name))
@@ -191,8 +191,9 @@ class NoxConDocker(object):
             time.sleep(5)
             return True
 
-    def copy(self, org):
+    def copy(self, org, wait_time=10):
         self._log('copy', self._docker_name)
+        time.sleep(wait_time)
         self._exec_nox_cmd(self._make_cmd("copy -name:" + self._docker_name + " -from:" + org))
         return True
 
@@ -232,7 +233,7 @@ class NoxConDocker(object):
         if len(dockers) > 1:
             pprint(dockers)
             msg = 'The number of docker found is more than 1.'
-            self._log('create', msg)
+            self._log('<<<error>>> create', msg)
             return False, msg
 
         if len(dockers) == 1:
@@ -243,14 +244,7 @@ class NoxConDocker(object):
                 self._log('<<error>> stop', msg)
                 return False, msg
 
-            # ret = self.remove()
-            # if not ret:
-            #     msg = 'failed!'
-            #     self._log('<<error>> remove', msg)
-            #     return False, msg
-
-        # time.sleep(10)
-        # self.copy('nox-org')
+        # self.copy('nox-org')  # copy命令不稳定
         ret = self.add()
         if not ret:
             msg = 'failed!'

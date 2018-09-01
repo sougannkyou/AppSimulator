@@ -238,6 +238,15 @@ def getTasksAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
+def getTasksCntAPI(request):
+    host_ip = request.GET.get('host_ip', '')
+    ret = MDB.emulator_get_tasks_cnt(host_ip)
+    output = JsonResponse({
+        'ret': ret
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
 def runTasks():
     tasks = MDB.emulator_get_tasks(status=STATUS_WAIT)
     output = JsonResponse({
@@ -333,7 +342,7 @@ def emulatorShakeAPI(request):
 
 
 # ------- logger ----------------------------------------------------------------
-def getLoggerAPI(request):
+def getLogsAPI(request):
     ip = request.GET.get('ip')
     ret = MDB.log_find_by_ip(ip)
     output = JsonResponse({
@@ -341,6 +350,14 @@ def getLoggerAPI(request):
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
+def getLogCntAPI(request):
+    ip = request.GET.get('ip')
+    ret = MDB.log_cnt(ip)
+    output = JsonResponse({
+        'ret': ret,
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
 
 if __name__ == "__main__":
-    test()
+    pass

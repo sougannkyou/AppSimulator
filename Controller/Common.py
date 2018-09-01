@@ -63,7 +63,7 @@ def common_log(_DEBUG, taskId, func, prefix, msg):
         MDB.log(taskId, func, prefix, msg)
 
     if _DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
-        print(datetime.now().strftime('%H:%M:%S') + ' [' + func + ']', prefix, msg)
+        print("{} [{}]".format(datetime.now().strftime('%H:%M:%S'), func), prefix, msg)
 
 
 def common_exec_cmd(_DEBUG, cmdline):
@@ -76,7 +76,7 @@ def common_exec_cmd(_DEBUG, cmdline):
         _stdout = stdout.decode('gbk')
         _stderr = stderr.decode('gbk')
     except Exception as e:
-        common_log(_DEBUG, -1, 'common_exec_cmd', 'error', e)
+        common_log(_DEBUG, -1, '<<<error>>> common_exec_cmd', 'Exception', e)
     finally:
         common_log(_DEBUG, -1, 'common_exec_cmd', cmdline, _stdout)
 

@@ -121,7 +121,7 @@ class NoxADB(object):
             self._stdout = stdout.decode('utf8')
             self._stderr = stderr.decode('utf8')
         except Exception as e:
-            self._log('[adb_cmd] err:', e)
+            self._log('<<<error>>> adb_cmd Exception:\n', e)
 
         return
 
@@ -130,7 +130,7 @@ class NoxADB(object):
         try:
             ret = self._stdout.split()[-1:][0]
         except Exception as e:
-            self._log('[get_version] err:', e)
+            self._log('<<<error>>> get_version Exception:\n', e)
             ret = None
         return ret
 
@@ -207,7 +207,7 @@ class NoxADB(object):
                     self._log('[get_devices] err: permissions')
             except Exception as e:
                 err_msg = e  # not found
-                self._log('[get_devices] err:', e)
+                self._log('<<<error>>> get_devices Exception:\n', e)
 
         return err_msg, self._devices
 

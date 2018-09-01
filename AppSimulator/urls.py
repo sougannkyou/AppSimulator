@@ -8,12 +8,12 @@ from AppSimulator.views import (
 )
 
 from AppSimulator.WebAPI import (
-    addTaskAPI, removeTaskAPI, getTasksAPI, getEmulatorsAPI,
+    addTaskAPI, removeTaskAPI, getTasksAPI, getTasksCntAPI, getEmulatorsAPI,
     getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI,
     setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,
     getDeviceCaptureAPI, getProxyServerInfoAPI,
     runTasksAPI,
-    getVMwaresAPI, getHostsAPI, getAllHostsAPI, getLoggerAPI, emulatorShakeAPI
+    getVMwaresAPI, getHostsAPI, getAllHostsAPI, getLogsAPI, getLogCntAPI, emulatorShakeAPI
 )
 
 cache_time_out = 60 * 3
@@ -24,10 +24,11 @@ urlpatterns = patterns('',
                        url(r'^emulators/$', EmulatorsView.as_view(), name='emulators'),
                        url(r'^hosts/$', HostsView.as_view(), name='hosts'),
                        url(r'^vmware/$', VMwareView.as_view(), name='vmware'),
-                       url(r'^logger/$', LoggerView.as_view(), name='logger'),
+                       url(r'^log/$', LoggerView.as_view(), name='log'),
                        url(r'^addTaskAPI/$', addTaskAPI, name='addTaskAPI'),
                        url(r'^removeTaskAPI/$', removeTaskAPI, name='removeTaskAPI'),
                        url(r'^getTasksAPI/$', getTasksAPI, name='getTasksAPI'),
+                       url(r'^getTasksCntAPI/$', getTasksCntAPI, name='getTasksCntAPI'),
 
                        url(r'^getDeviceCrawlCntAPI/$', getDeviceCrawlCntAPI, name='getDeviceCrawlCntAPI'),
                        url(r'^getDevicesStatusAPI/$', getDevicesStatusAPI, name='getDevicesStatusAPI'),
@@ -52,6 +53,7 @@ urlpatterns = patterns('',
                        url(r'^getHostsAPI/$', getHostsAPI, name='getHostsAPI'),
                        # all hosts
                        url(r'^getAllHostsAPI/$', getAllHostsAPI, name='getAllHostsAPI'),
-                       # logger
-                       url(r'^getLoggerAPI/$', getLoggerAPI, name='getLoggerAPI'),
+                       # log
+                       url(r'^getLogCntAPI/$', getLogCntAPI, name='getLogCntAPI'),
+                       url(r'^getLogsAPI/$', getLogsAPI, name='getLogsAPI'),
                        )

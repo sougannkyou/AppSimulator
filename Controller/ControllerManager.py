@@ -15,8 +15,6 @@ from Controller.DBLib import MongoDriver, RedisDriver
 from Controller.NoxConDocker import NoxConDocker
 from Controller.NoxConSelenium import NoxConSelenium
 
-_DEBUG = True
-
 
 # ------------------------ manager ----------------------
 class Manager(object):
@@ -58,7 +56,7 @@ class Manager(object):
     def _nox_check(self):
         if not self._work_path:
             msg = '请设置: APPSIMULATOR_WORK_PATH'
-            self._log('_check error', msg)
+            self._log('<<<error>>> _check', msg)
             return False, msg
 
     def nox_run_script1(self, task_info):
@@ -76,10 +74,10 @@ class Manager(object):
             _stdout = stdout.decode('gbk')
             _stderr = stderr.decode('gbk')
         except Exception as e:
-            self._log('<<error>> run_script:', e)
+            self._log('<<error>> run_script Exception:\n', e)
 
         if _stderr:
-            self._log('run_script stderr:\n', _stderr)
+            self._log('<<error>> run_script stderr:\n', _stderr)
             return False
         else:
             self._log('run_script stdout:\n', _stdout)
@@ -96,7 +94,7 @@ class Manager(object):
             self._log('<<info>> run_script ok', script)
             return True
         except Exception as e:
-            self._log('run_script error:', e)
+            self._log('<<error>> run_script Exception:\n', e)
             return False
 
     def nox_run_script(self, task_info):
@@ -106,7 +104,7 @@ class Manager(object):
             if task_info['timer'] == TIMER_ON:  # 从系统获取timer_no(Index of TIMER, start 0)
                 timer_no = self._mdb.task_get_timer_no(host_ip=LOCAL_IP)
                 if timer_no == -1:
-                    self._log('error', 'not fond timer_no')
+                    self._log('<<error>> nox_run_script', 'not fond timer_no')
                     return False, 'timer_no'
             else:  # timer:off 不使用timer功能
                 timer_no = -1
@@ -122,7 +120,7 @@ class Manager(object):
             return True, ''
         except Exception as e:
             os.chdir(org_path)
-            self._log('run_script error:', e)
+            self._log('<<error>> run_script Exception:\n', e)
             return False, e
 
     def nox_start(self, task, docker, retry_cnt):
@@ -245,9 +243,9 @@ class Manager(object):
             else:
                 ###############################################
                 cnt = self.nox_schedule()
-                ###############################################
                 if cnt:
-                    self._log('<<info>> run_schedule', 'reset {} task to wait status.'.format(cnt))
+                    self._log('<<info>> run_schedule', 'reset {} tasks to wait status.'.format(cnt))
+                ###############################################
 
                 self._log('<<info>> start_tasks', 'not found waiting task, retry after 60s.')
                 time.sleep(1 * 60)
@@ -279,7 +277,7 @@ class Manager(object):
             self._log('vm_reset end:', vm_name)
             return True
         except Exception as e:
-            self._log('vm_reset error:', e)
+            self._log('<<<error>>> vm_reset Exception:\n', e)
             return False
 
     def vm_check_active(self, host_ip):

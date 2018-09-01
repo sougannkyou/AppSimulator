@@ -186,7 +186,7 @@ class NoxADBSelenium(NoxADB):
             f.delete(remote_dir + '/' + remote_file + "_before")
             f.rmd(remote_dir)
         except Exception as e:
-            self._log('ftp_upload error:', e)
+            self._log('<<<error>>> ftp_upload Exception:\n', e)
             pass
 
         f.mkd(remote_dir)

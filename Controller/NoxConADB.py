@@ -147,7 +147,7 @@ class NoxConADB(object):
                 wait_time = TIMER[self._timer_no] - now
 
             tobe = datetime.fromtimestamp(int(datetime.now().timestamp()) + wait_time).strftime("%m-%d %H:%M:%S")
-            self._log('<<info>> timer_no:' + str(self._timer_no),
+            self._log('<<info>> timer_no:{}'.format(self._timer_no),
                       'will run at {} (sleep {} s)'.format(tobe, wait_time))
             time.sleep(wait_time)
             self._set_task_conf()
@@ -169,7 +169,7 @@ class NoxConADB(object):
             self._stdout = stdout.decode('utf8').replace('\r', '').replace('\n', '')
             self._stderr = stderr.decode('utf8').replace('\r', '').replace('\n', '')
         except Exception as e:
-            self._log('[adb_cmd] error:', e)
+            self._log('<<error>> adb_cmd Exception:\n', e)
         finally:
             os.chdir(self._org_path)  # 恢复路径
             # if self._stdout.find('device not exist!') != -1 or \
@@ -192,7 +192,7 @@ class NoxConADB(object):
                 ret = self._stdout
                 self._log('<<info>> get_adb_version ok:\n', ret)
         except Exception as e:
-            self._log('get_adb_version error:', e)
+            self._log('<<error>> get_adb_version Exception:\n', e)
         return ret
 
     def wait_for_device(self, timeout=30):
@@ -204,10 +204,10 @@ class NoxConADB(object):
         while timeout > 0:
             ver = self.get_android_version()
             if ver and ver.startswith('4.4.2'):
-                self._log('<<info>> wait_for_device:', 'ok')
+                self._log('<<info>> wait_for_device', 'ok')
                 break
             else:
-                self._log('<<info>> wait_for_device:', str(timeout) + 's')
+                self._log('<<info>> wait_for_device', str(timeout) + 's')
                 timeout -= 5
                 time.sleep(5)
 

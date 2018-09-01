@@ -98,6 +98,13 @@ class MongoDriver(object):
             ret.append(log)
         return ret
 
+    def log_cnt(self, ip=None):
+        cond = {}
+        if ip:
+            cond = {'ip': ip}
+
+        return self.logger.find(cond).count()
+
     # -------------  tasks -----------------------------------------------------------------
     def tasks_find_by_host(self, host_ip=None):
         ret = []
@@ -235,6 +242,13 @@ class MongoDriver(object):
             ret.append(r)
 
         return ret
+
+    def emulator_get_tasks_cnt(self, host_ip=None):
+        cond = {}
+        if host_ip:
+            cond = {'host_ip': host_ip}
+
+        return self.tasks.find(cond).count()
 
     def emulator_get_emulators(self, host_ip=None):
         ret = []

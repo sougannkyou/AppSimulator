@@ -44,7 +44,7 @@ class NoxConSelenium(NoxConADB):
         if isinstance(value, dict):
             self._PIC_PATH.update(value)
         else:
-            self._log('set_comment_to_pic error:', 'must be set a dictionary')
+            self._log('<<<error>>> set_comment_to_pic', 'must be set a dictionary')
 
     def wait_online(self, timeout=10):
         return self.wait_for_device(timeout=timeout)

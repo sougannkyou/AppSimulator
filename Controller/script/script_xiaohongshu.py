@@ -35,7 +35,7 @@ class MySelenium(NoxConSelenium):
             self.crawl(tries=3)
             return True
         except Exception as e:
-            self._log('error:', str(e))
+            self._log('<<<error>>> script Exception:\n', str(e))
             return False
 
     def open_app(self):
@@ -204,7 +204,7 @@ def main(task, mode):
         me._DEBUG = False
         me.run()
     except Exception as e:
-        msg = '<<error>>'
+        msg = '<<error>> Exception:'
         error = e
     finally:
         if APPSIMULATOR_MODE == MODE_MULTI:  # multi nox mode

@@ -61,7 +61,7 @@ class VMDocker(object):
             _stdout = stdout.decode('gbk')
             _stderr = stderr.decode('gbk')
         except Exception as e:
-            self._log('_exec_vmrun_cmd error:', e)
+            self._log('<<<error>>> _exec_vmrun_cmd Exception:\n', e)
         finally:
             pass
 
@@ -89,7 +89,7 @@ class VMDocker(object):
             f.close()
             self._log('<<info>> set run app:', app_name)
         except Exception as e:
-            self._log('set run app error:', e)
+            self._log('<<<error>>> set_run_app Exception:\n', e)
             return False
 
         guest_path = '"' + WORK_PATH + '\cmd\\app.conf"'
