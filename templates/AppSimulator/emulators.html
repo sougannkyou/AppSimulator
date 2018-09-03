@@ -26,6 +26,7 @@
               <th width="10%">APP</th>
               <th width="10%">Host-IP</th>
               <th width="5%">Status</th>
+              <th width="10%">Error Message</th>
               <th width="10%">Start Time</th>
               <th width="10%">End Time</th>
               <th width="10%">Spend Time</th>
@@ -41,6 +42,7 @@
                 (emu.status.indexOf('_ng')!=-1?'label label-danger':'label label-default')]">[[ emu.status ]]
                 </span>
               </td>
+              <td>[[ emu.error_msg ]]</td>
               <td>[[ emu.start_time ]]</td>
               <td>[[ emu.end_time ]]</td>
               <td>[[ emu.spend_times ]]</td>

@@ -15,3 +15,9 @@ div.schedule {
     height: 20px;
     /*width: 10%;*/
 }
+
+div.schedule {
+    border: 1px dashed gray;
+    height: 20px;
+    /*width: 10%;*/
+}

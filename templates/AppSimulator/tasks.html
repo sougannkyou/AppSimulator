@@ -24,9 +24,11 @@
             <tr>
               <th width="3%">TaskId</th>
               <th width="3%">From</th>
-              <th width="8%">APP</th>
+              <th width="10%">APP</th>
               <th width="10%">IP</th>
-              <th width="15%">Script</th>
+              <th width="10%">Script</th>
+              <th width="10%">Image Name</th>
+              <th width="10%">Description</th>
               <th width="5%">Live Cycle</th>
               <th width="10%">Schedule</th>
               <th width="5%">Timer</th>
@@ -47,14 +49,22 @@
                 </label>
               </td>
               <td>
-                <input type="text" v-model="task.ip" placeholder="IP address">
+                <input type="text" v-model="task.ip" style="width:120px" placeholder="IP address">
               </td><!-- IP -->
               <td><!-- Script -->
-                <input type="text" v-model="task.script" placeholder="script">
+                <input type="text" v-model="task.script" style="width:120px" placeholder="script">
+              </td>
+              <td><!-- Docker Image Name nox-miaopai.npbk -->
+                <input type="text" v-model="task.docker_img_name" style="width:120px" placeholder="npbk name">
+              </td>
+              <td><!-- description -->
+                <input type="text" v-model="task.description" style="width:120px" placeholder="">
               </td>
               <td><!-- Live Cycle -->
-                <input id="live_cycle_never" name="live_cycle" type="radio" v-model="task.live_cycle" value="never">never<br>
-                <input id="live_cycle_once" name="live_cycle" type="radio" v-model="task.live_cycle" value="once" checked>once
+                <input id="live_cycle_never" name="live_cycle" type="radio" v-model="task.live_cycle"
+                       value="never">never<br>
+                <input id="live_cycle_once" name="live_cycle" type="radio" v-model="task.live_cycle"
+                       value="once" checked>once
               </td>
               <td>
                 <input type="text" v-model="task.schedule.start" placeholder="Start YYYY-MM-DD hh:mm:ss">
@@ -90,6 +100,8 @@
               </td>
               <td>[[ t.host_ip ]]</td>
               <td>[[ t.script ]]</td>
+              <td>[[ t.docker_img_name ]]</td>
+              <td>[[ t.description ]]</td>
               <td>[[ t.live_cycle ]]</td>
               <td>
                 <div class="schedule">start:&nbsp;[[ t.schedule.start ]]</div>
@@ -188,6 +200,8 @@
           schedule_end: obj.task.schedule.end,     // 0000-00-00 00:00:00
           schedule_cycle: obj.task.schedule.cycle, // 24 * 60
           timer_on: obj.task.timer_on,
+          docker_img_name: obj.task.docker_img_name,
+          description: obj.task.description,
         },
         dataType: "json",
         error: function (xhr, err) {
@@ -243,6 +257,8 @@
             cycle: '',    // 24 * 60
           },
           timer: 'off',   // on off
+          docker_img_name: '',
+          description: '',
           app_name: '',
           status: STATUS_WAIT
         },
@@ -254,9 +270,13 @@
           if (this.task.app_name !== app_name) {
             this.task.app_name = app_name;
             this.task.script = 'script_' + app_name + '.py';
+            this.task.docker_img_name = 'nox-' + app_name + '.npbk';
+            this.task.description = '用于 ' + app_name + ' App的采集';
           } else {
             this.task.app_name = '';
             this.task.script = '';
+            this.task.docker_img_name = '';
+            this.task.description = '';
           }
         },
         addTask: function () {
@@ -273,7 +293,6 @@
       watch: {},//deep: true
       computed: {
         'task.live_cycle': function () {
-          console.log('this.task.schedule.cycle', this.task.schedule.cycle);
           if (this.task.schedule.cycle !== '') {
             console.log('once');
             return 'once';

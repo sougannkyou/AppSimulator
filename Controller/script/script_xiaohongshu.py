@@ -35,7 +35,7 @@ class MySelenium(NoxConSelenium):
             self.crawl(tries=3)
             return True
         except Exception as e:
-            self._log('<<<error>>> script Exception:\n', str(e))
+            self._log('<<error>> script Exception:\n', str(e))
             return False
 
     def open_app(self):

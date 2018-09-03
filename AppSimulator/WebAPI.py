@@ -2,6 +2,7 @@
 import os
 import sys
 import psutil
+import json
 from pprint import pprint
 from datetime import datetime
 from io import StringIO
@@ -199,6 +200,8 @@ def addTaskAPI(request):
     schedule_end = request.POST.get('schedule_end')
     schedule_cycle = request.POST.get('schedule_cycle', '')
     timer = request.POST.get('timer', 'off')
+    docker_img_name = request.POST.get('docker_img_name')
+    description = request.POST.get('description')
 
     ret = MDB.emulator_add_task({
         'script': script,
@@ -211,7 +214,9 @@ def addTaskAPI(request):
             'run_time': string2timestamp(schedule_start) if schedule_start else 0,
             'cycle': int(schedule_cycle) * 60 if schedule_cycle else 24 * 60 * 60,
         },
-        'timer': timer
+        'timer': timer,  # on off
+        'docker_img_name': docker_img_name,
+        'description': description
     })
     output = JsonResponse({
         'ret': ret
@@ -344,11 +349,13 @@ def emulatorShakeAPI(request):
 # ------- logger ----------------------------------------------------------------
 def getLogsAPI(request):
     ip = request.GET.get('ip')
-    ret = MDB.log_find_by_ip(ip)
+    log_filter = json.loads(request.GET.get('log_filter', {}))
+    ret = MDB.log_find_by_ip(ip, log_filter)
     output = JsonResponse({
         'ret': ret,
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
 
 def getLogCntAPI(request):
     ip = request.GET.get('ip')

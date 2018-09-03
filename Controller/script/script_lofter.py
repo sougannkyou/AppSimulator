@@ -56,7 +56,7 @@ class MySelenium(NoxConSelenium):
 
 
         except Exception as e:
-            self._log('<<<error>>>', e)
+            self._log('<<error>>', e)
 
 
 ##################################################################################

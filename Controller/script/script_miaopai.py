@@ -47,7 +47,7 @@ class MySelenium(NoxConSelenium):
                 self.v_scroll()
 
         except Exception as e:
-            self._log('error:', e)
+            self._log('<<error>>', e)
 
 
 ##################################################################################
@@ -55,7 +55,7 @@ def main(task, mode):
     msg = ''
     error = ''
     start = datetime.now()
-    common_log(True, task['taskId'], 'Script ' + task['docker_name'], 'start', task)
+    common_log(True, task['taskId'], 'task-{}'.format(task['taskId']), 'start', task)
     try:
         me = MySelenium(task_info=task, mode=mode)
         me.set_comment_to_pic({
@@ -75,7 +75,7 @@ def main(task, mode):
             m = Manager()
             m.nox_run_task_finally(taskId)
 
-        common_log(True, task['taskId'], 'Script ' + task['docker_name'] + 'end.',
+        common_log(True, task['taskId'], 'task-{} end.'.format(task['taskId']),
                    msg + 'total times:' + str((datetime.now() - start).seconds) + 's', error)
         return
 

@@ -59,7 +59,7 @@ class MongoDriver(object):
                 'msg': msg.decode('gbk') if isinstance(msg, bytes) else msg
             })
         except Exception as e:
-            print('mongodb connect error!')
+            print('mongodb connect error\n', e)
 
     # ---------- tasks -----------------------
     def task_get_timer_no(self, host_ip):
@@ -137,6 +137,8 @@ class MongoDriver(object):
             "up_time": 0,
             "end_time": 0,
             "timer_no": 0,
+            "docker_img_name": task['docker_img_name'],
+            "description": task['description'],
             "dockerId": ''
         })
         return taskId
@@ -207,11 +209,12 @@ class MongoDriver(object):
         }})
 
     # ---------- dockers -----------------------
-    def docker_create(self, docker_info):
+    def docker_create(self, docker_obj):
         return self.dockers.insert({  # ObjectId('5b5031baf930a530c47275d2')
-            'name': 'nox-{}'.format(docker_info['taskId']),
-            'taskId': docker_info['taskId'],
-            'app_name': docker_info['app_name'],
+            'name': 'nox-{}'.format(docker_obj.get_taskId()),
+            'taskId': docker_obj.get_taskId(),
+            'app_name': docker_obj.get_app_name(),
+            'error_msg': '',
             'host_ip': LOCAL_IP,
             'status': STATUS_DOCKER_RUN,
             'start_time': int(datetime.now().timestamp()),
@@ -219,23 +222,21 @@ class MongoDriver(object):
             'end_time': 0
         })
 
-    def docker_destroy(self, docker_info):
-        if docker_info['docker_id']:
+    def docker_destroy(self, docker_obj):
+        if docker_obj.get_docker_id():
             now = int(datetime.now().timestamp())
             ret = self.dockers.update(
-                {'_id': docker_info['docker_id']},
+                {'_id': docker_obj.get_docker_id()},
                 {"$set": {
-                    'status': STATUS_DOCKER_DESTROY,
+                    'error_msg': docker_obj.error_msg,
+                    'status': STATUS_DOCKER_RUN_NG if docker_obj.error_msg else STATUS_DOCKER_RUN_OK,
                     'up_time': now,
                     'end_time': now
                 }})
+            docker_obj.error_msg = ''
             return ret['nModified'] == 1
         else:
             return False
-
-    def docker_change_status(self, docker):
-        now = int(datetime.now().timestamp())
-        self.dockers.update({'_id': docker['_id']}, {"$set": {'status': docker['status'], 'up_time': now}})
 
     # ---------- vmware -----------------------
     def vm_find_vm_by_host(self, host_ip=None):

@@ -56,7 +56,7 @@ class Manager(object):
     def _nox_check(self):
         if not self._work_path:
             msg = '请设置: APPSIMULATOR_WORK_PATH'
-            self._log('<<<error>>> _check', msg)
+            self._log('<<error>> _check', msg)
             return False, msg
 
     def nox_run_script1(self, task_info):
@@ -123,69 +123,81 @@ class Manager(object):
             self._log('<<error>> run_script Exception:\n', e)
             return False, e
 
-    def nox_start(self, task, docker, retry_cnt):
+    def nox_start(self, task, docker):
         docker.rmi(kill_script=True)
         self.nox_stop_confirm(docker, retry=True, wait_time=30)
 
         ret = docker.run()  # docker run: create and start
         if ret:
-            ret = self.nox_start_check(task_info=task, timeout=60)  # 进一步确认确保启动成功: 可匹配到app图标
+            ret = self.nox_start_confirm(task_info=task, docker=docker, timeout=60)
 
         if ret:
             ret = self.nox_start_success(docker=docker)
-        else:  # 模拟器启动失败则重试3次
-            ret = self.nox_start_error(task=task, docker=docker, retry_cnt=retry_cnt)
+        else:
+            ret = self.nox_start_error(task=task, docker=docker)
 
         return ret
 
     def nox_start_success(self, docker):
         self._log('<<info>> nox_start_success', docker.get_name())
-        time.sleep(2)
         docker.shake(1)
         # docker.set_docker_name()
         # port = docker.get_port()
         return True
 
-    def nox_start_error(self, task, docker, retry_cnt):
-        retry_cnt -= 1
-        if retry_cnt > 0:  # 模拟器启动失败则重试
-            self._log('<<info>> nox_start_error', '\n<<< 将再尝试 {} 次 重启 {} >>>\n'.format(retry_cnt, docker.get_name()))
-            return self.nox_start(task, docker, retry_cnt)
+    def nox_start_error(self, task, docker):
+        self._log('<<info>> nox_start_error', 'start_retry_cnt: {}'.format(docker.start_retry_cnt))
+        if docker.start_retry_cnt == -1:  # _check error 不满足启动条件
+            return False
+
+        docker.start_retry_cnt -= 1
+        if docker.start_retry_cnt > 0:  # 模拟器启动失败则重试
+            self._log('<<info>> nox_start_error', '\n<< 将再尝试 {} 次 重启 {} >>\n'.format(
+                docker.start_retry_cnt, docker.get_name()
+            ))
+            return self.nox_start(task, docker)
         else:
             docker.rmi(kill_script=True)
 
         return False
 
-    def nox_start_check(self, task_info, timeout=60):
+    def nox_start_confirm(self, task_info, docker, timeout=60):  # 进一步确认可匹配到app图标，以确保启动成功.
         driver = NoxConSelenium(task_info=task_info, mode=MODE_MULTI)
         driver.set_comment_to_pic({
-            "APP图标": 'images/' + task_info['app_name'] + '/app_icon.png',
+            "APP图标": 'images/{}/app_icon.png'.format(task_info['app_name']),
         })
-        docker_name = 'nox-' + str(task_info['taskId'])
         ret = driver.wait_online(timeout=timeout)
         if ret:
             ret, x, y = driver.find_element(comment='很抱歉', timeout=10)  # 匹配到“很抱歉”字样
             if ret:
-                self._log('<<info>> check_docker_run', docker_name + ' 匹配到“很抱歉”.')
+                msg = '匹配到“很抱歉”'
+                docker.error_msg = msg
+                self._log('<<info>> nox_start_confirm', '{} {}'.format(docker.get_name(), msg))
                 return False
             else:
                 ret, x, y = driver.find_element(comment='APP图标', timeout=10)  # 可匹配到app图标
                 if ret:
-                    self._log('<<info>> check_docker_run', docker_name + ' 可匹配到app图标.')
+                    msg = '可匹配到app图标'
                 else:
-                    self._log('<<info>> check_docker_run', docker_name + ' 未匹配到app图标.')
+                    msg = '未匹配到app图标'
+                    docker.error_msg = msg
 
+                self._log('<<info>> nox_start_confirm', '{} {}'.format(docker.get_name(), msg))
                 return ret
 
-    def nox_stop_confirm(self, docker, retry=False, wait_time=30):
+    def nox_stop_confirm(self, docker, retry=False, wait_time=30):  # 进一步确认窗体消失，以确保停止成功
         while wait_time > 0:
             hwnd = win32gui.FindWindow(None, docker.get_name())
             if hwnd:  # hwnd is 0 if not found
                 time.sleep(1)
-                self._log('<<info>> nox_stop_confirm', '正在等待 {} 停止，剩余：{} 秒.'.format(docker.get_name(), wait_time))
+                self._log('<<info>> nox_stop_confirm', '正在等待 {} 停止，剩余：{} 秒.'.format(
+                    docker.get_name(), wait_time
+                ))
                 wait_time -= 1
             else:  # not found the window
-                self._log('<<info>> nox_stop_confirm', '{} 已停止，剩余：{} 秒.'.format(docker.get_name(), wait_time))
+                self._log('<<info>> nox_stop_confirm', '{} 已停止，剩余：{} 秒.'.format(
+                    docker.get_name(), wait_time
+                ))
                 break
 
         if retry and wait_time == 0:  # 不能强杀，会造成模拟器 ERR：1037
@@ -221,7 +233,7 @@ class Manager(object):
 
                 #    模拟器启动失败则重试3次
                 docker = NoxConDocker(task_info=task)
-                ret = self.nox_start(task=task, docker=docker, retry_cnt=3)
+                ret = self.nox_start(task=task, docker=docker)
 
                 # 2) 模拟器启动：成功/失败
                 status = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
@@ -247,7 +259,7 @@ class Manager(object):
                     self._log('<<info>> run_schedule', 'reset {} tasks to wait status.'.format(cnt))
                 ###############################################
 
-                self._log('<<info>> start_tasks', 'not found waiting task, retry after 60s.')
+                self._log('<<ignore>> start_tasks', 'not found waiting task, retry after 60s.')
                 time.sleep(1 * 60)
 
     # --------------------------- vmwares --------------------------------------------------------
@@ -277,7 +289,7 @@ class Manager(object):
             self._log('vm_reset end:', vm_name)
             return True
         except Exception as e:
-            self._log('<<<error>>> vm_reset Exception:\n', e)
+            self._log('<<error>> vm_reset Exception:\n', e)
             return False
 
     def vm_check_active(self, host_ip):

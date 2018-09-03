@@ -59,9 +59,11 @@ class ColorLog(object):
 
 
 def common_log(_DEBUG, taskId, func, prefix, msg):
-    if APPSIMULATOR_MODE == MODE_MULTI:
+    # keyword <<ignore>> db black list
+    if APPSIMULATOR_MODE == MODE_MULTI and prefix.find('<<ignore>>') == -1:
         MDB.log(taskId, func, prefix, msg)
 
+    # keyword error <<info>> print white list
     if _DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
         print("{} [{}]".format(datetime.now().strftime('%H:%M:%S'), func), prefix, msg)
 
@@ -76,7 +78,7 @@ def common_exec_cmd(_DEBUG, cmdline):
         _stdout = stdout.decode('gbk')
         _stderr = stderr.decode('gbk')
     except Exception as e:
-        common_log(_DEBUG, -1, '<<<error>>> common_exec_cmd', 'Exception', e)
+        common_log(_DEBUG, -1, '<<error>> common_exec_cmd', 'Exception', e)
     finally:
         common_log(_DEBUG, -1, 'common_exec_cmd', cmdline, _stdout)
 

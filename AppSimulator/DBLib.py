@@ -84,13 +84,29 @@ class MongoDriver(object):
         self._DEBUG = False
 
     # -------------  logger -----------------------------------------------------------------
-    def log_find_by_ip(self, ip=None):
+    def log_find_by_ip(self, ip=None, log_filter=None):
+        # {'module': {'adb': True, 'docker': True, 'manager': True, 'selenium': True}}
         ret = []
         cond = {}
         if ip:
-            cond = {'ip': ip}
+            cond['ip'] = ip
 
-        log_list = self.logger.find(cond).sort('time', pymongo.DESCENDING).skip(0).limit(200)
+        if log_filter:
+            func_list = []
+            if log_filter['module']['manager']:
+                func_list.append({'$not': {'$regex': 'Manager'}})
+            if log_filter['module']['selenium']:
+                func_list.append({'$not': {'$regex': 'NoxConSelenium'}})
+            if log_filter['module']['docker']:
+                func_list.append({'$not': {'$regex': 'NoxDocker'}})
+            if log_filter['module']['adb']:
+                func_list.append({'$not': {'$regex': 'adb'}})
+
+            cond['func'] = {'$and': func_list}
+
+        print('<<<<<<>>>>>>')
+        pprint(cond)
+        log_list = self.logger.find(cond).sort('time', pymongo.ASCENDING).skip(0).limit(200)
         for log in log_list:
             log.pop('_id')
             log['time'] = timestamp2string(log['time'], "%m-%d %H:%M:%S") if log['time'] else ''
@@ -196,7 +212,8 @@ class MongoDriver(object):
             "status": STATUS_WAIT,
             "live_cycle": task['live_cycle'],
             "schedule": task['schedule'],
-            ""
+            "docker_img_name": task['docker_img_name'],
+            "description": task['description'],
             "timer": task['timer'],
             "timer_no": -1 if task['timer'] == 'off' else 0,
             "host_ip": task['ip'],
@@ -254,17 +271,16 @@ class MongoDriver(object):
         ret = []
         cond = {}
         # cond = {'status': STATUS_WAIT, 'host_ip': host_ip}
-        print("emulator_get_emulators")
         dockers = self.dockers.find(cond)
-        for d in dockers:
-            d.pop('_id')
-            d['spend_times'] = seconds_format(seconds=(d['end_time'] - d['start_time'])) \
-                if d['end_time'] > 0 else 'N/A'
-            d['start_time'] = timestamp2string(d['start_time'], "%m-%d %H:%M:%S")
-            d['end_time'] = timestamp2string(d['end_time'], "%m-%d %H:%M:%S")
-            d['up_time'] = timestamp2string(d['up_time'], "%m-%d %H:%M:%S")
+        for docker in dockers:
+            docker.pop('_id')
+            docker['spend_times'] = seconds_format(seconds=(docker['end_time'] - docker['start_time'])) \
+                if docker['end_time'] > 0 else 'N/A'
+            docker['start_time'] = timestamp2string(docker['start_time'], "%m-%d %H:%M:%S")
+            docker['end_time'] = timestamp2string(docker['end_time'], "%m-%d %H:%M:%S")
+            docker['up_time'] = timestamp2string(docker['up_time'], "%m-%d %H:%M:%S")
 
-            ret.append(d)
+            ret.append(docker)
         return ret
 
     def emulator_set_task_server_ip(self, taskId, ip):

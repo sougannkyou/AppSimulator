@@ -56,7 +56,7 @@ def send2web(pic_path):
                         '../static/AppSimulator/images/capture_before.png')
         shutil.copyfile(pic_path, '../static/AppSimulator/images/capture.png')
     except Exception as e:
-        print("[rpc_server] <<<error>>> send2web Exception:\n", e)
+        print("[rpc_server] <<error>> send2web Exception:\n", e)
 
     return True
 

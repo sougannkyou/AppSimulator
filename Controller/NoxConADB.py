@@ -151,9 +151,9 @@ class NoxConADB(object):
                       'will run at {} (sleep {} s)'.format(tobe, wait_time))
             time.sleep(wait_time)
             self._set_task_conf()
-            self._log('[adb_cmd]<<info>> ' + datetime.now().strftime('%H:%M:%S %f') + '\n', cmdline)
+            self._log('<<info>>[adb_cmd] {}\n'.format(datetime.now().strftime('%H:%M:%S %f')), cmdline)
         else:
-            self._log('[adb_cmd]<<info>>\n\t', cmdline)
+            self._log('<<info>>[adb_cmd]\n\t', cmdline)
 
     def adb_cmd(self, cmd):
         self._clean()
@@ -207,7 +207,7 @@ class NoxConADB(object):
                 self._log('<<info>> wait_for_device', 'ok')
                 break
             else:
-                self._log('<<info>> wait_for_device', str(timeout) + 's')
+                self._log('<<info>> wait_for_device', 'timeout: {}s'.format(timeout))
                 timeout -= 5
                 time.sleep(5)
 
