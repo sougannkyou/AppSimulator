@@ -90,7 +90,7 @@ class NoxConSelenium(NoxConADB):
         if os.access(static_capture_path, os.R_OK):
             shutil.copy(capture_path, static_capture_path)
 
-    def find_element(self, comment, timeout, threshold=0.7):
+    def find_element(self, comment, timeout, threshold=0.7, rect=(0, 25, 480, 800)):
         img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
         while timeout > 0:
             self.get_capture()
@@ -106,7 +106,7 @@ class NoxConSelenium(NoxConADB):
 
         return False, -1, -1
 
-    def find_elements(self, comment, timeout, threshold=0.9):
+    def find_elements(self, comment, timeout, threshold=0.9, rect=(0, 25, 480, 800)):
         ret = []
         img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
         self.get_capture()
