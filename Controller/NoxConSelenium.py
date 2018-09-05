@@ -9,6 +9,7 @@ import pyautogui
 from Controller.setting import *
 from Controller.Common import common_log
 from Controller.NoxConADB import NoxConADB
+from Controller.ImgLib import NewsTitleList
 
 
 class NoxConSelenium(NoxConADB):
@@ -289,6 +290,11 @@ class NoxConSelenium(NoxConADB):
             pyautogui.mouseUp()
             time.sleep(1)
             return True
+
+    @staticmethod
+    def detect_title_line(image_path, font_size=18, region=(0, 0, 480, 800)):
+        news_title = NewsTitleList(font_size=font_size, region=region)
+        return news_title.detect(image_path)
 
     def __ftp_upload(self, capture_name, capture_before_name, mode='mnox'):
         # Controller\images\temp\capture_nox-1.png ->
