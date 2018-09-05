@@ -128,21 +128,6 @@ class NoxConSelenium(NoxConADB):
 
         return len(ret) > 0, ret
 
-    # def next_page_comments(self, wait_time):
-    #     self._log('<<info>> next_page_comments', '翻页')
-    #     # self .clear_cache()
-    #     self.adb_shell("input swipe 300 750 300 350")
-    #     time.sleep(wait_time)
-    #     return True
-    #
-    # def next_page(self, from_x=240, from_y=700, to_x=240, to_y=10, wait_time=2):
-    #     # 480 * 800
-    #     self._log('<<info>> next_page', '翻页')
-    #     self.adb_shell("input swipe " + str(from_x) + " " + str(from_y) + " " + str(to_x) + " " + str(to_y) + " " +
-    #                    str(int((from_y - to_y) * 5)))
-    #     time.sleep(wait_time)
-    #     return True
-
     def next_page_browser(self, wait_time=3):
         self._log('<<info>> next_page_browser', '浏览器翻页')
         self.adb_shell("input keyevent 93")  # KEYCODE_PAGE_DOWN = 93

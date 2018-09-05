@@ -1,4 +1,5 @@
 # coding=utf-8
+import re
 from pprint import pprint
 from datetime import datetime, timedelta, time
 import pymongo
@@ -94,17 +95,22 @@ class MongoDriver(object):
         if log_filter:
             func_list = []
             if log_filter['module']['manager']:
-                func_list.append({'$not': {'$regex': 'Manager'}})
+                # func_list.append({'func': {'$not': re.compile('Manager')}})
+                func_list.append({'func': {'$not': 'Manager'}})
             if log_filter['module']['selenium']:
-                func_list.append({'$not': {'$regex': 'NoxConSelenium'}})
+                # func_list.append({'func': {'$not': re.compile('NoxConSelenium')}})
+                func_list.append({'func': {'$not': 'NoxConSelenium'}})
             if log_filter['module']['docker']:
-                func_list.append({'$not': {'$regex': 'NoxDocker'}})
+                # func_list.append({'func': {'$not': re.compile('NoxDocker')}})
+                func_list.append({'func': {'$not': 'NoxDocker'}})
             if log_filter['module']['adb']:
-                func_list.append({'$not': {'$regex': 'adb'}})
+                # func_list.append({'func': {'$not': re.compile('adb')}})
+                func_list.append({'func': {'$not': 'adb'}})
 
             cond['func'] = {'$and': func_list}
 
-        print('<<<<<<>>>>>>')
+        print('<<<<<<log_find_by_ip>>>>>>')
+        # db.logger.find({$and: [{'func':{'$not': /NoxConSelenium/}},{'func':{'$not': /NoxDocker/}}]})
         pprint(cond)
         log_list = self.logger.find(cond).sort('time', pymongo.ASCENDING).skip(0).limit(200)
         for log in log_list:

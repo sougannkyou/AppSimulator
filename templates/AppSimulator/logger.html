@@ -58,8 +58,7 @@
 
 {% block body_tail %}
   <!-- page script -->
-  <script type="text/javascript"
-          src="{% static 'plugins/echarts/extension/dataTool.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'plugins/echarts/extension/dataTool.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'plugins/echarts/echarts-all-3.js' %}"></script>
   <script type="text/javascript" src="{% static 'dist/js/demo.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/theme/dark.js' %}"></script>
@@ -71,7 +70,6 @@
   <script type="text/javascript" src="{% static 'plugins/vue1/vue.js' %}"></script>
   <script type="text/javascript" src="{% static 'AppSimulator/js/csrf.js' %}"></script>
   <script type="text/javascript">
-
     function getLogs(obj) {
       let opt = {
         url: '/AppSimulator/getLogsAPI/',
