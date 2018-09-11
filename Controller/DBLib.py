@@ -123,8 +123,9 @@ class MongoDriver(object):
         return self.tasks.find_one({'taskId': taskId})
 
     def task_restart(self, task):  # copy from db
+        taskId = self.get_taskId()
         self.tasks.insert({
-            "taskId": task['taskId'],
+            "taskId": taskId,
             "orgTaskId": task['orgTaskId'] if task['orgTaskId'] != 0 else task['taskId'],  # 初始taskId
             "script": task['script'],
             "app_name": task['app_name'],

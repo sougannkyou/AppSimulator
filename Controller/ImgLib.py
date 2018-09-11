@@ -16,7 +16,7 @@ class NewsTitleList(object):
         self._img_obj = None
         self._work_path = WORK_PATH
 
-    def preprocess(self, gray):
+    def morphology(self, gray):
         # 二值化 x方向求梯度 GRADIENT
         sobel = cv2.Sobel(gray, cv2.CV_8U, 1, 0, ksize=3)
         ret, binary = cv2.threshold(sobel, 0, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY)
@@ -210,10 +210,10 @@ class NewsTitleList(object):
 
         return self.find_paragraph(focus, iterations - 1)
 
-    def detect(self, image_path):
+    def find_title(self, image_path):
         self._img_obj = cv2.imread(image_path)
         gray = cv2.cvtColor(self._img_obj, cv2.COLOR_BGR2GRAY)
-        dilation = self.preprocess(gray)
+        dilation = self.morphology(gray)
         region = self.find_text_region(dilation)
         # 画轮廓（绿） (蓝,绿,红)
         for rect in region:
@@ -253,6 +253,6 @@ if __name__ == '__main__':
     start = datetime.now()
     d = NewsTitleList(font_size=18)
     d._DEBUG = True
-    d.detect(image_path)
+    d.find_title(image_path)
     end = datetime.now()
     print('spend times:{}'.format(end - start))
