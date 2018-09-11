@@ -86,28 +86,25 @@ class MongoDriver(object):
 
     # -------------  logger -----------------------------------------------------------------
     def log_find_by_ip(self, ip=None, log_filter=None):
-        # {'module': {'adb': True, 'docker': True, 'manager': True, 'selenium': True}}
+        # log_filter = {'module': {'adb': True, 'docker': False, 'manager': True, 'selenium': True}}
         ret = []
         cond = {}
         if ip:
             cond['ip'] = ip
-
+                                                      
         if log_filter:
             func_list = []
-            if log_filter['module']['manager']:
-                # func_list.append({'func': {'$not': re.compile('Manager')}})
-                func_list.append({'func': {'$not': 'Manager'}})
-            if log_filter['module']['selenium']:
-                # func_list.append({'func': {'$not': re.compile('NoxConSelenium')}})
-                func_list.append({'func': {'$not': 'NoxConSelenium'}})
-            if log_filter['module']['docker']:
-                # func_list.append({'func': {'$not': re.compile('NoxDocker')}})
-                func_list.append({'func': {'$not': 'NoxDocker'}})
-            if log_filter['module']['adb']:
-                # func_list.append({'func': {'$not': re.compile('adb')}})
-                func_list.append({'func': {'$not': 'adb'}})
+            if not log_filter['module']['manager']:
+                func_list.append({'func': {'$not': re.compile('Manager')}})
+            if not log_filter['module']['selenium']:
+                func_list.append({'func': {'$not': re.compile('NoxConSelenium')}})
+            if not log_filter['module']['docker']:
+                func_list.append({'func': {'$not': re.compile('NoxDocker')}})
+            if not log_filter['module']['adb']:
+                func_list.append({'func': {'$not': re.compile('adb')}})
 
-            cond['func'] = {'$and': func_list}
+            if func_list:
+                cond['$and'] = func_list
 
         print('<<<<<<log_find_by_ip>>>>>>')
         # db.logger.find({$and: [{'func':{'$not': /NoxConSelenium/}},{'func':{'$not': /NoxDocker/}}]})
