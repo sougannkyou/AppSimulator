@@ -4,11 +4,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
 
 from AppSimulator.views import (
-    DashBoardView, TasksView, VMwareView, LoggerView, HostsView, EmulatorsView
+    DashBoardView, TasksView, VMwareView, LoggerView, HostsView, EmulatorsView, TasksStartView
 )
 
 from AppSimulator.WebAPI import (
-    addTaskAPI, removeTaskAPI, getTasksAPI, getTasksCntAPI, getEmulatorsAPI,
+    addTaskAPI, removeTaskAPI, getTasksAPI, getTasksCntAPI, getEmulatorsAPI,getTasksStartHeatmapAPI,
     getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI,
     setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,
     getDeviceCaptureAPI, getProxyServerInfoAPI,
@@ -22,6 +22,7 @@ urlpatterns = patterns('',
                        url(r'^dashboard/$', DashBoardView.as_view(), name='dashboard'),
                        url(r'^tasks/$', TasksView.as_view(), name='tasks'),
                        url(r'^emulators/$', EmulatorsView.as_view(), name='emulators'),
+                       url(r'^tasksStart/$', TasksStartView.as_view(), name='tasksStart'),
                        url(r'^hosts/$', HostsView.as_view(), name='hosts'),
                        url(r'^vmware/$', VMwareView.as_view(), name='vmware'),
                        url(r'^log/$', LoggerView.as_view(), name='log'),
@@ -47,6 +48,7 @@ urlpatterns = patterns('',
                        # emulator
                        url(r'^emulatorShakeAPI/$', emulatorShakeAPI, name='emulatorShakeAPI'),
                        url(r'^getEmulatorsAPI/$', getEmulatorsAPI, name='getEmulatorsAPI '),
+                       url(r'^getTasksStartHeatmapAPI/$', getTasksStartHeatmapAPI, name='getTasksStartHeatmapAPI '),
                        # vmware
                        url(r'^getVMwaresAPI/$', getVMwaresAPI, name='getVMwaresAPI'),
                        # hosts

@@ -259,6 +259,12 @@ def runTasks():
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
+def getTasksStartHeatmapAPI(request):
+    ret = True
+    output = JsonResponse({
+        'ret': ret
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 # ------- emulators ------------------------------------------------------------
 def getEmulatorsAPI(request):

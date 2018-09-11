@@ -174,6 +174,17 @@ class MongoDriver(object):
         else:
             return None
 
+    def string2timestamp(self, s, format_str="%Y-%m-%d %H:%M:%S"):
+        return int(time.mktime(datetime.strptime(s, format_str).timetuple()))
+
+    def emulator_get_start_by_day(self, taskId, day):
+        ret = []
+        for h in range(24):
+            t = self.string2timestamp('{} {}:00:00'.format(day, h))
+            cnt = self.dockers.find({"taskId": taskId, 'start_time': {'$gt': t, '$lt': t + 3600}}).count()
+            ret.append(cnt)
+        return ret
+
     def emulator_find_by_host(self, host_ip=None):
         ret = []
         if host_ip:
@@ -195,12 +206,6 @@ class MongoDriver(object):
         return ret
 
     def emulator_get_taskId(self):
-        # taskId = 1
-        # m = self.tasks.aggregate([{"$group": {'_id': '', 'max_id': {"$max": "$taskId"}}}])
-        # for i in m:
-        #     taskId = i['max_id'] + 1  # taskId自增
-        # return taskId
-
         counter = self.taskId.find_one_and_update(
             {'_id': 'counter'},
             {'$inc': {'count': 1}},
@@ -377,4 +382,4 @@ if __name__ == '__main__':
     info = {'device1': 10, 'device2': 20, 'device3': 30, 'device4': 40}
     db = MongoDriver()
     # db.update_device_statistics_info(info, SCOPE_TIMES)
-    pprint(db.emulator_get_taskId())
+    pprint(db.emulator_get_start_by_day(22, '2018-09-03'))
