@@ -91,7 +91,7 @@ class MongoDriver(object):
         cond = {}
         if ip:
             cond['ip'] = ip
-                                                      
+
         if log_filter:
             func_list = []
             if not log_filter['module']['manager']:
@@ -174,12 +174,12 @@ class MongoDriver(object):
     def string2timestamp(self, s, format_str="%Y-%m-%d %H:%M:%S"):
         return int(time.mktime(datetime.strptime(s, format_str).timetuple()))
 
-    def emulator_get_start_by_day(self, taskId, day):
+    def emulator_get_start_by_day(self, index, taskId, day):
         ret = []
         for h in range(24):
             t = self.string2timestamp('{} {}:00:00'.format(day, h))
             cnt = self.dockers.find({"taskId": taskId, 'start_time': {'$gt': t, '$lt': t + 3600}}).count()
-            ret.append(cnt)
+            ret.append([index, h, cnt])
         return ret
 
     def emulator_find_by_host(self, host_ip=None):

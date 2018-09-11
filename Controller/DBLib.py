@@ -122,10 +122,9 @@ class MongoDriver(object):
     def task_find_by_taskId(self, taskId):
         return self.tasks.find_one({'taskId': taskId})
 
-    def task_clone(self, task):  # copy from db
-        taskId = self.get_taskId()
+    def task_restart(self, task):  # copy from db
         self.tasks.insert({
-            "taskId": taskId,
+            "taskId": task['taskId'],
             "orgTaskId": task['orgTaskId'] if task['orgTaskId'] != 0 else task['taskId'],  # 初始taskId
             "script": task['script'],
             "app_name": task['app_name'],
@@ -136,6 +135,7 @@ class MongoDriver(object):
             "start_time": int(datetime.now().timestamp()),
             "up_time": 0,
             "end_time": 0,
+            "timer": task['timer'],
             "timer_no": 0,
             "docker_img_name": task['docker_img_name'],
             "description": task['description'],
