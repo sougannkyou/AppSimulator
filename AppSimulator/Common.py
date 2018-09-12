@@ -11,6 +11,8 @@ def seconds_format(seconds):
         hours, remainder = divmod(seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         return "{h:0>2d}:{m:0>2d}:{s:0>2d}".format(h=hours, m=minutes, s=seconds)
+    elif seconds == 0:
+        return '0'
     else:
         return 'N/A'
 

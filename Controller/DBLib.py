@@ -122,7 +122,7 @@ class MongoDriver(object):
     def task_find_by_taskId(self, taskId):
         return self.tasks.find_one({'taskId': taskId})
 
-    def task_restart(self, task):  # copy from db
+    def task_clone(self, task):
         taskId = self.get_taskId()
         self.tasks.insert({
             "taskId": taskId,
@@ -180,16 +180,19 @@ class MongoDriver(object):
 
     def task_change_status(self, task):
         now = int(datetime.now().timestamp())
-        if task['status'] == STATUS_SCRIPT_RUN_OK:
+        # 脚本运行完毕 docker创建完毕
+        if task['status'] == STATUS_SCRIPT_RUN_OK or task['status'] == STATUS_SCRIPT_RUN_NG or \
+                task['status'] == STATUS_DOCKER_RUN_OK or task['status'] == STATUS_DOCKER_RUN_NG:
             self.tasks.update({'_id': task['_id']}, {"$set": {
                 'status': task['status'],
                 'up_time': now,
                 'end_time': now
             }})
-        elif task['status'] == STATUS_WAIT:
+        elif task['status'] == STATUS_WAIT:  # 重启Task
             self.tasks.update({'_id': task['_id']}, {"$set": {
                 'status': task['status'],
                 'host_ip': '',
+                'start_time': now,
                 'up_time': now,
                 'end_time': 0
             }})
@@ -215,7 +218,7 @@ class MongoDriver(object):
             'name': 'nox-{}'.format(docker_obj.get_taskId()),
             'taskId': docker_obj.get_taskId(),
             'app_name': docker_obj.get_app_name(),
-            'error_msg': '',
+            'error_msg': [],
             'host_ip': LOCAL_IP,
             'status': STATUS_DOCKER_RUN,
             'start_time': int(datetime.now().timestamp()),
@@ -224,20 +227,31 @@ class MongoDriver(object):
         })
 
     def docker_destroy(self, docker_obj):
-        if docker_obj.get_docker_id():
-            now = int(datetime.now().timestamp())
-            ret = self.dockers.update(
-                {'_id': docker_obj.get_docker_id()},
-                {"$set": {
-                    'error_msg': docker_obj.error_msg,
-                    'status': STATUS_DOCKER_RUN_NG if docker_obj.error_msg else STATUS_DOCKER_RUN_OK,
-                    'up_time': now,
-                    'end_time': now
-                }})
-            docker_obj.error_msg = ''
-            return ret['nModified'] == 1
-        else:
-            return False
+        now = int(datetime.now().timestamp())
+        ret = self.dockers.update(
+            {'name': docker_obj.get_name()},
+            {"$set": {
+                'status': STATUS_DOCKER_RUN_NG if docker_obj.error_msg else STATUS_DOCKER_RUN_OK,
+                'up_time': now,
+                'end_time': now
+            }})
+        return ret['nModified'] == 1
+
+    def docker_add_deadly_msg(self, docker_obj, error_msg):
+        now = int(datetime.now().timestamp())
+        self.dockers.update(
+            {'name': docker_obj.get_name()},
+            {"$push": {
+                'error_msg': error_msg,
+            }})
+        ret = self.dockers.update(
+            {'name': docker_obj.get_name()},
+            {"$set": {
+                'status': STATUS_DOCKER_RUN_NG,
+                'up_time': now,
+                'end_time': now
+            }})
+        return ret['nModified'] == 1
 
     # ---------- vmware -----------------------
     def vm_find_vm_by_host(self, host_ip=None):

@@ -65,7 +65,7 @@ def main(task, mode):
             "复制链接": 'images/miaopai/copylink.png',
             "跳过软件升级": 'images/miaopai/ignore_upgrade.png',
         })
-        me._DEBUG = True
+        # me._DEBUG = True
         me.run()
     except Exception as e:
         msg = '<<error>>'

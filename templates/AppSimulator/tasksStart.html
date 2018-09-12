@@ -7,7 +7,7 @@
 {% endblock header_tail %}
 
 {% block section_content %}
-  <div id="tasks" style="height:800px"></div>
+  <div id="tasks" style="height:600px"></div>
   <div id="main">
     <div id="children" style="height:400px"></div>
   </div>
@@ -30,7 +30,7 @@
   <script type="text/javascript" src="{% static 'plugins/vue1/vue.js' %}"></script>
   <script type="text/javascript" src="{% static 'AppSimulator/js/csrf.js' %}"></script>
   <script type="text/javascript">
-    function draw(tasks, data) {
+    function drawHeatmap(tasks, data) {
       let dom = document.getElementById("tasks");
       let myChart = echarts.init(dom, {renderer: 'svg'});
       let app = {};
@@ -113,7 +113,7 @@
         type: 'GET',
         data: {
           taskIdList: JSON.stringify(tasks),
-          day: '2018-09-11'
+          day: '2018-09-12'
         },
         dataType: "json",
         error: function (xhr, err) {
@@ -121,13 +121,13 @@
         },
         success: function (data, status) {
           console.log(data);
-          draw(tasks, data['ret']);
+          drawHeatmap(tasks, data['ret']);
         }
       };
       $.ajax(opt);
     }
 
-    getTasksStartHeatmap([22, 23, 24, 25, 26]);
+    getTasksStartHeatmap([53, 54, 55, 56, 57, 58, 59, 60]);
 
     function drawChildren(orgTaskId) {
       console.log('drawChildren:', orgTaskId);

@@ -124,10 +124,10 @@ class Manager(object):
             return False, e
 
     def nox_start(self, task, docker):
-        docker.rmi(kill_script=True)
+        docker.docker_rmi(kill_script=True)
         self.nox_stop_confirm(docker, retry=True, wait_time=30)
 
-        ret = docker.run()  # docker run: create and start
+        ret = docker.docker_run()  # docker.docker_run = docker.docker_create(precheck) + docker.docker_start
         if ret:
             ret = self.nox_start_confirm(task_info=task, docker=docker, timeout=60)
 
@@ -140,7 +140,7 @@ class Manager(object):
 
     def nox_start_success(self, docker):
         self._log('<<info>> nox_start_success', docker.get_name())
-        docker.shake(1)
+        docker.docker_shake(1)
         # docker.set_docker_name()
         # port = docker.get_port()
         return True
@@ -157,7 +157,7 @@ class Manager(object):
             ))
             return self.nox_start(task, docker)
         else:
-            docker.rmi(kill_script=True)
+            docker.docker_rmi(kill_script=True)
 
         return False
 
@@ -171,7 +171,7 @@ class Manager(object):
             ret, x, y = driver.find_element(comment='很抱歉', timeout=10)  # 匹配到“很抱歉”字样
             if ret:
                 msg = '匹配到“很抱歉”'
-                docker.error_msg = msg
+                docker.add_deadly_msg('nox_start_confirm', msg)
                 self._log('<<info>> nox_start_confirm', '{} {}'.format(docker.get_name(), msg))
                 return False
             else:
@@ -180,7 +180,7 @@ class Manager(object):
                     msg = '可匹配到app图标'
                 else:
                     msg = '未匹配到app图标'
-                    docker.error_msg = msg
+                    docker.add_deadly_msg('nox_start_confirm', msg)
 
                 self._log('<<info>> nox_start_confirm', '{} {}'.format(docker.get_name(), msg))
                 return ret
@@ -202,7 +202,7 @@ class Manager(object):
 
         if retry and wait_time == 0:  # 不能强杀，会造成模拟器 ERR：1037
             # docker._cmd_kill_task
-            docker.rmi(kill_script=True)
+            docker.docker_rmi(kill_script=True)
 
         time.sleep(10)
         return True
@@ -211,13 +211,13 @@ class Manager(object):
         task = self._mdb.task_find_by_taskId(int(taskId))
 
         docker = NoxConDocker(task)
-        docker.rmi(kill_script=True)
+        docker.docker_rmi(kill_script=True)
 
         task['status'] = STATUS_SCRIPT_RUN_OK
         self._mdb.task_change_status(task)
         if task['live_cycle'] == LIVE_CYCLE_NEVER:
             self._log('<<info>> nox_run_task_finally', 'reset Task status to wait.')
-            self._mdb.task_restart(task)
+            self._mdb.task_clone(task)
 
     def nox_schedule(self):
         return self._mdb.task_schedule()
@@ -236,8 +236,7 @@ class Manager(object):
                 ret = self.nox_start(task=task, docker=docker)
 
                 # 2) 模拟器启动：成功/失败
-                status = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
-                task['status'] = status
+                task['status'] = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
                 self._mdb.task_change_status(task)
 
                 if ret:  # 3) 脚本启动：成功/失败

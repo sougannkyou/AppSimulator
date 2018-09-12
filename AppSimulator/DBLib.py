@@ -176,10 +176,15 @@ class MongoDriver(object):
 
     def emulator_get_start_by_day(self, index, taskId, day):
         ret = []
+        children = [taskId]
+        for t in self.tasks.find({"orgTaskId": taskId}):
+            children.append(t['taskId'])
+
         for h in range(24):
             t = self.string2timestamp('{} {}:00:00'.format(day, h))
-            cnt = self.dockers.find({"taskId": taskId, 'start_time': {'$gt': t, '$lt': t + 3600}}).count()
+            cnt = self.dockers.find({"taskId": {"$in": children}, 'start_time': {'$gt': t, '$lt': t + 3600}}).count()
             ret.append([index, h, cnt])
+
         return ret
 
     def emulator_find_by_host(self, host_ip=None):
@@ -287,6 +292,7 @@ class MongoDriver(object):
             docker['start_time'] = timestamp2string(docker['start_time'], "%m-%d %H:%M:%S")
             docker['end_time'] = timestamp2string(docker['end_time'], "%m-%d %H:%M:%S")
             docker['up_time'] = timestamp2string(docker['up_time'], "%m-%d %H:%M:%S")
+            docker['error_msg'] = ';'.join(docker['error_msg']) if docker['error_msg'] else '-'
 
             ret.append(docker)
         return ret

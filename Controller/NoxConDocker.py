@@ -16,7 +16,7 @@ class NoxConDocker(object):
     def __init__(self, task_info):
         self._DEBUG = True
         self.start_retry_cnt = 3
-        self.error_msg = ''  # 启动诊断信息
+        self.error_msg = []  # 启动诊断信息
         self._taskId = task_info['taskId']
         self._task_info = task_info
         self._local_ip = LOCAL_IP
@@ -32,46 +32,45 @@ class NoxConDocker(object):
     #     print('call NoxConDocker.__del__')
     #     os.chdir(self._org_path)
 
-    def _check(self):
-        msg = ''
-        self.error_msg = ''
+    def docker_precheck(self):
+        self.error_msg.clear()
         if not self._local_ip:
-            self.error_msg = '必须设定环境变量 APPSIMULATOR_IP'
+            self.add_deadly_msg('docker_precheck', '必须设定环境变量 APPSIMULATOR_IP')
+            return False
 
         if not self._app_name:
-            self.error_msg = '必须设定App名字'
+            self.add_deadly_msg('docker_precheck', '必须设定App名字')
+            return False
 
         mem = psutil.virtual_memory()
         if mem.free < 1 * GB:  # < 1GB
-            self.error_msg = '剩余内存需大于 1GB.'
-        else:
-            msg = 'Memory: {:.1f} GB'.format(mem.free / GB)
-
-        if not os.access('{}\\{}'.format(NOX_BACKUP_PATH, self._docker_img_name), os.R_OK):
-            self.error_msg = '未找到镜像文件: {}'.format(self._docker_img_name)
-
-        if len(self.ps(docker_name='nox-org')) == 0:
-            self.error_msg = '未找到 nox-org.'
-
-        running_dockers = self.ps(docker_status=STATUS_DOCKER_RUN_OK)
-        if len(running_dockers) >= len(TIMER):
-            self.error_msg = '启动数量不能大于 TIMER 设定数量：{}'.format(len(TIMER))
-        else:
-            msg = '正在运行的模拟器数: {}'.format(len(running_dockers))
-
-        if self.error_msg:
-            self._log('<<error>> _check', self.error_msg)
-            self.start_retry_cnt = -1  # 不满足启动条件
+            self.add_deadly_msg('docker_precheck', '剩余内存需大于 1GB.')
             return False
         else:
-            self._log('_check', msg)
-            return True
+            self._log('docker_precheck', 'Memory: {:.1f} GB'.format(mem.free / GB))
 
-    def _make_cmd(self, cmd):
+        if not os.access('{}\\{}'.format(NOX_BACKUP_PATH, self._docker_img_name), os.R_OK):
+            self.add_deadly_msg('docker_precheck', '未找到镜像文件: {}'.format(self._docker_img_name))
+            return False
+
+        if len(self.docker_ps(docker_name='nox-org')) == 0:
+            self.add_deadly_msg('docker_precheck', '未找到 nox-org.')
+            return False
+
+        running_dockers = self.docker_ps(docker_status=STATUS_DOCKER_RUN_OK)
+        if len(running_dockers) >= len(TIMER):
+            self.add_deadly_msg('docker_precheck', '启动数量不能大于 TIMER 设定数量：{}'.format(len(TIMER)))
+            return False
+        else:
+            self._log('docker_precheck', '正在运行的模拟器数: {}'.format(len(running_dockers)))
+
+        return True
+
+    def docker_make_cmd(self, cmd):
         os.chdir(NOX_BIN_PATH)
         return 'NoxConsole ' + cmd
 
-    def _exec_nox_cmd(self, cmdline):
+    def docker_exec_nox_cmd(self, cmdline):
         _stdout = ''
         _stderr = ''
         try:
@@ -96,40 +95,40 @@ class NoxConDocker(object):
             time.sleep(1)
             return _stdout
 
-    def _cmd_kill_task(self, docker_name):
-        dockers = self.ps(docker_name=docker_name, docker_status=STATUS_DOCKER_RUN_OK)
+    def docker_cmd_kill_task(self, docker_name):
+        dockers = self.docker_ps(docker_name=docker_name, docker_status=STATUS_DOCKER_RUN_OK)
         for d in dockers:
             cmd = 'TASKKILL /F /T /PID {}'.format(d['pid'])  # 不能强杀，会造成 ERR：1037
             common_exec_cmd(True, cmd)
             # os.system(cmd)
 
-    def kill_task(self):
+    def docker_kill_task(self):
         # <<cmd>> taskkill /f /t /fi "WINDOWTITLE eq task-99"
         cmd = 'TASKKILL /F /T /FI "WINDOWTITLE eq task-{}"'.format(self._taskId)
         common_exec_cmd(True, cmd)
         # os.system(cmd)
 
-    def shake(self, cnt):
+    def docker_shake(self, cnt):
         shell = win32com.client.Dispatch("WScript.Shell")
         shell.SendKeys('%')
         hwnd = win32gui.FindWindow(None, self._docker_name)
         if hwnd:
             win32gui.SetForegroundWindow(hwnd)
 
-        self._log('<<info>> shake', str(cnt) + ' times')
+        self._log('<<info>> docker_shake', str(cnt) + ' times')
         for _ in range(cnt):
-            self._exec_nox_cmd(self._make_cmd(
+            self.docker_exec_nox_cmd(self.docker_make_cmd(
                 "action -name:{} -key:call.shake -value:null".format(self._docker_name)
             ))
         return True
 
-    def rmi(self, kill_script=False, wait_time=2):  # remove docker image
-        self._log('<<info>> rmi', '退出并删除模拟器')
+    def docker_rmi(self, kill_script=False, wait_time=2):  # remove docker image
+        self._log('<<info>> docker_rmi', '退出并删除模拟器')
         # if kill_script:  # kill 掉 cmd 启动的 python script_xxx.py
         #     self.kill_task()
 
         time.sleep(wait_time)
-        self._exec_nox_cmd(self._make_cmd("quit -name:{}".format(self._docker_name)))
+        self.docker_exec_nox_cmd(self.docker_make_cmd("quit -name:{}".format(self._docker_name)))
         time.sleep(wait_time)
 
         # 确保窗体关闭
@@ -138,18 +137,19 @@ class NoxConDocker(object):
         #     return self.remove()
         # else:
         #     return False
-        return self.remove()
+        self.docker_remove()
+        return True
 
-    def rmi_all(self):
-        self._log('<<info>> rmi_all', 'wait: 10s')
+    def docker_rmi_all(self):
+        self._log('<<info>> docker_rmi_all', 'wait: 10s')
         time.sleep(2)
-        self._exec_nox_cmd(self._make_cmd('quitall'))
+        self.docker_exec_nox_cmd(self.docker_make_cmd('quitall'))
         time.sleep(10)
         return True
 
-    def ps(self, docker_name=None, docker_status=None):
+    def docker_ps(self, docker_name=None, docker_status=None):
         devices = []
-        ret = self._exec_nox_cmd(self._make_cmd('list'))
+        ret = self.docker_exec_nox_cmd(self.docker_make_cmd('list'))
         if ret:
             # 虚拟机名称，标题，顶层窗口句柄，工具栏窗口句柄，绑定窗口句柄，进程PID
             for s in ret.split('\r\n'):
@@ -165,10 +165,10 @@ class NoxConDocker(object):
 
         return devices
 
-    def pull(self):  # restore
-        self._log('pull', self._docker_img_name)
+    def docker_pull(self):  # restore
+        self._log('docker_pull', self._docker_img_name)
         time.sleep(1)
-        ret = self._exec_nox_cmd(self._make_cmd(
+        ret = self.docker_exec_nox_cmd(self.docker_make_cmd(
             'restore -name:{} -file:"{}\\{}"'.format(self._docker_name, NOX_BACKUP_PATH, self._docker_img_name)
         ))
         if ret.find('failed') > 0:
@@ -177,88 +177,91 @@ class NoxConDocker(object):
             time.sleep(5)
             return True
 
-    def copy(self, org, wait_time=10):
-        self._log('copy', self._docker_name)
+    def docker_copy(self, org, wait_time=10):
+        self._log('docker_copy', self._docker_name)
         time.sleep(wait_time)
-        self._exec_nox_cmd(self._make_cmd("copy -name:{} -from:{}".format(self._docker_name, org)))
+        self.docker_exec_nox_cmd(self.docker_make_cmd("copy -name:{} -from:{}".format(self._docker_name, org)))
         return True
 
-    def add(self):
-        self._log('add', self._docker_name)
+    def docker_add(self):
+        self._log('docker_add', self._docker_name)
         time.sleep(2)
-        self._docker_id = self._mdb.docker_create(docker_obj=self)
-        self._mdb.task_bind_docker(self._task_info, self._docker_id)  # bind docker to task
-        ret = self._exec_nox_cmd(self._make_cmd("add -name:" + self._docker_name))
+        ret = self.docker_exec_nox_cmd(self.docker_make_cmd("add -name:" + self._docker_name))
         # ret = self._exec_nox_cmd(self._make_cmd("add -name:" + self._docker_name + ' -systemtype:4')) # nox 6.2.1
         time.sleep(2)
         return False if ret.find('failed') != -1 or \
                         ret.find('not') != -1 or \
                         ret.find('system type err!') != -1 else True  # nox 6.2.1
 
-    def remove(self):
-        self._log('remove', self._docker_name)
+    def docker_remove(self):
+        self._log('docker_remove', self._docker_name)
         time.sleep(2)
-        self._exec_nox_cmd(self._make_cmd("remove -name:{}".format(self._docker_name)))
+        self.docker_exec_nox_cmd(self.docker_make_cmd("remove -name:{}".format(self._docker_name)))
+        time.sleep(2)
         self._mdb.docker_destroy(docker_obj=self)
         self._mdb.task_unbind_docker(self._task_info)  # unbind task
-        time.sleep(2)
         return True
 
-    def create(self):
+    def docker_create(self):
         poweron = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\poweron.png'
         static_capture_path = '{}\\static\\AppSimulator\\images\\temp\\emulators\\capture_{}.png'.format(
             self._work_path, self._docker_name)
         if os.access(static_capture_path, os.R_OK):
             shutil.copy(poweron, static_capture_path)
 
-        ret = self._check()
+        self._docker_id = self._mdb.docker_create(docker_obj=self)
+        self._mdb.task_bind_docker(self._task_info, self._docker_id)  # bind docker to task
+
+        ret = self.docker_precheck()
         if not ret:
+            self._log('<<error>> docker_precheck', ';'.join(self.error_msg))
+            self.start_retry_cnt = -1  # 不满足启动条件
             return False
 
-        dockers = self.ps(docker_name=self._docker_name)
+        dockers = self.docker_ps(docker_name=self._docker_name)
         if len(dockers) > 1:
             pprint(dockers)
-            self.error_msg = '找到不止 1 个模拟器'
-            self._log('<<error>> create', self.error_msg)
+            self.add_deadly_msg('docker_ps', '找到不止 1 个模拟器')
+            self._log('<<error>> docker_ps', self.error_msg)
             return False
 
         if len(dockers) == 1:
             # if dockers[0]['status'] == STATUS_DOCKER_RUN:
-            ret = self.rmi(kill_script=True, wait_time=5)
+            ret = self.docker_rmi(kill_script=True, wait_time=5)
             if not ret:
-                self.error_msg = 'failed!'
-                self._log('<<error>> stop', self.error_msg)
+                self.add_deadly_msg('docker_rmi', 'rmi failed!')
+                self._log('<<error>> docker_rmi', self.error_msg)
                 return False
 
         # self.copy('nox-org')  # copy命令不稳定
-        ret = self.add()
+        ret = self.docker_add()
         if not ret:
-            self.error_msg = 'add failed!'
-            self._log('<<error>> add', self.error_msg)
+            self.add_deadly_msg('docker_add', 'add failed!')
+            self._log('<<error>> docker_add', self.error_msg)
             return False
 
-        ret = self.pull()
+        ret = self.docker_pull()
         if not ret:
-            self.error_msg = 'pull failed!'
-            self._log('<<error>> pull', self.error_msg)
+            self.add_deadly_msg('docker_pull', 'pull failed!')
+            self._log('<<error>> docker_pull', self.error_msg)
             return False
 
         return True
 
-    def start(self, timeout=2):
+    def docker_start(self, timeout=2):
         time.sleep(timeout)
-        stdout = self._exec_nox_cmd(self._make_cmd("launch -name:" + self._docker_name))
+        stdout = self.docker_exec_nox_cmd(self.docker_make_cmd("launch -name:" + self._docker_name))
         time.sleep(timeout)
         if stdout.find('player is not exist!') == -1:
             return True
         else:
-            self.error_msg = 'launch failed!'
+            self.add_deadly_msg('docker_start', 'launch failed!')
             return False
 
-    def run(self):  # run = create + start
-        ret = self.create()
+    def docker_run(self):  # run = create + start
+        ret = self.docker_create()
         if ret:
-            ret = self.start()
+            ret = self.docker_start()
 
         return ret
 
@@ -274,15 +277,20 @@ class NoxConDocker(object):
     def get_app_name(self):
         return self._app_name
 
+    def add_deadly_msg(self, prefix, msg):  # 模拟器致命错误
+        self._log(prefix, msg)
+        self.error_msg.append(msg)
+        self._mdb.docker_add_deadly_msg(docker_obj=self, error_msg=msg)
+
     def _log(self, prefix, msg):
-        common_log(self._DEBUG, self._taskId, 'NoxDocker ' + self._docker_name, prefix, msg)
+        common_log(self._DEBUG, self._taskId, 'Docker ' + self._docker_name, prefix, msg)
 
 
 # -------------------------------------------------------------------------------
 def main(task_info):
     docker = NoxConDocker(task_info=task_info)
     docker._DEBUG = True
-    return docker.run()
+    return docker.docker_run()
 
 
 if __name__ == "__main__":
