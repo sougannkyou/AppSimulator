@@ -292,7 +292,7 @@ class MongoDriver(object):
             docker['start_time'] = timestamp2string(docker['start_time'], "%m-%d %H:%M:%S")
             docker['end_time'] = timestamp2string(docker['end_time'], "%m-%d %H:%M:%S")
             docker['up_time'] = timestamp2string(docker['up_time'], "%m-%d %H:%M:%S")
-            docker['error_msg'] = ';'.join(docker['error_msg']) if docker['error_msg'] else '-'
+            docker['error_msg'] = '\n'.join(docker['error_msg']) if docker['error_msg'] else '-'
 
             ret.append(docker)
         return ret

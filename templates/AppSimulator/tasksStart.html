@@ -98,7 +98,7 @@
         myChart.on('click', function (params) {
           console.log(params);
           //  window.open('https://www.baidu.com/s?wd=' + encodeURIComponent(params.name));
-          window.location.href = 'http://172.16.253.37:8000/AppSimulator/tasks/';
+          window.location.href = '/AppSimulator/tasks/';
         });
         myChart.on('mouseover', function (params) {
           console.log(params);
@@ -127,7 +127,7 @@
       $.ajax(opt);
     }
 
-    getTasksStartHeatmap([53, 54, 55, 56, 57, 58, 59, 60]);
+    getTasksStartHeatmap([13, 14, 15, 16, 17, 18, 19, 20]);
 
     function drawChildren(orgTaskId) {
       console.log('drawChildren:', orgTaskId);

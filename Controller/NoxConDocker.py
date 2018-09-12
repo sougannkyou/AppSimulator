@@ -214,7 +214,7 @@ class NoxConDocker(object):
 
         ret = self.docker_precheck()
         if not ret:
-            self._log('<<error>> docker_precheck', ';'.join(self.error_msg))
+            self._log('<<error>> docker_precheck', '\n'.join(self.error_msg))
             self.start_retry_cnt = -1  # 不满足启动条件
             return False
 
