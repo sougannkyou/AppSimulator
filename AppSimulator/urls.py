@@ -8,10 +8,10 @@ from AppSimulator.views import (
 )
 
 from AppSimulator.WebAPI import (
-    addTaskAPI, removeTaskAPI, getTasksAPI, getTasksCntAPI, getEmulatorsAPI,getTasksStartHeatmapAPI,
-    getDeviceCrawlCntAPI, getResultSampleAPI, getDevicesStatusAPI,
-    setDeviceGPSAPI, restartDeviceAPI, startScriptAPI, stopScriptAPI, quitAppAPI, startProxyServerAPI,
-    getDeviceCaptureAPI, getProxyServerInfoAPI,
+    addTaskAPI, removeTaskAPI, getTasksAPI, getTasksCntAPI, getEmulatorsAPI, getHeatmapAPI, getHeatmapFamilyAPI,
+    getResultSampleAPI, getDevicesStatusAPI,
+    startProxyServerAPI,
+    getProxyServerInfoAPI,
     runTasksAPI,
     getVMwaresAPI, getHostsAPI, getAllHostsAPI, getLogsAPI, getLogCntAPI, emulatorShakeAPI
 )
@@ -31,16 +31,11 @@ urlpatterns = patterns('',
                        url(r'^getTasksAPI/$', getTasksAPI, name='getTasksAPI'),
                        url(r'^getTasksCntAPI/$', getTasksCntAPI, name='getTasksCntAPI'),
 
-                       url(r'^getDeviceCrawlCntAPI/$', getDeviceCrawlCntAPI, name='getDeviceCrawlCntAPI'),
                        url(r'^getDevicesStatusAPI/$', getDevicesStatusAPI, name='getDevicesStatusAPI'),
                        url(r'^getResultSampleAPI/$', getResultSampleAPI, name='getResultSampleAPI'),
                        url(r'^startProxyServerAPI/$', startProxyServerAPI, name='startProxyServerAPI'),
 
                        url(r'^setDeviceGPSAPI/$', setDeviceGPSAPI, name='setDeviceGPSAPI'),
-                       url(r'^restartDeviceAPI/$', restartDeviceAPI, name='restartDeviceAPI'),
-                       url(r'^startScriptAPI/$', startScriptAPI, name='startScriptAPI'),
-                       url(r'^stopScriptAPI/$', stopScriptAPI, name='stopScriptAPI'),
-                       url(r'^quitAppAPI/$', quitAppAPI, name='quitAppAPI'),
                        url(r'^runTasksAPI/$', runTasksAPI, name='runTasksAPI'),
 
                        url(r'^getDeviceCaptureAPI/$', getDeviceCaptureAPI, name='getDeviceCaptureAPI'),
@@ -48,7 +43,8 @@ urlpatterns = patterns('',
                        # emulator
                        url(r'^emulatorShakeAPI/$', emulatorShakeAPI, name='emulatorShakeAPI'),
                        url(r'^getEmulatorsAPI/$', getEmulatorsAPI, name='getEmulatorsAPI '),
-                       url(r'^getTasksStartHeatmapAPI/$', getTasksStartHeatmapAPI, name='getTasksStartHeatmapAPI '),
+                       url(r'^getHeatmapAPI/$', getHeatmapAPI, name='getHeatmapAPI '),
+                       url(r'^getHeatmapFamilyAPI/$', getHeatmapFamilyAPI, name='getHeatmapFamilyAPI '),
                        # vmware
                        url(r'^getVMwaresAPI/$', getVMwaresAPI, name='getVMwaresAPI'),
                        # hosts

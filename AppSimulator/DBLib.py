@@ -28,6 +28,10 @@ class RedisDriver(object):
         print("get_devices_ip_list:", l)
         return l
 
+    def get_crawl_cnt_by_(self, ip, taskId):
+        # devices:172.16.250.199:task-1
+        return self._conn.scard('devices:{}:task-{}'.format(ip, taskId))
+
     def get_crwal_cnt_by_device(self, app_name):
         keys = [x.decode('utf8') for x in self._conn.keys()]
         key_acquire_url_cnt = '0'

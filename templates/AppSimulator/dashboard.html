@@ -87,36 +87,35 @@
           </a>
         </div>
       </div>
-      <!--
+      <!--<div class="col-md-2">
+        <div class="small-box bg-gray">
+          <div class="inner">
+            <p>Support App</p>
+            <label v-for="app in support_app_list">
+              <img class="app-icon" src="/static/AppSimulator/images/app/[[app]]/app_icon.png">
+            </label>
+          </div>
+          <div href="/AppSimulator/dashboard/" class="small-box-footer">
+            [[ support_app_list | count ]] Apps</i>
+          </div>
+        </div>
+      </div> -->
       <div class="col-md-2">
-        <div class="small-box bg-gray">
+        <div class="small-box bg-gray-active">
           <div class="inner">
-            <p>Support App</p>
-            <label v-for="app in support_app_list">
-              <img class="app-icon" src="/static/AppSimulator/images/app/[[app]]/app_icon.png">
-            </label>
+            <p>HeatMap</p>
+            <h3>[[ hosts_cnt ]]</h3>
           </div>
-          <div href="/AppSimulator/dashboard/" class="small-box-footer">
-            [[ support_app_list | count ]] Apps</i>
+          <div class="icon">
+            <img class="top-icon" src="{% static 'AppSimulator/images/page/heatmap.png' %}">
           </div>
+          <a href="/AppSimulator/tasksStart/" class="small-box-footer">
+            More&nbsp;<i class="fa fa-arrow-circle-right"></i>
+          </a>
         </div>
       </div>
-    </div>
-    -->
-    <div class="col-md-2">
-        <div class="small-box bg-gray">
-          <div class="inner">
-            <p>Support App</p>
-            <label v-for="app in support_app_list">
-              <img class="app-icon" src="/static/AppSimulator/images/app/[[app]]/app_icon.png">
-            </label>
-          </div>
-          <div href="/AppSimulator/dashboard/" class="small-box-footer">
-            [[ support_app_list | count ]] Apps</i>
-          </div>
-        </div>
-      </div>
-    </div>
+    </div><!-- row end. -->
+
     <div class="row nav-tabs-custom">
       <div class="tab-content">
         <!-------------------------- emulators -------------------------------------------------->

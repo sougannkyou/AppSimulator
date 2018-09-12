@@ -7,9 +7,10 @@
 {% endblock header_tail %}
 
 {% block section_content %}
+  <h1 style="alignment:center">Tasks Start</h1>
   <div id="tasks" style="height:600px"></div>
-  <div id="main">
-    <div id="children" style="height:400px"></div>
+  <div id="main" style="height:400px">
+    <div id="children"></div>
   </div>
 {% endblock section_content %}
 
@@ -30,7 +31,7 @@
   <script type="text/javascript" src="{% static 'plugins/vue1/vue.js' %}"></script>
   <script type="text/javascript" src="{% static 'AppSimulator/js/csrf.js' %}"></script>
   <script type="text/javascript">
-    function drawHeatmap(tasks, data) {
+    function draw(tasks, data) {
       let dom = document.getElementById("tasks");
       let myChart = echarts.init(dom, {renderer: 'svg'});
       let app = {};
@@ -102,18 +103,17 @@
         });
         myChart.on('mouseover', function (params) {
           console.log(params);
-          drawChildren(params.value);
+          getChildrenTasks(params.value);
         });
       }
     }
 
-    function getTasksStartHeatmap(tasks) {
+    function getHeatmap(taskId) {
       let opt = {
-        url: '/AppSimulator/getTasksStartHeatmapAPI/',
+        url: '/AppSimulator/getHeatmapChildrenTasksAPI/',
         type: 'GET',
         data: {
-          taskIdList: JSON.stringify(tasks),
-          day: '2018-09-12'
+          taskId: taskId,
         },
         dataType: "json",
         error: function (xhr, err) {
@@ -121,16 +121,35 @@
         },
         success: function (data, status) {
           console.log(data);
-          drawHeatmap(tasks, data['ret']);
+          draw(tasks, data['ret']);
         }
       };
       $.ajax(opt);
     }
 
-    getTasksStartHeatmap([13, 14, 15, 16, 17, 18, 19, 20]);
+    function getFamily(taskId) {
+      let opt = {
+        url: '/AppSimulator/getHeatmapFamilyAPI/',
+        type: 'GET',
+        data: {
+          taskId: taskId
+        },
+        dataType: "json",
+        error: function (xhr, err) {
+          console.error("[tasks] getHeatmapFamilyAPI", err);
+        },
+        success: function (data, status) {
+          console.log(data);
+          drawFamily(tasks, data['ret']);
+        }
+      };
+      $.ajax(opt);
+    }
 
-    function drawChildren(orgTaskId) {
-      console.log('drawChildren:', orgTaskId);
+    getHeatmap([13, 14, 15, 16, 17, 18, 19, 20]);
+
+    function drawFamily(orgTaskId) {
+      console.log('drawFamily:', orgTaskId);
       $('#children').remove();
       $('#main').html('<div id="children" style="width:100%;height:300px;"></div>');
 

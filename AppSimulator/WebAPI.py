@@ -28,28 +28,11 @@ MDB = MongoDriver()
 RDB = RedisDriver()
 
 
-def getRpcServerStatus(deviceId):
-    info = MDB.emulator_get_config_info(deviceId)
-    # print('emulator_get_config_info', deviceId, info['ip'])
-
-    output = JsonResponse({
-        'ret': ret,
-    })
-    return HttpResponse(output, content_type='application/json; charset=UTF-8')
-
-
 def startProxyServerAPI(request):
     if sys.platform == 'win32':
         os.system('taskkill /t /f /fi "WINDOWTITLE eq ProxyServer"')
         os.system('start "ProxyServer" node.exe %ANYPROXY_HOME%\main.js')
 
-    output = JsonResponse({
-        'ret': 'ok',
-    })
-    return HttpResponse(output, content_type='application/json; charset=UTF-8')
-
-
-def getProxyServerStatusAPI(request):
     output = JsonResponse({
         'ret': 'ok',
     })
@@ -68,42 +51,6 @@ def setDeviceGPSAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
-def restartDeviceAPI(request):
-    deviceId = request.GET.get('deviceId')  # 设备ID
-
-    output = JsonResponse({
-        'ret': ret,
-    })
-    return HttpResponse(output, content_type='application/json; charset=UTF-8')
-
-
-def quitAppAPI(request):
-    deviceId = request.GET.get('deviceId')  # 设备ID
-
-    # ret = True
-    output = JsonResponse({
-        'ret': ret,
-    })
-    return HttpResponse(output, content_type='application/json; charset=UTF-8')
-
-
-def startScriptAPI(request):
-    deviceId = request.GET.get('deviceId')  # 设备ID
-    output = JsonResponse({
-        'ret': ret,
-    })
-    return HttpResponse(output, content_type='application/json; charset=UTF-8')
-
-
-def stopScriptAPI(request):
-    deviceId = request.GET.get('deviceId')  # 设备ID
-    ret = rpc_stop_script()
-    output = JsonResponse({
-        'ret': ret,
-    })
-    return HttpResponse(output, content_type='application/json; charset=UTF-8')
-
-
 def runTasksAPI(request):
     ret = True
     app_name = request.GET.get('app_name')  # 'dianping'
@@ -111,26 +58,6 @@ def runTasksAPI(request):
 
     output = JsonResponse({
         'ret': ret,
-    })
-    return HttpResponse(output, content_type='application/json; charset=UTF-8')
-
-
-def getDeviceCaptureAPI(request):
-    # deviceId = request.POST.get('deviceId')  # 设备ID
-    # try:
-    #     hwnd = win32gui.FindWindow(None, "douyin0")
-    #     print("getDeviceCaptureAPI start.", hwnd)
-    #     win32gui.SetForegroundWindow(hwnd)
-    #     left, top, right, bottom = win32gui.GetWindowRect(hwnd)
-    #     app_bg_box = (left, top, right, bottom)
-    #     im = ImageGrab.grab(app_bg_box)
-    #     im.save('capture.png')
-    #     shutil.copyfile('capture.png', './static/AppSimulator/images/capture.png')
-    # except Exception as e:
-    #     print(e)
-    # %errorlevel%
-    output = JsonResponse({
-        'ret': 'ok',
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
@@ -156,19 +83,6 @@ def getProxyServerInfoAPI(request):
             'free': mem_info.free
         },
         'ret': 'ok',
-    })
-    return HttpResponse(output, content_type='application/json; charset=UTF-8')
-
-
-def getDeviceCrawlCntAPI(request):
-    app_name = request.GET.get('app_name')
-    info = RDB.get_crwal_cnt_by_device(app_name)
-    print('getDeviceCrawlCntAPI:', info)
-    MDB.update_device_statistics_info(info=info, scope_times=SCOPE_TIMES)
-    print("getDeviceCrawlCntAPI end", info)
-    # info.pop('dedup_cnt')
-    output = JsonResponse({
-        'ret': info,
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
@@ -260,7 +174,7 @@ def runTasks():
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
-def getTasksStartHeatmapAPI(request):
+def getHeatmapAPI(request):
     ret = []
     taskIdList = json.loads(request.GET.get('taskIdList', '[]'))
     day = request.GET.get('day', datetime.now().strftime('%Y-%m-%d'))
@@ -291,7 +205,35 @@ def getTasksStartHeatmapAPI(request):
         [6, 19, 0], [6, 20, 1], [6, 21, 2], [6, 22, 2], [6, 23, 6]
     ]
 
-    pprint(ret)
+    # pprint(ret)
+    output = JsonResponse({
+        'ret': ret
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
+def getHeatmapFamilyAPI(request):
+    taskId = request.GET.get('taskId')
+    ret = [
+        ['times', 'crawl', 'taskId'],
+        # [89.3, 58212, 'Matcha Latte'],
+        # [57.1, 78254, 'Milk Tea'],
+        # [74.4, 41032, 'Cheese Cocoa'],
+        # [50.1, 12755, 'Cheese Brownie'],
+        # [89.7, 20145, 'Matcha Cocoa'],
+        # [68.1, 79146, 'Tea'],
+        # [19.6, 91852, 'Orange Juice'],
+        # [10.6, 101852, 'Lemon Juice'],
+        # [32.7, 20112, 'Walnut Brownie']
+    ]
+    parent = MDB.tasks.find_one({'taskId': taskId})
+    if parent:
+        children = MDB.tasks.find({'orgTaskId': taskId})
+        for c in children:
+            score = spend_time_score(seconds=(c['up_time'] - c['start_time']))
+            crawl_cnt = RDB.get_crwal_cnt_by_device()
+            ret.append([score, crael_cnt, taskId])
+
     output = JsonResponse({
         'ret': ret
     })

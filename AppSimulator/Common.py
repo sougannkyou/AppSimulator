@@ -17,6 +17,23 @@ def seconds_format(seconds):
         return 'N/A'
 
 
+def spend_time_score(seconds):
+    if seconds <= 2 * 60:  # 2min
+        score = 100
+    elif seconds <= 5 * 60:  # 5min
+        score = 80
+    elif seconds <= 30 * 60:  # 30min
+        score = 60
+    elif seconds <= 2 * 60 * 60:  # 2h
+        score = 40
+    elif seconds <= 12 * 60 * 60:  # 12h
+        score = 20
+    else:  # >12h
+        score = 0
+
+    return score
+
+
 def string2timestamp(s, format_str="%Y-%m-%d %H:%M:%S"):
     return int(time.mktime(datetime.strptime(s, format_str).timetuple()))
 
