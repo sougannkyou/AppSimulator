@@ -213,26 +213,23 @@ def getHeatmapAPI(request):
 
 
 def getHeatmapFamilyAPI(request):
-    taskId = request.GET.get('taskId')
+    taskId = int(request.GET.get('taskId', -1))
     ret = [
-        ['times', 'crawl', 'taskId'],
-        # [89.3, 58212, 'Matcha Latte'],
-        # [57.1, 78254, 'Milk Tea'],
-        # [74.4, 41032, 'Cheese Cocoa'],
-        # [50.1, 12755, 'Cheese Brownie'],
-        # [89.7, 20145, 'Matcha Cocoa'],
-        # [68.1, 79146, 'Tea'],
-        # [19.6, 91852, 'Orange Juice'],
-        # [10.6, 101852, 'Lemon Juice'],
-        # [32.7, 20112, 'Walnut Brownie']
+        ['times', 'crawlCnt', 'taskId'],
+        [80, 58, 'task-10'],
+        [60, 78, 'task-11'],
+        [40, 127, 'task-12'],
+        [80, 791, 'task-13'],
+        [20, 918, 'task-14'],
+        [100, 201, 'task-15']
     ]
     parent = MDB.tasks.find_one({'taskId': taskId})
     if parent:
         children = MDB.tasks.find({'orgTaskId': taskId})
         for c in children:
             score = spend_time_score(seconds=(c['up_time'] - c['start_time']))
-            crawl_cnt = RDB.get_crwal_cnt_by_device()
-            ret.append([score, crael_cnt, taskId])
+            crawl_cnt = RDB.get_crawl_cnt_by_taskId(c['host_ip'], 'task-{}'.format(taskId))
+            ret.append([score, crawl_cnt, taskId])
 
     output = JsonResponse({
         'ret': ret

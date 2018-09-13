@@ -28,7 +28,7 @@ class RedisDriver(object):
         print("get_devices_ip_list:", l)
         return l
 
-    def get_crawl_cnt_by_(self, ip, taskId):
+    def get_crawl_cnt_by_taskId(self, ip, taskId):
         # devices:172.16.250.199:task-1
         return self._conn.scard('devices:{}:task-{}'.format(ip, taskId))
 
@@ -103,7 +103,7 @@ class MongoDriver(object):
             if not log_filter['module']['selenium']:
                 func_list.append({'func': {'$not': re.compile('NoxConSelenium')}})
             if not log_filter['module']['docker']:
-                func_list.append({'func': {'$not': re.compile('NoxDocker')}})
+                func_list.append({'func': {'$not': re.compile('Docker')}})
             if not log_filter['module']['adb']:
                 func_list.append({'func': {'$not': re.compile('adb')}})
 

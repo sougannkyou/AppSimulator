@@ -35,10 +35,8 @@ urlpatterns = patterns('',
                        url(r'^getResultSampleAPI/$', getResultSampleAPI, name='getResultSampleAPI'),
                        url(r'^startProxyServerAPI/$', startProxyServerAPI, name='startProxyServerAPI'),
 
-                       url(r'^setDeviceGPSAPI/$', setDeviceGPSAPI, name='setDeviceGPSAPI'),
                        url(r'^runTasksAPI/$', runTasksAPI, name='runTasksAPI'),
 
-                       url(r'^getDeviceCaptureAPI/$', getDeviceCaptureAPI, name='getDeviceCaptureAPI'),
                        url(r'^getProxyServerInfoAPI/$', getProxyServerInfoAPI, name='getProxyServerInfoAPI'),
                        # emulator
                        url(r'^emulatorShakeAPI/$', emulatorShakeAPI, name='emulatorShakeAPI'),
