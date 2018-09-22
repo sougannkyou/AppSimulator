@@ -361,7 +361,7 @@ def detection(file_path):
     client = AipImageClassify(APP_ID, API_KEY, SECRET_KEY)
     image = get_file_content(file_path)
     client.carDetect(image)
-    ret = client.carDetect(image, {'top_num': 3, 'baike_num': 5})  # 带参数调用车辆识别
+    ret = client.carDetect(image, {'top_num': 10, 'baike_num': 5})  # 带参数调用车辆识别
     pprint(ret)
     return ret
 

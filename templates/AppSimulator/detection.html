@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block header_tail %}
-  <link rel="stylesheet" href="{% static 'AppSimulator/css/emulators.css' %}">
+  <link rel="stylesheet" href="{% static 'AppSimulator/css/detection.css' %}">
   <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
 {% endblock header_tail %}
 
@@ -12,28 +12,37 @@
       <div class="box box-primary">
         <div class="box-header">
           <p>base64编码后大小不超过4M，最短边至少15px，最长边最大4096px，长宽比3：1以内</p>
-          <input type="file" name="file" id="file_upload" style="display:inline-block;">
-          <input type="button" value="上传" onclick="FileUpload()" style="display:inline-block;">
+          <input type="file" name="file" id="file_upload" class="btn btn-sm btn-default"
+                 style="display:inline-block;overflow:hidden;">
+          <button type="button" onclick="FileUpload()" class="btn btn-info"
+                  style="display:inline-block;">[[action]]
+          </button>
         </div>
-        <div class="box-body table-responsive no-padding">
-          <label>[[color_result]]</label>
+        <!--
+        <span class="btn btn-success fileinput-button">
+            <span>上传</span>
+            <input type="file" name="file" id="file_upload" onclick="FileUpload()">
+        </span>
+        -->
+        <div class="box-body table-responsive">
+          <label class="label label-default">汽车颜色：[[color_result]]</label>
           <table class="table table-hover">
             <tbody>
             <tr>
-              <th width="10%">车型</th>
-              <th width="10%">匹配度</th>
-              <th width="10%">年份</th>
-              {#              <th width="20%">baike_info</th>#}
-              <th width="70%">车型描述</th>
-              {#              <th width="20%">baike_info</th>#}
+              <th width="10%"><label class="label label-info">预测车型</label></th>
+              <th width="10%"><label class="label label-info">匹配度</label></th>
+              <th width="10%"><label class="label label-info">生产年份</label></th>
+              {#<th width="20%">baike_info</th>#}
+              <th width="70%"><label class="label label-info">车型描述</label></th>
+              {#<th width="20%">baike_info</th>#}
             </tr>
             <tr v-for="info in info_list">
               <td><label class="label label-default">[[ info.name ]]</label></td>
-              <td>[[ info.score ]]</td>
+              <td>[[ info.score ]]%</td>
               <td>[[ info.year ]]</td>
-              {#              <td>[[ info.baike_info.baike_url ]]</td>#}
-              <td>[[ info.baike_info.description ]]</td>
-              {#              <td><img src="[[ info.baike_info.image_url ]]"></td>#}
+              {#<td>[[ info.baike_info.baike_url ]]</td>#}
+              <td>[[ info.description ]]</td>
+              {#<td><img src="[[ info.baike_info.image_url ]]"></td>#}
             </tr>
             </tbody>
           </table>
@@ -55,6 +64,7 @@
       //alert('你没有选择任何文件');
       //return false
       // base64编码后大小不超过4M，最短边至少15px，最长边最大4096px，长宽比3：1以内
+      mainVue.action = '正在识别 。。。';
       let opt = {
         url: '/AppSimulator/uploadAPI/',
         type: 'POST',
@@ -62,17 +72,29 @@
         processData: false,  // tell jquery not to process the data
         contentType: false, // tell jquery not to set contentType
         error: function (xhr, err) {
+          mainVue.action = '识别失败';
           console.error("[detection] uploadAPI", err);
         },
         success: function (data, status) {
+          mainVue.action = '识别完成';
+          setTimeout(function () {
+            mainVue.action = '开始识别';
+          }, 2000);
           console.log('ok', status);
           console.log(data);
-          mainVue.color_result = data.result.color_result;
+          mainVue.color_result = data.color_result;
           for (let i = 0; i < 10; i++) {
             mainVue.info_list.shift();
           }
           for (let i = 0; i < data.result.length; i++) {
-            mainVue.info_list.push(data.result[i])
+            let info = data.result[i];
+            let score = (info.score * 100).toFixed(3);
+            mainVue.info_list.push({
+              name: info.name,
+              score: score,
+              year: info.year,
+              description: info.baike_info.description,
+            });
           }
         }
       };
@@ -85,8 +107,10 @@
     let mainVue = new Vue({
       el: "#main",
       data: {
-        color_result: 'unkown',
-        info_list: [{
+        action: '开始识别',
+        color_result: '未知',
+        info_list: [],
+        /*{
           'baike_info': {
             'baike_url': 'http://baike.baidu.com/item/%E4%BC%A0%E7%A5%BAGS8/19937717',
             'description': '传祺GS8是广汽集团旗下自主品牌-广汽传祺推出的一款大七座高端SUV，由广汽研究院副院长、造型设计首席总师张帆率领的团队倾力打造。传祺GS8首创“外刚内柔”设计理念，整体呈现霸气硬朗的视觉冲击。外观上，GS8采用世界首创的矩阵式LED前大灯，匹配贯穿式“凌云翼”家族式进气格栅；车身肌肉感十足，平直的腰线刚劲有力，“8”字尾灯具有更高辨识度。2017年7月3日，中国汽车技术研究中心发布第二批C-NCAP碰撞安全性能测试成绩，传祺GS8获得五星评价，得分为57.7分。2017年9月28日，全球权威的市场调研机构J.D.Power发布了2017年中国新车质量研究(IQS)报告，广汽传祺连续五年位列中国品牌第一。2016年9月2日，2016年度中国汽车售后服务客户满意度调查结果在北京发布。广汽传祺以87.14高分荣膺中国品牌满意度第一名，并成功跻身于行业主流车前列。2016年11月17日，传祺GS8获得“2017网易年度新车总评榜年度中国品牌SUV”大奖。2017年1月17日，传祺GS8获得2016-2017搜狐汽车年度大选-年度中国品牌SUV。2017年1月18日，传祺GS8获得凤凰传媒2016中国汽车年度盛典年度SUV大奖。2017年1月19日，传祺GS8获得2017新浪年度中型SUV奖。',
@@ -105,7 +129,8 @@
           'name': '奥迪_S8',
           'score': 7.7629127190448e-05,
           'year': '2016'
-        }],
+        }
+       //*/
         msg: ""
       },
       methods: {},
