@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
 
 from AppSimulator.views import (
-    DashBoardView, TasksView, VMwareView, LoggerView, HostsView, EmulatorsView, TasksStartView
+    DashBoardView, TasksView, VMwareView, LoggerView, HostsView, EmulatorsView, TasksStartView, DetectionView
 )
 
 from AppSimulator.WebAPI import (
@@ -23,6 +23,7 @@ urlpatterns = patterns('',
                        url(r'^tasks/$', TasksView.as_view(), name='tasks'),
                        url(r'^emulators/$', EmulatorsView.as_view(), name='emulators'),
                        url(r'^tasksStart/$', TasksStartView.as_view(), name='tasksStart'),
+                       url(r'^detection/$', DetectionView.as_view(), name='detection'),
                        url(r'^hosts/$', HostsView.as_view(), name='hosts'),
                        url(r'^vmware/$', VMwareView.as_view(), name='vmware'),
                        url(r'^log/$', LoggerView.as_view(), name='log'),

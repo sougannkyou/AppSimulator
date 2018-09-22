@@ -35,3 +35,8 @@ class VMwareView(TemplateView):
 class LoggerView(TemplateView):
     queryset = []
     template_name = 'AppSimulator/logger.html'
+
+
+class DetectionView(TemplateView):
+    queryset = []
+    template_name = 'AppSimulator/detection.html'
