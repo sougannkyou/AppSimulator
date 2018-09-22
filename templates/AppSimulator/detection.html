@@ -1,0 +1,514 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html>
+<head>
+
+  <title>在线识别车辆品牌及型号 - AI人工智能图像处理</title>
+  <meta name="keywords"
+        content="图片GPS,图片exif,在线识别图片,识别图,在线图片识别工具,图片识别,图片识别软件,图片转文字,图片文字识别,图片文字提取,图片文字翻译,菜品识别,车型识别,logo商标识别,动物识别,植物识别,图像主体检测,文字识别,身份证识别,银行卡识别,驾驶证识别,行驶证识别,车牌识别,营业执照识别,票据识别">
+  <meta name="description" content="识别图专注AI人工智能在线识别图片中车辆品牌及车型信息">
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="renderer" content="webkit"/>
+  {#  <link href="/static/css/w3.css" rel="stylesheet" type="text/css"/>#}
+  <link rel="stylesheet" href="{% static 'detection/w3.css' %}">
+  <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- link href="/static/css/site.css?" rel="stylesheet" type="text/css" / -->
+
+
+  <style>
+    .ms-controller {
+      visibility: hidden
+    }
+
+    .w3-large {
+      font-size: 16px !important;
+    }
+
+    .bk-body {
+      display: block;
+    }
+
+    .bk-body-ie7 {
+      display: none;
+    }
+
+    .tu-menu {
+      margin-bottom: 150px
+    }
+
+    .tu-footer a {
+      text-decoration: none !important;
+      display: inline-block;
+    }
+
+    .w3-closebtn {
+      cursor: pointer;
+    }
+
+    /*iphone点击bug*/
+  </style>
+  <!--[if lte IE 7]>
+	<style>
+		.bk-body{display:none;}
+		.bk-body-ie7{display:block;}
+	</style>
+	<![endif]-->
+
+  <!--[if lt IE 9]>
+	<script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+	<script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+	<script src="node_modules/bluebird/js/browser/bluebird.min.js"></script>
+<![endif]-->
+  {#  <script src="/node_modules/reqwest/reqwest.min.js"></script>#}
+  <script type="text/javascript" src="{% static 'detection/reqwest.min.js' %}"></script>
+  <script>/*support for IE6/IE7 https://cdn.bootcss.com/json3/3.3.2/json3.min.js*/
+  (function () {
+    if (!window.JSON) {
+      document.write('<scr' + 'ipt src="node_modules/json3/lib/json3.min.js"><\/scr' + 'ipt>')
+    }
+  }());
+  </script>
+  {#  <script src="/node_modules/avalon2/dist/avalon.js"></script>#}
+  <script type="text/javascript" src="{% static 'detection/avalon.js' %}"></script>
+
+  {#  <script src="/static/js/jquery-1.12.4/jquery.min.js" type="text/javascript"></script>#}
+
+  <style>
+    /*webuploader file input */
+    .webuploader-element-invisible {
+      display: none;
+    }
+  </style>
+
+  {#  <script src="/static/js/webuploader-0.1.5/webuploader.min.js" type="text/javascript"></script>#}
+  <script type="text/javascript" src="{% static 'detection/webuploader.min.js' %}"></script>
+
+</head>
+<body>
+
+<div class="bk-body">
+
+  <div ms-controller="app-nav" class="">
+
+    <!-- Top -->
+    <div class="w3-top">
+      <div class="w3-row w3-white w3-padding w3-hide-medium w3-hide-small">
+        <div class="w3-half w3-hide-medium w3-hide-small" style="margin:4px 0 6px 0"><a href="/"><img
+            src="/static/images/logo.png" alt="shibietu.com"></a></div>
+        <div class="w3-half w3-margin-top w3-wide w3-hide-medium w3-hide-small">
+          <div class="w3-right">人工智能之图像技术，轻松识别图片信息</div>
+        </div>
+      </div>
+
+      <ul class="w3-navbar w3-green w3-large" style="z-index:4;">
+        <li class="w3-opennav w3-left w3-hide-large">
+          <a class="w3-hover-white w3-large w3-green w3-padding-16" href="javascript:void(0)" :click="navCollapse"><i
+              class="fa fa-bars w3-text-white"></i> 识别图</a>
+        </li>
+        <li class="w3-hide-medium w3-hide-small"><a class=" w3-hover-dark-grey w3-padding-16"
+                                                    href="http://jiema.wwei.cn/">二维码解码</a></li>
+        <li class="w3-hide-medium w3-hide-small"><a class="w3-dark-grey w3-hover-dark-grey w3-padding-16"
+                                                    href="http://shibietu.wwei.cn/">识别图</a></li>
+        <li class="w3-hide-medium w3-hide-small "><a class="w3-hover-dark-grey w3-padding-16"
+                                                     href="http://www.tiezhima.com/" target="_blank" style="color:#fff">二维码贴纸</a>
+        </li>
+        <li class="w3-hide-medium w3-hide-small "><a class="w3-hover-dark-grey w3-padding-16" href="http://www.wwei.cn/"
+                                                     target="_blank">生成二维码</a></li>
+        <li class="w3-hide-medium w3-hide-small "><a class="w3-hover-dark-grey w3-padding-16"
+                                                     href="http://www.mobanma.com/" target="_blank">二维码模板</a></li>
+      </ul>
+    </div>
+
+    <!-- Sidenav -->
+    <div class="w3-sidenav w3-collapse w3-animate-left w3-light-grey" style="z-index:3;width:270px"
+         :class="[(@navToggle ? 'w3-show':'')]">
+      <a href="javascript:void(0)" class="w3-right w3-xlarge w3-padding w3-hide-large w3-red" title="close menu"
+         :click="navCollapse">×</a>
+      <div class="tu-menu">
+        <div class="w3-container w3-padding-top">
+          <a href="/" class="w3-padding-8">图片属性</a>
+          <a href="/wenzi.html" class="w3-padding-8">图片文字提取</a>
+          <a href="/caipin.html" class="w3-padding-8">菜品识别</a>
+          <a href="/chexing.html" class="w3-padding-8 w3-dark-grey"><i class="fa fa-play" aria-hidden="true"></i>
+            车型识别</a>
+          <a href="/dongwu.html" class="w3-padding-8">动物识别</a>
+          <a href="/zhiwu.html" class="w3-padding-8">植物识别</a>
+          <a href="/shangbiao.html" class="w3-padding-8">logo商标识别</a>
+
+          <a href="http://www.tiezhima.com/" target="_blank" style="color:#f30;">二维码贴纸</a>
+
+          <a class="w3-hide-large w3-padding-8" href="http://jiema.wwei.cn/">二维码解码</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay effect when opening sidenav on small screens -->
+    <div class="w3-overlay w3-hide-large" style="cursor:pointer" title="close side menu" :click="navCollapse"
+         :class="[(@navToggle ? 'w3-show':'')]"></div>
+
+  </div>
+
+
+  <!-- Main content: shift it to the right by 270 pixels when the sidenav is visible -->
+  <div class="w3-main w3-container" style="margin-left:270px;margin-top:127px;">
+
+
+    <div ms-controller="app-main">
+
+
+      <div class="w3-margin-top">
+
+        <h1 class="w3-xlarge">车辆识别</h1>
+        <p>检测一张车辆图片的具体车型、车辆品牌及型号等信息。</p>
+        <div>
+          <a class="w3-btn w3-btn-block w3-dark-grey w3-hover-black" href="javascript:;" id="picker_uploader"><i
+              class="fa fa-cloud-upload" aria-hidden="true"></i> 上传我的图片</a>
+        </div>
+
+
+        <div class="w3-row">
+
+          <div class="w3-col l8 m12 s12 ">
+            <div class="w3-margin-top w3-white">
+              <h4>识别结果：</h4>
+
+
+              <table class="w3-table w3-bordered w3-striped w3-border w3-hoverable">
+                <thead>
+                <tr class="w3-sand">
+                  <th>车型名称</th>
+                  <th>准确度</th>
+                </tr>
+                </thead>
+                <tbody id="img_exif">
+                <tr>
+                  <td>奔驰SL级</td>
+                  <td>11.60%</td>
+                </tr>
+                <tr>
+                  <td>奔驰C级AMG</td>
+                  <td>7.05%</td>
+                </tr>
+                <tr>
+                  <td>捷豹XE</td>
+                  <td>6.05%</td>
+                </tr>
+                <tr>
+                  <td>奔驰S级双门</td>
+                  <td>4.78%</td>
+                </tr>
+                <tr>
+                  <td>沃尔沃S90</td>
+                  <td>3.86%</td>
+                </tr>
+                </tbody>
+              </table>
+
+
+            </div>
+          </div>
+          <div class="w3-col l4 m12 s12">
+
+            <div class="w3-display-container w3-margin">
+              <img src="/static/images/chexing.jpg" alt="识别图片" class="w3-border w3-round" style="width:100%;"
+                   id="upload_preview">
+              <div class="w3-display-middle w3-large" id="upload_progress"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+    </div><!-- /app-main -->
+
+
+    <div class="w3-container w3-section w3-padding-jumbo w3-center w3-opacity tu-footer">
+      <p class="w3-hide-small">
+        <a href="http://www.wwei.cn/" target="_blank" title="二维码生成器">二维码生成器</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="http://www.mobanma.com/" target="_blank" title="二维码美化">二维码美化</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="http://www.ppsao.com/" target="_blank" title="pp扫码神器">APP</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="http://www.mobanma.com/news/view/id/21.html" target="_blank" title="二维码生成器小程序">微信小程序</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="http://t.wwei.cn/index-wenan-view.html?id=60" target="_blank" title="二维码公众号">公众号</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="http://pc.wwei.cn/" target="_blank" title="微微二维码-桌面软件版">PC桌面软件</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="http://yst.wwei.cn/" target="_blank" title="在线压缩图片">压缩图片</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="http://we.wwei.cn/" target="_blank" title="微信对话生成器">微信对话生成器</a>
+      </p>
+      <p>
+        Powered by 2016-2018 shibietu.com All Rights Reserved.
+      </p>
+      <p>
+        <a href="http://www.shengcai.net/" target="_blank">深圳市生财网络科技有限公司</a> | <a href="http://www.miitbeian.gov.cn/"
+                                                                                  target="_blank" rel="nofollow">粤ICP备13051130号</a><br><br>
+      </p>
+    </div>
+
+    <!-- END MAIN -->
+  </div>
+
+  <div ms-controller="app-tools">
+    <!-- Modal -->
+    <div class="w3-modal" :visible="@data.modal.toggle">
+      <div class="w3-modal-content w3-card-8 w3-animate-bottom">
+        <div class="w3-container w3-black">
+          <span class="w3-closebtn w3-hover-text-red" :click="@closeModal">×</span>
+          <h5 :html="@data.modal.title"></h5>
+        </div>
+        <div class="w3-padding">
+          <p :html="@data.modal.content"></p>
+        </div>
+        <div class="w3-container w3-light-grey" :visible="@data.modal.toggleConfirm">
+          <button class="w3-btn w3-white w3-border w3-border-blue w3-text-blue w3-round w3-tiny w3-right w3-section-8"
+                  :click="@confirmModal">确 定
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+<div class="bk-body-ie7">
+
+
+  <div class="w3-container w3-info">
+
+    <h3><span class="w3-tag w3-black">w</span>
+      <span class="w3-tag w3-blue">w</span>
+      <span class="w3-tag w3-blue">e</span>
+      <span class="w3-tag w3-blue">i</span>
+      温馨提示</h3>
+    <p>你正在使用的浏览器内核版本过低，<span class="w3-text-blue">微软已经不再提供技术支持</span>，为避免可能存在的安全隐患，请尽快升级你的浏览器或者安装更安全的浏览器访问wwei.cn平台。</p>
+    <p>推荐使用：
+      <a href="http://xiazai.sogou.com/detail/34/0/6262355089742005676.html?uID=04583CB73B70900A0000000057318502&w=2295"
+         target="_blank" rel="nofollow">谷歌浏览器</a>&nbsp;&nbsp;
+      <a href="http://www.firefox.com.cn/" target="_blank" rel="nofollow">火狐浏览器</a>&nbsp;&nbsp;
+      <a href="http://www.opera.com/zh-cn" target="_blank" rel="nofollow">Opera浏览器</a>&nbsp;&nbsp;
+    </p>
+    <p>如果你正在使用的是双核浏览器，比如QQ浏览器、搜狗浏览器、猎豹浏览器、世界之窗浏览器、傲游浏览器、360浏览器等，可以使用浏览器的<span class="w3-text-blue">极速模式</span>来继续访问bkuan.com平台
+    </p>
+  </div>
+
+
+  ​
+
+</div>
+
+<script type="text/javascript">
+
+  var app_tools = avalon.define({
+    $id: "app-tools",
+    data: {
+      modal: {
+        toggle: false,
+        toggleConfirm: false,
+        funConfirm: function () {
+        },
+        title: "提示信息",
+        content: '', /* html content*/
+        footer: ""
+      }
+    },
+    modal: function (content, title, funConfirm) {
+      if (title) {
+        this.data.modal.title = title;
+      }
+      if (content) {
+        this.data.modal.content = content;
+      }
+      if (typeof(funConfirm) == "function") {
+        this.data.modal.funConfirm = funConfirm;
+        this.data.modal.toggleConfirm = true;
+      }
+      this.data.modal.toggle = true;
+    },
+    closeModal: function () {
+      this.data.modal.toggle = false;
+    },
+    confirmModal: function () {
+      this.data.modal.toggle = false;
+      this.data.modal.funConfirm();
+    }
+  });
+  /* test
+  app_tools.modal(23);
+
+  app_tools.modal(23,'23asdfasf',function(){
+
+  });
+  */
+
+
+  var app_nav = avalon.define({
+    $id: "app-nav",
+    navToggle: false,
+    navCollapse: function () {
+      this.navToggle = !this.navToggle;
+    }
+  })
+</script>
+
+
+<script type="text/javascript">
+  /*
+  var app_main = avalon.define({
+      $id: "app-main",
+      upload_picker:function(pick_id){
+          document.getElementById(pick_id).click();
+      }
+  });*/
+
+  var parse_probability = function (proba) {
+    proba = parseFloat(proba);
+    proba *= 100;
+    return proba.toFixed(2);
+
+  }
+
+  $(function () {
+
+    var BASE_URL = "/static/js/webuploader-0.1.5", upurl = "/fileupload.html?op=shibietu_chexing";
+    // 判断浏览器是否支持图片的base64
+    var ratio = window.devicePixelRatio || 1, // 优化retina, 在retina下这个值是2
+      thumbnailWidth = 350 * ratio,
+      thumbnailHeight = 350 * ratio,
+      isSupportBase64 = (function () {
+        var data = new Image();
+        var support = true;
+        data.onload = data.onerror = function () {
+          if (this.width != 1 || this.height != 1) {
+            support = false;
+          }
+        }
+        data.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+        return support;
+      })();
+    uploader = WebUploader.create({
+      auto: true,
+      // swf文件路径
+      swf: BASE_URL + '/js/Uploader.swf',
+      // 文件接收服务端。
+      server: upurl,
+      accept: {
+        title: '微微二维码'
+        , extensions: 'gif,jpg,jpeg,png'
+        , mimeTypes: 'image/jpg,image/jpeg,image/png,image/gif'
+      },
+      compress: {
+        width: 800,
+        height: 800,
+        quality: 90,
+        allowMagnify: false,
+        crop: false,
+        preserveHeaders: true,
+        noCompressIfLarger: false,
+        compressSize: 307200 //300kb
+      },
+      fileNumLimit: 1,
+      //fileSizeLimit: 2097152,//2m,
+      fileSingleSizeLimit: 10485760,//10m
+      // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+      pick: "#picker_uploader"
+    });
+
+    uploader.on('error', function (code, reason, file) {
+
+      if (code == 'Q_EXCEED_NUM_LIMIT') {
+        app_tools.modal('错误:\n 添加的图片总数量超出限制');
+      } else if (code == 'Q_EXCEED_SIZE_LIMIT') {
+        app_tools.modal('错误:\n 添加的图片总大小超出限制');
+      } else if (code == 'F_EXCEED_SIZE') {
+        app_tools.modal('错误:\n 文件 ( ' + file.name + ' ) \n 添加的图片大小超出限制');
+      } else if (code == 'Q_TYPE_DENIED') {
+        app_tools.modal('错误:\n 文件 ( ' + file.name + ' ) \n 只能添加 ( jpg、png、gif ) 图片类型');
+      } else if (code == 'F_DUPLICATE') {
+        app_tools.modal('跳过:\n 文件 ( ' + file.name + ' ) \n 重复添加');
+      } else {
+        app_tools.modal('错误:\n ' + code);
+      }
+
+    });
+    uploader.on('uploadError', function (file) {
+      uploader.removeFile(file);
+      app_tools.modal('上传出错，请重试。');
+    });
+
+    // 文件上传过程中创建进度条实时显示。
+    uploader.on('uploadProgress', function (file, percentage) {
+      $("#upload_progress").text('上传完成：' + percentage * 100 + '%');
+
+    });
+
+    uploader.on('fileQueued', function (file) {
+
+      $("#img_exif").html('<tr><td colspan="2"><i class="fa fa-refresh w3-spin" aria-hidden="true"></i> 识别中...</td></tr>');
+
+      uploader.makeThumb(file, function (error, src) {
+        if (error) {
+          $("#upload_preview").attr("src", '/static/images/nopreview.jpg');
+          return;
+        }
+        if (isSupportBase64) {
+          $("#upload_preview").attr("src", src);
+        } else {
+          $("#upload_preview").attr("src", '/static/images/nopreview.jpg');
+        }
+      }, thumbnailWidth, thumbnailHeight);
+
+    });
+
+
+    uploader.on('uploadSuccess', function (file, resporse) {
+      //queue
+      uploader.removeFile(file);
+      if (resporse.error || resporse.id <= 0) {
+        app_tools.modal('<span class="red">' + resporse.error.message + '</sapn>');
+      } else if (resporse.id > 0) {
+
+        var _data = resporse.data;
+        var _html = '';
+
+
+        if (_data.result.length > 0) {
+          var result = _data.result;
+          for (var i in result) {
+            _html += '<tr><td><a href="https://www.baidu.com/s?wd=' + encodeURIComponent(result[i].name) + '" target="_blank">' + result[i].name + '</a></td><td>' + parse_probability(result[i].score) + '%</td></tr>';
+          }
+        } else {
+          _html += '<tr><td colspan="2"><div class="w3-container w3-pale-yellow"><h3>提示!</h3><p>未识别出信息，请重试</p></div></td></tr>';
+        }
+        $("#img_exif").html(_html);
+
+
+      } else {
+        console.log(resporse);
+        app_tools.modal('<span class="red">上传失败，请重新上传</sapn>');
+      }
+
+
+    });
+  });
+
+</script>
+
+
+<div style="display:none;">
+  <script>
+    var _hmt = _hmt || [];
+    (function () {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ee32a1614ffc926d0d8e45e76de43b91";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+</div>
+
+</body>
+</html>
