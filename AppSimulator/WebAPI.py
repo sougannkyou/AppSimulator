@@ -4,6 +4,8 @@ import sys
 import psutil
 import json
 from pprint import pprint
+
+from backend.settings import STATIC_ROOT
 from datetime import datetime
 from io import StringIO
 import bson.binary
@@ -20,12 +22,18 @@ from django.http import HttpResponse, JsonResponse
 # from rest_framework.response import Response as restResponse
 # from rest_framework import status
 
+from aip import AipImageClassify
+
 from AppSimulator.Common import *
 from AppSimulator.DBLib import MongoDriver, RedisDriver
 from Controller.NoxConDocker import NoxConDocker
 
 MDB = MongoDriver()
 RDB = RedisDriver()
+
+APP_ID = '14131380'
+API_KEY = 'KyCbH0iKqkr1usuRAQR5CSga'
+SECRET_KEY = 'IkS88smDf5Ab8OGvobIsDzM2x9zWRB7g'
 
 
 def startProxyServerAPI(request):
@@ -315,7 +323,7 @@ def emulatorShakeAPI(request):
     task = MDB.tasks_find_by_taskId(taskId)
     if task:
         docker = NoxConDocker(task_info=task)
-        docker.shake(cnt)
+        docker.docker_shake(cnt)
 
     output = JsonResponse({
         'ret': True if task else False,
@@ -341,6 +349,42 @@ def getLogCntAPI(request):
         'ret': ret,
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
+
+
+# --------- img upload ------------------------------------------------
+def get_file_content(file_path):
+    with open(file_path, 'rb') as fp:
+        return fp.read()
+
+
+def detection(file_path):
+    client = AipImageClassify(APP_ID, API_KEY, SECRET_KEY)
+    image = get_file_content(file_path)
+    client.carDetect(image)
+    ret = client.carDetect(image, {'top_num': 3, 'baike_num': 5})  # 带参数调用车辆识别
+    pprint(ret)
+    return ret
+
+
+def uploadAPI(request):
+    ret = {}
+    try:
+        file_obj = request.FILES.get('file')
+        img_path = os.path.join(STATIC_ROOT, 'upload', file_obj.name)
+        print(img_path)
+        f = open(img_path, 'wb')
+        print(file_obj, type(file_obj))
+        for chunk in file_obj.chunks():
+            f.write(chunk)
+        f.close()
+
+        ret = detection(img_path)
+
+    except Exception as e:
+        print('error:', e)
+    finally:
+        output = JsonResponse(ret)
+        return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
 if __name__ == "__main__":

@@ -1,4 +1,3 @@
-# coding=utf-8
 from django.conf.urls import patterns, url
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
@@ -13,7 +12,8 @@ from AppSimulator.WebAPI import (
     startProxyServerAPI,
     getProxyServerInfoAPI,
     runTasksAPI,
-    getVMwaresAPI, getHostsAPI, getAllHostsAPI, getLogsAPI, getLogCntAPI, emulatorShakeAPI
+    getVMwaresAPI, getHostsAPI, getAllHostsAPI, getLogsAPI, getLogCntAPI, emulatorShakeAPI,
+    uploadAPI
 )
 
 cache_time_out = 60 * 3
@@ -53,4 +53,6 @@ urlpatterns = patterns('',
                        # log
                        url(r'^getLogCntAPI/$', getLogCntAPI, name='getLogCntAPI'),
                        url(r'^getLogsAPI/$', getLogsAPI, name='getLogsAPI'),
+                       # upload
+                       url(r'^uploadAPI/$', uploadAPI, name='uploadAPI'),
                        )
