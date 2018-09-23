@@ -20,23 +20,23 @@
         <div class="box-body table-responsive">
           <div class="col-md-3">
             <img src="[[img_src]]">
-            <p>base64编码后大小不超过4M，最短边至少15px，最长边最大4096px，长宽比3：1以内</p>
+            <h5>base64编码后大小不超过4M，最短边至少15px，最长边最大4096px，长宽比3：1以内</h5>
             <input type="file" name="file" id="file_upload" class="btn btn-sm btn-default"
                    style="display:inline-block;overflow:hidden;">
             <button type="button" onclick="FileUpload()" class="btn btn-info"
                     style="display:inline-block;">[[action]]
             </button>
           </div>
-          <div class="col-md-9">
-            <label class="label label-default">汽车颜色：[[color_result]]</label>
+          <div class="col-md-8 pull-right">
+            <h1>车身颜色：[[color_result]]</h1>
             <table class="table table-hover">
               <tbody>
               <tr>
-                <th width="10%"><label class="label label-info">预测车型</label></th>
-                <th width="10%"><label class="label label-info">匹配度</label></th>
-                <th width="10%"><label class="label label-info">生产年份</label></th>
+                <th width="10%">预测车型</th>
+                <th width="10%">匹配度</th>
+                <th width="10%">生产年份</th>
                 {#<th width="20%">baike_info</th>#}
-                <th width="70%"><label class="label label-info">车型描述</label></th>
+                <th width="70%">车型描述</th>
                 {#<th width="20%">baike_info</th>#}
               </tr>
               <tr v-for="info in info_list">
