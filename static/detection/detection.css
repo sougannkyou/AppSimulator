@@ -29,6 +29,10 @@ th {
     background-color: #0d6aad;
 }
 
+tr {
+    border-radius: 5px;
+}
+
 td {
     padding: 2px 2px 2px 2px;
     background-color: #e0e0e0;
