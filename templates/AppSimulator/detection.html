@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block header_tail %}
-  <link rel="stylesheet" href="{% static 'AppSimulator/css/detection.css' %}">
+  <link rel="stylesheet" href="{% static 'detection/detection.css' %}">
   <link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
 {% endblock header_tail %}
 
@@ -19,7 +19,7 @@
         -->
         <div class="box-body table-responsive">
           <div class="col-md-3">
-            <img src="[[img_src]]" style="width:416px;border-radius:5px;border:1px dashed gray;margin:5px 5px 5px 5px;">
+            <img src="[[img_src]]">
             <p>base64编码后大小不超过4M，最短边至少15px，最长边最大4096px，长宽比3：1以内</p>
             <input type="file" name="file" id="file_upload" class="btn btn-sm btn-default"
                    style="display:inline-block;overflow:hidden;">

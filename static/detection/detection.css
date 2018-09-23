@@ -11,3 +11,10 @@
     opacity: 0;
     -ms-filter: 'alpha(opacity=0)';
 }
+
+img {
+    width: 416px;
+    border-radius: 5px;
+    border: 1px dashed gray;
+    margin: 5px 5px 5px 5px;
+}
