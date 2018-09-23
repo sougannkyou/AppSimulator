@@ -367,24 +367,25 @@ def detection(file_path):
 
 
 def uploadAPI(request):
-    ret = {}
+    ret = {'img_src': 'error.png'}
     try:
+        img_src = str(int(datetime.now().timestamp() * 1000000))
         file_obj = request.FILES.get('file')
-        img_path = os.path.join(STATIC_ROOT, 'upload', file_obj.name)
+        fixed = file_obj.name[file_obj.name.find('.'):]
+        img_path = os.path.join(STATIC_ROOT, 'upload', img_src + fixed)
+        ret = {'img_src': '/static/upload/{}{}'.format(img_src, fixed)}
         print(img_path)
         f = open(img_path, 'wb')
-        print(file_obj, type(file_obj))
+        # print(file_obj, type(file_obj))
         for chunk in file_obj.chunks():
             f.write(chunk)
         f.close()
-
-        ret = detection(img_path)
-
+        ret.update(detection(img_path))
     except Exception as e:
+        ret = {'img_src': 'error.png'}
         print('error:', e)
     finally:
-        output = JsonResponse(ret)
-        return HttpResponse(output, content_type='application/json; charset=UTF-8')
+        return HttpResponse(JsonResponse(ret), content_type='application/json; charset=UTF-8')
 
 
 if __name__ == "__main__":

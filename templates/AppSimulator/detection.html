@@ -10,14 +10,7 @@
   <div id="main" v-cloak>
     <div class="col-xs-12">
       <div class="box box-primary">
-        <div class="box-header">
-          <p>base64编码后大小不超过4M，最短边至少15px，最长边最大4096px，长宽比3：1以内</p>
-          <input type="file" name="file" id="file_upload" class="btn btn-sm btn-default"
-                 style="display:inline-block;overflow:hidden;">
-          <button type="button" onclick="FileUpload()" class="btn btn-info"
-                  style="display:inline-block;">[[action]]
-          </button>
-        </div>
+        <div class="box-header"></div>
         <!--
         <span class="btn btn-success fileinput-button">
             <span>上传</span>
@@ -25,27 +18,38 @@
         </span>
         -->
         <div class="box-body table-responsive">
-          <label class="label label-default">汽车颜色：[[color_result]]</label>
-          <table class="table table-hover">
-            <tbody>
-            <tr>
-              <th width="10%"><label class="label label-info">预测车型</label></th>
-              <th width="10%"><label class="label label-info">匹配度</label></th>
-              <th width="10%"><label class="label label-info">生产年份</label></th>
-              {#<th width="20%">baike_info</th>#}
-              <th width="70%"><label class="label label-info">车型描述</label></th>
-              {#<th width="20%">baike_info</th>#}
-            </tr>
-            <tr v-for="info in info_list">
-              <td><label class="label label-default">[[ info.name ]]</label></td>
-              <td>[[ info.score ]]%</td>
-              <td>[[ info.year ]]</td>
-              {#<td>[[ info.baike_info.baike_url ]]</td>#}
-              <td>[[ info.description ]]</td>
-              {#<td><img src="[[ info.baike_info.image_url ]]"></td>#}
-            </tr>
-            </tbody>
-          </table>
+          <div class="col-md-3">
+            <img src="[[img_src]]" style="width:416px;border-radius:5px;border:1px dashed gray;margin:5px 5px 5px 5px;">
+            <p>base64编码后大小不超过4M，最短边至少15px，最长边最大4096px，长宽比3：1以内</p>
+            <input type="file" name="file" id="file_upload" class="btn btn-sm btn-default"
+                   style="display:inline-block;overflow:hidden;">
+            <button type="button" onclick="FileUpload()" class="btn btn-info"
+                    style="display:inline-block;">[[action]]
+            </button>
+          </div>
+          <div class="col-md-9">
+            <label class="label label-default">汽车颜色：[[color_result]]</label>
+            <table class="table table-hover">
+              <tbody>
+              <tr>
+                <th width="10%"><label class="label label-info">预测车型</label></th>
+                <th width="10%"><label class="label label-info">匹配度</label></th>
+                <th width="10%"><label class="label label-info">生产年份</label></th>
+                {#<th width="20%">baike_info</th>#}
+                <th width="70%"><label class="label label-info">车型描述</label></th>
+                {#<th width="20%">baike_info</th>#}
+              </tr>
+              <tr v-for="info in info_list">
+                <td><label class="label label-default">[[ info.name ]]</label></td>
+                <td>[[ info.score ]]%</td>
+                <td>[[ info.year ]]</td>
+                {#<td>[[ info.baike_info.baike_url ]]</td>#}
+                <td>[[ info.description ]]</td>
+                {#<td><img src="[[ info.baike_info.image_url ]]"></td>#}
+              </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -83,6 +87,7 @@
           console.log('ok', status);
           console.log(data);
           mainVue.color_result = data.color_result;
+          mainVue.img_src = data.img_src;
           for (let i = 0; i < 10; i++) {
             mainVue.info_list.shift();
           }
@@ -109,6 +114,7 @@
       data: {
         action: '开始识别',
         color_result: '未知',
+        img_src: '/static/upload/wait.png',
         info_list: [],
         /*{
           'baike_info': {
