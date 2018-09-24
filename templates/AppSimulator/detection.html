@@ -18,12 +18,12 @@
         </span>
         -->
         <div class="box-body table-responsive">
-          <div class="col-md-3">
+          <div class="col-md-4">
             <img src="[[img_src]]">
             <h5>base64编码后大小不超过4M，最短边至少15px，最长边最大4096px，长宽比3：1以内</h5>
             <input type="file" name="file" id="file_upload" class="btn btn-sm btn-default"
                    style="display:inline-block;overflow:hidden;">
-            <button type="button" onclick="FileUpload()" class="btn btn-info"
+            <button type="button" onclick="FileUpload()" class="btn btn-info" v-bind:disabled="!file_info"
                     style="display:inline-block;">[[action]]
             </button>
           </div>
@@ -40,7 +40,7 @@
                 {#<th width="20%">baike_info</th>#}
               </tr>
               <tr v-for="info in info_list">
-                <td><label class="label label-default">[[ info.name ]]</label></td>
+                <td><a href="[[info.baike_url]]" target="_blank">[[ info.name ]]</a></td>
                 <td>[[ info.score ]]%</td>
                 <td>[[ info.year ]]</td>
                 {#<td>[[ info.baike_info.baike_url ]]</td>#}
@@ -61,9 +61,9 @@
   <script type="text/javascript" src="{% static 'plugins/vue1/vue.js' %}"></script>
   <script type="text/javascript">
     function FileUpload() {
-      var form_data = new FormData();
-      var file_info = $('#file_upload')[0].files[0];
-      form_data.append('file', file_info);
+      let form_data = new FormData();
+      mainVue.file_info = $('#file_upload')[0].files[0];
+      form_data.append('file', mainVue.file_info);
       //if(file_info==undefined)暂且不许要判断是否有附件
       //alert('你没有选择任何文件');
       //return false
@@ -88,7 +88,7 @@
           console.log(data);
           mainVue.color_result = data.color_result;
           mainVue.img_src = data.img_src;
-          for (let i = 0; i < 10; i++) {
+          for (let i = 0; i < 100; i++) {
             mainVue.info_list.shift();
           }
           for (let i = 0; i < data.result.length; i++) {
@@ -99,6 +99,7 @@
               score: score,
               year: info.year,
               description: info.baike_info.description,
+              baike_url: info.baike_info.baike_url,
             });
           }
         }
@@ -112,31 +113,11 @@
     let mainVue = new Vue({
       el: "#main",
       data: {
+        file_info: null,
         action: '开始识别',
         color_result: '未知',
         img_src: '/static/upload/wait.png',
         info_list: [],
-        /*{
-          'baike_info': {
-            'baike_url': 'http://baike.baidu.com/item/%E4%BC%A0%E7%A5%BAGS8/19937717',
-            'description': '传祺GS8是广汽集团旗下自主品牌-广汽传祺推出的一款大七座高端SUV，由广汽研究院副院长、造型设计首席总师张帆率领的团队倾力打造。传祺GS8首创“外刚内柔”设计理念，整体呈现霸气硬朗的视觉冲击。外观上，GS8采用世界首创的矩阵式LED前大灯，匹配贯穿式“凌云翼”家族式进气格栅；车身肌肉感十足，平直的腰线刚劲有力，“8”字尾灯具有更高辨识度。2017年7月3日，中国汽车技术研究中心发布第二批C-NCAP碰撞安全性能测试成绩，传祺GS8获得五星评价，得分为57.7分。2017年9月28日，全球权威的市场调研机构J.D.Power发布了2017年中国新车质量研究(IQS)报告，广汽传祺连续五年位列中国品牌第一。2016年9月2日，2016年度中国汽车售后服务客户满意度调查结果在北京发布。广汽传祺以87.14高分荣膺中国品牌满意度第一名，并成功跻身于行业主流车前列。2016年11月17日，传祺GS8获得“2017网易年度新车总评榜年度中国品牌SUV”大奖。2017年1月17日，传祺GS8获得2016-2017搜狐汽车年度大选-年度中国品牌SUV。2017年1月18日，传祺GS8获得凤凰传媒2016中国汽车年度盛典年度SUV大奖。2017年1月19日，传祺GS8获得2017新浪年度中型SUV奖。',
-            'image_url': 'http://imgsrc.baidu.com/baike/pic/item/faedab64034f78f0f9d4735c75310a55b2191c45.jpg'
-          },
-          'name': '奥迪_Q5',
-          'score': 0.99872082471848,
-          'year': '2017'
-        }, {
-          'baike_info': {},
-          'name': '奥迪_Q3',
-          'score': 0.00027195696020499,
-          'year': '2017'
-        }, {
-          'baike_info': {},
-          'name': '奥迪_S8',
-          'score': 7.7629127190448e-05,
-          'year': '2016'
-        }
-       //*/
         msg: ""
       },
       methods: {},
