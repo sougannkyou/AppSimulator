@@ -1,21 +1,7 @@
-.fileinput-button {
-    position: relative;
-    display: inline-block;
-    overflow: hidden;
-}
-
-.fileinput-button input {
-    position: absolute;
-    left: 0;
-    top: 0;
-    opacity: 0;
-    -ms-filter: 'alpha(opacity=0)';
-}
-
 img {
     width: 500px;
     border-radius: 5px;
-    border: 1px dashed gray;
+    border: 1px solid steelblue;
     margin: 5px 5px 5px 5px;
 }
 
@@ -26,7 +12,7 @@ table {
 th {
     font-size: large;
     padding: 2px 2px 2px 2px;
-    background-color: #0d6aad;
+    background-color: steelblue;
 }
 
 tr {
