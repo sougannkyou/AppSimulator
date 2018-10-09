@@ -1,9 +1,15 @@
-0） 电源计划 
+[PC]
+zhxg/zhxg2018
+-- 电源计划 
  高性能
  关闭显示器时间：从不
 
-1) 设置桥接
------------------------------------------
+-- 设置桥接
+
+[进入开发者模式]
+
+[解锁]
+使用 adb shell 的 rm /data/system/gesture.key  
 
 [PC]
 48:4D:7E:D9:B4:4D   172.16.2.109    (7500 + 8G + SSD-512G)  (pc@zhxg)
@@ -17,7 +23,7 @@
 [VM] 使用桥接
 00:0c:29:04:ca:80   172.16.2.101 
 00:0c:29:f4:b2:63   172.16.2.102
-00:0c:29:0a:00:94   172.16.2.104    tester-1    
+00:0c:29:0a:00:94   172.16.2.104    tester-1
 00:0c:29:f7:e3:2b   172.16.2.105    tester-2     
 00:0c:29:3c:91:27   172.16.2.106    tester-3   
 00:0c:29:e9:ca:4e   172.16.2.107         
@@ -33,7 +39,7 @@
 
 ------------------------------------------
 
-2) VM-win7设置登录免密（netplwiz 命令）
+[免密登录] VM-win7设置（netplwiz 命令）
 win7_64/zhxg2018
 vmrun -T ws -gu win7_64 -gp zhxg2018 captureScreen "c:\VMware\VM\vm1\Windows 7 x64.vmx" c:\vmware\vm\1.png
 
@@ -45,19 +51,19 @@ MONGODB_SERVER_IP = 172.16.2.109
 MONGODB_SERVER_PORT = 27017
 REDIS_SERVER_IP = 172.16.2.109
 
-4) FTP  
+[FTP]  
 ftp://172.16.253.37/
 host = '172.16.253.37'
 username = 'ControllerManager'
 password = 'zhxg2018'
     
-5）python3 pip install
+[python3 pip install]
 python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
 pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements_web.txt
 pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements_controller.txt
 #pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple psutil pandas opencv-python==3.4.1.15 Pillow aircv pypiwin32 protobuf grpcio grpcio-tools pyautogui==0.9.36 matplotlib opencv-contrib-python
 
-6)数据结构
+[数据结构]
 [taskId]
 {
     "_id" : "counter",

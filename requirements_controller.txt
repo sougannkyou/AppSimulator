@@ -9,3 +9,4 @@ protobuf==3.6.0
 pyautogui==0.9.36
 matplotlib==2.2.2
 opencv-contrib-python==3.4.2.17
+baidu-aip
