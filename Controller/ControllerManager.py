@@ -59,7 +59,7 @@ class Manager(object):
             self._log('<<error>> _check', msg)
             return False, msg
 
-    def nox_run_script1(self, task_info):
+    def __nox_run_script(self, task_info):
         _stdout = ''
         _stderr = ''
         try:
@@ -84,7 +84,7 @@ class Manager(object):
             time.sleep(1)
             return True
 
-    def nox_run_script2(self, task, docker_name):
+    def ___nox_run_script(self, task, docker_name):
         try:
             script = 'Controller.' + task['script'][:-3]
             importlib.invalidate_caches()

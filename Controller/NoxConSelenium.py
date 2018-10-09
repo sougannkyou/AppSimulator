@@ -62,12 +62,13 @@ class NoxConSelenium(NoxConADB):
         return True
 
     def get_capture(self):
-        capture_default_path = self._work_path + '\\Controller\\images\\temp\\default.png'
-        capture_name = 'capture_' + self._docker_name + '.png'
-        capture_before_name = 'capture_' + self._docker_name + '_before.png'
-        capture_path = self._work_path + '\\Controller\\images\\temp\\' + capture_name
-        capture_before_path = self._work_path + '\\Controller\\images\\temp\\' + capture_before_name
-        static_capture_path = self._work_path + '\\static\\AppSimulator\\images\\temp\\emulators\\' + capture_name
+        capture_default_path = '{}\\Controller\\images\\temp\\default.png'.format(self._work_path)
+        capture_name = 'capture_{}.png'.format(self._docker_name)
+        capture_before_name = 'capture_{}_before.png'.format(self._docker_name)
+        capture_path = '{}\\Controller\\images\\temp\\{}'.format(self._work_path, capture_name)
+        capture_before_path = '{}\\Controller\\images\\temp\\{}'.format(self._work_path, capture_before_name)
+        static_capture_path = '{}\\static\\AppSimulator\\images\\temp\\emulators\\{}'.format(
+            self._work_path, capture_name)
 
         if not os.access(capture_before_path, os.R_OK):
             shutil.copy(capture_default_path, capture_before_path)
@@ -83,16 +84,16 @@ class NoxConSelenium(NoxConADB):
                 shutil.copy(capture_path, capture_before_path)
 
         # emulator ==> pc temp  可能获取失败
-        self.adb_shell("screencap -p /sdcard/" + capture_name)
-        self.adb_cmd("pull /sdcard/" + capture_name + " " + self._work_path + '\\Controller\\images\\temp')
+        self.adb_shell("screencap -p /sdcard/{}".format(capture_name))
+        self.adb_cmd("pull /sdcard/{} {}\\Controller\\images\\temp".format(capture_name, self._work_path))
 
         self._capture_obj = ac.imread(capture_path)
         # pc temp ==> pc static
-        if os.access(static_capture_path, os.R_OK):
-            shutil.copy(capture_path, static_capture_path)
+        # if os.access(static_capture_path, os.R_OK):
+        shutil.copy(capture_path, static_capture_path)
 
     def find_element(self, comment, timeout, threshold=0.7, rect=(0, 25, 480, 800)):
-        img_obj = ac.imread(self._work_path + '\\Controller\\' + self._PIC_PATH[comment])
+        img_obj = ac.imread('{}\\Controller\\{}'.format(self._work_path, self._PIC_PATH[comment]))
         while timeout > 0:
             self.get_capture()
             pos = ac.find_template(self._capture_obj, img_obj, threshold=threshold)
