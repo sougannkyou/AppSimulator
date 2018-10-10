@@ -8,7 +8,7 @@ const SET_NAME = "xiaohongshu_meilinkai";
 
 function save_data(data) {
   request.post(URL, {form: {"content": JSON.stringify(data), "task_id": SET_NAME}}, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
+    if (!error && response.statusCode === 200) {
       console.log(body) // 请求成功的处理逻辑
     }
   });
@@ -23,7 +23,7 @@ module.exports = {
 
       if (statusCode === 200 || statusCode === 206 || statusCode === 301 || statusCode === 302) {
         let detailUrl = requestDetail.url;
-        if (detailUrl.indexOf("www.xiaohongshu.com/api/sns/v9/note") != -1) {
+        if (detailUrl.indexOf("www.xiaohongshu.com/api/sns/v9/note") !== -1) {
           let body = JSON.parse(new Buffer(newResponse.body, 'base64').toString())
           let title = body.data.share_info.content;
           let ctimestamp = body.data.post_time * 1000 - 3600 * 8 * 1000;
