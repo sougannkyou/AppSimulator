@@ -82,7 +82,7 @@ class NoxConADB(object):
 
     def get_android_version(self):
         self._clean()
-        time.sleep(20)
+        time.sleep(20)  # 6.2.37
         self.adb_shell("getprop ro.build.version.release")
         return self._stdout
 
