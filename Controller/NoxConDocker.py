@@ -53,9 +53,9 @@ class NoxConDocker(object):
             self.add_deadly_msg('docker_precheck', '未找到镜像文件: {}'.format(self._docker_img_name))
             return False
 
-        if len(self.docker_ps(docker_name='nox-org')) == 0:
-            self.add_deadly_msg('docker_precheck', '未找到 nox-org.')
-            return False
+        # if len(self.docker_ps(docker_name='nox-org')) == 0:
+        #     self.add_deadly_msg('docker_precheck', '未找到 nox-org.')
+        #     return False
 
         running_dockers = self.docker_ps(docker_status=STATUS_DOCKER_RUN_OK)
         if len(running_dockers) >= len(TIMER):
@@ -186,8 +186,9 @@ class NoxConDocker(object):
     def docker_add(self):
         self._log('docker_add', self._docker_name)
         time.sleep(2)
-        ret = self.docker_exec_nox_cmd(self.docker_make_cmd("add -name:" + self._docker_name))
-        # ret = self._exec_nox_cmd(self._make_cmd("add -name:" + self._docker_name + ' -systemtype:4')) # nox 6.2.1
+        # ret = self.docker_exec_nox_cmd(self.docker_make_cmd("add -name:" + self._docker_name))
+        ret = self.docker_exec_nox_cmd(self.docker_make_cmd(
+            "add -name:" + self._docker_name + ' -systemtype:4'))  # nox 6.2.1
         time.sleep(2)
         return False if ret.find('failed') != -1 or \
                         ret.find('not') != -1 or \
