@@ -8,7 +8,7 @@ from AppSimulator.views import (
 
 from AppSimulator.WebAPI import (
     addTaskAPI, removeTaskAPI, getTasksAPI, getTasksCntAPI, getEmulatorsAPI, getHeatmapAPI, getHeatmapFamilyAPI,
-    getResultSampleAPI, getDevicesStatusAPI,
+    getDevicesStatusAPI,
     startProxyServerAPI,
     getProxyServerInfoAPI,
     runTasksAPI,
@@ -33,7 +33,6 @@ urlpatterns = patterns('',
                        url(r'^getTasksCntAPI/$', getTasksCntAPI, name='getTasksCntAPI'),
 
                        url(r'^getDevicesStatusAPI/$', getDevicesStatusAPI, name='getDevicesStatusAPI'),
-                       url(r'^getResultSampleAPI/$', getResultSampleAPI, name='getResultSampleAPI'),
                        url(r'^startProxyServerAPI/$', startProxyServerAPI, name='startProxyServerAPI'),
 
                        url(r'^runTasksAPI/$', runTasksAPI, name='runTasksAPI'),

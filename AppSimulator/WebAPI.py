@@ -104,18 +104,11 @@ def getDevicesStatusAPI(request):
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 
-def getResultSampleAPI(request):
-    ret = RDB.get_result_sample()
-    output = JsonResponse({
-        'ret': ret,
-    })
-    return HttpResponse(output, content_type='application/json; charset=UTF-8')
-
-
 # ------- tasks ----------------------------------------------------------------
 def addTaskAPI(request):
     app_name = request.POST.get('app_name')
     script = request.POST.get('script')
+    redis_key = request.POST.get('redis_key')
     ip = request.POST.get('ip')
     live_cycle = request.POST.get('live_cycle', 'once')
     schedule_start = request.POST.get('schedule_start')
@@ -127,6 +120,7 @@ def addTaskAPI(request):
 
     ret = MDB.emulator_add_task({
         'script': script,
+        'redis_key': redis_key,
         'ip': ip,
         'app_name': app_name,
         'live_cycle': live_cycle,
@@ -224,12 +218,12 @@ def getHeatmapFamilyAPI(request):
     taskId = int(request.GET.get('taskId', -1))
     ret = [
         ['times', 'crawlCnt', 'taskId'],
-        [80, 58, 'task-10'],
-        [60, 78, 'task-11'],
-        [40, 127, 'task-12'],
-        [80, 791, 'task-13'],
-        [20, 918, 'task-14'],
-        [100, 201, 'task-15']
+        [80, 5, 'task-10'],
+        [60, 7, 'task-11'],
+        [40, 12, 'task-12'],
+        [80, 79, 'task-13'],
+        [20, 91, 'task-14'],
+        [100, 20, 'task-15']
     ]
     parent = MDB.tasks.find_one({'taskId': taskId})
     if parent:

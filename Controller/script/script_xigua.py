@@ -88,13 +88,16 @@ if __name__ == "__main__":
     if APPSIMULATOR_MODE == MODE_SINGLE:
         taskId = -1
         timer_no = -1
+        redis_key = 'test'
     else:
         taskId = sys.argv[1]
         timer_no = int(sys.argv[2])
+        redis_key = sys.argv[3]
 
     task = {
         'taskId': taskId,
         'app_name': 'xigua',
+        'redis_key': redis_key,
         'docker_name': 'nox-' + str(taskId),
         'timer_no': timer_no
     }

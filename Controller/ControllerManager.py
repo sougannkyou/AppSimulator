@@ -110,8 +110,13 @@ class Manager(object):
                 timer_no = -1
 
             ##################################################################################################
-            cmd = 'START "task-{}" python {}\Controller\\script\\{} {} {}'.format(
-                task_info['taskId'], self._work_path, task_info['script'], task_info['taskId'], timer_no
+            cmd = 'START "task-{}" python {}\Controller\\script\\{} {} {} {}'.format(
+                task_info['taskId'],
+                self._work_path,
+                task_info['script'],
+                task_info['taskId'],
+                timer_no,
+                task_info['redis_key']
             )
             self._log('<<info>> run_script cmd:\n', cmd)
             os.system(cmd)

@@ -128,6 +128,7 @@ class MongoDriver(object):
             "taskId": taskId,
             "orgTaskId": task['orgTaskId'] if task['orgTaskId'] != 0 else task['taskId'],  # 初始taskId
             "script": task['script'],
+            "redis_key": task['redis_key'],
             "app_name": task['app_name'],
             "status": STATUS_WAIT,
             "live_cycle": task['live_cycle'],

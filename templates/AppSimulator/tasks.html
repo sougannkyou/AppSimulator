@@ -24,11 +24,12 @@
             <tr>
               <th width="3%">TaskId</th>
               <th width="3%">From</th>
-              <th width="10%">APP</th>
-              <th width="10%">IP</th>
-              <th width="10%">Script</th>
-              <th width="10%">Image Name</th>
-              <th width="10%">Description</th>
+              <th width="8%">APP</th>
+              <th width="8%">IP</th>
+              <th width="8%">Script</th>
+              <th width="8%">RedisKey</th>
+              <th width="8%">Image Name</th>
+              <th width="8%">Description</th>
               <th width="5%">Live Cycle</th>
               <th width="10%">Schedule</th>
               <th width="5%">Timer</th>
@@ -53,6 +54,9 @@
               </td><!-- IP -->
               <td><!-- Script -->
                 <input type="text" v-model="task.script" style="width:120px" placeholder="script">
+              </td>
+              <td><!-- RedisKey -->
+                <input type="text" v-model="task.redis_key" style="width:120px" placeholder="save redis key">
               </td>
               <td><!-- Docker Image Name nox-miaopai.npbk -->
                 <input type="text" v-model="task.docker_img_name" style="width:120px" placeholder="npbk name">
@@ -82,9 +86,9 @@
               <td>N/A</td><!-- End Time -->
               <td>N/A</td><!-- Spend Time -->
               <td><!-- Operation -->
-                <button v-on:click="addTask" title="add task" v-bind:disabled="task.app_name==''"
-                        class="btn btn-primary">
-                  <i class="fa fa-fw fa-2x fa-plus-square-o"></i>
+                <button v-on:click="addTask" title="add task" class="btn btn-primary"
+                        v-bind:disabled="task.app_name==''||task.redis_key==''||task.docker_img_name==''">
+                  <i class="fa fa-fw fa-plus"></i>
                 </button>
               </td>
             </tr>
@@ -100,6 +104,7 @@
               </td>
               <td>[[ t.host_ip ]]</td>
               <td>[[ t.script ]]</td>
+              <td>[[ t.redis_key ]]</td>
               <td>[[ t.docker_img_name ]]</td>
               <td>[[ t.description ]]</td>
               <td>[[ t.live_cycle ]]</td>
@@ -109,7 +114,7 @@
                 <div class="schedule">run:&nbsp;&nbsp;&nbsp;[[ t.schedule.run_time ]]</div>
                 <div class="schedule">cycle:&nbsp;[[ t.schedule.cycle ]] minus</div>
               </td>
-              <td>[[ t.timer_on ]]</td>
+              <td>[[ t.timer ]]</td>
               <td>
                 <span v-bind:class="[t.status.indexOf('_ok')!=-1?'label label-success':
                 (t.status.indexOf('_ng')!=-1?'label label-danger':'label label-default')]">[[ t.status ]]
@@ -193,6 +198,7 @@
         type: 'POST',
         data: {
           script: obj.task.script,
+          redis_key: obj.task.redis_key,
           ip: obj.task.ip,
           app_name: obj.task.app_name,
           live_cycle: obj.task.live_cycle,
@@ -248,6 +254,7 @@
           ip: '',
           port: '等待分配',
           script: '',
+          redis_key: '',
           host_type: 'emulator',
           live_cycle: 'never',
           schedule: {
@@ -270,11 +277,13 @@
           if (this.task.app_name !== app_name) {
             this.task.app_name = app_name;
             this.task.script = 'script_' + app_name + '.py';
+            this.task.redis_key = app_name;
             this.task.docker_img_name = 'nox-' + app_name + '.npbk';
             this.task.description = '用于 ' + app_name + ' App的采集';
           } else {
             this.task.app_name = '';
             this.task.script = '';
+            this.task.redis_key = '';
             this.task.docker_img_name = '';
             this.task.description = '';
           }

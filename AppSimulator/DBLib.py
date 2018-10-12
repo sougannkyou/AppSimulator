@@ -12,12 +12,8 @@ from AppSimulator.Common import *
 # ------------------------ web server db lib ----------------------
 class RedisDriver(object):
     def __init__(self):
-        self._conn = redis.StrictRedis.from_url(REDIS_SERVER)
-
-    def get_result_sample(self):
-        cnt = self._conn.llen('douyin_data')
-        ret = self._conn.blrange('douyin_data', -1, -1)
-        return ret
+        self._conn = redis.Redis(host=REDIS_SERVER, port='6379', db=10, decode_responses=True)
+        self._conn_result = redis.Redis(host=REDIS_SERVER_RESULT, port='6379', db=11, decode_responses=True)
 
     def get_devices_ip_list(self, app_name):
         l = []
@@ -32,7 +28,11 @@ class RedisDriver(object):
         crawl_cnt = 0
         try:
             # devices:172.16.250.199:task-1
-            crawl_cnt = self._conn.scard('devices:{}:task-{}'.format(ip, taskId))
+            k = 'devices:{}:task-{}'.format(ip, taskId)
+            # pprint(self._conn_result.keys())
+            if k in self._conn_result.keys(k):
+                crawl_cnt = self._conn_result.scard(k)
+                print(k, crawl_cnt)
         except Exception as e:
             print('<<error>> get_crawl_cnt_by_taskId:', e)
         return crawl_cnt
@@ -230,6 +230,7 @@ class MongoDriver(object):
             "taskId": taskId,
             "orgTaskId": 0,
             "script": task['script'],
+            "redis_key": task['redis_key'],
             "app_name": task['app_name'],
             "status": STATUS_WAIT,
             "live_cycle": task['live_cycle'],
@@ -387,11 +388,8 @@ class MongoDriver(object):
 
 # ------------------------ server db lib ----------------------
 if __name__ == '__main__':
-    # from .setting import
-    # r = RedisDriver()
-    # pprint(r.get_crwal_cnt_by_device())
+    r = RedisDriver()
+    pprint(r.get_crawl_cnt_by_taskId(ip='172.16.2.110', taskId=10202))
 
-    info = {'device1': 10, 'device2': 20, 'device3': 30, 'device4': 40}
-    db = MongoDriver()
+    # db = MongoDriver()
     # db.update_device_statistics_info(info, SCOPE_TIMES)
-    pprint(db.emulator_get_start_by_day(22, '2018-09-03'))

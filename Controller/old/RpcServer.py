@@ -28,7 +28,7 @@ def reset_vm(docker_name):
 def set_app_name_to_vm(docker_name, app_name):
     # docker_name: vm1 vm2 vm3
     os.system(
-        'vmrun.exe  -T ws -gu "zhxg" -gp "zhxg2018" CopyFileFromHostToGuest "c:\VMWare\VM\\vm1\Windows 7 x64.vmx"  %APPSIMULATOR_WORK_PATH%"\cmd\\app.conf"')
+        'vmrun.exe  -T ws -gu "zhxg" -gp "zhxg2018" CopyFileFromHostToGuest "c:\VMWare\VM\\vm1\Windows 7 x64.vmx"  %APPSIMULATOR_WORK_PATH%"\cmd\\save_redis_key.conf"')
     os.system('vmrun.exe reset "c:\VMWare\VM\\' + docker_name + '\Windows 7 x64.vmx"')
     return True
 

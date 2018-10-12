@@ -36,6 +36,7 @@ class NoxConADB(object):
         self._console_binary = CONSOLE_BINARY_PATH
         self._adb_binary = ADB_BINARY_PATH
         self._app_name = task_info['app_name']
+        self._redis_key = task_info['redis_key']
         self._docker_name = str(task_info['taskId']) if str(task_info['taskId']).startswith('nox') \
             else 'nox-' + str(task_info['taskId'])
         self._timer_no = task_info['timer_no']
@@ -131,15 +132,15 @@ class NoxConADB(object):
             cmd_str = self._adb_binary + ' ' + cmd
         return cmd_str
 
-    def _set_task_conf(self):
-        f = open(self._work_path + '\\cmd\\app.conf', 'w')
-        self._log('<<info>> write app.conf:', datetime.now().strftime('%H:%M:%S %f'))
-        f.write('task-' + str(self._taskId))
+    def _set_save_redis_key(self):
+        f = open(self._work_path + '\\cmd\\save_redis_key.conf', 'w')
+        self._log('<<info>> save_redis_key:', self._redis_key)  # datetime.now().strftime('%H:%M:%S %f')
+        f.write(str(self._redis_key))
         f.close()
 
     def adb_cmd_before(self, cmdline):
         # overwrite NoxConADB adb_cmd_before
-        self._set_task_conf()
+        self._set_save_redis_key()
         if self.mode == MODE_MULTI and self._timer_flg and self._timer_no >= 0:
             cycle = 3 * len(TIMER)
             now = datetime.now().second % cycle

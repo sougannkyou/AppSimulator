@@ -1,13 +1,12 @@
 # coding=utf-8
 import os
 
-
 PAGE_SIZE = 20
 
 # ---------------------- db -----------------------------
-# REDIS_SERVER = 'redis://' + os.environ["REDIS_SERVER_IP"] + '/11'
-REDIS_SERVER = 'redis://172.16.253.232/11'
-REDIS_SERVER_RESULT = 'redis://' + os.environ["REDIS_SERVER_IP"] + '/10'
+REDIS_SERVER = os.environ["REDIS_SERVER_IP"]
+# REDIS_SERVER_RESULT = os.environ["REDIS_SERVER_IP"]
+REDIS_SERVER_RESULT = '192.168.174.130'
 
 MONGODB_SERVER_IP = os.environ["MONGODB_SERVER_IP"]
 MONGODB_SERVER_PORT = int(os.environ["MONGODB_SERVER_PORT"])
