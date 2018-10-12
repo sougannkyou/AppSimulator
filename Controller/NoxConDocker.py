@@ -109,11 +109,11 @@ class NoxConDocker(object):
         # os.system(cmd)
 
     def docker_shake(self, cnt):
-        shell = win32com.client.Dispatch("WScript.Shell")
-        shell.SendKeys('%')
-        hwnd = win32gui.FindWindow(None, self._docker_name)
-        if hwnd:
-            win32gui.SetForegroundWindow(hwnd)
+        # shell = win32com.client.Dispatch("WScript.Shell")
+        # shell.SendKeys('%')
+        # hwnd = win32gui.FindWindow(None, self._docker_name)
+        # if hwnd:
+        #     win32gui.SetForegroundWindow(hwnd)
 
         self._log('<<info>> docker_shake', str(cnt) + ' times')
         for _ in range(cnt):

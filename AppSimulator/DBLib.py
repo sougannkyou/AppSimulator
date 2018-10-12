@@ -136,7 +136,7 @@ class MongoDriver(object):
         else:
             cond = {'status': {'$ne': 'disable'}}
 
-        tasks = self.tasks.find(cond)
+        tasks = self.tasks.find(cond).sort('host_ip', pymongo.ASCENDING)
         for task in tasks:
             task.pop('_id')
             task.pop('dockerId')
