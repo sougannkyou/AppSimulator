@@ -257,8 +257,10 @@ class Manager(object):
                 if cnt:
                     self._log('<<info>> run_schedule', 'reset {} tasks to wait status.'.format(cnt))
                 ###############################################
-
-                self._log('<<ignore>> start_tasks', 'not found waiting task, retry after 60s.')
+                if msg:
+                    self._log('<<info>> start_tasks', msg)
+                else:
+                    self._log('<<ignore>> start_tasks', 'not found waiting task, retry after 60s.')
                 time.sleep(1 * 60)
 
     # --------------------------- vmwares --------------------------------------------------------

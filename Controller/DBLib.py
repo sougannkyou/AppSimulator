@@ -112,7 +112,7 @@ class MongoDriver(object):
 
         if task:
             self.tasks.update({'_id': task['_id']}, {'$set': {'host_ip': LOCAL_IP}})
-            return task, 'ok'
+            return task, ''
 
         return None, ''
 
