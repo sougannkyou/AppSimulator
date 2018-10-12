@@ -61,11 +61,16 @@ class ColorLog(object):
 def common_log(_DEBUG, taskId, func, prefix, msg):
     # keyword <<ignore>> db black list
     if APPSIMULATOR_MODE == MODE_MULTI and prefix.find('<<ignore>>') == -1:
-        MDB.log(taskId, func, prefix, msg)
+        MDB.save_log(taskId, func, prefix, msg)
 
     # keyword error <<info>> print white list
     if _DEBUG or prefix.find('error') != -1 or prefix.find('<<info>>') != -1:
         print("{} [{}]".format(datetime.now().strftime('%H:%M:%S'), func), prefix, msg)
+
+
+def common_action(taskId, action, msg):
+    if APPSIMULATOR_MODE == MODE_MULTI:
+        MDB.save_action(taskId, action, msg)
 
 
 def common_exec_cmd(_DEBUG, cmdline):

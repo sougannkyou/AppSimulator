@@ -22,7 +22,7 @@ class RedisDriver(object):
             name = key.decode('utf-8')
             if name.startswith('devices:' + app_name + ':') and name.endswith('_org'):
                 l.append(name.split(':')[2][:-4])
-        print("get_devices_ip_list:", l)
+        print("[DBLib]<<info>> get_devices_ip_list:", l)
         return l
 
     def get_vmware_shareLink_cnt(self, ip, app_name):
@@ -36,6 +36,7 @@ class MongoDriver(object):
         self._client = pymongo.MongoClient(host=MONGODB_SERVER_IP, port=MONGODB_SERVER_PORT)
         self._db = self._client.AppSimulator
         self.activeInfo = self._db.activeInfo
+        self.action = self._db.action
         self.deviceConfig = self._db.deviceConfig
         self.hosts = self._db.hosts
         self.tasks = self._db.tasks
@@ -48,7 +49,7 @@ class MongoDriver(object):
     #     common_log(self._DEBUG, '[Controller DB]', prefix, msg)
 
     # ---------- log -----------------------
-    def log(self, taskId, func, prefix, msg):
+    def save_log(self, taskId, func, prefix, msg):
         try:
             self.logger.insert({
                 'time': int(datetime.now().timestamp()),
@@ -59,7 +60,22 @@ class MongoDriver(object):
                 'msg': msg.decode('gbk') if isinstance(msg, bytes) else msg
             })
         except Exception as e:
-            print('mongodb connect error\n', e)
+            print('[DBLib]<<error>> save log:\n', e)
+
+    def save_action(self, taskId, action, msg):
+        try:
+            self.action.update(
+                {'taskId': taskId, 'action': action},
+                {"$set": {
+                    'taskId': int(taskId) if taskId and isinstance(taskId, str) else taskId,
+                    'action': action,
+                    'msg': msg.decode('gbk') if isinstance(msg, bytes) else msg,
+                    'cnt': 0,
+                    'time': int(datetime.now().timestamp()),
+                }},
+                upsert=True)
+        except Exception as e:
+            print('[DBLib]<<error>> save action:\n', e)
 
     # ---------- tasks -----------------------
     def task_get_timer_no(self, host_ip):
