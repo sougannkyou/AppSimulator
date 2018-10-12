@@ -139,6 +139,7 @@ class NoxConADB(object):
 
     def adb_cmd_before(self, cmdline):
         # overwrite NoxConADB adb_cmd_before
+        self._set_task_conf()
         if self.mode == MODE_MULTI and self._timer_flg and self._timer_no >= 0:
             cycle = 3 * len(TIMER)
             now = datetime.now().second % cycle
@@ -151,7 +152,6 @@ class NoxConADB(object):
             self._log('<<info>> timer_no:{}'.format(self._timer_no),
                       'will run at {} (sleep {} s)'.format(tobe, wait_time))
             time.sleep(wait_time)
-            self._set_task_conf()
             self._log('<<info>>[adb_cmd] {}\n'.format(datetime.now().strftime('%H:%M:%S %f')), cmdline)
         else:
             self._log('<<info>>[adb_cmd]\n\t', cmdline)

@@ -7,7 +7,14 @@
 {% endblock header_tail %}
 
 {% block section_content %}
-  <h1 style="alignment:center">Tasks Start</h1>
+  <div class="box-header">
+    <h3 class="box-title">Tasks start frequency</h3>
+    <div class="box-tools">
+      <a class="btn btn-primary" title="back" href="/AppSimulator/dashboard/">
+        <i class="fa fa-fw fa-lg fa-arrow-left pull-right"></i>
+      </a>
+    </div>
+  </div>
   <div id="tasks" style="height:600px"></div>
   <div id="main" style="height:400px">
     <div id="children"></div>
@@ -116,7 +123,7 @@
         type: 'GET',
         data: {
           taskIdList: JSON.stringify(taskIdList),
-          day: '2018-09-12'
+          day: '2018-10-12'
         },
         dataType: "json",
         error: function (xhr, err) {

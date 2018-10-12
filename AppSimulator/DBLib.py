@@ -29,8 +29,13 @@ class RedisDriver(object):
         return l
 
     def get_crawl_cnt_by_taskId(self, ip, taskId):
-        # devices:172.16.250.199:task-1
-        return self._conn.scard('devices:{}:task-{}'.format(ip, taskId))
+        crawl_cnt = 0
+        try:
+            # devices:172.16.250.199:task-1
+            crawl_cnt = self._conn.scard('devices:{}:task-{}'.format(ip, taskId))
+        except Exception as e:
+            print('<<error>> get_crawl_cnt_by_taskId:', e)
+        return crawl_cnt
 
     def get_crwal_cnt_by_device(self, app_name):
         keys = [x.decode('utf8') for x in self._conn.keys()]
