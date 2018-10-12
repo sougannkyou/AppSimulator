@@ -1,5 +1,5 @@
 @ECHO OFF
-echo now update source from git
+echo now clone projext from git
 cd %APPSIMULATOR_WORK_PATH%\..
 RMDIR /Q /S AppSimulator
 REM C:\Git\bin\git pull https://github.com/sougannkyou/AppSimulator.git
