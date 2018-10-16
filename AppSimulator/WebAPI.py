@@ -148,6 +148,13 @@ def removeTaskAPI(request):
     })
     return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
+def resetTaskAPI(request):
+    taskId = request.POST.get('taskId')
+    ret = MDB.emulator_reset_task(int(taskId))
+    output = JsonResponse({
+        'ret': ret
+    })
+    return HttpResponse(output, content_type='application/json; charset=UTF-8')
 
 def getTasksAPI(request):
     # status = request.POST.get('status')

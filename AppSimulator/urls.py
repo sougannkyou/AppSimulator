@@ -7,7 +7,8 @@ from AppSimulator.views import (
 )
 
 from AppSimulator.WebAPI import (
-    addTaskAPI, removeTaskAPI, getTasksAPI, getTasksCntAPI, getEmulatorsAPI, getHeatmapAPI, getHeatmapFamilyAPI,
+    addTaskAPI, removeTaskAPI, resetTaskAPI, getTasksAPI, getTasksCntAPI, getEmulatorsAPI, getHeatmapAPI,
+    getHeatmapFamilyAPI,
     getDevicesStatusAPI,
     startProxyServerAPI,
     getProxyServerInfoAPI,
@@ -29,6 +30,7 @@ urlpatterns = patterns('',
                        url(r'^log/$', LoggerView.as_view(), name='log'),
                        url(r'^addTaskAPI/$', addTaskAPI, name='addTaskAPI'),
                        url(r'^removeTaskAPI/$', removeTaskAPI, name='removeTaskAPI'),
+                       url(r'^resetTaskAPI/$', resetTaskAPI, name='resetTaskAPI'),
                        url(r'^getTasksAPI/$', getTasksAPI, name='getTasksAPI'),
                        url(r'^getTasksCntAPI/$', getTasksCntAPI, name='getTasksCntAPI'),
 

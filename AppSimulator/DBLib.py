@@ -253,6 +253,10 @@ class MongoDriver(object):
         })
         return True
 
+    def emulator_reset_task(self, taskId):
+        self.tasks.update({"taskId": taskId}, {'$set': {'status': STATUS_WAIT}})
+        return True
+
     def emulator_get_one_wait_task(self):
         task = self.tasks.find_one({'status': STATUS_WAIT, 'host_ip': ''})
         if task:

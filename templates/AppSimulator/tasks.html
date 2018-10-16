@@ -24,12 +24,12 @@
             <tr>
               <th width="3%">TaskId</th>
               <th width="3%">From</th>
-              <th width="8%">APP</th>
-              <th width="8%">IP</th>
-              <th width="8%">Script</th>
-              <th width="8%">RedisKey</th>
-              <th width="8%">Image Name</th>
-              <th width="8%">Description</th>
+              <th width="10%">APP</th>
+              <th width="5%">IP</th>
+              <th width="5%">Script</th>
+              <th width="5%">RedisKey</th>
+              <th width="5%">Image Name</th>
+              <th width="5%">Description</th>
               <th width="5%">Live Cycle</th>
               <th width="10%">Schedule</th>
               <th width="5%">Timer</th>
@@ -125,6 +125,7 @@
               <td>[[ t.spend_time ]]</td>
               <td>
                 <i v-on:click="removeTask(t.taskId)" class="fa fa-fw fa-2x fa-minus-square-o" title="remove task"></i>
+                <i v-on:click="resetTask(t.taskId)" class="fa fa-fw fa-2x fa-recycle" title="reset"></i>
               </td>
             </tr>
             </tbody>
@@ -242,6 +243,26 @@
       $.ajax(opt);
     }
 
+    function resetTask(taskId) {
+      let opt = {
+        url: '/AppSimulator/resetTaskAPI/',
+        type: 'POST',
+        data: {
+          taskId: taskId
+        },
+        dataType: "json",
+        error: function (xhr, err) {
+          mainVue.msg = "failure";
+          console.error("[tasks] resetTaskAPI", err);
+        },
+        success: function (data, status) {
+          mainVue.msg = "success";
+          getTasks(mainVue);
+        }
+      };
+      $.ajax(opt);
+    }
+
     //----------------------------------------------------------------------------
     Vue.config.delimiters = ['[[', ']]'];
     //----------------------------------------------------------------------------
@@ -294,6 +315,9 @@
         },
         removeTask: function (taskId) {
           removeTask(taskId);
+        },
+        resetTask: function (taskId) {
+          resetTask(taskId);
         }
       },
       created: function () {

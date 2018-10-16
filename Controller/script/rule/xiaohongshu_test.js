@@ -1,9 +1,5 @@
 // const redis = require("redis");
 const redis = require("C:\\Users\\zhxg\\AppData\\Roaming\\npm\\node_modules\\redis\\index.js");
-// const client = redis.createClient(6379, '192.168.31.227', {});
-//const client = redis.createClient(6379, '172.16.253.37', {});
-//const client = redis.createClient(6379, '172.16.253.147', {});
-//const client = redis.createClient(6379, '172.16.253.232', {});
 // const client = redis.createClient(6379, '192.168.17.109', {});
 const client = redis.createClient(6379, '172.16.2.109', {});
 const set_name = "xiaohongshu_meilinkai";
