@@ -235,30 +235,35 @@ class Manager(object):
         while True:
             task, msg = self._mdb.task_get_one_for_run()
             if task:
-                # 1) 模拟器启动
-                task['status'] = STATUS_DOCKER_RUN
-                self._mdb.task_change_status(task)
-
-                #    模拟器启动失败则重试3次
-                docker = NoxConDocker(task_info=task)
-                ret = self.nox_start(task=task, docker=docker)
-
-                # 2) 模拟器启动：成功/失败
-                task['status'] = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
-                self._mdb.task_change_status(task)
-
-                if ret:  # 3) 脚本启动：成功/失败
-                    ###############################################
-                    ret, msg = self.nox_run_script(task_info=task)
-                    ###############################################
-                    if ret:
-                        task['status'] = STATUS_SCRIPT_START_OK
-                    elif msg == 'timer_no':  # 系统无法获取可用 timer_no
-                        task['status'] = STATUS_WAIT
-                    else:
-                        task['status'] = STATUS_SCRIPT_START_NG
-
+                try:
+                    # 1) 模拟器启动
+                    task['status'] = STATUS_DOCKER_RUN
                     self._mdb.task_change_status(task)
+
+                    #    模拟器启动失败则重试3次
+                    docker = NoxConDocker(task_info=task)
+                    ret = self.nox_start(task=task, docker=docker)
+
+                    # 2) 模拟器启动：成功/失败
+                    task['status'] = STATUS_DOCKER_RUN_OK if ret else STATUS_DOCKER_RUN_NG
+                    self._mdb.task_change_status(task)
+
+                    if ret:  # 3) 脚本启动：成功/失败
+                        ###############################################
+                        ret, msg = self.nox_run_script(task_info=task)
+                        ###############################################
+                        if ret:
+                            task['status'] = STATUS_SCRIPT_START_OK
+                        elif msg == 'timer_no':  # 系统无法获取可用 timer_no
+                            task['status'] = STATUS_WAIT
+                        else:
+                            task['status'] = STATUS_SCRIPT_START_NG
+
+                        self._mdb.task_change_status(task)
+
+                except Exception as e:
+                    self._log('<<error>> task run\n', e)
+
             else:
                 ###############################################
                 cnt = self.nox_schedule()
