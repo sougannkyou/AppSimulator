@@ -102,6 +102,13 @@ class MongoDriver(object):
     def host_register_service(self, controller_info):
         self.hosts.update({'ip': controller_info['ip']}, {"$set": controller_info}, upsert=True)
 
+    def task_reset(self):
+        # {'n': 1, 'nModified': 1, 'ok': 1.0, 'updatedExisting': True}
+        # {'n': 0, 'nModified': 0, 'ok': 1.0, 'updatedExisting': False}
+        info = self.tasks.update({'status': STATUS_DOCKER_RUN, 'host_ip': LOCAL_IP},
+                                 {"$set": {'status': STATUS_WAIT}})
+        return info['nModified']
+
     def task_get_one_for_run(self):
         cnt = self.tasks.find({'status': STATUS_DOCKER_RUN, 'host_ip': LOCAL_IP}).count()
         if cnt > 0:
@@ -329,7 +336,7 @@ class MongoDriver(object):
 # ------------------------ docker db lib ----------------------
 if __name__ == '__main__':
     # from .setting import
-    host_ip = '172.16.253.37'
+    host_ip = '172.16.2.113'  # 172.16.2.113
     info = {'device1': 10, 'device2': 20, 'device3': 30, 'device4': 40}
     db = MongoDriver()
     db._DEBUG = True
@@ -337,4 +344,5 @@ if __name__ == '__main__':
     # pprint(db.task_find_by_taskId(10))
     # db.update_device_statistics_info(info, SCOPE_TIMES)
     # pprint(db.task_get_timer_no(host_ip='172.16.250.199'))
-    db.task_reset_schedule()
+    LOCAL_IP = '172.16.2.113'
+    print(LOCAL_IP, db.task_reset())

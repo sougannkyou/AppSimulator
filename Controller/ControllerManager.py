@@ -228,6 +228,9 @@ class Manager(object):
         return self._mdb.task_schedule()
 
     def nox_run_tasks(self):
+        cnt = self._mdb.task_reset()
+        self._log('<<info>> task_reset', 'reset {} tasks to wait status.'.format(cnt))
+
         # 1)docker running -> 2)docker run ok(ng) -> 3)script run ok(ng)
         while True:
             task, msg = self._mdb.task_get_one_for_run()
