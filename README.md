@@ -13,7 +13,7 @@ zhxg/zhxg2018
 
 [进入开发者模式]
 
-[解锁]
+[锁屏解锁]
 使用 adb shell 的 rm /data/system/gesture.key  
 
 [PC]
